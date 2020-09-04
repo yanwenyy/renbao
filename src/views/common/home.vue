@@ -5,7 +5,7 @@
       <img class="home-bg-jd" src="../../../static/img/bg1.jpg" alt="">
       <div class="home-title">
         <div>欢迎使用</div>
-        <div>金鼎清洁运输管控平台</div>
+        <div>港陆清洁运输管控平台</div>
       </div>
     </div>
     <div class="aobo-logo">

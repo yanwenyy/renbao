@@ -161,6 +161,7 @@
           <el-button slot="reference">批量隐藏列</el-button>
         </el-popover>
         <el-button type="danger" @click="reload()">刷新</el-button>
+        <el-button v-if="isAuth('biz:tran:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <div v-if="dataList" @scroll="barScroll" class="elScrollbar">
@@ -680,7 +681,7 @@
       // 删除
       deleteHandle (id) {
         var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.userId
+          return item.id
         })
         this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
           confirmButtonText: '确定',
