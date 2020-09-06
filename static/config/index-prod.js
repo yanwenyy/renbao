@@ -5,8 +5,8 @@
   window.SITE_CONFIG = {};
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = 'http://27.188.74.31:9080/jinding-back/';
-  window.SITE_CONFIG['wsUrl'] = 'ws://27.188.74.31:9080/jinding-back/imserver/';
+  window.SITE_CONFIG['baseUrl'] = 'http://172.16.48.105:9080/tangshan-back/';
+  window.SITE_CONFIG['wsUrl'] = 'ws://172.16.48.105:9080/tangshan-back/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名
