@@ -6,7 +6,7 @@
 
   // api接口请求地址
   window.SITE_CONFIG['baseUrl'] = 'http://172.16.48.105:9080/tangshan-back/';
-  window.SITE_CONFIG['wsUrl'] = 'ws://172.16.48.105:9080/tangshan-back/';
+  window.SITE_CONFIG['wsUrl'] = 'ws://172.16.48.105:9080/tangshan-back/imserver/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名
