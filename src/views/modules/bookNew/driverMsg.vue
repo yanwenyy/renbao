@@ -1,6 +1,9 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+      <el-form-item label="车牌号:">
+        <el-input v-model="dataForm.carnum" placeholder="车牌号" clearable></el-input>
+      </el-form-item>
       <el-form-item label="开始时间:">
         <el-date-picker
           v-model="dataForm.timeStart"
@@ -130,6 +133,12 @@
         label="排放阶段">
       </el-table-column>
       <el-table-column
+        prop="createDate"
+        header-align="center"
+        align="center"
+        label="录入时间">
+      </el-table-column>
+      <el-table-column
         align="center"
         label="随车清单">
         <template slot-scope="scope">
@@ -187,7 +196,8 @@
           timeStart: '',
           timeEnd: '',
           emissionStand:'',
-          fuelType:''
+          fuelType:'',
+          carnum:''
         },
         token:'',
         imgUrlfront:'',
@@ -247,6 +257,7 @@
           params: this.$http.adornParams({
             'pageNum': this.pageIndex,
             'pageSize': this.pageSize,
+            'carnum': this.dataForm.carnum,
             'timeStart': this.dataForm.timeStart|| '',
             'timeEnd': this.dataForm.timeEnd|| '',
             'emissionStand': this.dataForm.emissionStand,
