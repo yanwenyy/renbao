@@ -521,30 +521,122 @@
         ],
         mgList:[
           {
-            value: '三号门西进口',
-            label: '三号门西进口'
+            value: '7号门',
+            label: '7号门'
           },
           {
-            value: '三号门东进口',
-            label: '三号门东进口'
+            value: '2号门',
+            label: '2号门'
           },
           {
-            value: '北门进口',
-            label: '北门进口'
+            value: '3号门',
+            label: '3号门'
+          },
+          {
+            value: '8号门1号',
+            label: '8号门1号'
+          },
+          {
+            value: '8号门2号',
+            label: '8号门2号'
+          },
+          {
+            value: '6号门',
+            label: '6号门'
+          },
+          {
+            value: '矿渣微粉',
+            label: '矿渣微粉'
+          },
+          {
+            value: '三万制氧',
+            label: '三万制氧'
           },
         ],
         bfList:[
           {
-            value: 'sohao磅',
-            label: 'sohao磅'
+            value: '1号汽车衡',
+            label: '1号汽车衡'
           },
           {
-            value: '一号磅东',
-            label: '一号磅东'
+            value: '2号汽车衡',
+            label: '2号汽车衡'
           },
           {
-            value: '三号西',
-            label: '三号西'
+            value: '3号汽车衡',
+            label: '3号汽车衡'
+          },
+          {
+            value: '5号汽车衡',
+            label: '5号汽车衡'
+          },
+          {
+            value: '6号汽车衡',
+            label: '6号汽车衡'
+          },
+          {
+            value: '7号汽车衡',
+            label: '7号汽车衡'
+          },
+          {
+            value: '8号汽车衡',
+            label: '8号汽车衡'
+          },
+          {
+            value: '9号汽车衡',
+            label: '9号汽车衡'
+          },
+          {
+            value: '10号汽车衡',
+            label: '10号汽车衡'
+          },
+          {
+            value: '21号汽车衡',
+            label: '21号汽车衡'
+          },
+          {
+            value: '22号汽车衡',
+            label: '22号汽车衡'
+          },
+          {
+            value: '23号汽车衡',
+            label: '23号汽车衡'
+          },
+          {
+            value: '25号汽车衡',
+            label: '25号汽车衡'
+          },
+          {
+            value: '26号汽车衡',
+            label: '26号汽车衡'
+          },
+          {
+            value: '27号汽车衡',
+            label: '27号汽车衡'
+          },
+          {
+            value: '28号汽车衡',
+            label: '28号汽车衡'
+          },
+          {
+            value: '29号汽车衡',
+            label: '29号汽车衡'
+          },
+          {
+            value: '18号汽车衡',
+            label: '18号汽车衡'
+          },
+          {
+            value: '17号汽车衡',
+            label: '17号汽车衡'
+          },
+          {
+            value: '19号汽车衡',
+            label: '19号汽车衡'
+          },
+          {
+            value: '20号汽车衡',
+            label: '20号汽车衡'
           },
         ],
         ifJzx:[
