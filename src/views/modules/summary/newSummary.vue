@@ -55,6 +55,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="exportList()">导出</el-button>
         <!--<el-button v-if="" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
         <!--<el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
@@ -305,6 +306,147 @@
       })
     },
     methods: {
+      //导出
+      exportList() {
+        //要导出的json数据
+        this.$http({
+          url: this.$http.adornUrl('/jinding/sum/list/two'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'pageNum': this.pageIndex,
+            'pageSize': 100000000,
+            'timeStart': this.dataForm.timeStart || '',
+            'timeEnd': this.dataForm.timeEnd || '',
+            'meaType': this.dataForm.meaType,
+            'materialsPname': this.dataForm.materialsPname,
+            'emissionStand': this.dataForm.emissionStand,
+            'tranType': this.dataForm.tranType,
+            'materialsName': this.dataForm.materialsName
+          })
+        }).then(({data}) => {
+          if (data && data.code === 10000) {
+            var jsonData = data.data;
+            //列标题
+            let str = '<tr>\n' +
+              '<th rowspan="2">运输类型</th>\n' +
+              '<th rowspan="2">物料大类</th>\n' +
+              '<th rowspan="2">物料名称</th>\n' +
+              '<th colspan="2">铁路</th>\n' +
+              '<th colspan="2">电车</th>\n' +
+              '<th colspan="2">公路（国五及以上车辆）</th>\n' +
+              '<th rowspan="2">清洁运输占比(%)</th>\n' +
+              '</tr>\n' +
+              '<tr>\n' +
+              '<th>车数</th>\n' +
+              '<th>重量</th>\n' +
+              '<th>车数</th>\n' +
+              '<th>重量</th>\n' +
+              '<th>车数</th>\n' +
+              '<th>重量</th>\n' +
+              '</tr>';
+            //循环遍历，每行加入tr标签，每个单元格加td标签
+            for (let i = 0; i < jsonData.length; i++) {
+              var v = jsonData[i];
+              str += ' <tr>\n' +
+                '<td>' + (v.measureType && (v.measureType == 1 ? '采购 ' : '销售')) + '</td>\n' +
+                '<td>' + (v.materialsPname || '') + '</td>\n' +
+                '<td>' + (v.materialsName || '') + '</td>\n' +
+                '<td>' + (v.trainNum) + '</td>\n' +
+                // '<td>' + (v.trains) + '</td>\n' +
+                '<td>' + (v.trainWeigh == 0 || v.trainWeigh % 1 == 0 ? v.trainWeigh : v.trainWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.electNum) + '</td>\n' +
+                // '<td>' + (v.elects) + '</td>\n' +
+                '<td>' + (v.electWeigh == 0 || v.electWeigh % 1 == 0 ? v.electWeigh : v.electWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.carNum) + '</td>\n' +
+                // '<td>' + (v.cars) + '</td>\n' +
+                '<td>' + (v.carWeigh == 0 || v.carWeigh % 1 == 0 ? v.carWeigh : v.carWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.percentage % 1 === 0 ? v.percentage * 100 + '%' : (v.percentage * 100).toFixed(2) + '%') + '</td>\n' +
+                '</tr>';
+            }
+            var hjStr = ' <tr>\n' +
+              '<th>合计类型</th>\n' +
+              '<th>铁路</th>\n' +
+              '<th>电车</th>\n' +
+              '<th>公路</th>\n' +
+              '<th>总计</th>\n' +
+              '<th>清洁运输占比</th>\n' +
+              '</tr>';
+            var list = this.totalList, i = 0, len = list.length, html = '';
+            for (; i < len; i++) {
+              var v = list[i];
+              hjStr += ' <tr>\n' +
+                '<td>' + (v.measureType && (v.measureType == 1 ? '采购 ' : v.measureType == 2 ? '销售 ' : '采购+销售')) + '</td>\n' +
+                '<td>' + (v.trainWeigh == 0 || v.trainWeigh % 1 == 0 ? v.trainWeigh : v.trainWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.electWeigh == 0 || v.electWeigh % 1 == 0 ? v.electWeigh : v.electWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.carWeigh == 0 || v.carWeigh % 1 == 0 ? v.carWeigh : v.carWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.sumWeigh == 0 || v.sumWeigh % 1 == 0 ? v.sumWeigh : v.sumWeigh.toFixed(2)) + '</td>\n' +
+                '<td>' + (v.percentage % 1 === 0 ? v.percentage * 100 + '%' : (v.percentage * 100).toFixed(2) + '%') + '</td>\n' +
+                '</tr>'
+            }
+            //Worksheet名
+            let worksheet = 'Sheet1';
+            let uri = 'data:application/vnd.ms-excel;base64,';
+
+            var tabel = this.parseDom(`<table id="newSummary">${str + hjStr}</table>`);
+            this.autoRowSpan(tabel, 1, 1);
+            this.autoRowSpan(tabel, 1, 0);
+            var htmlTabel = this.nodeToString(tabel[0]);
+            //下载的表格模板数据
+            let template = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+        <x:Name>${worksheet}</x:Name>
+        <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+        </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+        </head><body>${htmlTabel}</body></html>`;
+            //下载模板
+            window.location.href = uri + this.base64(template)
+          }
+        });
+
+      },
+      //输出base64编码
+      base64(s) {
+        return window.btoa(unescape(encodeURIComponent(s)))
+      },
+      nodeToString(node) {
+        //createElement()返回一个Element对象
+        var tmpNode = document.createElement("div");
+        //appendChild()  参数Node对象   返回Node对象  Element方法
+        //cloneNode()  参数布尔类型  返回Node对象   Element方法
+        tmpNode.appendChild(node.cloneNode(true));
+        var str = tmpNode.innerHTML;
+        tmpNode = node = null; // prevent memory leaks in IE
+        return str;
+      },
+      //合并单元格
+      autoRowSpan(tb, row, col) {
+        var lastValue = "";
+        var value = "";
+        var pos = 1;
+        var list = tb[0].rows,
+          len = list.length,
+          i = row;
+        for (; i < len; i++) {
+          value = list[i].cells[col].innerText && list[i].cells[col].innerText;
+          if (lastValue == value) {
+            list[i].deleteCell(col);
+            list[i - pos].cells[col].rowSpan = list[i - pos].cells[col].rowSpan + 1;
+            pos++;
+          } else {
+            lastValue = value;
+            pos = 1;
+          }
+        }
+
+      },
+      parseDom(arg) {
+        var objE = document.createElement("div");
+        objE.innerHTML = arg;
+        return objE.childNodes;
+      },
+
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true;

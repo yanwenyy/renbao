@@ -832,8 +832,9 @@
 
       //导出
       down (){
-        var url='/jinding/po/list?pageNum='+this.pageIndex+'&pageSize='+this.pageSize+'&enterTime='+this.dataForm.enterTime+'&outFactoryTime='+this.dataForm.outFactoryTime+ '&carNum='+this.dataForm.carNum+'&materialsName='+this.dataForm.materialsName+ '&doorPostName='+this.dataForm.doorPostName+'&poundRoom='+this.dataForm.poundRoom+'&containerNum='+ this.dataForm.containerNum+'&tranType='+this.dataForm.tranType+'&emissionStand='+this.dataForm.emissionStand+ '&fuelType='+this.dataForm.fuelType;
+        var url='/jinding/po/list?timeStart='+this.dataForm.timeStart+'&timeEnd='+this.dataForm.timeEnd+ '&carNum='+this.dataForm.carNum+'&materialsName='+this.dataForm.materialsName+ '&doorPostName='+this.dataForm.doorPostName+'&poundRoom='+this.dataForm.poundRoom+'&containerNum=&tranType='+this.dataForm.tranType+'&emissionStand='+this.dataForm.emissionStand+ '&fuelType='+this.dataForm.fuelType+'&ifconm='+this.dataForm.ifconm+ '&meaType='+this.dataForm.meaType;
         window.open(this.$http.adornUrl(url));
+        console.log(url)
       },
 
       //刷新页面
