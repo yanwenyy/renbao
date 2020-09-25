@@ -1,7 +1,7 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="车牌号:">
+      <el-form-item  label="车牌号:">
         <el-input v-model="dataForm.carNum" placeholder="车牌号" clearable></el-input>
       </el-form-item>
       <el-form-item label="开始时间:">
@@ -42,47 +42,12 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button type="warning" @click="down">导出</el-button>
-        <!--<el-button v-if="isAuth('biz:factorycar:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-        <!--<el-popover v-model="drVisibel"  v-if="isAuth('biz:factorycar:save')"-->
-        <!--placement="left"-->
-        <!--width="400"-->
-        <!--trigger="click">-->
-        <!--<template>-->
-        <!--<div class="dr-notice-body">-->
-        <!--<div class="dr-notice-list">-->
-        <!--<div class="inline-block dr-notice-title">1.下载excel模板</div>-->
-        <!--<a :href="path+'/static/file/venueVehicle.xls'" download="venueVehicle.xls">点击下载模板</a>-->
-        <!--</div>-->
-        <!--<div class="dr-notice-list">-->
-        <!--<div class="inline-block dr-notice-title">2.上传编辑好的文件</div>-->
-        <!--<el-upload-->
-        <!--class="inline-block"-->
-        <!--:headers="{'token':token}"-->
-        <!--:action="this.$http.adornUrl('/biz/factorycar/import/factory/car')"-->
-        <!--:on-success="handleChange"-->
-        <!--:on-error="handleChange"-->
-        <!--:show-file-list="false"-->
-        <!--&gt;-->
-        <!--<el-button type="warning">批量导入</el-button>-->
-        <!--</el-upload>-->
-        <!--</div>-->
-        <!--<div class="dr-notice-warn">-->
-        <!--<div>-->
-        <!--<i class="el-icon-warning"></i>-->
-        <!--注意:-->
-        <!--</div>-->
-        <!--<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;excel批量导入将覆盖询单内现有物料;上传文件类型仅限excel文件!</div>-->
-        <!--<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;模板内有内容的单元格为必填项,请严格按照模板格式填写!</div>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</template>-->
-        <!--<el-button type="warning" slot="reference">批量导入</el-button>-->
-        <!--</el-popover>-->
+        <!--<el-button type="warning" @click="down">导出</el-button>-->
 
-        <el-button v-if="isAuth('biz:outcar:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <!--<el-button v-if="isAuth('biz:outcar:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
+    <div class="sumWeigh">小计:{{totalPage}}</div>
     <el-table
       :data="dataList"
       height="80vh"
@@ -155,17 +120,17 @@
           <img @click="preImg(scope.row.drivinglLicense&&scope.row.drivinglLicense.indexOf('http')!=-1?scope.row.drivinglLicense:imgUrlfront+scope.row.drivinglLicense)" class="table-list-img" v-if="scope.row.drivinglLicense" :src="scope.row.drivinglLicense&&scope.row.drivinglLicense.indexOf('http')!=-1?scope.row.drivinglLicense:scope.row.drivinglLicense?imgUrlfront+scope.row.drivinglLicense:''" alt="">
         </template>
       </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
-          <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
-        </template>
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--fixed="right"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--width="150"-->
+        <!--label="操作">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>-->
+          <!--<el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -232,6 +197,10 @@
           }, {
             value: '国六',
             label: '国六'
+          },
+          {
+            value: '纯电动',
+            label: '纯电动'
           }],
       }
     },
@@ -249,7 +218,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/jinding/outcar/list'),
+          url: this.$http.adornUrl('/jinding/outcartaizhang/list'),
           method: 'get',
           params: this.$http.adornParams({
             'pageNum': this.pageIndex,
@@ -258,7 +227,7 @@
             'timeEnd': this.dataForm.timeEnd|| '',
             'emissionStand': this.dataForm.emissionStand,
             'fuelType': this.dataForm.fuelType||'',
-            'carnum': this.dataForm.carNum||''
+            'carNum': this.dataForm.carNum||''
           })
         }).then(({data}) => {
           if (data && data.code === 10000) {
@@ -354,9 +323,8 @@
 
       //导出
       down (){
-        var url='/jinding/outcar/port?timeStart='+this.dataForm.timeStart+'&timeEnd='+this.dataForm.timeEnd+ '&emissionStand='+this.dataForm.emissionStand+'&fuelType='+this.dataForm.fuelType+'&carnum='+this.dataForm.carNum;
+        var url='/jinding/outcar/port?timeStart='+this.dataForm.timeStart+'&timeEnd='+this.dataForm.timeEnd+ '&emissionStand='+this.dataForm.emissionStand+'&fuelType='+this.dataForm.fuelType;
         window.open(this.$http.adornUrl(url));
-        console.log(url)
       },
     }
   }
@@ -377,5 +345,10 @@
   }
   .dr-notice-body>div{
     margin-bottom: 20px;
+  }
+  .sumWeigh{
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
   }
 </style>

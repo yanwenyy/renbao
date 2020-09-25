@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    title="修改"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="车牌号">
-        <el-input v-model="dataForm.evnCarNum" placeholder="车牌号"></el-input>
+        <el-input disabled v-model="dataForm.carNum" placeholder="车牌号"></el-input>
       </el-form-item>
       <el-form-item label="注册日期">
         <el-date-picker
@@ -99,7 +99,7 @@
         dialogVisible: false,
         dataForm: {
           id: 0,
-          evnCarNum: '',
+          carNum: '',
           registTime: '',
           vehicleNum: '',
           engineNum: '',
@@ -111,7 +111,7 @@
         token:'',
         imgUrlfront:'',
         srcList: [],
-        options: [{
+        options: [  {
           value: '国五',
           label: '国五'
         }, {
@@ -143,57 +143,58 @@
       init (id) {
         this.imgUrlfront=this.$http.adornUrl('/jinding/showImg/');
         this.token=this.$cookie.get('token');
-        this.dataForm.id = id||0;
+        this.dataForm=id;
         this.visible = true;
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields();
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/biz/factorycar/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 200) {
-                this.dataForm.evnCarNum = data.data.evnCarNum;
-                this.dataForm.registTime = data.data.registTime;
-                this.dataForm.vehicleNum = data.data.vehicleNum;
-                this.dataForm.engineNum = data.data.engineNum;
-                this.dataForm.emissionStand = data.data.emissionStand;
-                this.dataForm.carCheckList = data.data.carCheckList;
-                this.dataForm.drivinglLicense = data.data.drivinglLicense;
-                this.dataForm.fuelType = data.data.fuelType;
-                var list=[this.dataForm.carCheckList.indexOf('http')!=-1?this.dataForm.carCheckList:this.imgUrlfront+data.data.carCheckList,this.dataForm.drivinglLicense.indexOf('http')!=-1?this.dataForm.drivinglLicense:this.imgUrlfront+data.data.drivinglLicense];
-                this.srcList=list;
-              }
-            })
-          }else{
-            this.dataForm.evnCarNum ='';
-            this.dataForm.registTime = '';
-            this.dataForm.vehicleNum = '';
-            this.dataForm.engineNum = '';
-            this.dataForm.emissionStand = '';
-            this.dataForm.carCheckList = '';
-            this.dataForm.drivinglLicense = '';
-            this.dataForm.fuelType=''
-          }
-        })
+        // this.$nextTick(() => {
+        //   this.$refs['dataForm'].resetFields();
+        //   if (this.dataForm.id) {
+        //     this.$http({
+        //       url: this.$http.adornUrl(`/biz/factorycar/info/${this.dataForm.id}`),
+        //       method: 'get',
+        //       params: this.$http.adornParams()
+        //     }).then(({data}) => {
+        //       if (data && data.code === 200) {
+        //         this.dataForm.evnCarNum = data.data.evnCarNum;
+        //         this.dataForm.registTime = data.data.registTime;
+        //         this.dataForm.vehicleNum = data.data.vehicleNum;
+        //         this.dataForm.engineNum = data.data.engineNum;
+        //         this.dataForm.emissionStand = data.data.emissionStand;
+        //         this.dataForm.carCheckList = data.data.carCheckList;
+        //         this.dataForm.drivinglLicense = data.data.drivinglLicense;
+        //         this.dataForm.fuelType = data.data.fuelType;
+        //         var list=[this.dataForm.carCheckList.indexOf('http')!=-1?this.dataForm.carCheckList:this.imgUrlfront+data.data.carCheckList,this.dataForm.drivinglLicense.indexOf('http')!=-1?this.dataForm.drivinglLicense:this.imgUrlfront+data.data.drivinglLicense];
+        //         this.srcList=list;
+        //       }
+        //     })
+        //   }else{
+        //     this.dataForm.evnCarNum ='';
+        //     this.dataForm.registTime = '';
+        //     this.dataForm.vehicleNum = '';
+        //     this.dataForm.engineNum = '';
+        //     this.dataForm.emissionStand = '';
+        //     this.dataForm.carCheckList = '';
+        //     this.dataForm.drivinglLicense = '';
+        //     this.dataForm.fuelType=''
+        //   }
+        // })
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/biz/factorycar/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/biz/tran/out/update`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'registTime': this.dataForm.registTime+" 00:00:00",
-                'evnCarNum': this.dataForm.evnCarNum,
+                'registTime': this.dataForm.registTime,
+                'carNum': this.dataForm.carNum,
                 'vehicleNum': this.dataForm.vehicleNum,
                 'engineNum': this.dataForm.engineNum,
                 'emissionStand': this.dataForm.emissionStand,
+                'doorEmissionStand':this.dataForm.emissionStand,
                 'carCheckList': this.dataForm.carCheckList,
-                'drivinglLicense': this.dataForm.drivinglLicense
+                'drivinglLicense': this.dataForm.drivinglLicense,
+                'fuelType': this.dataForm.fuelType
               })
             }).then(({data}) => {
               if (data && data.code ===200) {
