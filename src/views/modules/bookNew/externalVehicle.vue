@@ -136,6 +136,12 @@
         label="排放阶段">
       </el-table-column>
       <el-table-column
+        prop="createDate"
+        header-align="center"
+        align="center"
+        label="录入时间">
+      </el-table-column>
+      <el-table-column
         align="center"
         label="随车清单">
         <template slot-scope="scope">

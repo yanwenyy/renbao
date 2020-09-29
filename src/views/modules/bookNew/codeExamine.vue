@@ -1,46 +1,7 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="开始时间:">
-        <el-form-item label="车牌号:">
-          <el-input v-model="dataForm.carnum" placeholder="车牌号" clearable></el-input>
-        </el-form-item>
-        <el-date-picker
-          v-model="dataForm.timeStart"
-          type="datetime"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="选择日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="结束时间:">
-        <el-date-picker
-          v-model="dataForm.timeEnd"
-          type="datetime"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="选择日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="燃油种类:">
-        <el-select clearable  v-model="dataForm.fuelType" placeholder="请选择">
-          <el-option
-            v-for="item in ryzl"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="排放标准:">
-        <el-select clearable  v-model="dataForm.emissionStand" placeholder="请选择">
-          <el-option
-            v-for="item in pfbz"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item v-show="searchMore" label="车牌号:">
+      <el-form-item label="车牌号:">
         <el-input v-model="dataForm.carNum" placeholder="车牌号" clearable></el-input>
       </el-form-item>
       <el-form-item>
@@ -123,13 +84,21 @@
         </template>
       </el-table-column>
       <el-table-column
+        align="center"
+        label="状态">
+        <template slot-scope="scope">
+           <span :class="scope.row.status==1?'orange':scope.row.status==3?'red':''">{{scope.row.status==1?'待审核':scope.row.status==3?'审核未通过':''}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
       fixed="right"
       header-align="center"
       align="center"
       width="150"
       label="操作">
       <template slot-scope="scope">
-      <el-button v-if="isAuth('biz:factorycar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">审核</el-button>
+      <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum,1)">通过</el-button>
+        <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum,0)">不通过</el-button>
       </template>
       </el-table-column>
     </el-table>
@@ -158,9 +127,7 @@
         dataForm: {
           timeStart: '',
           timeEnd: '',
-          emissionStand:'',
-          fuelType:'',
-          carnum:''
+          carNum:''
         },
         token:'',
         imgUrlfront:'',
@@ -215,16 +182,12 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/jinding/outcar/list'),
+          url: this.$http.adornUrl('/biz/tran/qrcode/status/list'),
           method: 'get',
           params: this.$http.adornParams({
             'pageNum': this.pageIndex,
             'pageSize': this.pageSize,
-            'carnum': this.dataForm.carnum,
-            'timeStart': this.dataForm.timeStart|| '',
-            'timeEnd': this.dataForm.timeEnd|| '',
-            'emissionStand': this.dataForm.emissionStand,
-            'fuelType': this.dataForm.fuelType||'',
+            'carnum': this.dataForm.carNum
           })
         }).then(({data}) => {
           if (data && data.code === 10000) {
@@ -253,11 +216,36 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
-        })
+      addOrUpdateHandle (id,status) {
+        // this.addOrUpdateVisible = true
+        // this.$nextTick(() => {
+        //   this.$refs.addOrUpdate.init(id)
+        // })
+        this.$confirm(`确认${status==1?'通过':'不通过'}审核吗`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`biz/tran/car/status/check/${id}/${status}`),
+            method: 'get'
+          }).then(({data}) => {
+            if (data && data.code === 10000) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.dataForm.carNum='';
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+
       },
       //图片预览
       preImg(src){
@@ -335,5 +323,11 @@
   }
   .dr-notice-body>div{
     margin-bottom: 20px;
+  }
+  .orange{
+    color: orange;
+  }
+  .red{
+    color: red;
   }
 </style>
