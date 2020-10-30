@@ -41,12 +41,22 @@
         chartBar: null,
         chartBar2: null,
         chartBar3: null,
+        timer:null
       }
     },
     mounted () {
-      this.initChartBar();
-      this.initChartBar2();
-      this.initChartBar3();
+      this.getListDay();
+      this.getListMonth();
+      this.getListYear();
+      this.timer = setInterval(() =>{    //应用setInterval来刷新getList()
+        this.getListDay();
+        console.log('请求了')
+      },60000);
+    },
+    beforeDestroy () {
+      if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+        clearInterval(this.timer); //关闭
+      }
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -61,8 +71,95 @@
       }
     },
     methods: {
+      //当天的数据
+      getListDay(){
+        this.$http({
+          url: this.$http.adornUrl('/jinding/statistics/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'type': '1',
+          })
+        }).then(({data}) => {
+          if (data && data.code === 10000) {
+           var datas=data.data,i=0,len=datas.length;
+           var gw=0,gl=0,cdd=0;
+           for(;i<len;i++){
+             var v=datas[i];
+             if(v.doorEmissionStand=='国五'){
+               gw=v.tranNum;
+             }
+             if(v.doorEmissionStand=='国六'){
+               gl=v.tranNum;
+             }
+             if(v.doorEmissionStand=='纯电动'){
+               cdd=v.tranNum;
+             }
+             this.initChartBar(gw,gl,cdd)
+           }
+          }
+          this.dataListLoading = false
+        })
+      },
+      //当月
+      getListMonth(){
+        this.$http({
+          url: this.$http.adornUrl('/jinding/statistics/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'type': '2',
+          })
+        }).then(({data}) => {
+          if (data && data.code === 10000) {
+            var datas=data.data,i=0,len=datas.length;
+            var gw=0,gl=0,cdd=0;
+            for(;i<len;i++){
+              var v=datas[i];
+              if(v.doorEmissionStand=='国五'){
+                gw=v.tranNum;
+              }
+              if(v.doorEmissionStand=='国六'){
+                gl=v.tranNum;
+              }
+              if(v.doorEmissionStand=='纯电动'){
+                cdd=v.tranNum;
+              }
+              this.initChartBar2(gw,gl,cdd)
+            }
+          }
+          this.dataListLoading = false
+        })
+      },
+      //当年
+      getListYear(){
+        this.$http({
+          url: this.$http.adornUrl('/jinding/statistics/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'type': '3',
+          })
+        }).then(({data}) => {
+          if (data && data.code === 10000) {
+            var datas=data.data,i=0,len=datas.length;
+            var gw=0,gl=0,cdd=0;
+            for(;i<len;i++){
+              var v=datas[i];
+              if(v.doorEmissionStand=='国五'){
+                gw=v.tranNum;
+              }
+              if(v.doorEmissionStand=='国六'){
+                gl=v.tranNum;
+              }
+              if(v.doorEmissionStand=='纯电动'){
+                cdd=v.tranNum;
+              }
+              this.initChartBar3(gw,gl,cdd)
+            }
+          }
+          this.dataListLoading = false
+        })
+      },
       // 当日
-      initChartBar () {
+      initChartBar (gw,gl,cdd) {
         var option = {
           title: {
             'text': '当日运输量'
@@ -75,8 +172,20 @@
             type: 'value'
           },
           series: [{
-            data: [120, 200, 150],
-            type: 'bar'
+            data: [gw,gl,cdd],
+            type: 'bar',
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,  //开启显示
+                  position: 'top',  //在上方显示
+                  textStyle: {  //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                }
+              }
+            },
           }]
         }
         this.chartBar = echarts.init(document.getElementById('J_chartBarBox'));
@@ -86,7 +195,7 @@
         })
       },
       // 当月
-      initChartBar2 () {
+      initChartBar2 (gw,gl,cdd) {
         var option = {
           title: {
             'text': '当月运输量'
@@ -95,12 +204,27 @@
             type: 'category',
             data: ['国五', '国六', '纯电动']
           },
+          grid:{
+            left: '50'
+          },
           yAxis: {
-            type: 'value'
+            type: 'value',
           },
           series: [{
-            data: [120, 200, 150],
-            type: 'bar'
+            data: [gw,gl,cdd],
+            type: 'bar',
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,  //开启显示
+                  position: 'top',  //在上方显示
+                  textStyle: {  //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                }
+              }
+            },
           }]
         }
         this.chartBar2 = echarts.init(document.getElementById('J_chartBarBox2'));
@@ -110,7 +234,7 @@
         })
       },
       // 当年
-      initChartBar3 () {
+      initChartBar3 (gw,gl,cdd) {
         var option = {
           title: {
             'text': '当年运输量'
@@ -119,12 +243,27 @@
             type: 'category',
             data: ['国五', '国六', '纯电动']
           },
+          grid:{
+            left: '50'
+          },
           yAxis: {
             type: 'value'
           },
           series: [{
-            data: [120, 200, 150],
-            type: 'bar'
+            data: [gw,gl,cdd],
+            type: 'bar',
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,  //开启显示
+                  position: 'top',  //在上方显示
+                  textStyle: {  //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                }
+              }
+            },
           }]
         }
         this.chartBar3 = echarts.init(document.getElementById('J_chartBarBox3'));
