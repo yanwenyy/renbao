@@ -162,6 +162,18 @@
         </template>
       </el-table-column>
       <el-table-column
+        prop="operateBy"
+        header-align="center"
+        align="center"
+        label="操作人">
+      </el-table-column>
+      <el-table-column
+        prop="updateTime"
+        header-align="center"
+        align="center"
+        label="操作时间">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"
