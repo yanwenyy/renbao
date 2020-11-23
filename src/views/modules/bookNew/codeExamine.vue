@@ -105,7 +105,7 @@
       width="150"
       label="操作">
       <template slot-scope="scope">
-      <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="examine(),dataForm.status=1,dataForm.id=scope.row.carNum">通过</el-button>
+        <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="dataForm.status=1,dataForm.id=scope.row.carNum,examine()">通过</el-button>
         <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="dialogFormVisible = true,dataForm.remaks='',dataForm.status='',dataForm.id=scope.row.carNum">不通过</el-button>
         <el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum)">修改</el-button>
         <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
@@ -126,11 +126,11 @@
     <ImgPre v-if="ImgPreVisible"  ref="preImgList" @refreshClose="imgClose"></ImgPre>
     <el-dialog title="审核不通过" :visible.sync="dialogFormVisible">
       <el-form :model="dataForm"  :rules="dataRule"  ref="dataForm">
-        <el-form-item label="原因" :label-width="formLabelWidth" prop="status">
+        <el-form-item label="原因" prop="status">
           <el-radio v-model="dataForm.status" label="0">格式不通过</el-radio>
           <el-radio v-model="dataForm.status" label="-1">排放阶段不通过</el-radio>
         </el-form-item>
-        <el-form-item label="备注" :label-width="formLabelWidth">
+        <el-form-item label="备注">
           <el-input
             type="textarea"
             placeholder="请输入内容"
@@ -262,41 +262,49 @@
       },
       //审核通过不通过
       examine(id){
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$confirm(`确认${this.dataForm.status==1?'通过':'不通过'}审核吗`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              this.$http({
-                url: this.$http.adornUrl(`biz/tran/check/car`),
-                method: 'POST',
-                data: this.$http.adornData({
-                  'carnum': this.dataForm.id,
-                  'remaks': this.dataForm.remaks,
-                  'status': this.dataForm.status,
-                })
-              }).then(({data}) => {
-                if (data && data.code === 10000) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.dataForm.carNum='';
-                      this.getDataList();
-                      this.dialogFormVisible = false;
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg)
+        if(this.dataForm.status==1){
+          this.pass();
+        }else{
+          this.$refs['dataForm'].validate((valid) => {
+            if (valid) {
+              this.pass();
+            }
+          })
+
+        }
+      },
+      //通过函数
+      pass(){
+        this.$confirm(`确认${this.dataForm.status==1?'通过':'不通过'}审核吗`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`biz/tran/check/car`),
+            method: 'POST',
+            data: this.$http.adornData({
+              'carnum': this.dataForm.id,
+              'remaks': this.dataForm.remaks,
+              'status': this.dataForm.status,
+            })
+          }).then(({data}) => {
+            if (data && data.code === 10000) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.dataForm.carNum='';
+                  this.getDataList();
+                  this.dialogFormVisible = false;
                 }
               })
-            }).catch(() => {})
-          }
-        })
-
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
       },
       //图片预览
       preImg(src){
