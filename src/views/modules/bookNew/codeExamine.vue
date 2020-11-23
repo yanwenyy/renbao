@@ -6,6 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button type="warning" @click="down">导出</el-button>
+        <el-button  type="primary" v-if="isAuth('biz:outcar:save')" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -71,10 +73,16 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="emissionStand"
+        prop="fuelType"
         header-align="center"
         align="center"
         label="燃油方式">
+      </el-table-column>
+      <el-table-column
+        prop="remaks"
+        header-align="center"
+        align="center"
+        label="备注">
       </el-table-column>
       <el-table-column
         align="center"
@@ -97,8 +105,10 @@
       width="150"
       label="操作">
       <template slot-scope="scope">
-      <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum,1)">通过</el-button>
-        <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum,0)">不通过</el-button>
+      <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="examine(),dataForm.status=1,dataForm.id=scope.row.carNum">通过</el-button>
+        <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="dialogFormVisible = true,dataForm.remaks='',dataForm.status='',dataForm.id=scope.row.carNum">不通过</el-button>
+        <el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum)">修改</el-button>
+        <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
       </template>
       </el-table-column>
     </el-table>
@@ -114,11 +124,30 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <ImgPre v-if="ImgPreVisible"  ref="preImgList" @refreshClose="imgClose"></ImgPre>
+    <el-dialog title="审核不通过" :visible.sync="dialogFormVisible">
+      <el-form :model="dataForm">
+        <el-form-item label="原因" :label-width="formLabelWidth">
+          <el-radio v-model="dataForm.status" label="0">格式不通过</el-radio>
+          <el-radio v-model="dataForm.status" label="-1">排放阶段不通过</el-radio>
+        </el-form-item>
+        <el-form-item label="备注" :label-width="formLabelWidth">
+          <el-input
+            type="textarea"
+            placeholder="请输入内容"
+            v-model="dataForm.remaks">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="examine()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './externalVehicle-add-or-update'
+  import AddOrUpdate from './codeExamine-add-or-update'
   import ImgPre from './img-pre'
   export default {
     data () {
@@ -127,8 +156,12 @@
         dataForm: {
           timeStart: '',
           timeEnd: '',
-          carNum:''
+          carNum:'',
+          status:'',
+          remaks:'',
+          id:''
         },
+        dialogFormVisible:false,
         token:'',
         imgUrlfront:'',
         dataList: [],
@@ -217,18 +250,26 @@
       },
       // 新增 / 修改
       addOrUpdateHandle (id,status) {
-        // this.addOrUpdateVisible = true
-        // this.$nextTick(() => {
-        //   this.$refs.addOrUpdate.init(id)
-        // })
-        this.$confirm(`确认${status==1?'通过':'不通过'}审核吗`, '提示', {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id)
+        })
+      },
+      //审核通过不通过
+      examine(id){
+        this.$confirm(`确认${this.dataForm.status==1?'通过':'不通过'}审核吗`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl(`biz/tran/car/status/check/${id}/${status}`),
-            method: 'get'
+            url: this.$http.adornUrl(`biz/tran/check/car`),
+            method: 'POST',
+            data: this.$http.adornData({
+              'carnum': this.dataForm.id,
+              'remaks': this.dataForm.remaks,
+              'status': this.dataForm.status,
+            })
           }).then(({data}) => {
             if (data && data.code === 10000) {
               this.$message({
@@ -237,7 +278,8 @@
                 duration: 1500,
                 onClose: () => {
                   this.dataForm.carNum='';
-                  this.getDataList()
+                  this.getDataList();
+                  this.dialogFormVisible = false;
                 }
               })
             } else {
@@ -245,7 +287,6 @@
             }
           })
         }).catch(() => {})
-
       },
       //图片预览
       preImg(src){
@@ -260,15 +301,16 @@
       // 删除
       deleteHandle (id) {
         var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.userId
+          return item.carNum
         })
+        console.log(id)
         this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/biz/factorycar/delete'),
+            url: this.$http.adornUrl('/biz/tran/outcar/delete'),
             method: 'post',
             data: this.$http.adornData(userIds, false)
           }).then(({data}) => {
@@ -303,7 +345,14 @@
         } else {
           this.$message.error(response.msg)
         }
-      }
+      },
+
+      //导出
+      down (){
+        var url='/biz/tran/port/carstatus/list?carnum='+this.dataForm.carNum;
+        console.log(this.$http.adornUrl(url))
+        window.open(this.$http.adornUrl(url));
+      },
     }
   }
 </script>

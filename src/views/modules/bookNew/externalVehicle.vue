@@ -174,6 +174,12 @@
         label="操作时间">
       </el-table-column>
       <el-table-column
+        prop="remaks"
+        header-align="center"
+        align="center"
+        label="备注">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

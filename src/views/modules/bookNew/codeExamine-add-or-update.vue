@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    title="修改"
+    :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="车牌号">
-        <el-input disabled v-model="dataForm.carNum" placeholder="车牌号"></el-input>
+        <el-input :disabled="dataForm.id!=''" v-model="dataForm.carNum" placeholder="车牌号"></el-input>
       </el-form-item>
       <el-form-item label="注册日期">
         <el-date-picker
@@ -61,6 +61,13 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="备注:">
+        <el-input
+          type="textarea"
+          placeholder="请输入内容"
+          v-model="dataForm.remaks">
+        </el-input>
+      </el-form-item>
       <el-form-item label="行驶证">
         <div class="inline-block box-img" v-if="dataForm.drivinglLicense&&dataForm.drivinglLicense!=''">
           <el-image class="look-img" title="点击查看大图"
@@ -81,13 +88,6 @@
           </el-upload>
         </div>
       </el-form-item>
-      <el-form-item label="备注:">
-        <el-input
-          type="textarea"
-          placeholder="请输入内容"
-          v-model="dataForm.remaks">
-        </el-input>
-      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -105,7 +105,7 @@
         dialogImageUrl: '',
         dialogVisible: false,
         dataForm: {
-          id: 0,
+          id: '',
           carNum: '',
           registTime: '',
           vehicleNum: '',
@@ -151,50 +151,55 @@
       init (id) {
         this.imgUrlfront=this.$http.adornUrl('/jinding/showImg/');
         this.token=this.$cookie.get('token');
-        this.dataForm=id;
+        this.dataForm.id = id||0;
         this.visible = true;
-        // this.$nextTick(() => {
-        //   this.$refs['dataForm'].resetFields();
-        //   if (this.dataForm.id) {
-        //     this.$http({
-        //       url: this.$http.adornUrl(`/biz/factorycar/info/${this.dataForm.id}`),
-        //       method: 'get',
-        //       params: this.$http.adornParams()
-        //     }).then(({data}) => {
-        //       if (data && data.code === 200) {
-        //         this.dataForm.evnCarNum = data.data.evnCarNum;
-        //         this.dataForm.registTime = data.data.registTime;
-        //         this.dataForm.vehicleNum = data.data.vehicleNum;
-        //         this.dataForm.engineNum = data.data.engineNum;
-        //         this.dataForm.emissionStand = data.data.emissionStand;
-        //         this.dataForm.carCheckList = data.data.carCheckList;
-        //         this.dataForm.drivinglLicense = data.data.drivinglLicense;
-        //         this.dataForm.fuelType = data.data.fuelType;
-        //         var list=[this.dataForm.carCheckList.indexOf('http')!=-1?this.dataForm.carCheckList:this.imgUrlfront+data.data.carCheckList,this.dataForm.drivinglLicense.indexOf('http')!=-1?this.dataForm.drivinglLicense:this.imgUrlfront+data.data.drivinglLicense];
-        //         this.srcList=list;
-        //       }
-        //     })
-        //   }else{
-        //     this.dataForm.evnCarNum ='';
-        //     this.dataForm.registTime = '';
-        //     this.dataForm.vehicleNum = '';
-        //     this.dataForm.engineNum = '';
-        //     this.dataForm.emissionStand = '';
-        //     this.dataForm.carCheckList = '';
-        //     this.dataForm.drivinglLicense = '';
-        //     this.dataForm.fuelType=''
-        //   }
-        // })
+        console.log(id)
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields();
+          if (this.dataForm.id) {
+            this.$http({
+              url: this.$http.adornUrl(`/biz/tran/out/info/${this.dataForm.id}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 200) {
+                var datas=data.data;
+                this.dataForm.carNum=datas.carNum;
+                this.dataForm.registTime=datas.registTime;
+                this.dataForm.vehicleNum=datas.vehicleNum;
+                this.dataForm.engineNum=datas.engineNum;
+                this.dataForm.emissionStand=datas.emissionStand;
+                this.dataForm.carCheckList=datas.carCheckList;
+                this.dataForm.drivinglLicense=datas.drivinglLicense;
+                this.dataForm.fuelType=datas.fuelType;
+                this.dataForm.remaks=datas.remaks;
+              }
+            })
+          }else{
+            this.dataForm={
+              id: '',
+              carNum: '',
+              registTime: '',
+              vehicleNum: '',
+              engineNum: '',
+              emissionStand:'',
+              carCheckList:'',
+              drivinglLicense:'',
+              fuelType:'',
+              remaks:''
+            };
+          }
+        })
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/biz/tran/out/update`),
+              url: this.$http.adornUrl(`/biz/tran/${!this.dataForm.id ? 'save' : 'out/update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'registTime': this.dataForm.registTime,
+                'registTime': this.dataForm.registTime+(!this.dataForm.id?' 00:00:00':''),
                 'carNum': this.dataForm.carNum,
                 'vehicleNum': this.dataForm.vehicleNum,
                 'engineNum': this.dataForm.engineNum,

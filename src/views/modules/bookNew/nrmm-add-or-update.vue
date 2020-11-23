@@ -31,6 +31,16 @@
       <el-form-item label="发动机铭牌">
         <el-input v-model="dataForm.engineNum" placeholder="发动机铭牌"></el-input>
       </el-form-item>
+      <el-form-item label="状态">
+        <el-select clearable  v-model="dataForm.status" placeholder="请选择">
+          <el-option
+            v-for="item in zt"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -71,8 +81,18 @@
           produceTime: '',
           emission: '',
           emissionNum: '',
-          engineNum:''
+          engineNum:'',
+          status:''
         },
+        zt:[
+          {
+            value: '0',
+            label: '在用'
+          }, {
+            value: '1',
+            label: '淘汰'
+          }
+        ],
         options: [
           {
           value: '国三',
@@ -113,6 +133,7 @@
       this.dataForm.emission = "";
       this.dataForm.emissionNum = "";
       this.dataForm.engineNum = "";
+      this.dataForm.status ='';
       },
     methods: {
       init (id) {
@@ -132,6 +153,7 @@
                 this.dataForm.emission = data.data.emission;
                 this.dataForm.emissionNum = data.data.emissionNum;
                 this.dataForm.engineNum = data.data.engineNum;
+                this.dataForm.status = String(data.data.status);
               }
             })
           }else{
@@ -140,6 +162,7 @@
             this.dataForm.emission = "";
             this.dataForm.emissionNum = "";
             this.dataForm.engineNum = "";
+            this.dataForm.status ='';
           }
         })
       },
@@ -156,7 +179,8 @@
                 'evnProNum': this.dataForm.evnProNum,
                 'emission': this.dataForm.emission,
                 'emissionNum': this.dataForm.emissionNum,
-                'engineNum': this.dataForm.engineNum
+                'engineNum': this.dataForm.engineNum,
+                'status': this.dataForm.status,
               })
             }).then(({data}) => {
               if (data && data.code ===200) {

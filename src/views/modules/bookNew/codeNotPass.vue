@@ -1,67 +1,13 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="生产日期:">
-        <el-date-picker
-          v-model="dataForm.produceTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="环保登记编码">
-        <el-input v-model="dataForm.evnProNum" placeholder="环保登记编码" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select clearable  v-model="dataForm.status" placeholder="请选择">
-          <el-option
-            v-for="item in zt"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+      <el-form-item label="车牌号:">
+        <el-input v-model="dataForm.carNum" placeholder="车牌号" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('biz:offroad:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-popover  v-model="drVisibel" v-if="isAuth('biz:offroad:save')"
-          placement="left"
-          width="400"
-          trigger="click">
-          <template>
-            <div class="dr-notice-body">
-              <div class="dr-notice-list">
-                <div class="inline-block dr-notice-title">1.下载excel模板</div>
-                <a :href="path+'/static/file/nrmm.xls'" download="nrmm.xls">点击下载模板</a>
-              </div>
-              <div class="dr-notice-list">
-                <div class="inline-block dr-notice-title">2.上传编辑好的文件</div>
-                <el-upload
-                  class="inline-block"
-                  :headers="{'token':token}"
-                  :action="this.$http.adornUrl('/biz/offroad/import/road')"
-                  :on-success="handleChange"
-                  :on-error="handleChange"
-                  :show-file-list="false"
-                >
-                  <el-button type="warning">批量导入</el-button>
-                </el-upload>
-              </div>
-              <div class="dr-notice-warn">
-                <div>
-                  <i class="el-icon-warning"></i>
-                  注意:
-                </div>
-                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;excel批量导入将覆盖询单内现有物料;上传文件类型仅限excel文件!</div>
-                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;模板内有内容的单元格为必填项,请严格按照模板格式填写!</div>
-              </div>
-            </div>
-          </template>
-          <el-button type="warning" slot="reference">批量导入</el-button>
-        </el-popover>
-
-        <el-button v-if="isAuth('biz:offroad:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="pageIndex=1,pageSize=10,getDataList()">查询</el-button>
+        <!--<el-button type="warning" @click="down">导出</el-button>-->
+        <!--<el-button v-if="isAuth('biz:outcar:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
     <el-table
@@ -85,57 +31,92 @@
         label="ID">
       </el-table-column>
       <el-table-column
-        prop="evnProNum"
+        prop="carNum"
         align="center"
-        label="环保登记编码">
+        label="车牌号">
       </el-table-column>
       <el-table-column
-        prop="produceTime"
+        prop="registTime"
         header-align="center"
         align="center"
-        label="生产日期">
+        label="注册日期">
+        <template slot-scope="scope">
+          <span>{{scope.row.registTime&&scope.row.registTime.split(" ")[0]}}</span>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="emission"
+        prop="vehicleNum"
         header-align="center"
         align="center"
-        label="排放阶段">
-      </el-table-column>
-      <el-table-column
-        prop="emissionNum"
-        header-align="center"
-        align="center"
-        label="器械环保代码">
+        label="车辆识别代号(VIN)">
       </el-table-column>
       <el-table-column
         prop="engineNum"
         header-align="center"
         align="center"
-        label="发动机铭牌">
+        label="发动机号码">
+      </el-table-column>
+      <el-table-column
+        prop="emissionStand"
+        header-align="center"
+        align="center"
+        label="排放阶段">
+      </el-table-column>
+      <el-table-column
+        prop="createDate"
+        header-align="center"
+        align="center"
+        label="录入时间">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="随车清单">
+        <template slot-scope="scope">
+          <img  @click="preImg(scope.row.carCheckList&&scope.row.carCheckList.indexOf('http')!=-1?scope.row.carCheckList:imgUrlfront+scope.row.carCheckList)" class="table-list-img" v-if="scope.row.carCheckList" :src="scope.row.carCheckList&&scope.row.carCheckList.indexOf('http')!=-1?scope.row.carCheckList:scope.row.carCheckList?imgUrlfront+scope.row.carCheckList:''" alt="">
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="fuelType"
+        header-align="center"
+        align="center"
+        label="燃油方式">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="行驶证">
+        <template slot-scope="scope">
+          <img @click="preImg(scope.row.drivinglLicense&&scope.row.drivinglLicense.indexOf('http')!=-1?scope.row.drivinglLicense:imgUrlfront+scope.row.drivinglLicense)" class="table-list-img" v-if="scope.row.drivinglLicense" :src="scope.row.drivinglLicense&&scope.row.drivinglLicense.indexOf('http')!=-1?scope.row.drivinglLicense:scope.row.drivinglLicense?imgUrlfront+scope.row.drivinglLicense:''" alt="">
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="operateBy"
+        header-align="center"
+        align="center"
+        label="操作人">
+      </el-table-column>
+      <el-table-column
+        prop="updateTime"
+        header-align="center"
+        align="center"
+        label="操作时间">
+      </el-table-column>
+      <el-table-column
+        prop="remaks"
+        header-align="center"
+        align="center"
+        label="备注">
+      </el-table-column>
+      <!--<el-table-column-->
+        <!--fixed="right"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--width="150"-->
+        <!--label="操作">-->
         <!--<template slot-scope="scope">-->
-        <!--{{ (scope.row.effective).toFixed(2)*100+"%"}}-->
+          <!--<el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>-->
+          <!--<el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>-->
         <!--</template>-->
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="状态">
-        <template slot-scope="scope">
-        {{scope.row.status=='0'?'在用':'淘汰'}}
-        </template>
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button v-if="isAuth('biz:offroad:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('biz:offroad:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-        </template>
-      </el-table-column>
+      <!--</el-table-column>-->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -148,30 +129,24 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <ImgPre v-if="ImgPreVisible"  ref="preImgList" @refreshClose="imgClose"></ImgPre>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './nrmm-add-or-update'
+  import AddOrUpdate from './externalVehicle-add-or-update'
+  import ImgPre from './img-pre'
   export default {
     data () {
       return {
         path:window.SITE_CONFIG.cdnUrl,
         dataForm: {
-          produceTime: '',
-          evnProNum: '',
-          status:''
+          timeStart: '',
+          timeEnd: '',
+          carNum:''
         },
-        zt:[
-          {
-            value: '0',
-            label: '在用'
-          }, {
-            value: '1',
-            label: '淘汰'
-          }
-        ],
         token:'',
+        imgUrlfront:'',
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -179,14 +154,43 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        drVisibel:false
+        ImgPreVisible:false,
+        drVisibel:false,
+        ryzl:[
+          {
+            value: '柴油',
+            label: '柴油'
+          },
+          {
+            value: '天然气',
+            label: '天然气'
+          },
+          {
+            value: '纯电动',
+            label: '纯电动'
+          },
+          {
+            value: '油电混动',
+            label: '油电混动'
+          },
+        ],
+        pfbz: [
+          {
+            value: '国五',
+            label: '国五'
+          }, {
+            value: '国六',
+            label: '国六'
+          }],
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ImgPre
     },
     activated () {
       this.getDataList();
+      this.imgUrlfront=this.$http.adornUrl('/jinding/showImg/');
       this.token=this.$cookie.get('token')
     },
     methods: {
@@ -194,14 +198,12 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/jinding/offroad/list'),
+          url: this.$http.adornUrl('/biz/tran/nocheck/status/list'),
           method: 'get',
           params: this.$http.adornParams({
             'pageNum': this.pageIndex,
             'pageSize': this.pageSize,
-            'produceTime': this.dataForm.produceTime||'',
-            'evnProNum': this.dataForm.evnProNum,
-            'status': this.dataForm.status,
+            'carnum': this.dataForm.carNum||''
           })
         }).then(({data}) => {
           if (data && data.code === 10000) {
@@ -236,18 +238,29 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      //图片预览
+      preImg(src){
+        this.ImgPreVisible = true;
+        this.$nextTick(() => {
+          this.$refs.preImgList.init(src)
+        })
+      },
+      imgClose(){
+        this.ImgPreVisible = false;
+      },
       // 删除
       deleteHandle (id) {
         var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
+          return item.carNum
         })
+        console.log(id)
         this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/biz/offroad/delete'),
+            url: this.$http.adornUrl('/biz/tran/outcar/delete'),
             method: 'post',
             data: this.$http.adornData(userIds, false)
           }).then(({data}) => {
@@ -266,6 +279,7 @@
           })
         }).catch(() => {})
       },
+
       //导入
       handleChange(response, file, fileList){
         if (response && response.code === 10000) {
@@ -281,7 +295,14 @@
         } else {
           this.$message.error(response.msg)
         }
-      }
+      },
+
+      //导出
+      down (){
+        var url='/jinding/outcar/port?timeStart='+this.dataForm.timeStart+'&timeEnd='+this.dataForm.timeEnd+ '&emissionStand='+this.dataForm.emissionStand+'&fuelType='+this.dataForm.fuelType+'&carnum='+this.dataForm.carNum;
+        window.open(this.$http.adornUrl(url));
+        console.log(url)
+      },
     }
   }
 </script>
