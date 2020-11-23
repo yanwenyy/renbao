@@ -125,8 +125,8 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <ImgPre v-if="ImgPreVisible"  ref="preImgList" @refreshClose="imgClose"></ImgPre>
     <el-dialog title="审核不通过" :visible.sync="dialogFormVisible">
-      <el-form :model="dataForm">
-        <el-form-item label="原因" :label-width="formLabelWidth">
+      <el-form :model="dataForm"  :rules="dataRule"  ref="dataForm">
+        <el-form-item label="原因" :label-width="formLabelWidth" prop="status">
           <el-radio v-model="dataForm.status" label="0">格式不通过</el-radio>
           <el-radio v-model="dataForm.status" label="-1">排放阶段不通过</el-radio>
         </el-form-item>
@@ -160,6 +160,11 @@
           status:'',
           remaks:'',
           id:''
+        },
+        dataRule: {
+          status: [
+            { required: true, message: '原因不能为空', trigger: 'blur' }
+          ],
         },
         dialogFormVisible:false,
         token:'',
@@ -257,36 +262,41 @@
       },
       //审核通过不通过
       examine(id){
-        this.$confirm(`确认${this.dataForm.status==1?'通过':'不通过'}审核吗`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl(`biz/tran/check/car`),
-            method: 'POST',
-            data: this.$http.adornData({
-              'carnum': this.dataForm.id,
-              'remaks': this.dataForm.remaks,
-              'status': this.dataForm.status,
-            })
-          }).then(({data}) => {
-            if (data && data.code === 10000) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.dataForm.carNum='';
-                  this.getDataList();
-                  this.dialogFormVisible = false;
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$confirm(`确认${this.dataForm.status==1?'通过':'不通过'}审核吗`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.$http({
+                url: this.$http.adornUrl(`biz/tran/check/car`),
+                method: 'POST',
+                data: this.$http.adornData({
+                  'carnum': this.dataForm.id,
+                  'remaks': this.dataForm.remaks,
+                  'status': this.dataForm.status,
+                })
+              }).then(({data}) => {
+                if (data && data.code === 10000) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.dataForm.carNum='';
+                      this.getDataList();
+                      this.dialogFormVisible = false;
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
                 }
               })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
+            }).catch(() => {})
+          }
+        })
+
       },
       //图片预览
       preImg(src){
