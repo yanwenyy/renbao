@@ -106,17 +106,17 @@
         align="center"
         label="备注">
       </el-table-column>
-      <!--<el-table-column-->
-        <!--fixed="right"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--width="150"-->
-        <!--label="操作">-->
-        <!--<template slot-scope="scope">-->
+      <el-table-column
+        fixed="right"
+        header-align="center"
+        align="center"
+        width="150"
+        label="操作">
+        <template slot-scope="scope">
           <!--<el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>-->
-          <!--<el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+          <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
