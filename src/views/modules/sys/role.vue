@@ -23,11 +23,12 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="roleId"
+        type="index"
         header-align="center"
         align="center"
         width="80"
         label="ID">
+        <!--prop="roleId"-->
       </el-table-column>
       <el-table-column
         prop="roleName"

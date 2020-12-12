@@ -11,6 +11,9 @@
       <!--<img src="../../../static/img/aobao.png" alt="">-->
     <!--</div>-->
     <div class="echarts-title">港陆清洁运输情况</div>
+    <div class="zwr-div">重污染天气预警,车辆管控要求:≤
+      <el-input style="width:100px;margin:0 10px" v-model="codeValue" type="number" @blur="editCarCode"  @keyup.native="number"></el-input>辆/日
+    </div>
     <div class="mod-demo-echarts">
       <el-row :gutter="20">
         <el-col :span="8">
@@ -41,7 +44,8 @@
         chartBar: null,
         chartBar2: null,
         chartBar3: null,
-        timer:null
+        timer:null,
+        codeValue:''
       }
     },
     mounted () {
@@ -52,6 +56,12 @@
         this.getListDay();
         console.log('请求了')
       },60000);
+      this.$http({
+        url: this.$http.adornUrl('/biz/syscode/info/1'),
+        method: 'get',
+      }).then(({data}) => {
+         this.codeValue=data.data.codeValue;
+      })
     },
     beforeDestroy () {
       if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
@@ -71,6 +81,34 @@
       }
     },
     methods: {
+      //重污染车辆输入
+      editCarCode(){
+        this.$http({
+          url: this.$http.adornUrl(`/biz/syscode/update`),
+          method: 'post',
+          data: this.$http.adornData({
+            'id': '1',
+            'codeValue': this.codeValue,
+          })
+        }).then(({data}) => {
+          if (data && data.code ===200) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      },
+      number(){
+        this.codeValue=this.codeValue.replace(/[^\.\d]/g,'');
+        this.codeValue=this.codeValue.replace('.','');
+      },
       //当天的数据
       getListDay(){
         this.$http({
@@ -162,7 +200,10 @@
       initChartBar (gw,gl,cdd) {
         var option = {
           title: {
-            'text': '当日运输量'
+            'text': '当日运输车次:'+(gw+gl+cdd)+'辆\n国五及以上车辆占比100%',
+            textStyle:{
+              'fontSize':14
+            }
           },
           xAxis: {
             type: 'category',
@@ -198,7 +239,10 @@
       initChartBar2 (gw,gl,cdd) {
         var option = {
           title: {
-            'text': '当月运输量'
+            'text': '当月运输车次:'+(gw+gl+cdd)+'辆\n国五及以上车辆占比100%',
+            textStyle:{
+              'fontSize':14,
+              }
           },
           xAxis: {
             type: 'category',
@@ -237,7 +281,10 @@
       initChartBar3 (gw,gl,cdd) {
         var option = {
           title: {
-            'text': '当年运输量'
+            'text': '当年运输车次:'+(gw+gl+cdd)+'辆\n国五及以上车辆占比100%',
+            textStyle:{
+              'fontSize':14
+            }
           },
           xAxis: {
             type: 'category',
@@ -276,6 +323,16 @@
   }
 </script>
 <style lang="scss">
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  .zwr-div{
+    margin-bottom: 20px;
+  }
   .echarts-title{
     font-size: 24px;
     font-weight: bold;
