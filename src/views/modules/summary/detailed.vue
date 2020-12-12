@@ -1,5 +1,6 @@
 <template>
   <div class="mod-user">
+    <!--菜单上的明细表,路由:summary/detailed-->
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="物料名称" name="materials"></el-tab-pane>
       <el-tab-pane label="运输方式" name="trantype"></el-tab-pane>
