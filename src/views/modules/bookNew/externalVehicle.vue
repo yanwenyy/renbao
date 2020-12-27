@@ -41,7 +41,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="pageIndex=1,pageSize=10,getDataList()">查询</el-button>
         <el-button type="warning" @click="down">导出</el-button>
         <!--<el-button v-if="isAuth('biz:factorycar:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
         <!--<el-popover v-model="drVisibel"  v-if="isAuth('biz:factorycar:save')"-->

@@ -4,22 +4,32 @@
       <el-form-item label="物料名称:">
         <el-input v-model="dataForm.materialsName" placeholder="物料名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="月份:">
+      <el-form-item label="时间:">
         <el-date-picker
-          v-model="dataForm.monthTime"
-          value-format="yyyy-MM"
-          type="month"
-          placeholder="选择月份" @change="dataForm.dayTime=''">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="日期:">
-        <el-date-picker
-          v-model="dataForm.dayTime"
+          v-model="value1"
           value-format="yyyy-MM-dd"
-          type="date"
-          placeholder="选择日期"  @change="dataForm.monthTime=''">
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期">
         </el-date-picker>
       </el-form-item>
+      <!--<el-form-item label="月份:">-->
+        <!--<el-date-picker-->
+          <!--v-model="dataForm.monthTime"-->
+          <!--value-format="yyyy-MM"-->
+          <!--type="month"-->
+          <!--placeholder="选择月份" @change="dataForm.dayTime=''">-->
+        <!--</el-date-picker>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="日期:">-->
+        <!--<el-date-picker-->
+          <!--v-model="dataForm.dayTime"-->
+          <!--value-format="yyyy-MM-dd"-->
+          <!--type="date"-->
+          <!--placeholder="选择日期"  @change="dataForm.monthTime=''">-->
+        <!--</el-date-picker>-->
+      <!--</el-form-item>-->
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!--<el-button v-if="" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
@@ -119,8 +129,11 @@
         dataForm: {
           monthTime: '',
           dayTime: '',
-          materialsName:''
+          materialsName:'',
+          timeStart:'',
+          timeEnd:''
         },
+        value1:'',
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -140,15 +153,18 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true;
+        this.dataForm.timeStart=this.value1[0];
+        this.dataForm.timeEnd=this.value1[1];
         this.$http({
           url: this.$http.adornUrl('/jinding/sum/list'),
           method: 'get',
           params: this.$http.adornParams({
             'pageNum': this.pageIndex,
             'pageSize': this.pageSize,
-            'monthTime': this.dataForm.monthTime||'',
-            'dayTime': this.dataForm.dayTime||'',
-            'materialsName': this.dataForm.materialsName
+            // 'monthTime': this.dataForm.monthTime||'',
+            // 'dayTime': this.dataForm.dayTime||'',
+            'timeStart': this.dataForm.timeStart,
+            'timeEnd': this.dataForm.timeEnd,
           })
         }).then(({data}) => {
           if (data && data.code === 10000) {

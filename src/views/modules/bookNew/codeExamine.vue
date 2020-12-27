@@ -2,10 +2,10 @@
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="车牌号:">
-        <el-input v-model="dataForm.carNum" placeholder="车牌号" clearable></el-input>
+        <el-input v-model.trim="dataForm.carNum" placeholder="车牌号" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="pageIndex=1,pageSize=10,getDataList()">查询</el-button>
         <el-button type="warning" @click="down">导出</el-button>
         <el-button  type="primary" v-if="isAuth('biz:outcar:save')" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>

@@ -94,7 +94,7 @@
         align="center"
         label="不通过分类">
         <template slot-scope="scope">
-          {{scope.row.checkStatus==1?'排放阶段不符合':scope.row.checkStatus==2?'格式不通过':'其他'}}
+          {{scope.row.checkStatus==2?'排放阶段不符合':scope.row.checkStatus==1?'格式不通过':' '}}
         </template>
       </el-table-column>
       <el-table-column
