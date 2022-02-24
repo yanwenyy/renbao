@@ -41,6 +41,7 @@
   export default {
     data () {
       return {
+        currdatetime:'',
         dataForm: {
           userName: '',
           password: '',
@@ -70,12 +71,12 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl('/sys/login'),
+              url: this.$http.adornUrl('login/login'),
               method: 'post',
               data: this.$http.adornData({
                 'username': this.dataForm.userName,
                 'password': this.dataForm.password,
-                'uuid': this.dataForm.uuid,
+                'checkKey':  this.dataForm.uuid,
                 'captcha': this.dataForm.captcha
               })
             }).then(({data}) => {
@@ -92,8 +93,15 @@
       },
       // 获取验证码
       getCaptcha () {
-        this.dataForm.uuid = getUUID()
-        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        this.dataForm.uuid = getUUID();
+        // this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        this.currdatetime = new Date().getTime();
+        this.$http({
+          url: this.$http.adornUrl(`/login/randomImage/${ this.dataForm.uuid}`),
+          method: 'get',
+        }).then(({data}) => {
+          this.captchaPath =data.result;
+        })
       }
     }
   }

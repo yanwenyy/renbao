@@ -123,7 +123,7 @@
         label="操作">
         <template slot-scope="scope">
           <!--<el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>-->
-          <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
+          <el-button v-if="isAuth('biz:notPass:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

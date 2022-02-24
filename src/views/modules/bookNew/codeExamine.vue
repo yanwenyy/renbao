@@ -7,7 +7,7 @@
       <el-form-item>
         <el-button @click="pageIndex=1,pageSize=10,getDataList()">查询</el-button>
         <el-button type="warning" @click="down">导出</el-button>
-        <el-button  type="primary" v-if="isAuth('biz:outcar:save')" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button  type="primary" v-if="isAuth('biz:car:save')" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -107,8 +107,8 @@
       <template slot-scope="scope">
         <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="dataForm.status=1,dataForm.id=scope.row.carNum,examine()">通过</el-button>
         <el-button v-if="isAuth('biz:car:check')" type="text" size="small" @click="dialogFormVisible = true,dataForm.remaks='',dataForm.status='',dataForm.id=scope.row.carNum">不通过</el-button>
-        <el-button v-if="isAuth('biz:outcar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum)">修改</el-button>
-        <el-button v-if="isAuth('biz:outcar:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
+        <el-button v-if="isAuth('biz:car:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.carNum)">修改</el-button>
+        <el-button v-if="isAuth('biz:car:delete')" type="text" size="small" @click="deleteHandle(scope.row.carNum)">删除</el-button>
       </template>
       </el-table-column>
     </el-table>

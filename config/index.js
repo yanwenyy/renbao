@@ -15,7 +15,7 @@ module.exports = {
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
         // target: 'http://59.110.54.1:8080/jinding-back/',
-        target: 'http://27.188.74.31:9080/jinding-back/',
+        target: 'http://10.10.113.229:1070/jeecg-boot/',
         changeOrigin: true,
         pathRewrite: {
           '^/proxyApi': '/'
@@ -24,7 +24,7 @@ module.exports = {
     },
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '10.10.23.98', // can be overwritten by process.env.HOST
     port: 8001, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: true,
     errorOverlay: true,

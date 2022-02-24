@@ -165,6 +165,7 @@
             // 'dayTime': this.dataForm.dayTime||'',
             'timeStart': this.dataForm.timeStart,
             'timeEnd': this.dataForm.timeEnd,
+            'materialsName':this.dataForm.materialsName
           })
         }).then(({data}) => {
           if (data && data.code === 10000) {
