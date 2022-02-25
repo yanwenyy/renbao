@@ -68,30 +68,28 @@
     methods: {
       // 提交表单
       dataFormSubmit () {
-        this.$router.replace({ name: 'home' });
-
-        // this.$refs['dataForm'].validate((valid) => {
-        //   if (valid) {
-        //     this.$http({
-        //       url: this.$http.adornUrl('login/login'),
-        //       method: 'post',
-        //       data: this.$http.adornData({
-        //         'username': this.dataForm.userName,
-        //         'password': this.dataForm.password,
-        //         'checkKey':  this.dataForm.uuid,
-        //         'captcha': this.dataForm.captcha
-        //       })
-        //     }).then(({data}) => {
-        //       if (data && data.code === 0) {
-        //         this.$cookie.set('token', data.token);
-        //         this.$router.replace({ name: 'home' });
-        //       } else {
-        //         this.getCaptcha();
-        //         this.$message.error(data.msg);
-        //       }
-        //     })
-        //   }
-        // })
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl('login/login'),
+              method: 'post',
+              data: this.$http.adornData({
+                'username': this.dataForm.userName,
+                'password': this.dataForm.password,
+                // 'checkKey':  this.dataForm.uuid,
+                // 'captcha': this.dataForm.captcha
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$cookie.set('token', data.token);
+                this.$router.replace({ name: 'home' });
+              } else {
+                this.getCaptcha();
+                this.$message.error(data.msg);
+              }
+            })
+          }
+        })
       },
       // 获取验证码
       getCaptcha () {
