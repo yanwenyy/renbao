@@ -3,7 +3,7 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <!--<h2 class="brand-info__text">清洁运输管控平台</h2>-->
+          <h2 class="brand-info__text">人保管理平台</h2>
           <!--<p class="brand-info__intro">renren-fast-vue基于vue、element-ui构建开发，实现renren-fast后台管理前端功能，提供一套更优的前端解决方案。</p>-->
         </div>
         <div class="login-main">
@@ -15,17 +15,17 @@
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
-            <el-form-item prop="captcha">
-              <el-row :gutter="20">
-                <el-col :span="14">
-                  <el-input v-model="dataForm.captcha" placeholder="验证码">
-                  </el-input>
-                </el-col>
-                <el-col :span="10" class="login-captcha">
-                  <img :src="captchaPath" @click="getCaptcha()" alt="">
-                </el-col>
-              </el-row>
-            </el-form-item>
+            <!--<el-form-item prop="captcha">-->
+              <!--<el-row :gutter="20">-->
+                <!--<el-col :span="14">-->
+                  <!--<el-input v-model="dataForm.captcha" placeholder="验证码">-->
+                  <!--</el-input>-->
+                <!--</el-col>-->
+                <!--<el-col :span="10" class="login-captcha">-->
+                  <!--<img :src="captchaPath" @click="getCaptcha()" alt="">-->
+                <!--</el-col>-->
+              <!--</el-row>-->
+            <!--</el-form-item>-->
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit()">登录</el-button>
             </el-form-item>
@@ -68,28 +68,30 @@
     methods: {
       // 提交表单
       dataFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl('login/login'),
-              method: 'post',
-              data: this.$http.adornData({
-                'username': this.dataForm.userName,
-                'password': this.dataForm.password,
-                'checkKey':  this.dataForm.uuid,
-                'captcha': this.dataForm.captcha
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$cookie.set('token', data.token)
-                this.$router.replace({ name: 'home' })
-              } else {
-                this.getCaptcha()
-                this.$message.error(data.msg)
-              }
-            })
-          }
-        })
+        this.$router.replace({ name: 'home' });
+
+        // this.$refs['dataForm'].validate((valid) => {
+        //   if (valid) {
+        //     this.$http({
+        //       url: this.$http.adornUrl('login/login'),
+        //       method: 'post',
+        //       data: this.$http.adornData({
+        //         'username': this.dataForm.userName,
+        //         'password': this.dataForm.password,
+        //         'checkKey':  this.dataForm.uuid,
+        //         'captcha': this.dataForm.captcha
+        //       })
+        //     }).then(({data}) => {
+        //       if (data && data.code === 0) {
+        //         this.$cookie.set('token', data.token);
+        //         this.$router.replace({ name: 'home' });
+        //       } else {
+        //         this.getCaptcha();
+        //         this.$message.error(data.msg);
+        //       }
+        //     })
+        //   }
+        // })
       },
       // 获取验证码
       getCaptcha () {
@@ -124,7 +126,7 @@
       width: 100%;
       height: 100%;
       content: "";
-      background-image: url(~@/assets/img/bg5.jpg);
+      background-image: url(~@/assets/img/bg1.jpg);
       /*background-size:  100% 100%;*/
       background-size: 100% 100%;
     }
