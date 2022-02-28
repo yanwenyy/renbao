@@ -71,7 +71,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl('login/login'),
+              url: this.$http.adornUrl('sys/login'),
               method: 'post',
               data: this.$http.adornData({
                 'username': this.dataForm.userName,
@@ -80,12 +80,12 @@
                 // 'captcha': this.dataForm.captcha
               })
             }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$cookie.set('token', data.token);
+              if (data && data.code === 200) {
+                this.$cookie.set('token', data.result.token);
                 this.$router.replace({ name: 'home' });
               } else {
                 this.getCaptcha();
-                this.$message.error(data.msg);
+                this.$message.error(data.message);
               }
             })
           }
