@@ -190,9 +190,10 @@
           params: this.$http.adornParams({
             'pageNo': this.pageIndex,
             'pageSize': this.pageSize,
-            'username': this.dataForm.userName,
+            'userName': this.dataForm.userName,
             'userNumber': this.dataForm.userNumber,
-            'userSex': this.dataForm.userSex
+            'userSex': this.dataForm.userSex,
+            'userPhone': this.dataForm.userPhone
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
