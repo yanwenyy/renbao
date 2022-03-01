@@ -2,12 +2,43 @@
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
+        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input v-model="dataForm.userNumber" placeholder="工号" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-select clearable v-model="dataForm.userSex" placeholder="请选择性别">
+          <el-option label="男" value="1"></el-option>
+          <el-option label="女" value="2"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="dataForm.userPhone" placeholder="手机号" clearable></el-input>
+      </el-form-item>
+      <!--<el-form-item>-->
+        <!--<el-select v-model="dataForm.userName" placeholder="请选择性别">-->
+          <!--<el-option label="请选择" value=""></el-option>-->
+          <!--<el-option label="正常" value="1"></el-option>-->
+          <!--<el-option label="冻结" value="1"></el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
+      <el-form-item  class="searchBtn">
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" @click="down()">下载模板</el-button>
+        <!--<el-upload-->
+          <!--class="inline-block"-->
+          <!--:headers="{'token':token}"-->
+          <!--:action="this.$http.adornUrl('/biz/offroad/import/road')"-->
+          <!--:on-success="handleChange"-->
+          <!--:on-error="handleChange"-->
+          <!--:show-file-list="false"-->
+        <!--&gt;-->
+          <!--<el-button type="warning">导入</el-button>-->
+        <!--</el-upload>-->
+        <el-button type="primary">导入</el-button>
+        <!--<el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
     <el-table
@@ -31,39 +62,51 @@
         <!--prop="userId"-->
       </el-table-column>
       <el-table-column
-        prop="username"
+        prop="userName"
         header-align="center"
         align="center"
-        label="用户名">
+        label="用户姓名">
       </el-table-column>
       <el-table-column
-        prop="email"
+        prop="userNumber"
         header-align="center"
         align="center"
-        label="邮箱">
+        label="工号">
       </el-table-column>
       <el-table-column
-        prop="mobile"
+        prop="userSex"
+        header-align="center"
+        align="center"
+        label="性别">
+        <template slot-scope="scope">{{
+          scope.row.userSex=='1'?'男': scope.row.userSex=='2'?'女':''
+          }}</template>
+      </el-table-column>
+      <el-table-column
+        prop="userPhone"
         header-align="center"
         align="center"
         label="手机号">
       </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="状态">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
-          <el-tag v-else size="small">正常</el-tag>
-        </template>
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--prop="status"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--label="状态">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>-->
+          <!--<el-tag v-else size="small">正常</el-tag>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
         width="180"
         label="创建时间">
+        <template slot-scope="scope">{{
+          scope.row.createTime | dateformat
+          }}</template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -72,8 +115,10 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
-          <el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
+          <!--<el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>-->
+          <!--<el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>-->
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -97,7 +142,9 @@
     data () {
       return {
         dataForm: {
-          userName: ''
+          userName: '',
+          userNumber: '',
+          userSex: '',
         },
         dataList: [],
         pageIndex: 1,
@@ -112,24 +159,45 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList();
+      this.token=this.$cookie.get('token')
     },
     methods: {
+      //导入
+      handleChange(response, file, fileList){
+        if (response && response.code === 10000) {
+          this.$message({
+            message: '导入成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList();
+              this.drVisibel=false;
+            }
+          })
+        } else {
+          this.$message.error(response.msg)
+        }
+      },
+      //下载
+      down(){},
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/sys/user/list'),
+          url: this.$http.adornUrl('/user/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'username': this.dataForm.userName
+            'pageNo': this.pageIndex,
+            'pageSize': this.pageSize,
+            'username': this.dataForm.userName,
+            'userNumber': this.dataForm.userNumber,
+            'userSex': this.dataForm.userSex
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
+          if (data && data.code === 200) {
+            this.dataList = data.result.records
+            this.totalPage = data.result.total
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -164,17 +232,17 @@
         var userIds = id ? [id] : this.dataListSelections.map(item => {
           return item.userId
         })
-        this.$confirm(`确定对[id=${userIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定进行删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/user/delete'),
+            url: this.$http.adornUrl('/user/delete/'+id),
             method: 'post',
-            data: this.$http.adornData(userIds, false)
+            // data: this.$http.adornData(userIds, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -192,3 +260,8 @@
     }
   }
 </script>
+<style scoped>
+  .searchBtn{
+    float: right;
+  }
+</style>

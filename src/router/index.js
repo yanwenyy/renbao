@@ -41,6 +41,7 @@ const mainRoutes = {
     { path: '/summary-detail', component: _import('modules/summary/summary-detailed'), name: 'summary-detail', meta: { title: '明细表', isTab: true } },
     { path: '/authoriza', component: _import('modules/authoriza/list'), name: 'authoriza', meta: { title: '授权管理', isTab: true } },
     { path: '/rule', component: _import('modules/data/rule'), name: 'rule', meta: { title: '规则管理', isTab: true } },
+    { path: '/projectList', component: _import('modules/projectManage/projectList'), name: 'projectList', meta: { title: '立项管理', isTab: true } },
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

@@ -43,10 +43,10 @@
       <div class="right">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <el-form-item label="规则名称:">
-            <el-input v-model="dataForm.carnum" placeholder="车牌号" clearable></el-input>
+            <el-input v-model="dataForm.carnum" placeholder="规则名称" clearable></el-input>
           </el-form-item>
           <el-form-item label="审计事项:">
-            <el-input v-model="dataForm.carnum" placeholder="车牌号" clearable></el-input>
+            <el-input v-model="dataForm.carnum" placeholder="审计事项" clearable></el-input>
           </el-form-item>
           <el-form-item label="风险等级:">
             <el-select clearable  v-model="dataForm.fuelType" placeholder="请选择">

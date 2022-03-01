@@ -5,10 +5,7 @@
   window.SITE_CONFIG = {};
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = 'http://172.16.48.105:9080/tangshan-back/';
-  window.SITE_CONFIG['wsUrl'] = 'ws://172.16.48.105:9080/tangshan-back/imserver/';
-  // window.SITE_CONFIG['baseUrl'] = 'http://221.194.106.171:9080/tangshan-back/';
-  // window.SITE_CONFIG['wsUrl'] = 'ws://221.194.106.171:9080/tangshan-back/imserver/';
+  window.SITE_CONFIG['baseUrl'] = 'http://10.10.113.229:1070/jeecg-boot/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名

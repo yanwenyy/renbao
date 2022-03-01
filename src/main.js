@@ -10,7 +10,7 @@ import '@/assets/scss/index.scss'
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
-
+import moment from 'moment'
 
 Vue.use(VueCookie)
 Vue.config.productionTip = false
@@ -19,13 +19,52 @@ Vue.config.productionTip = false
 if (process.env.NODE_ENV !== 'production') {
   require('@/mock')
 }
-
+Vue.prototype.$moment = moment
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
 
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
+
+// 日期格式化过滤器注册
+Vue.filter('dateformat', function(dataStr, pattern = 'YYYY-MM-DD') {
+  if (dataStr) {
+    return moment(dataStr).format(pattern)
+  } else {
+    return ''
+  }
+})
+Vue.filter('monthdateformat', function(dataStr, pattern = 'YYYY-MM') {
+  if (dataStr) {
+    return moment(dataStr).format(pattern)
+  } else {
+    return ''
+  }
+})
+
+Vue.filter('formatMoney', function(num) {
+  return utils.formatMoney(num, 4)
+})
+Vue.filter('datetimeformat', function(
+  dataStr,
+  pattern = 'YYYY-MM-DD HH:mm:ss'
+) {
+  if (dataStr) {
+    return moment(dataStr).format(pattern)
+  } else {
+    return ''
+  }
+})
+Vue.filter('numberToChinese', function(integer) {
+  return utils.numberToChinese(integer)
+})
+Vue.filter('stateTranslate', function(code) {
+  return utils.stateTranslate(code)
+})
+Vue.filter('datetoMonth', function(date) {
+  return utils.datetoMonth(date)
+})
 
 /* eslint-disable no-new */
 new Vue({
