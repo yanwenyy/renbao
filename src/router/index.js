@@ -39,6 +39,8 @@ const mainRoutes = {
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/summary-detail', component: _import('modules/summary/summary-detailed'), name: 'summary-detail', meta: { title: '明细表', isTab: true } },
+    { path: '/authoriza', component: _import('modules/authoriza/list'), name: 'authoriza', meta: { title: '授权管理', isTab: true } },
+    { path: '/rule', component: _import('modules/data/rule'), name: 'rule', meta: { title: '规则管理', isTab: true } },
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

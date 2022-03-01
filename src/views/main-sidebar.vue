@@ -10,6 +10,26 @@
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
         </el-menu-item>
+        <el-submenu index="sq">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>授权管理</span>
+          </template>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'authoriza' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">功能授权</span>
+          </el-menu-item>
+        </el-submenu>
+        <el-submenu index="sj">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>数据管理</span>
+          </template>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'rule' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">规则管理</span>
+          </el-menu-item>
+        </el-submenu>
         <!--<el-submenu index="demo">-->
           <!--<template slot="title">-->
             <!--<icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>-->
