@@ -50,7 +50,7 @@ export default {
       ruleForm: {
         roleNumber: "",
         roleName: "",
-        roleDes: "",
+        roleDes: ""
       },
       //   form校验
       rules: {
@@ -59,12 +59,12 @@ export default {
       },
       loading: false,
       // 单位选择页是否显示
-      showDetailDialog: false,
+      showDetailDialog: false
     };
   },
-  // created() {
-  //   this.init();
-  // },
+  created() {
+    this.init();
+  },
   methods: {
     init() {
       if (this.id != "") {
@@ -138,9 +138,6 @@ export default {
       // 弹出单位选择页
       this.showDetailDialog = true;
     }
-  },
-  created() {
-    this.init();
   }
 };
 </script>

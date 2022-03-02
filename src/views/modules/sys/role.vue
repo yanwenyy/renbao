@@ -5,17 +5,17 @@
       :model="dataForm"
       @keyup.enter.native="getDataList()"
     >
-      <el-form-item label="角色编码：">
+      <el-form-item>
         <el-input
           v-model="dataForm.roleNumber"
-          placeholder="请输入搜索内容"
+          placeholder="角色编码"
           clearable
         ></el-input>
       </el-form-item>
-      <el-form-item label="角色名称：">
+      <el-form-item>
         <el-input
           v-model="dataForm.roleName"
-          placeholder="请输入搜索内容"
+          placeholder="角色名称"
           clearable
         ></el-input>
       </el-form-item>
@@ -82,6 +82,9 @@
         align="center"
         label="创建时间"
       >
+        <template slot-scope="scope">{{
+          scope.row.createTime | dateformat
+        }}</template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -148,18 +151,30 @@ export default {
   data() {
     return {
       dataForm: {
-        roleName: ""
+        roleName: "",
+        roleNumber: ""
       },
+      //列表数据
       dataList: [],
+      //当前页
       pageIndex: 1,
+      //每页条数
       pageSize: 10,
+      //总页数
       totalPage: 0,
+      //列表加载
       dataListLoading: false,
+      //多选数据
       dataListSelections: [],
+      //新增修改弹窗
       showAddDialog: false,
+      //授权用户弹窗
       showAuthorityUser: false,
+      //传给修改弹窗的子组件id
       id: "",
+      //弹窗标题
       title: "",
+      //弹窗按钮
       showBtn: ""
     };
   },
@@ -215,7 +230,7 @@ export default {
       this.showAddDialog = true;
       this.title = "新增角色";
       this.showBtn = true;
-      this.id = ""
+      this.id = "";
     },
     //修改
     editHandle() {
@@ -228,7 +243,7 @@ export default {
     detail(data) {
       this.showAddDialog = true;
       this.title = "查看角色";
-      this.id = data.roleId
+      this.id = data.roleId;
       this.showBtn = false;
     },
     //关闭新增/修改弹窗
@@ -252,7 +267,13 @@ export default {
       this.showAuthorityUser = true;
     },
     //重置
-    reset() {},
+    reset() {
+      this.dataForm = {
+        roleName: "",
+        roleNumber: ""
+      };
+      this.getDataList();
+    },
     // 删除
     deleteHandle() {
       debugger;
