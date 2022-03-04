@@ -165,6 +165,7 @@ export default {
         getSelectPage () {
             this.tableLoading = true;
              this.$http({
+                isLoading:false,
                 url: this.$http.adornUrl(`/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
                 params:  this.$http.adornParams(this.searchForm)
@@ -202,7 +203,6 @@ export default {
 
         },
         deleteFn () {
-            console.log(this.multipleTable, '是啥')
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
             var deleteList = []
             this.multipleTable.forEach( item =>{
@@ -215,6 +215,7 @@ export default {
                 type: 'warning'
                 }).then(() => {
                 this.$http({
+                    isLoading:false,
                     url: this.$http.adornUrl('/rule/deleteByIds'),
                     method: 'DELETE',
                     data: this.$http.adornData(deleteList, false)
@@ -256,7 +257,6 @@ export default {
         },
         // 提交个性化规则
         submitgxhgz () {
-            console.log('打开弹框')
             this.$refs.submitPersonalityRule.showDialog()
         },
         // 立即执行

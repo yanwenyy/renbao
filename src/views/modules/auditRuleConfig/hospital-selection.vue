@@ -3,7 +3,7 @@
         <el-dialog
             ref="hospitalSelection"
             title="选择医院"
-            :visible.sync="dialogVisible"
+            :visible.sync="innerVisible"
             :close-on-click-modal="false"
             width="900px"
             :close-on-press-escape="false"
@@ -65,7 +65,7 @@ export default {
     data() {
         return {
             loading: false,
-            dialogVisible: false,
+            innerVisible: false,
             tableLoading: false,
             searchHospitalForm: {
                 name: '',
@@ -78,18 +78,20 @@ export default {
                 {dataname:'q3' , label:'医院性质' , issortable:false , type:''},
                 {dataname:'q4' , label:'医院类别' , issortable:false , type:''},
             ],
+            type: '',
         }
     },
     methods: {
         //默认打开页面
         showDialog(type, d) {
-            this.dialogVisible = true
+            this.innerVisible = true;
+            this.type = type
             
         },
        
         handleClose () {
-            this.dialogVisible = false;
-            this.$parent.showDialog();
+            this.innerVisible = false;
+            this.$parent.showDialog(this.type);
         },
         handleSelectionChange (val) {
             console.log(val, 'valvalval')
@@ -105,8 +107,8 @@ export default {
 
         },
         cancel () {
-            this.dialogVisible = false;
-            this.$parent.showDialog();
+            this.innerVisible = false;
+            this.$parent.showDialog(this.type);
            
         }
     },

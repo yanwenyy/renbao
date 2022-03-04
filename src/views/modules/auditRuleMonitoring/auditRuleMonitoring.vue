@@ -156,7 +156,7 @@ export default {
         },
         // 列表重置
         onReset () {
-
+            this.searchForm= {type: '',runningState: ''};
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
