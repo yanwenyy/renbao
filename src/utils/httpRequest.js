@@ -5,6 +5,35 @@ import qs from 'qs'
 import merge from 'lodash/merge'
 import { clearLoginInfo } from '@/utils'
 
+let loading;
+let needLoadingRequestCount = 0; // 声明一个对象用于存储请求个数
+function startLoading () {
+  loading = Vue.prototype.$loading({
+    lock: true,
+    text: "努力加载中...",
+    // background: 'rgba(0,0,0,0.3)',
+    background: 'transparent',
+    customClass: 'loadingIcon',
+    target: document.querySelector(".loading-area") // 设置加载动画区域
+  });
+}
+function endLoading () {
+  loading.close();
+}
+function showFullScreenLoading () {
+  if (needLoadingRequestCount === 0) {
+    startLoading();
+  }
+  needLoadingRequestCount++;
+}
+function hideFullScreenLoading () {
+  if (needLoadingRequestCount <= 0) return;
+  needLoadingRequestCount--;
+  if (needLoadingRequestCount === 0) {
+    endLoading();
+  }
+}
+
 const http = axios.create({
   timeout: 1000 * 60,
   withCredentials: true,
@@ -17,9 +46,14 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
+  if (config.isLoading !== false) {
+    // 如果配置了isLoading: false，则不显示loading
+    showFullScreenLoading();
+  }
   config.headers['token'] = Vue.cookie.get('token') // 请求头带上token
   return config
 }, error => {
+  hideFullScreenLoading();
   return Promise.reject(error)
 })
 
@@ -31,8 +65,10 @@ http.interceptors.response.use(response => {
     clearLoginInfo()
     router.push({ name: 'login' })
   }
+  hideFullScreenLoading();
   return response
 }, error => {
+  hideFullScreenLoading();
   return Promise.reject(error)
 })
 
