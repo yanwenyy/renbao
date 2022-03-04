@@ -31,16 +31,19 @@
           <!--<el-button @click="setCheckedKeys">通过 key 设置</el-button>-->
           <!--<el-button @click="resetChecked">清空</el-button>-->
         </div>
-        <el-tree
-          :default-checked-keys="selTree"
-          :data="dataRight"
-          show-checkbox
-          default-expand-all
-          node-key="menuId"
-          ref="tree"
-          highlight-current
-          :props="defaultProps">
-        </el-tree>
+        <div style="margin-top: 5%">
+          <el-tree
+            :default-checked-keys="selTree"
+            :data="dataRight"
+            show-checkbox
+            default-expand-all
+            node-key="menuId"
+            ref="tree"
+            highlight-current
+            :props="defaultProps">
+          </el-tree>
+        </div>
+
 
 
       </div>
@@ -282,11 +285,14 @@
   }
   .right{
     width: 60%;
+    position: relative;
   }
   .buttons{
     text-align: right;
     width: 100%;
     position: fixed;
+    right: 5%;
+    z-index: 9999;
   }
   .user-list{
     padding: 0;
