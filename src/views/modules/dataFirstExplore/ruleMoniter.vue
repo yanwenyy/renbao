@@ -14,7 +14,7 @@
             ref="dataTree1"
             node-key="id"
           ></el-tree>
-         <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
+          <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
             apComServerData.childCount1
           }}</span>
           <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
@@ -31,7 +31,7 @@
                   <el-input
                     v-model="apComServerData.displayname"
                     size="small"
-                    placeholder="规则名称"
+                    placeholder="规则类型"
                     clearable
                   ></el-input>
                 </div>
@@ -42,7 +42,7 @@
                     v-model="apComServerData.type"
                     filterable
                     clearable
-                    placeholder="规则类型"
+                    placeholder="运行状态"
                     size="small"
                     @change="getProjectId"
                   >
@@ -61,7 +61,7 @@
                 >
                 <el-button @click="reset()">重置</el-button>
               </el-col>
-              <el-col :span="11">
+              <!--  <el-col :span="11">
                 <el-button-group style="float:right">
                   <el-button>当前选择规则数量：{{ 10 }}</el-button>
                   <el-button @click="runNow">立即运行</el-button>
@@ -78,7 +78,7 @@
                     >
                   </el-popover>
                 </el-button-group>
-              </el-col>
+              </el-col> -->
             </el-row>
           </div>
           <div class="content">
@@ -89,11 +89,11 @@
                 }}</span
                 >条</span
               >
-              <div style="float:right;margin-bottom:10px">
+              <!--  <div style="float:right;margin-bottom:10px">
                 <el-button @click="addData" type="primary">新增</el-button>
                 <el-button @click="editData" type="primary">修改</el-button>
                 <el-button @click="deleteData" type="danger">删除</el-button>
-              </div>
+              </div> -->
             </div>
             <el-table
               :data="tableData"
@@ -113,20 +113,28 @@
                 label="规则类别"
               ></el-table-column>
               <el-table-column
-                prop="REGULATIONCATEGORY"
-                label="创建人"
-              ></el-table-column>
-              <el-table-column
                 prop="RULEGRADATIONNAME"
-                label="创建时间"
+                label="预计开始时间"
               ></el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="医院">
+              <el-table-column prop="TIMELINESSNAME" label="预计结束时间">
+              </el-table-column>
+              <el-table-column prop="TIMELINESSNAME" label="实际开始时间">
+              </el-table-column>
+              <el-table-column prop="TIMELINESSNAME" label="实际结束时间">
+              </el-table-column>
+              <el-table-column prop="TIMELINESSNAME" label="运行状态">
+                <template scope="scope">
+                  <div v-if="scope.row.TIMELINESSNAME == 1">执行失败</div>
+                  <div v-if="scope.row.TIMELINESSNAME == 2">执行中</div>
+                  <div v-if="scope.row.TIMELINESSNAME == 3">已完成</div>
+                </template>
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
                 <template scope="scope">
                   <el-button type="text" @click="detailHandle(scope.row.id)"
-                    >查看详情</el-button
+                    >查看日志</el-button
                   >
+                  <div type="text" v-if="scope.row.aa == 1">运行成功</div>
                 </template>
               </el-table-column>
             </el-table>
@@ -143,7 +151,7 @@
           <!--查看详细弹窗 -->
           <el-dialog
             :visible.sync="showDetailDialog"
-            title="初探规则详细"
+            title="监控报告详情"
             :close-on-click-modal="false"
             :modal-append-to-body="false"
             width="40%"
@@ -156,52 +164,16 @@
               v-if="showDetailDialog"
             ></detail>
           </el-dialog>
-          <!--新增/修改页面 -->
-          <el-dialog
-            :visible.sync="showAddOrEditDialog"
-            title="sql编辑器"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="80%"
-            :close-on-press-escape="false"
-          >
-            <AddOrEdit
-              @close="closeAddOrEdit"
-              @ok="succeed"
-              :info="info"
-              v-if="showAddOrEditDialog"
-            ></AddOrEdit>
-          </el-dialog>
-          <!--规则运行页面 -->
-          <el-dialog
-            :visible.sync="showRunDialog"
-            title="规则运行"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <runNow
-              @close="closeRun"
-              @ok="succeedRun"
-              :info="info"
-              v-if="showRunDialog"
-            ></runNow>
-          </el-dialog>
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
 <script>
-// import detail from "./component/ruleConfig-detail.vue";
-// import AddOrEdit from "./component/ruleConfig-addOredit.vue";
-// import runNow from "./component/ruleConfig-runNow.vue";
+import detail from "./component/ruleMoniter-detail.vue";
 export default {
   components: {
-    // detail,
-    // AddOrEdit,
-    // runNow
+    detail,
   },
   data() {
     return {
@@ -212,14 +184,13 @@ export default {
           name: "批次名称",
           children: [
             {
-              name: "人民医院医保数据筛查",
+              name: "人民医院医保数据筛查"
             },
             {
-              name: "妇幼保健院医院数据筛查",
+              name: "妇幼保健院医院数据筛查"
             }
           ]
         }
-      
       ],
       serverType: [
         { id: 1, name: "门诊规则" },
