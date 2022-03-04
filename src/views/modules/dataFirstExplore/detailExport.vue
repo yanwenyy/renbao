@@ -132,7 +132,7 @@
                 </template>
               </el-table-column> -->
               <el-table-column prop="moblie" label="操作">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <el-button type="text" @click="detailHandle(scope.row.id)"
                     >查看明细</el-button
                   >

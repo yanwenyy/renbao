@@ -123,14 +123,14 @@
               <el-table-column prop="TIMELINESSNAME" label="实际结束时间">
               </el-table-column>
               <el-table-column prop="TIMELINESSNAME" label="运行状态">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <div v-if="scope.row.TIMELINESSNAME == 1">执行失败</div>
                   <div v-if="scope.row.TIMELINESSNAME == 2">执行中</div>
                   <div v-if="scope.row.TIMELINESSNAME == 3">已完成</div>
                 </template>
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <el-button type="text" @click="detailHandle(scope.row.id)"
                     >查看日志</el-button
                   >

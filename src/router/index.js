@@ -47,6 +47,10 @@ const mainRoutes = {
 
     { path: '/projectList', component: _import('modules/projectManage/projectList'), name: 'projectList', meta: { title: '立项管理', isTab: true } },
     { path: '/codemirror', component: _import('modules/projectManage/codemirror'), name: 'codemirror', meta: { title: 'sql编译器', isTab: true } },
+    { path: '/ruleConfig', component: _import('modules/dataFirstExplore/ruleConfig'), name: 'ruleConfig', meta: { title: '初探规则配置', isTab: true } },
+    { path: '/ruleMoniter', component: _import('modules/dataFirstExplore/ruleMoniter'), name: 'ruleMoniter', meta: { title: '初探规则监控', isTab: true } },
+    { path: '/detailExport', component: _import('modules/dataFirstExplore/detailExport'), name: 'detailExport', meta: { title: '结果明细导出', isTab: true } },
+    { path: '/reportExport', component: _import('modules/dataFirstExplore/reportExport'), name: 'reportExport', meta: { title: '初探报告导出', isTab: true } },
   ],
     beforeEnter (to, from, next) {
       let token = Vue.cookie.get('token')

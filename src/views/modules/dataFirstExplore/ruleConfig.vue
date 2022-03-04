@@ -133,7 +133,7 @@
               <el-table-column prop="TIMELINESSNAME" label="医院">
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <el-button type="text" @click="detailHandle(scope.row.id)"
                     >查看详情</el-button
                   >
