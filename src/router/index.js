@@ -41,16 +41,20 @@ const mainRoutes = {
     { path: '/summary-detail', component: _import('modules/summary/summary-detailed'), name: 'summary-detail', meta: { title: '明细表', isTab: true } },
     { path: '/authoriza', component: _import('modules/authoriza/list'), name: 'authoriza', meta: { title: '授权管理', isTab: true } },
     { path: '/rule', component: _import('modules/data/rule'), name: 'rule', meta: { title: '规则管理', isTab: true } },
+    { path: '/auditRuleConfig', component: _import('modules/auditRuleConfig/auditRuleConfig'), name: 'auditRuleConfig', meta: { title: '审核规则配置', isTab: true } },
+    { path: '/auditRuleMonitoring', component: _import('modules/auditRuleMonitoring/auditRuleMonitoring'), name: 'auditRuleMonitoring', meta: { title: '审核执行监控', isTab: true } },
+    { path: '/resultDetailsExport', component: _import('modules/resultDetailsExport/resultDetailsExport'), name: 'resultDetailsExport', meta: { title: '结果明细导出', isTab: true } },
+
     { path: '/projectList', component: _import('modules/projectManage/projectList'), name: 'projectList', meta: { title: '立项管理', isTab: true } },
   ],
-  beforeEnter (to, from, next) {
-    let token = Vue.cookie.get('token')
-    if (!token || !/\S/.test(token)) {
-      clearLoginInfo()
-      next({ name: 'login' })
+    beforeEnter (to, from, next) {
+      let token = Vue.cookie.get('token')
+      if (!token || !/\S/.test(token)) {
+        clearLoginInfo()
+        next({ name: 'login' })
+      }
+      next()
     }
-    next()
-  }
 }
 
 const router = new Router({

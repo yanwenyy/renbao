@@ -57,6 +57,29 @@
             <span slot="title">初探报告导出</span>
           </el-menu-item>
         </el-submenu>
+        <el-submenu index="sc">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>二次数据筛查</span>
+          </template>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'auditRuleConfig' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">审核规则配置</span>
+          </el-menu-item>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'auditRuleMonitoring' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">审核执行监控</span>
+          </el-menu-item>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'resultDetailsExport' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">结果明细导出</span>
+          </el-menu-item>
+        </el-submenu>
+
+        <!--<el-menu-item index="lx" @click="$router.push({ name: 'projectList' })">-->
+          <!--<icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>-->
+          <!--<span slot="title">立项管理</span>-->
+        <!--</el-menu-item>-->
         <!--<el-submenu index="demo">-->
           <!--<template slot="title">-->
             <!--<icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>-->
