@@ -108,6 +108,55 @@ export default {
       "open": null,
       "list": []
     }]
+  },{
+    "menuId": 100,
+    "parentId": 0,
+    "parentName": null,
+    "name": "数据采集",
+    "url": null,
+    "perms": null,
+    "type": 0,
+    "icon": "system",
+    "orderNum": 0,
+    "open": null,  
+    "list": [{
+      "menuId": 101,
+      "parentId": 1,
+      "parentName": null,
+      "name": "三目数据导入",
+      "url": "dataAcquisition/threeData",
+      "perms": null,
+      "type": 1,
+      "icon": "admin",
+      "orderNum": 1,
+      "open": null,
+      "list": []
+    },{
+      "menuId": 102,
+      "parentId": 1,
+      "parentName": null,
+      "name": "医院基本信息",
+      "url": "dataAcquisition/basicInformation",
+      "perms": null,
+      "type": 1,
+      "icon": "log",
+      "orderNum": 1,
+      "open": null,
+      "list": []
+    },
+    {
+      "menuId": 103,
+      "parentId": 1,
+      "parentName": null,
+      "name": "采集进度监控",
+      "url": "dataAcquisition/collection",
+      "perms": null,
+      "type": 1,
+      "icon": "menu",
+      "orderNum": 1,
+      "open": null,
+      "list": []
+    }]
   }],
   "code": 0,
   "permissions": ["sys:schedule:info", "sys:menu:update", "sys:menu:delete", "sys:config:info", "sys:menu:list", "sys:config:save", "sys:config:update", "sys:schedule:resume", "sys:user:delete", "sys:config:list", "sys:user:update", "sys:role:list", "sys:menu:info", "sys:menu:select", "sys:schedule:update", "sys:schedule:save", "sys:role:select", "sys:user:list", "sys:menu:save", "sys:role:save", "sys:schedule:log", "sys:role:info", "sys:schedule:delete", "sys:role:update", "sys:schedule:list", "sys:user:info", "sys:schedule:run", "sys:config:delete", "sys:role:delete", "sys:user:save", "sys:schedule:pause", "sys:log:list", "sys:oss:all"]
