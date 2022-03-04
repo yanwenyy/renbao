@@ -12,6 +12,20 @@ import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import moment from 'moment'
 
+// 引入jshint用于实现js自动补全提示
+
+import jshint from "jshint";
+
+window.JSHINT = jshint.JSHINT;
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+// import base style
+import 'codemirror/lib/codemirror.css'
+// import more codemirror resource...
+Vue.use(VueCodemirror, /* {
+  options: { theme: 'base16-dark', ... },
+  events: ['scroll', ...]
+} */)
 Vue.use(VueCookie)
 Vue.config.productionTip = false
 

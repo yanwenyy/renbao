@@ -8,7 +8,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo } from '@/utils'
+import { clearLoginInfo ,treeDataTranslate} from '@/utils'
 
 Vue.use(Router)
 
@@ -42,6 +42,7 @@ const mainRoutes = {
     { path: '/authoriza', component: _import('modules/authoriza/list'), name: 'authoriza', meta: { title: '授权管理', isTab: true } },
     { path: '/rule', component: _import('modules/data/rule'), name: 'rule', meta: { title: '规则管理', isTab: true } },
     { path: '/projectList', component: _import('modules/projectManage/projectList'), name: 'projectList', meta: { title: '立项管理', isTab: true } },
+    { path: '/codemirror', component: _import('modules/projectManage/codemirror'), name: 'codemirror', meta: { title: 'sql编译器', isTab: true } },
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
@@ -67,10 +68,30 @@ router.beforeEach((to, from, next) => {
   if (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global') {
     next()
   } else {
-      if (data && data.code === 0) {
-        fnAddDynamicMenuRoutes(data.menuList);
+      // if (data && data.code === 0) {
+      //   fnAddDynamicMenuRoutes(data.menuList);
+      //   router.options.isAddDynamicMenuRoutes = true
+      //   sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+      //   sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
+      //   next({ ...to, replace: true })
+      // } else {
+      //   sessionStorage.setItem('menuList', '[]')
+      //   sessionStorage.setItem('permissions', '[]')
+      //   next()
+      // }
+
+
+    http({
+      url: http.adornUrl('/menu/getCurrentUserMenuList'),
+      method: 'get',
+    }).then(({data}) => {
+      if (data && data.code === 200) {
+        var datas=treeDataTranslate(data.result ,'menuId','menuParentId');
+        changeName(datas)
+        console.log(datas)
+        fnAddDynamicMenuRoutes(datas)
         router.options.isAddDynamicMenuRoutes = true
-        sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+        sessionStorage.setItem('menuList', JSON.stringify(datas || '[]'))
         sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
         next({ ...to, replace: true })
       } else {
@@ -78,31 +99,25 @@ router.beforeEach((to, from, next) => {
         sessionStorage.setItem('permissions', '[]')
         next()
       }
-
-
-    // http({
-    //   url: http.adornUrl('/sys/menu/nav'),
-    //   method: 'get',
-    //   params: http.adornParams()
-    // }).then(({data}) => {
-    //   if (data && data.code === 0) {
-    //     fnAddDynamicMenuRoutes(data.menuList)
-    //     router.options.isAddDynamicMenuRoutes = true
-    //     sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
-    //     sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-    //     next({ ...to, replace: true })
-    //   } else {
-    //     sessionStorage.setItem('menuList', '[]')
-    //     sessionStorage.setItem('permissions', '[]')
-    //     next()
-    //   }
-    // }).catch((e) => {
-    //   console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-    //   router.push({ name: 'login' })
-    // })
+    }).catch((e) => {
+      console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
+      router.push({ name: 'login' })
+    })
   }
 })
-
+function changeName(list){
+  list.forEach(item=>{
+    item.url=item.menuUrl;
+    item.type=item.menuUrl?1:0;
+    item.name=item.menuName;
+    item.orderNum=item.menuUrl;
+    item.parentId=item.menuParentId;
+    item.orderNum=item.menuSort;
+    if(item.children&&item.children.length>0){
+      changeName(item.children)
+    }
+  });
+}
 /**
  * 判断当前路由类型, global: 全局路由, main: 主入口路由
  * @param {*} route 当前路由
@@ -127,8 +142,8 @@ function fnCurrentRouteType (route, globalRoutes = []) {
 function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
   var temp = []
   for (var i = 0; i < menuList.length; i++) {
-    if (menuList[i].list && menuList[i].list.length >= 1) {
-      temp = temp.concat(menuList[i].list)
+    if (menuList[i].children && menuList[i].children.length >= 1) {
+      temp = temp.concat(menuList[i].children)
     } else if (menuList[i].url && /\S/.test(menuList[i].url)) {
       menuList[i].url = menuList[i].url.replace(/^\//, '')
       var route = {
@@ -161,10 +176,12 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
   } else {
     mainRoutes.name = 'main-dynamic'
     mainRoutes.children = routes
+    console.log(routes,mainRoutes)
     router.addRoutes([
       mainRoutes,
       { path: '*', redirect: { name: '404' } }
     ])
+
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
     console.log('\n')
     console.log('%c!<-------------------- 动态(菜单)路由 s -------------------->', 'color:blue')

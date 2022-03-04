@@ -34,6 +34,10 @@
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">立项管理</span>
         </el-menu-item>
+        <el-menu-item index="lx" @click="$router.push({ name: 'codemirror' })">
+          <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
+          <span slot="title">codemirror Demo</span>
+        </el-menu-item>
         <!--<el-submenu index="demo">-->
           <!--<template slot="title">-->
             <!--<icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>-->

@@ -1,32 +1,17 @@
 <template>
-  <div class="mod-user">
+  <el-dialog
+    width="70%"
+    title="sql草稿列表"
+    :close-on-click-modal="false"
+    :visible.sync="visible">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
 
-      <el-form-item label="项目编号:">
-        <el-input v-model="dataForm.name" placeholder="项目编号" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="项目名称:">
-        <el-input v-model="dataForm.name" placeholder="项目名称" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="项目时间:">
-        <el-date-picker
-          v-model="dataForm.startTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择日期">
-        </el-date-picker>
-        <span>--</span>
-        <el-date-picker
-          v-model="dataForm.startTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择日期">
-        </el-date-picker>
+      <el-form-item label="sql标题:">
+        <el-input v-model="dataForm.name" placeholder="模糊查询" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <!--<el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+        <el-button v-if="" type="info" @click="">重置</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -46,37 +31,13 @@
         header-align="center"
         align="center"
         width="80"
-        label="项目编号">
-      </el-table-column>
-      <el-table-column
-        prop="agencyName"
-        align="center"
-        label="项目名称">
-      </el-table-column>
-
-      <el-table-column
-        prop="dataAmount"
-        header-align="center"
-        align="center"
-        label="项目周期">
-      </el-table-column>
-      <el-table-column
-        prop="effectiveData"
-        header-align="center"
-        align="center"
-        label="被审核单位">
-      </el-table-column>
-      <el-table-column
-        prop="todayConsumeMoney"
-        header-align="center"
-        align="center"
-        label="创建人">
+        label="草稿名称">
       </el-table-column>
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        label="创建时间">
+        label="草稿创建时间">
         <template slot-scope="scope">
           {{scope.row.createTime | dateformat }}
         </template>
@@ -88,12 +49,13 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('biz:pdbaidudate:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('biz:pdbaidudate:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">查看详情</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
+      class="self-page"
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
       :current-page="pageIndex"
@@ -102,18 +64,19 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-
-  </div>
+    <span slot="footer" class="dialog-footer">
+        <el-button @click="visible = false">取消</el-button>
+        <el-button type="primary" @click="sub()">确定</el-button>
+      </span>
+  </el-dialog>
 </template>
 
 <script>
-  import AddOrUpdate from './project-add-or-update'
-
   export default {
     data () {
       return {
+        roleList:[],
+        visible:true,
         dataForm: {
           startTime: '',
           endTime: '',
@@ -146,7 +109,7 @@
       }
     },
     components: {
-      AddOrUpdate
+
     },
     activated () {
       // this.getDataList();
@@ -159,6 +122,10 @@
       // })
     },
     methods: {
+      //保存信息
+      sub(){
+        this.$emit('refreshDataList',this.dataListSelections);
+      },
       // 获取数据列表
       getDataList () {
         console.log(this.value1)
@@ -239,3 +206,8 @@
     }
   }
 </script>
+<style scoped>
+  .self-page{
+    text-align: center;
+  }
+</style>
