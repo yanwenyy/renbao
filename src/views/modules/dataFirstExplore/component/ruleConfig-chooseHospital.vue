@@ -121,7 +121,7 @@ export default {
           administration: "综合医院",
           basicType: "三级甲等",
           absicamount: "1224759234.53"
-        }, 
+        },
         {
           id: "2",
           basicName: "中医医院",
@@ -184,6 +184,16 @@ export default {
     resetForm() {},
     //查询
     getDataList() {},
+    // 页数
+    handleSizeChange(val) {
+      this.apComServerData.size = val;
+      this.initList();
+    },
+    //当前页
+    handleCurrentChange(val) {
+      this.apComServerData.pageNum = val;
+      this.initList();
+    },
     //确定
     ok() {
       this.$emit("ok");
