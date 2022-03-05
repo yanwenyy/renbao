@@ -25,7 +25,7 @@
       </el-form-item>
       <el-form-item style="float:right">
         <el-button type="primary" @click="addHandle()">新增</el-button>
-        <el-button
+        <!-- <el-button
           type="primary"
           @click="editHandle"
           :disabled="
@@ -40,7 +40,7 @@
             dataListSelections.length <= 0 || dataListSelections.length > 1
           "
           >删除</el-button
-        >
+        > -->
       </el-form-item>
     </el-form>
     <el-table
@@ -50,13 +50,13 @@
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
     >
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50"
       >
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="roleNumber"
         header-align="center"
@@ -93,10 +93,16 @@
         label="操作"
       >
         <template slot-scope="scope">
+          <el-button type="text" @click="editHandle(scope.row)">修改</el-button>
+          <el-button type="text" @click="deleteHandle(scope.row)"
+            >删除</el-button
+          >
+        </template>
+        <!--  <template slot-scope="scope">
           <el-button type="text" @click="authorizedUser(scope.row)"
             >授权用户</el-button
           >
-        </template>
+        </template> -->
       </el-table-column>
     </el-table>
     <el-pagination
@@ -127,7 +133,7 @@
       ></addOrUpdate>
     </el-dialog>
     <!-- 弹窗, 授权用户 -->
-    <el-dialog
+    <!-- <el-dialog
       :visible.sync="showAuthorityUser"
       title="授权用户"
       :close-on-click-modal="false"
@@ -140,7 +146,7 @@
         @ok="succeed"
         v-if="showAuthorityUser"
       ></authorityUser>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -169,7 +175,7 @@ export default {
       //新增修改弹窗
       showAddDialog: false,
       //授权用户弹窗
-      showAuthorityUser: false,
+      // showAuthorityUser: false,
       //传给修改弹窗的子组件id
       id: "",
       //弹窗标题
@@ -233,10 +239,10 @@ export default {
       this.id = "";
     },
     //修改
-    editHandle() {
+    editHandle(data) {
       this.showAddDialog = true;
       this.title = "修改角色";
-      this.id = this.dataListSelections[0].roleId;
+      this.id = data.roleId;
       this.showBtn = true;
     },
     //查看详情
@@ -255,17 +261,17 @@ export default {
       this.getDataList();
     },
     //关闭授权用户弹窗
-    close() {
+    /* close() {
       this.showAuthorityUser = false;
-    },
+    }, */
     //授权用户弹窗关闭
     succeed() {
       this.close();
     },
     //授权用户
-    authorizedUser(data) {
+    /* authorizedUser(data) {
       this.showAuthorityUser = true;
-    },
+    }, */
     //重置
     reset() {
       this.dataForm = {
@@ -275,9 +281,8 @@ export default {
       this.getDataList();
     },
     // 删除
-    deleteHandle() {
-      debugger;
-      var roleId = this.dataListSelections[0].roleId;
+    deleteHandle(data) {
+      var roleId = data.roleId;
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",

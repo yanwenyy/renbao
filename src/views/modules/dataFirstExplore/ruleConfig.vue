@@ -25,10 +25,10 @@
             node-key="id"
           ></el-tree>
           <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount1
+            dataForm.childCount1
           }}</span>
           <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount2
+            dataForm.childCount2
           }}</span>
         </el-card>
       </el-col>
@@ -39,7 +39,7 @@
               <el-col :span="4">
                 <div class="search-operation">
                   <el-input
-                    v-model="apComServerData.displayname"
+                    v-model="dataForm.ruleName"
                     size="small"
                     placeholder="规则名称"
                     clearable
@@ -49,15 +49,14 @@
               <el-col :span="4" style="margin-left:10px">
                 <div class="search-operation">
                   <el-select
-                    v-model="apComServerData.type"
+                    v-model="dataForm.ruleCategory"
                     filterable
                     clearable
                     placeholder="规则类型"
                     size="small"
-                    @change="getProjectId"
                   >
                     <el-option
-                      v-for="(item, index) in serverType"
+                      v-for="(item, index) in ruleCategory"
                       :key="index"
                       :label="item.name"
                       :value="item.id"
@@ -74,8 +73,16 @@
               <el-col :span="11">
                 <el-button-group style="float:right">
                   <el-button>当前选择规则数量：{{ 10 }}</el-button>
-                  <el-button @click="runNow">立即运行</el-button>
-                  <el-button @click="timeRun">定时运行</el-button>
+                  <el-button
+                    :disabled="this.multipleSelection.length <= 0"
+                    @click="runNow"
+                    >立即运行</el-button
+                  >
+                  <el-button
+                    :disabled="this.multipleSelection.length <= 0"
+                    @click="timeRun"
+                    >定时运行</el-button
+                  >
                   <el-popover
                     placement="bottom"
                     title="当前所选规则"
@@ -94,14 +101,20 @@
           <div class="content">
             <div class="tableTitle">
               <span
-                >查询结果<span style="color:#E6A23C">{{
-                  apComServerData.total
-                }}</span
+                >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
                 <el-button @click="addData" type="primary">新增</el-button>
-                <el-button @click="editData" type="primary">修改</el-button>
+                <el-button
+                  :disabled="
+                    this.multipleSelection.length <= 0 ||
+                      this.multipleSelection.length > 1
+                  "
+                  @click="editData"
+                  type="primary"
+                  >修改</el-button
+                >
                 <el-button @click="deleteData" type="danger">删除</el-button>
               </div>
             </div>
@@ -115,26 +128,29 @@
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
-                prop="ISSUEUNIT"
+                prop="ruleName"
                 label="规则名称"
               ></el-table-column>
+              <el-table-column prop="ruleCategory" label="规则类别">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+                </template>
+              </el-table-column>
               <el-table-column
-                prop="REFERENCENUMBER"
-                label="规则类别"
-              ></el-table-column>
-              <el-table-column
-                prop="REGULATIONCATEGORY"
+                prop="createUserName"
                 label="创建人"
               ></el-table-column>
-              <el-table-column
-                prop="RULEGRADATIONNAME"
-                label="创建时间"
-              ></el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="医院">
-              </el-table-column>
+              <el-table-column prop="createTime" label="创建时间">
+                <template slot-scope="scope">{{
+                  scope.row.createTime | dateformat
+                }}</template></el-table-column
+              >
+              <!-- <el-table-column prop="hospitalName" label="医院">
+              </el-table-column> -->
               <el-table-column prop="moblie" label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" @click="detailHandle(scope.row.id)"
+                  <el-button type="text" @click="detailHandle(scope.row.ruleId)"
                     >查看详情</el-button
                   >
                 </template>
@@ -142,12 +158,15 @@
             </el-table>
             <div class="pager">
               <el-pagination
-                small
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="pageSize"
+                :total="totalPage"
                 layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :total="apComServerData.total"
-              ></el-pagination>
+              >
+              </el-pagination>
             </div>
           </div>
           <!--查看详细弹窗 -->
@@ -162,7 +181,7 @@
             <detail
               @close="closeDetail"
               @ok="editSucceed"
-              :info="info"
+              :ruleId="ruleId"
               v-if="showDetailDialog"
             ></detail>
           </el-dialog>
@@ -178,7 +197,7 @@
             <AddOrEdit
               @close="closeAddOrEdit"
               @ok="succeed"
-              :info="info"
+              :ruleId="ruleId"
               v-if="showAddOrEditDialog"
             ></AddOrEdit>
           </el-dialog>
@@ -215,8 +234,21 @@ export default {
   },
   data() {
     return {
-      pbFileList: [],
-      pbFiles: [],
+      dataForm: {
+        ruleName: "",
+        ruleCategory: "",
+        createUserName: "",
+        createTime: ""
+        // hospitalName: ""
+      },
+      // pbFileList: [],
+      // pbFiles: [],
+      //当前页
+      pageIndex: 1,
+      //每页条数
+      pageSize: 10,
+      //总页数
+      totalPage: 0,
       dataTree1: [
         {
           name: "全国通用规则",
@@ -272,7 +304,7 @@ export default {
           ]
         }
       ],
-      serverType: [
+      ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
@@ -280,12 +312,9 @@ export default {
         children: "children",
         label: "name"
       },
-      apComServerData: {
-        title: "",
-        content: ""
-      },
-      tableData: [1],
+      tableData: [],
       multipleSelection: [],
+      listLoadingTry: false,
       loading: false,
       treeLoading: false,
       formLoading: false,
@@ -296,42 +325,45 @@ export default {
       //立即运行、定时运行弹窗是否显示
       showRunDialog: false,
       rows: [],
-      info: ""
+      info: "",
+      ruleId: ""
     };
   },
   mounted() {
-    // this.initData()
+    this.initData();
     // this.initTree()
   },
   created() {},
   methods: {
     initData() {
-      this.loading = true;
-      showLawDataPage(this.apComServerData, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
-        this.loading = false;
+      this.$http({
+        url: this.$http.adornUrl("/rule/selectPage"),
+        method: "get",
+        params: this.$http.adornParams({
+          pageNo: this.pageIndex,
+          pageSize: this.pageSize,
+          ruleName: this.dataForm.ruleName,
+          ruleCategory: this.dataForm.ruleCategory,
+          folderId: 1
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableData = data.result.records;
+          this.totalPage = data.result.total;
+        } else {
+          this.tableData = [];
+          this.totalPage = 0;
+        }
       });
     },
-    initTree() {
-      this.treeLoading = true;
-      selectLawRule().then(res => {
-        this.dataTree1 = this.listToTree(res.data);
-        this.apComServerData.childCount1 = res.data.length - 1;
-      });
-      selectLawIndexRule().then(res => {
-        this.dataTree2 = this.listToTree(res.data);
-        this.apComServerData.childCount2 = res.data.length - 1;
-        this.treeLoading = false;
-      });
-    },
+    initTree() {},
     //点击树节点切换表
     handleNodeClick1(data) {
       this.loading = true;
       showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
         res => {
           this.tableData = res.data.body.result;
-          this.apComServerData.total = res.data.body.pagination.dataCount;
+          this.dataForm.total = res.data.body.pagination.dataCount;
           this.loading = false;
         }
       );
@@ -340,22 +372,19 @@ export default {
       this.loading = true;
       showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
         this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
+        this.dataForm.total = res.data.body.pagination.dataCount;
         this.loading = false;
       });
-    },
-    //查看详情弹框
-    ledgerTable(data) {
-      this.showDetailDialog = true;
-      this.info = data;
     },
     //新增弹框
     addData() {
       this.showAddOrEditDialog = true;
+      this.ruleId = "";
     },
     //修改弹框
     editData() {
       this.showAddOrEditDialog = true;
+      this.ruleId = this.multipleSelection[0].ruleId;
     },
     //弹窗提交
     popUpSubmit() {
@@ -367,37 +396,6 @@ export default {
           } else {
             this.submitForm();
           }
-        }
-      });
-    },
-
-    //修改保存
-    submitForm() {
-      let params = {
-        lawRegulationUuid: this.multipleSelection[0].LAWREGULATIONUUID,
-        title: this.submitData.title, //标题
-        issueUnit: this.submitData.issueUnit, //颁布单位
-        referenceNumber: this.submitData.referenceNumber, //文号
-        effectiveDate: new Date(this.submitData.effectiveDate), //生效日期
-        regulationCategoryCode: this.regulationCategory1.extStr1,
-        regulationCategory: this.regulationCategory1.name,
-        ruleGradationCode: this.ruleGradation1.extStr1,
-        ruleGradationName: this.ruleGradation1.name,
-        addressName: this.submitData.addressName,
-        content: this.submitData.content,
-        timelinessName: this.submitData.timelinessName,
-        remark: this.submitData.remark,
-        pbFiles: this.pbFileList,
-        deleteFileIds: this.deleteFileIds
-      };
-      updateLawRule(params, "").then(res => {
-        if (res.data.head.status == 20) {
-          this.$message.success("操作成功");
-          this.popUpDatas.show = false;
-          this.initData();
-        } else {
-          this.$message.error("操作失败");
-          this.popUpDatas.show = false;
         }
       });
     },
@@ -445,93 +443,55 @@ export default {
     editSucceed() {
       this.closeDetail();
     },
-    // 关闭新增弹窗
-    closeAddDrawer() {
-      this.showAddDialog = false;
-    },
-    // 保存新增
-    addSucceed() {
-      this.showAddDialog = false;
-      this.initData();
-    },
     //列表多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    //获取选择的法规类型数据
-    getRegulationCategory(extStr1) {
-      this.regulationCategory1 = this.regulationCategory.find(
-        item => item.extStr1 == extStr1
-      );
-    },
-    //获取选择的法规层次数据
-    getRuleGradation(extStr1) {
-      this.ruleGradation1 = this.ruleGradationName.find(
-        item => item.extStr1 == extStr1
-      );
-    },
     //删除
     deleteData() {
-      if (this.multipleSelection.length == 0) {
-        this.$confirm("请勾选数据", "信息", {
-          confirmButtonText: "关闭",
-          type: "warning"
-        });
-      } else {
-        var uuids = [];
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          uuids.push(this.multipleSelection[i].LAWREGULATIONUUID);
-        }
-        this.$confirm("确定进行删除操作?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            let formdata = new FormData();
-            formdata.append("uuids[]", uuids);
-            daleteLawRule(formdata, "").then(res => {
-              if (res.data.head.status == 20) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
-                });
-                this.initData();
-                this.initTree();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: "删除失败!"
-                });
-              }
-            });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
-          });
+      var ruleIds = [];
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        ruleIds.push(this.multipleSelection[0].ruleId);
       }
+      console.log(ruleIds);
+      this.$confirm(`确定进行删除操作?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/rule/deleteByIds/"),
+            method: "delete",
+            data: this.$http.adornData({
+              ruleIds: ruleIds
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.initData();
+                }
+              });
+            } else {
+              this.$message.error("操作失败");
+            }
+          });
+        })
+        .catch(() => {});
     },
     //查看详情
     detailHandle(id) {
       this.showDetailDialog = true;
+      this.ruleId = id;
     },
     //重置表单
     resetForm(formName) {
       this.submitData = {};
       this.$refs[formName].resetFields();
-    },
-    //分页
-    handleSizeChange(val) {
-      this.apComServerData.pageSize = val;
-      this.initData();
-    },
-    //分页
-    handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
-      this.initData();
     },
     //搜索
     getAllSearch() {
@@ -539,9 +499,11 @@ export default {
     },
     //重置搜索
     reset() {
-      this.apComServerData = {
-        title: "",
-        content: ""
+      this.dataForm = {
+        ruleName: "",
+        ruleCategory: "",
+        createUserName: "",
+        createTime: ""
       };
       this.initData();
     },
@@ -563,7 +525,27 @@ export default {
     },
     succeedRun() {
       this.showRunDialog = false;
-    }
+    },
+    //关闭新增、修改弹窗
+    closeAddOrEdit() {
+      this.showAddOrEditDialog = false;
+    },
+    succeed() {
+      this.closeAddOrEdit();
+      this.initData();
+    },
+    // 每页数
+    sizeChangeHandle(val) {
+      this.pageSize = val;
+      this.pageIndex = 1;
+      this.initData();
+    },
+    // 当前页
+    currentChangeHandle(val) {
+      this.pageIndex = val;
+      this.initData();
+    },
+    filterNode() {}
   }
 };
 </script>
