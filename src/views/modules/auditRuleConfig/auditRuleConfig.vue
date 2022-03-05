@@ -1,13 +1,14 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <el-tree :data="projectRulesTreeList" highlight-current :default-expand-all="true" @node-click="treeClick" v-loading="treeLoading" node-key="id" ref="treesa" >
+            <!-- <el-tree :data="projectRulesTreeList" highlight-current :default-expand-all="true" @node-click="treeClick" v-loading="treeLoading" node-key="id" ref="treesa" >
                     <span class="custom-tree-node" slot-scope="{ node }" >
                         <span>
                             {{node.label}}
                         </span>
                     </span>
-            </el-tree>
+            </el-tree> -->
+            <rule-tree ref="ruleTree" :isShowSearch="true" :treeData="projectRulesTreeList" :isShowCheckBox="true" :isShowEdit="true"></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box">
@@ -16,9 +17,9 @@
                         <el-input v-model="searchForm.ruleName" clearable></el-input>
                     </el-form-item>
                     <el-form-item label="审核规则类型：">
-                        <el-select v-model="searchForm.ruleType"  placeholder="请选择" clearable>
-                            <el-option label="门诊审核规则" value="shanghai"></el-option>
-                            <el-option label="住院审核规则" value="beijing"></el-option>
+                        <el-select v-model="searchForm.ruleCategory"  placeholder="请选择" clearable>
+                            <el-option label="门诊审核规则" value="1"></el-option>
+                            <el-option label="住院审核规则" value="2"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -58,7 +59,7 @@
                 </div>
                 <div class="auditRuleConfig-right-bottom">
                     <el-pagination
-                        v-show="Pager.total >= 1" 
+                        v-if="Pager.total>=1"
                         @size-change="sizeChangeHandle"
                         @current-change="currentChangeHandle"
                         :current-page="Pager.pageIndex"
@@ -67,7 +68,7 @@
                         :total="Pager.total"
                         layout="total, sizes, prev, pager, next, jumper">
                     </el-pagination>
-                    <div class="optipn">
+                    <div class="optipn"  v-if="Pager.total>=1">
                         <el-button-group>
                             <el-button>当前选择规则数量：{{multipleTable.length}}</el-button>
                             <el-button @click="executeImmediatelyClick">立即执行</el-button>
@@ -100,6 +101,7 @@
 <script>
 import submitPersonalityRule from './submit-personality-rule.vue'// 提交至地区个性化规则弹框
 import ruleOperation from './rule-operation.vue' // 规则运行弹框
+import ruleTree from '../../common/rule-tree.vue'
 export default {
     data () {
         return {
@@ -132,7 +134,7 @@ export default {
             ],
             searchForm: {
                 ruleName: '',
-                ruleType: ''
+                ruleCategory: ''
 
             },
             tableData: [],
@@ -173,12 +175,13 @@ export default {
                 this.tableLoading = false
                 if (data.code == 200) {
                     data.result.records.map(i => {
-                        i.createTime = i.createTime.split('T')[0]
+                        i.createTime = i.createTime.split('T')[0];
+                        i.ruleCategory = i.ruleCategory == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
                     })
                     this.tableData = data.result.records;
-                    this.Pager.pageSize = data.size;
-                    this.Pager.pageIndex = data.pages;
-                    this.Pager.total = data.total;  
+                    this.Pager.pageSize = data.result.size;
+                    this.Pager.pageIndex = data.result.current;
+                    this.Pager.total = data.result.total;  
                 }
             }).catch(() => {
                 this.tableLoading = false
@@ -270,7 +273,8 @@ export default {
     },
     components: {
         submitPersonalityRule,
-        ruleOperation
+        ruleOperation,
+        ruleTree
     }
 }
 
