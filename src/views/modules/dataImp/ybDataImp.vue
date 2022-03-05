@@ -17,15 +17,8 @@
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button type="primary" @click="getFileTree()">导入数据</el-button>
-        <!--<el-button v-if="" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-        <!--<el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
-    <!-- <el-row justify="end">
-      <el-col>
-        <el-button type="primary" size="small" @click="getDataList()">导入数据</el-button>
-      </el-col>
-    </el-row> -->
     <el-table
       :data="dataList"
       height="80vh"
@@ -63,8 +56,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">查看数据</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">查看字段</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.tableName)">查看数据</el-button>
+          <el-button type="text" size="small" @click="tableColumnView(scope.row.tableName)">查看字段</el-button>
           <!--<el-button v-if="isAuth('biz:pdbaidudate:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>-->
         </template>
       </el-table-column>
@@ -293,10 +286,22 @@
         <el-button type="primary" @click="impYBData">导入</el-button>
       </span>
     </el-dialog>
+    <!-- 查看字段 -->
+    <el-dialog
+      :title="checkTableName"
+      :visible.sync="tableColumnViewDialogVisible"
+      width="50%"
+      :close-on-click-modal="false">
+      <column-view :table-name="checkTableName"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="tableColumnViewDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import ColumnView from './columnView'
   export default {
     data () {
       return {
@@ -318,6 +323,8 @@
         fileTableDialogVisible: false,
         // 控制匹配预览弹窗
         columnTableDialogVisible: false,
+        // 查看字段弹窗
+        tableColumnViewDialogVisible: false,
         // 文件选中数据
         fileSelections: [],
         // 文件树
@@ -343,10 +350,13 @@
         // 匹配字段时选中的表
         selectTableNames: [],
         // 匹配预览是选中的表
-        selectTableViewNames: []
+        selectTableViewNames: [],
+        // 查看表数据，表结构选中的表
+        checkTableName: ''
       }
     },
     components: {
+      ColumnView
     },
     activated () {
       this.getDataList()
@@ -505,7 +515,8 @@
         //   }
         //   this.dataListLoading = false
         // })
-        this.dataList = [{ tableName : "aaa",dataSize: 11 ,dataNumber: 123,lastUpdateTime: "2020-01-02"}]
+        this.dataList = [{ tableName : "医保病案首页",dataSize: 11 ,dataNumber: 123,lastUpdateTime: "2020-01-02"},
+        { tableName : "医保医疗机构信息",dataSize: 11 ,dataNumber: 123,lastUpdateTime: "2020-01-02"}]
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -546,6 +557,11 @@
 
           }
         })
+      },
+      // 查看字段
+      tableColumnView(tableName) {
+        this.checkTableName = tableName
+        this.tableColumnViewDialogVisible = true
       }
     }
   }
