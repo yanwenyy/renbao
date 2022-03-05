@@ -1,5 +1,4 @@
 <!--结果明细导出-->
-<!--初探规则监控--><!--初探规则配置-->
 <template>
   <div class="lawsAregulations">
     <el-row :gutter="20">
@@ -16,10 +15,10 @@
             node-key="id"
           ></el-tree>
           <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount1
+            dataForm.childCount1
           }}</span>
           <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount2
+            dataForm.childCount2
           }}</span> -->
         </el-card>
       </el-col>
@@ -30,9 +29,9 @@
               <el-col :span="4">
                 <div class="search-operation">
                   <el-input
-                    v-model="apComServerData.displayname"
+                    v-model="dataForm.ruleName"
                     size="small"
-                    placeholder="规则类型"
+                    placeholder="规则名称"
                     clearable
                   ></el-input>
                 </div>
@@ -40,15 +39,15 @@
               <el-col :span="4" style="margin-left:10px">
                 <div class="search-operation">
                   <el-select
-                    v-model="apComServerData.type"
+                    v-model="dataForm.ruleType"
                     filterable
                     clearable
-                    placeholder="运行状态"
+                    placeholder="规则类型"
                     size="small"
                     @change="getProjectId"
                   >
                     <el-option
-                      v-for="(item, index) in serverType"
+                      v-for="(item, index) in ruleType"
                       :key="index"
                       :label="item.name"
                       :value="item.id"
@@ -85,9 +84,7 @@
           <div class="content">
             <div class="tableTitle">
               <span
-                >查询结果<span style="color:#E6A23C">{{
-                  apComServerData.total
-                }}</span
+                >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
@@ -107,22 +104,22 @@
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
-                prop="ISSUEUNIT"
+                prop="ruleName"
                 label="规则名称"
               ></el-table-column>
               <el-table-column
-                prop="REFERENCENUMBER"
+                prop="ruleType"
                 label="规则类别"
               ></el-table-column>
               <el-table-column
-                prop="RULEGRADATIONNAME"
+                prop="actualBeginTime"
                 label="开始时间"
               ></el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="结束时间">
+              <el-table-column prop="actualEndTime" label="结束时间">
               </el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="结果条数">
+              <el-table-column prop="resultCount" label="结果条数">
               </el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="执行人">
+              <el-table-column prop="createUserName" label="执行人">
               </el-table-column>
               <!--  <el-table-column prop="TIMELINESSNAME" label="运行状态">
                 <template scope="scope">
@@ -146,7 +143,7 @@
                 layout="total, sizes, prev, pager, next, jumper"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :total="apComServerData.total"
+                :total="dataForm.total"
               ></el-pagination>
             </div>
           </div>
@@ -175,10 +172,18 @@
 import detail from "./component/detailExport-detail.vue";
 export default {
   components: {
-    detail,
+    detail
   },
   data() {
     return {
+      dataForm: {
+        ruleName: "",
+        ruleType: "",
+        actualBeginTime: "",
+        actualEndTime: "",
+        resultCount: "",
+        createUserName: ""
+      },
       pbFileList: [],
       pbFiles: [],
       dataTree1: [
@@ -194,17 +199,13 @@ export default {
           ]
         }
       ],
-      serverType: [
+      ruleType: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
       defaultProps: {
         children: "children",
         label: "name"
-      },
-      apComServerData: {
-        title: "",
-        content: ""
       },
       tableData: [1],
       multipleSelection: [],
@@ -229,9 +230,9 @@ export default {
   methods: {
     initData() {
       this.loading = true;
-      showLawDataPage(this.apComServerData, "").then(res => {
+      showLawDataPage(this.dataForm, "").then(res => {
         this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
+        this.dataForm.total = res.data.body.pagination.dataCount;
         this.loading = false;
       });
     },
@@ -239,11 +240,11 @@ export default {
       this.treeLoading = true;
       selectLawRule().then(res => {
         this.dataTree1 = this.listToTree(res.data);
-        this.apComServerData.childCount1 = res.data.length - 1;
+        this.dataForm.childCount1 = res.data.length - 1;
       });
       selectLawIndexRule().then(res => {
         this.dataTree2 = this.listToTree(res.data);
-        this.apComServerData.childCount2 = res.data.length - 1;
+        this.dataForm.childCount2 = res.data.length - 1;
         this.treeLoading = false;
       });
     },
@@ -253,7 +254,7 @@ export default {
       showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
         res => {
           this.tableData = res.data.body.result;
-          this.apComServerData.total = res.data.body.pagination.dataCount;
+          this.dataForm.total = res.data.body.pagination.dataCount;
           this.loading = false;
         }
       );
@@ -262,7 +263,7 @@ export default {
       this.loading = true;
       showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
         this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
+        this.dataForm.total = res.data.body.pagination.dataCount;
         this.loading = false;
       });
     },
@@ -447,12 +448,12 @@ export default {
     },
     //分页
     handleSizeChange(val) {
-      this.apComServerData.pageSize = val;
+      this.dataForm.pageSize = val;
       this.initData();
     },
     //分页
     handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
+      this.dataForm.pageNum = val;
       this.initData();
     },
     //搜索
@@ -461,7 +462,7 @@ export default {
     },
     //重置搜索
     reset() {
-      this.apComServerData = {
+      this.dataForm = {
         title: "",
         content: ""
       };

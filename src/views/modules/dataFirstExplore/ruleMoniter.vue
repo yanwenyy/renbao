@@ -1,4 +1,4 @@
-<!--初探规则监控--><!--初探规则配置-->
+<!--初探规则监控-->
 <template>
   <div class="lawsAregulations">
     <el-row :gutter="20">
@@ -15,10 +15,10 @@
             node-key="id"
           ></el-tree>
           <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount1
+            dataForm.childCount1
           }}</span>
           <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            apComServerData.childCount2
+            dataForm.childCount2
           }}</span> -->
         </el-card>
       </el-col>
@@ -28,18 +28,8 @@
             <el-row>
               <el-col :span="4">
                 <div class="search-operation">
-                  <el-input
-                    v-model="apComServerData.displayname"
-                    size="small"
-                    placeholder="规则类型"
-                    clearable
-                  ></el-input>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <div class="search-operation">
                   <el-select
-                    v-model="apComServerData.type"
+                    v-model="dataForm.ruleCategory"
                     filterable
                     clearable
                     placeholder="运行状态"
@@ -47,7 +37,26 @@
                     @change="getProjectId"
                   >
                     <el-option
-                      v-for="(item, index) in serverType"
+                      v-for="(item, index) in ruleCategory"
+                      :key="index"
+                      :label="item.name"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select>
+                </div>
+              </el-col>
+              <el-col :span="4" style="margin-left:10px">
+                <div class="search-operation">
+                  <el-select
+                    v-model="dataForm.runStatus"
+                    filterable
+                    clearable
+                    placeholder="运行状态"
+                    size="small"
+                    @change="getProjectId"
+                  >
+                    <el-option
+                      v-for="(item, index) in runStatus"
                       :key="index"
                       :label="item.name"
                       :value="item.id"
@@ -84,9 +93,7 @@
           <div class="content">
             <div class="tableTitle">
               <span
-                >查询结果<span style="color:#E6A23C">{{
-                  apComServerData.total
-                }}</span
+                >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
               <!--  <div style="float:right;margin-bottom:10px">
@@ -105,28 +112,28 @@
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
-                prop="ISSUEUNIT"
+                prop="ruleName"
                 label="规则名称"
               ></el-table-column>
               <el-table-column
-                prop="REFERENCENUMBER"
+                prop="ruleCategory"
                 label="规则类别"
               ></el-table-column>
               <el-table-column
-                prop="RULEGRADATIONNAME"
+                prop="expectedBeginTime"
                 label="预计开始时间"
               ></el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="预计结束时间">
+              <el-table-column prop="expectedEndTime" label="预计结束时间">
               </el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="实际开始时间">
+              <el-table-column prop="actualBeginTime" label="实际开始时间">
               </el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="实际结束时间">
+              <el-table-column prop="actualEndTime" label="实际结束时间">
               </el-table-column>
-              <el-table-column prop="TIMELINESSNAME" label="运行状态">
+              <el-table-column prop="runStatus" label="运行状态">
                 <template slot-scope="scope">
-                  <div v-if="scope.row.TIMELINESSNAME == 1">执行失败</div>
-                  <div v-if="scope.row.TIMELINESSNAME == 2">执行中</div>
-                  <div v-if="scope.row.TIMELINESSNAME == 3">已完成</div>
+                  <div v-if="scope.row.runStatus == 1">执行失败</div>
+                  <div v-if="scope.row.runStatus == 2">执行中</div>
+                  <div v-if="scope.row.runStatus == 3">已完成</div>
                 </template>
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
@@ -144,7 +151,7 @@
                 layout="total, sizes, prev, pager, next, jumper"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :total="apComServerData.total"
+                :total="dataForm.total"
               ></el-pagination>
             </div>
           </div>
@@ -173,10 +180,19 @@
 import detail from "./component/ruleMoniter-detail.vue";
 export default {
   components: {
-    detail,
+    detail
   },
   data() {
     return {
+      dataForm: {
+        ruleName: "",
+        ruleCategory: "",
+        expectedBeginTime: "",
+        expectedEndTime: "",
+        actualBeginTime: "",
+        actualEndTime: "",
+        runStatus: ""
+      },
       pbFileList: [],
       pbFiles: [],
       dataTree1: [
@@ -192,17 +208,20 @@ export default {
           ]
         }
       ],
-      serverType: [
+      //运行状态
+      runStatus: [
+        { id: 1, name: "执行中" },
+        { id: 2, name: "已完成" },
+        { id: 3, name: "执行失败" }
+      ],
+      //规则类别
+      ruleCategory: [
         { id: 1, name: "门诊规则" },
-        { id: 2, name: "住院规则" }
+        { id: 2, name: "住院规则" },
       ],
       defaultProps: {
         children: "children",
         label: "name"
-      },
-      apComServerData: {
-        title: "",
-        content: ""
       },
       tableData: [1],
       multipleSelection: [],
@@ -227,9 +246,9 @@ export default {
   methods: {
     initData() {
       this.loading = true;
-      showLawDataPage(this.apComServerData, "").then(res => {
+      showLawDataPage(this.dataForm, "").then(res => {
         this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
+        this.dataForm.total = res.data.body.pagination.dataCount;
         this.loading = false;
       });
     },
@@ -237,11 +256,11 @@ export default {
       this.treeLoading = true;
       selectLawRule().then(res => {
         this.dataTree1 = this.listToTree(res.data);
-        this.apComServerData.childCount1 = res.data.length - 1;
+        this.dataForm.childCount1 = res.data.length - 1;
       });
       selectLawIndexRule().then(res => {
         this.dataTree2 = this.listToTree(res.data);
-        this.apComServerData.childCount2 = res.data.length - 1;
+        this.dataForm.childCount2 = res.data.length - 1;
         this.treeLoading = false;
       });
     },
@@ -251,7 +270,7 @@ export default {
       showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
         res => {
           this.tableData = res.data.body.result;
-          this.apComServerData.total = res.data.body.pagination.dataCount;
+          this.dataForm.total = res.data.body.pagination.dataCount;
           this.loading = false;
         }
       );
@@ -260,7 +279,7 @@ export default {
       this.loading = true;
       showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
         this.tableData = res.data.body.result;
-        this.apComServerData.total = res.data.body.pagination.dataCount;
+        this.dataForm.total = res.data.body.pagination.dataCount;
         this.loading = false;
       });
     },
@@ -445,12 +464,12 @@ export default {
     },
     //分页
     handleSizeChange(val) {
-      this.apComServerData.pageSize = val;
+      this.dataForm.pageSize = val;
       this.initData();
     },
     //分页
     handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
+      this.dataForm.pageNum = val;
       this.initData();
     },
     //搜索
@@ -459,7 +478,7 @@ export default {
     },
     //重置搜索
     reset() {
-      this.apComServerData = {
+      this.dataForm = {
         title: "",
         content: ""
       };
