@@ -7,6 +7,7 @@
             v-model="filterText">
         </el-input>
         <el-tree
+            v-loading="treeLoading"
             ref="ruleTree"
             class="treeClass"
             :data="treeData"
@@ -14,6 +15,7 @@
             node-key="id"
             default-expand-all
             :filter-node-method="filterNode"
+            :props="layoutTreeProps"
             :expand-on-click-node="false">
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span>{{ node.label }}</span>
@@ -64,9 +66,9 @@ export default {
             type: Boolean,
             default: false
         },
-        treeData: { // 规则数数据
-            type: Array,
-        },
+        // treeData: { // 规则数数据
+        //     type: Array,
+        // },
         isShowCheckBox: { // 是否显示多选框
             type: Boolean,
             default: false
@@ -82,28 +84,98 @@ export default {
             filterText: '',
             treeVisible: false,
             treeTitle: '',
+            treeLoading: false,
             treeForm: {
                 name: ''
+            },
+            treeData: [],
+            layoutTreeProps: {
+                label(data, node) {
+                    const config = data.__config__ || data
+                    // console.log(config, 'configconfigconfigconfig')
+                    return  config.label || config.folderName
+                },
             }
         }
     },
     mounted () {
 
     },
+    created () {
+        this.getRuleFolder();
+    },
     methods: {
+        // 获取规则树
+        getRuleFolder () {
+            this.treeLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
+                method: 'get',
+            }).then(({data}) => {
+                this.treeLoading = false
+                if (data.code == 200) { 
+                    this.treeData = data.result;
+                }
+            }).catch(() => {
+                this.treeLoading = false
+            })
+
+
+        },
         filterNode(value, data) {
+            console.log(this.treeData, 'valuevaluevalue')
             if (!value) return true;
-            return data.label.indexOf(value) !== -1;
+            return this.treeData.label.indexOf(value) !== -1;
+
+        },
+        addRuleFolder () {
+            let addRuleFolderdata = {
+
+            }
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('ruleFolder/add'),
+                method: 'post',
+                params:  this.$http.adornData(addRuleFolderdata, false)
+            }).then(({data}) => {
+                console.log(data, 'datadatadatadata')
+                // this.tableLoading = false
+                // if (data.code == 200) {
+                //     data.result.records.map(i => {
+                //         i.createTime = i.createTime.split('T')[0];
+                //         i.ruleCategory = i.ruleCategory == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
+                //     })
+                //     this.tableData = data.result.records;
+                //     this.Pager.pageSize = data.result.size;
+                //     this.Pager.pageIndex = data.result.current;
+                //     this.Pager.total = data.result.total;  
+                // }
+            }).catch(() => {
+                // this.tableLoading = false
+            })
+
         },
         append (data, type) {
             this.treeTitle=type=='add'?'填写分类信息':'编辑分类信息';
             this.treeVisible=true;
             this.treeForm.name=type=='add'?'':data.label;
+            // /ruleFolder/add 
+
+           
         },
         remove (node, data) {
 
+
+
         }
 
+    },
+    watch: {
+      filterText(val) {
+          console.log(val, 'valvalvalvalval')
+        this.$refs.ruleTree.filter(val);
+      }
     },
     
 }

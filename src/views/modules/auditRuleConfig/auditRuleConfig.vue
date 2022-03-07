@@ -166,7 +166,7 @@ export default {
     methods: {
         getSelectPage () {
             this.tableLoading = true;
-             this.$http({
+            this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl(`/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
