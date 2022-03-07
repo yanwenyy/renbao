@@ -7,19 +7,19 @@
     >
       <el-form-item label="医院名称：">
         <el-input
-          v-model="dataForm.basicName"
+          v-model="dataForm.hospitalName"
           placeholder="请输入搜索内容"
           clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="医院类别：">
         <el-select
-          v-model="dataForm.basicType"
+          v-model="dataForm.hospitalType"
           placeholder="请输入搜索内容"
           clearable
         >
           <el-option
-            v-for="item in options"
+            v-for="item in hospitalType"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -53,26 +53,26 @@
           width="50"
         ></el-table-column>
         <el-table-column
-          prop="basicName"
+          prop="hospitalName"
           header-align="center"
           align="center"
           label="医院名称"
         ></el-table-column>
         <el-table-column
-          prop="basicCode"
+          prop="hospitalCode"
           header-align="center"
           align="center"
           label="医院编码"
         ></el-table-column>
         <el-table-column
-          prop="administration"
+          prop="HospitalNature"
           header-align="center"
           align="center"
           label="医院性质"
         >
         </el-table-column>
         <el-table-column
-          prop="basicType"
+          prop="hospitalType"
           header-align="center"
           align="center"
           label="医院类别"
@@ -90,10 +90,10 @@ export default {
   data() {
     return {
       dataForm: {
-        basicName: "",
-        basicType: "",
-        data2: "",
-        data1: ""
+        hospitalName: "",
+        hospitalType: "",
+        hospitalCode: "",
+        HospitalNature: ""
       },
       //loading
       listLoading: false,
@@ -105,50 +105,9 @@ export default {
         total: 0
       },
       //table表格数据
-      tableList: [
-        {
-          id: "0",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "1",
-          basicName: "幼妇保健院",
-          basicCode: "1650000",
-          administration: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "1224759234.53"
-        },
-        {
-          id: "2",
-          basicName: "中医医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "3",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "4",
-          basicName: "商洛康健精神病医院",
-          basicCode: "1650000",
-          administration: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "45423465.78"
-        }
-      ],
+      tableList: [],
       tableColumns: [],
-      options: [
+      hospitalType: [
         {
           value: "0",
           label: "三级甲等"
@@ -165,20 +124,32 @@ export default {
     };
   },
   mounted() {
-    // this.initList();
-     this.$nextTick(() => {
+    this.initList();
+    this.$nextTick(() => {
       this.$refs.multipleTable.toggleAllSelection();
     });
   },
   methods: {
     //初始化数据列表
     initList() {
-      this.listLoading = true;
-      // this.$http({
-
-      // }).then(() =>{
-      //     // this.listLoading =false
-      // })
+       this.$http({
+        url: this.$http.adornUrl("/dataanalysis/hospitalBasicInfo/getPageList"),
+        method: "get",
+        params: this.$http.adornParams({
+          pageNo: this.pageIndex,
+          pageSize: this.pageSize,
+          hospitalName: this.dataForm.hospitalName,
+          hospitalType: this.dataForm.hospitalType,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableList = data.result.records;
+          this.totalPage = data.result.total;
+        } else {
+          this.tableList = [];
+          this.totalPage = 0;
+        }
+      });
     },
     //重置
     resetForm() {},

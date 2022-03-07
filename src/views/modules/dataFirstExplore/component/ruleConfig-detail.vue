@@ -79,7 +79,7 @@ export default {
           this.dataForm.ruleCategory = rule.ruleCategory;
           this.dataForm.createUserName = rule.createUserName;
           this.dataForm.ruleSqlValue = rule.ruleSqlValue;
-          this.dataForm.createTime = new Date(rule.createTime);
+          this.dataForm.createTime = rule.createTime;
           this.loading = false;
         }
       });

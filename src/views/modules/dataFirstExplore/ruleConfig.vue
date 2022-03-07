@@ -142,10 +142,7 @@
                 label="创建人"
               ></el-table-column>
               <el-table-column prop="createTime" label="创建时间">
-                <template slot-scope="scope">{{
-                  scope.row.createTime | dateformat
-                }}</template></el-table-column
-              >
+              </el-table-column>
               <!-- <el-table-column prop="hospitalName" label="医院">
               </el-table-column> -->
               <el-table-column prop="moblie" label="操作">
@@ -191,7 +188,7 @@
             title="sql编辑器"
             :close-on-click-modal="false"
             :modal-append-to-body="false"
-            width="80%"
+            width="40%"
             :close-on-press-escape="false"
           >
             <AddOrEdit
@@ -214,6 +211,7 @@
               @close="closeRun"
               @ok="succeedRun"
               :info="info"
+              :runIds="runIds"
               v-if="showRunDialog"
             ></runNow>
           </el-dialog>
@@ -243,6 +241,7 @@ export default {
       },
       // pbFileList: [],
       // pbFiles: [],
+      runIds: "",
       //当前页
       pageIndex: 1,
       //每页条数
@@ -445,15 +444,19 @@ export default {
     },
     //列表多选
     handleSelectionChange(val) {
+      // console.log(val)
       this.multipleSelection = val;
     },
     //删除
     deleteData() {
-      var ruleIds = [];
+      var ruleIds = "";
       for (var i = 0; i < this.multipleSelection.length; i++) {
-        ruleIds.push(this.multipleSelection[0].ruleId);
+        ruleIds += this.multipleSelection[i].ruleId + ",";
       }
-      console.log(ruleIds);
+      if (ruleIds != null && ruleIds != "" && ruleIds != undefined) {
+        ruleIds = ruleIds.substr(0, ruleIds.length - 1);
+      }
+      // console.log(ruleIds);
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -461,11 +464,11 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl("/rule/deleteByIds/"),
-            method: "delete",
-            data: this.$http.adornData({
-              ruleIds: ruleIds
-            })
+            url: this.$http.adornUrl(`/rule/deleteRuleByIds/${ruleIds}`),
+            method: "delete"
+            // data: this.$http.adornData({
+            //   ruleIds: JSON.stringify(ruleIds)
+            // })
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -509,11 +512,27 @@ export default {
     },
     //立即运行
     runNow() {
+      var arrIds = "";
+      for (var j = 0; j < this.multipleSelection.length; j++) {
+        arrIds += this.multipleSelection[j].ruleId + ",";
+      }
+      if (arrIds != null && arrIds != "" && arrIds != undefined) {
+        arrIds = arrIds.substr(0, arrIds.length - 1);
+      }
+      this.runIds = arrIds;
       this.showRunDialog = true;
       this.info = false;
     },
     //定时运行
     timeRun() {
+      var arrIds = "";
+      for (var j = 0; j < this.multipleSelection.length; j++) {
+        arrIds += this.multipleSelection[j].ruleId + ",";
+      }
+      if (arrIds != null && arrIds != "" && arrIds != undefined) {
+        arrIds = arrIds.substr(0, arrIds.length - 1);
+      }
+      this.runIds = arrIds;
       this.showRunDialog = true;
       this.info = true;
     },

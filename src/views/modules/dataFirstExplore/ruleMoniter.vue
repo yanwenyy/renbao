@@ -32,7 +32,7 @@
                     v-model="dataForm.ruleCategory"
                     filterable
                     clearable
-                    placeholder="运行状态"
+                    placeholder="规则类别"
                     size="small"
                     @change="getProjectId"
                   >
