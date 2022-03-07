@@ -81,17 +81,25 @@ export default {
     methods: {
         //默认打开页面
         showDialog(type, d) {
+            this.reset();
             this.dialogVisible = true;
-            this.type = type
-            
+            this.type = type;
+            // Object.assign(this.$data, this.$options.data()) // 全部重置
         },
         changeHospital () {
-            console.log('选择医院')
-            this.dialogVisible = false
-            this.$refs.hospitalSelection.showDialog()
+            // this.dialogVisible = false
+            this.$refs.hospitalSelection.showDialog(this.type)
+        },
+        reset () {
+            this.ruleOperationForm = {
+                startTime: '',
+                hospital: '',
+                batchName: ''
+            };
         },
       
         handleClose () {
+            this.resetForm();
             this.dialogVisible = false
         },
         onSubmit (formName) {
@@ -100,8 +108,12 @@ export default {
             
         },
         cancel () {
+            this.resetForm();
             this.dialogVisible = false;
            
+        },
+        resetForm(formName) {
+            this.$refs['ruleOperationForm'].resetFields();
         }
     },
     components: {

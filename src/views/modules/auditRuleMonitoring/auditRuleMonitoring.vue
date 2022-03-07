@@ -141,12 +141,41 @@ export default {
         }
     },
     mounted () {
+        this.getbatchList();
+        
       
     },
     created () {
 
     },
     methods: {
+        getbatchList () {
+            // /batch/selectList
+
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('batch/selectList'),
+                method: 'post',
+                // params:  this.$http.adornData('', false)
+            }).then(({data}) => {
+                console.log(data, 'datadatadatadata')
+                // this.tableLoading = false
+                // if (data.code == 200) {
+                //     data.result.records.map(i => {
+                //         i.createTime = i.createTime.split('T')[0];
+                //         i.ruleCategory = i.ruleCategory == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
+                //     })
+                //     this.tableData = data.result.records;
+                //     this.Pager.pageSize = data.result.size;
+                //     this.Pager.pageIndex = data.result.current;
+                //     this.Pager.total = data.result.total;  
+                // }
+            }).catch(() => {
+                // this.tableLoading = false
+            })
+
+        },
+
         treeClick (data) {
 
         },
@@ -156,7 +185,7 @@ export default {
         },
         // 列表重置
         onReset () {
-
+            this.searchForm= {type: '',runningState: ''};
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;

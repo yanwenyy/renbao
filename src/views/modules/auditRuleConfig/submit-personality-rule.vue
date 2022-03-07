@@ -11,9 +11,12 @@
                 <span>选择规则：</span>
                 <el-tree
                     ref="ruleTree"
+                    check-strictly
                     :default-expand-all="true"
                     :data="projectRulesTreeList"
                     show-checkbox
+                    :check-on-click-node="true"
+                    :expand-on-click-node="false"
                     node-key="label"
                     @check-change="handleCheckChange"
                     >
@@ -61,8 +64,7 @@ export default {
                 }
                
             ],
-           
-           
+            uniqueValue: '', //最后拿到的唯一选择的moduldCode值,相当于id 
         }
     },
     methods: {
@@ -72,8 +74,18 @@ export default {
             
         },
         handleCheckChange (data, checked, indeterminate) {
-            if (checked) {
-                this.$refs.ruleTree.setCheckedKeys([data.label])
+            // if (checked) {
+            //     this.$refs.ruleTree.setCheckedKeys([data.label])
+            // }
+            if(checked){
+                // 注意：后端返回的node-key不是id，是moduldCode
+                this.$refs.ruleTree.setCheckedKeys([data.label]); //data.moduldCode 根据自己需求改，我这个是moduldCode，上面data配置中我已经修改了的
+                this.uniqueValue =  this.$refs.ruleTree.getCheckedKeys().toString(); //不加上toString()会报：期望一个数字或者字符串，结果返回的是数组
+            }else{
+                this.uniqueValue =  this.$refs.ruleTree.getCheckedKeys().toString();
+                if(this.uniqueValue.length == 0){
+                    this.uniqueValue = ''
+                }
             }
         },
         handleClose () {

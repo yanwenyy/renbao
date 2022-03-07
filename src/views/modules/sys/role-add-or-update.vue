@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     init() {
-      if (this.id != "") {
+      if (this.id != null && this.id != "" && this.id != undefined) {
         this.loading = true;
         this.$nextTick(() => {
           this.$refs["ruleForm"].resetFields();

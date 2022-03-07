@@ -80,12 +80,12 @@
                 layout="total, sizes, prev, pager, next, jumper">
             </el-pagination>
         </div>
-       
+       <result-detail-out-dialog ref="resultDetailOutDialog"></result-detail-out-dialog>
         
     </div>
 </template>
 <script>
-
+import resultDetailOutDialog from './resultDetailOutDialog.vue'
 export default {
     data () {
         return {
@@ -148,7 +148,7 @@ export default {
 
         },
         onReset () {
-
+            this.searchForm={type: '',name: ''};
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
@@ -162,17 +162,21 @@ export default {
         },
         // 列表查看
         resultViewClick (data) {
-            console.log(data, 'datadatadata')
-            this.$refs.resultView.showDialog(data)
+            // this.$refs.resultView.showDialog(data)
+            console.log('查看明细')
 
         },
         resultDetailsExportClick () {
-
+            // console.log('导出弹框')
+            this.$refs.resultDetailOutDialog.showDialog()
         },
        
         deleteFn () {
 
         }
+    },
+    components: {
+        resultDetailOutDialog
     }
    
 }
