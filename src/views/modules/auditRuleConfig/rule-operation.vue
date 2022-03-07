@@ -46,7 +46,7 @@
                
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
+                <el-button type="primary" @click="onSubmit('ruleOperationForm')" :loading="loading" size="small">确 定</el-button>
                 <el-button @click="cancel" size="small">取 消</el-button>
                
             </span>
@@ -74,6 +74,9 @@ export default {
                 batchName: [
                     { required: true, message: '请输入批次名称'},
                 ],
+                hospital: [
+                     { required: true, message: '请选择医院'},
+                ]
             },
             type: ''
         }
@@ -103,7 +106,14 @@ export default {
             this.dialogVisible = false
         },
         onSubmit (formName) {
-            console.log(this.ruleOperationForm, '表单数据')
+            // 
+             this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    console.log(this.ruleOperationForm, '表单数据')
+                    
+
+                }
+            })
             
             
         },

@@ -22,7 +22,6 @@
                 <span @click="nodeClick(node, data)">{{ node.label }}</span>
                 <span class="tree-btn" v-if="isShowEdit">
                 <el-button
-                    v-if="data.folderParentId"
                     type="text"
                     size="mini"
                     @click="() => append(data,node,'add')">
@@ -245,11 +244,8 @@ export default {
                             this.$message({
                                 message: '操作成功',
                                 type: 'success',
-                                duration: 1500,
-                                onClose: () => {
-                                    this.getRuleFolder()
-                                }
                             })
+                            this.getRuleFolder()
                         } else {
                             this.$message.error(data.msg)
 
