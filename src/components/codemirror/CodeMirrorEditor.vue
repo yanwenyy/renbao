@@ -3,6 +3,10 @@
     <div class="codemirror-div" v-if="!fullScreen">
       <div class="btn-group">
         <el-button type="text"
+                   @click="implement">
+          <i class="el-icon-paperclip" title="格式化"></i>
+        </el-button>
+        <el-button type="text"
                    :disabled="implementDisabled"
                    @click="implement">
           <i class="el-icon-video-play" title="运行"></i>
@@ -76,6 +80,76 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      width="70%"
+      title="sql草稿列表"
+      :close-on-click-modal="false"
+      :visible.sync="sqlvisible">
+      <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+
+        <el-form-item label="sql标题:">
+          <el-input v-model="dataForm.name" placeholder="模糊查询" clearable></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="getDataList()">查询</el-button>
+          <el-button v-if="" type="info" @click="">重置</el-button>
+        </el-form-item>
+      </el-form>
+      <el-table
+        :data="dataList"
+        border
+        v-loading="dataListLoading"
+        @selection-change="selectionChangeHandle"
+        style="width: 100%;">
+        <el-table-column
+          type="selection"
+          header-align="center"
+          align="center"
+          width="50">
+        </el-table-column>
+        <el-table-column
+          prop="id"
+          header-align="center"
+          align="center"
+          width="80"
+          label="草稿名称">
+        </el-table-column>
+        <el-table-column
+          prop="createTime"
+          header-align="center"
+          align="center"
+          label="草稿创建时间">
+          <template slot-scope="scope">
+            {{scope.row.createTime | dateformat }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          header-align="center"
+          align="center"
+          width="150"
+          label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">查看详情</el-button>
+            <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="self-page"
+        @size-change="sizeChangeHandle"
+        @current-change="currentChangeHandle"
+        :current-page="pageIndex"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pageSize"
+        :total="totalPage"
+        layout="total, sizes, prev, pager, next, jumper">
+      </el-pagination>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="sqlvisible = false">取消</el-button>
+        <el-button type="primary" @click="sub()">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -129,27 +203,51 @@
     components: {
       codemirror
     },
-    props: ["cmTheme", "cmMode", "autoFormatJson", "jsonIndentation",'treeLable'],
+    // props: ["cmTheme", "cmMode", "autoFormatJson", "jsonIndentation",'treeLable','tableData'],
+    props: {
+      cmMode: {
+        type: String,
+        default: null,
+      },
+      autoFormatJson: {
+        type: Boolean,
+        default: null,
+      },
+      jsonIndentation: {
+        type: Number,
+        default: null,
+      },
+      treeLable: {
+        type: String,
+        default: null,
+      },
+      tableData: {
+        type: Array,
+        default: null,
+      },
+      getwsData: {
+        type: Function,
+        default: null,
+      },
+    },
     data() {
       return {
+        //sql列表
+        sqlvisible:false,
+        dataForm: {
+          startTime: '',
+          endTime: '',
+        },
+        dataList: [],
+        pageIndex: 1,
+        pageSize: 10,
+        totalPage: 0,
+        dataListLoading: false,
+        dataListSelections: [],
+        addOrUpdateVisible: false,
+
+
         fullScreen:false,
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
         implementDisabled:false,
         editorValue: "",
         cmOptions: {
@@ -273,9 +371,96 @@
         this.$set(this.cmOptions, "mode", this.cmMode);
         this.resetLint();
         this.resetFoldGutter();
+      },
+      tabelData: function (newValue, oldValue) {
+
       }
     },
     methods: {
+      //sql列表开始
+      //保存信息
+      sub(){
+        this.$emit('refreshDataList',this.dataListSelections);
+      },
+      // 获取数据列表
+      getDataList () {
+        console.log(this.value1)
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/biz/pdbaidudata/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'pageNum': this.pageIndex,
+            'pageSize': this.pageSize,
+            'agencyId': this.dataForm.agencyId,
+            'startTime': this.dataForm.startTime,
+            'endTime': this.dataForm.endTime
+          })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.dataList = data.data.list
+            this.totalPage = data.data.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+      // 每页数
+      sizeChangeHandle (val) {
+        this.pageSize = val
+        this.pageIndex = 1
+        this.getDataList()
+      },
+      // 当前页
+      currentChangeHandle (val) {
+        this.pageIndex = val
+        this.getDataList()
+      },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
+      },
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 删除
+      deleteHandle (id) {
+        var userIds = id ? [id] : this.dataListSelections.map(item => {
+          return item.userId
+        })
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/biz/pdbaidudata/delete'),
+            method: 'post',
+            data: this.$http.adornData(userIds, false)
+          }).then(({data}) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      //sql列表结束
+
       //是否全屏
       setFullScreen(type){
         this.fullScreen=type==1?true:false;
@@ -283,1553 +468,123 @@
       },
       // 执行
       implement: function () {
-        //清空上一次的执行结果
-        this.arr = [];
-        //执行按钮禁用
-        var executeFlag = false;
-        this.implementDisabled = true;
-        /*if (this.batchId.trim() == "") {
-          // this.$emit("result", "false");
-          this.$message({
-            message: "获取登录信息失败，请重新加载网页",
-          });
-          this.implementDisabled = false;
-          return false;
-        }*/
-        //每次执行重新给一个执行的uuid
-        this.batchId = "";
-        generateUUID().split("-").forEach(e => {
-          this.batchId += e;
-        })
-        // this.batchId = generateUUID().replace("-","");
-        /*if (this.selectNumber.trim() != "") {
-          //设置cookie
-          setCookie("selectNumber", this.selectNumber);
-        }*/
-        //显示开始进行执行
-        this.$emit("result", "true");
-        //逐行拆分
-        var valueList = this.editorValue.split("\n");
-        //检测python删除文件的方法
-        //删除文件方法组
-        var delArr = [
-          "remove",
-          "rmdir",
-          "removedirs",
-          "unlink",
-          "rmtree",
-          "delete",
-          "del",
-          "Send2trash"
-        ];
-        //小括号
-        var regex = /\([^\)]*\)/g;
-        //对代码进行检测
-        valueList.forEach(item => {
-          if (item.search(regex) !== -1) {
-            delArr.forEach(delarr => {
-              if (item.indexOf(("." + delarr + "(")) !== -1) {
-                // this.$emit("result", "false");
-                this.$message({
-                  message: "函数不能以" + delarr + "命名或使用",
-                });
-                //返回前解禁按钮
-                this.implementDisabled = false;
-                return false;
-              }
-            })
-          }
-        })
-        //进行特殊方法的包装
-        var data = [];
-        valueList.forEach((item) => {
-          if (item.indexOf("execute") != -1) {
-            // replace(/(\s*$)/g, "")
-            var a = item;
-            var b = a + "&}";
-            // var b = a.replace(")", ")#}")
-            var str = b.replace("execute", "execute{&");
-            data.push(str);
-          } else if (item.indexOf("outPutPrint") != -1) {
-            // replace(/(\s*$)/g, "")
-            var a = item;
-            var b = a + "%}";
-            // var b = a.replace(")", ")#}")
-            var str = b.replace("outPutPrint", "outPutPrint{%");
-            data.push(str);
-          } else if (item.indexOf("outPutPicture") != -1) {
-            // replace(/(\s*$)/g, "")
-            var a = item;
-            var b = a + "%}";
-            // var b = a.replace(")", ")#}")
-            var str = b.replace("outPutPicture", "outPutPicture{%");
-            data.push(str);
-          } else if (item.indexOf("outPutTable") != -1) {
-            // replace(/(\s*$)/g, "")
-            var a = item;
-            var b = a + "%}";
-            // var b = a.replace(")", ")#}")
-            var str = b.replace("outPutTable", "outPutTable{%");
-            data.push(str);
-          } else if (item.indexOf("fileDownloadOutPut") != -1) {
-            // replace(/(\s*$)/g, "")
-            var a = item;
-            var b = a + "%}";
-            // var b = a.replace(")", ")#}")
-            var str = b.replace("fileDownloadOutPut", "fileDownloadOutPut{%");
-            data.push(str);
-          } else {
-            data.push(item);
-          }
-        });
-        data = data.join("\n");
-        if (this.funLists.length > 0) {
-          this.funLists.forEach((item) => {
-            var m = "import " + item.name;
-            if (data.indexOf(m) != -1) {
-              var f = "{|(" + m + ")|}";
-              data = data.replace(m, f);
-            }
-          });
-        }
+        this.getwsData();
+        // //清空上一次的执行结果
         // this.arr = [];
-        let formData = new FormData();
-        // var str = "";
-        // var str1 = "";
-        // if (
-        //   data.indexOf("{@cursor@}") != -1 &&
-        //   data.indexOf("{@send_msg@}") != -1
-        // ) {
-        //   str = data.replace("{@cursor@}", this.funList[0].value);
-        //   str1 = str.replace("{@send_msg@}", this.funList[1].value);
-        // } else {
-        // str1 = data;
+        // //执行按钮禁用
+        // var executeFlag = false;
+        // this.implementDisabled = true;
+        // /*if (this.batchId.trim() == "") {
+        //   // this.$emit("result", "false");
+        //   this.$message({
+        //     message: "获取登录信息失败，请重新加载网页",
+        //   });
+        //   this.implementDisabled = false;
+        //   return false;
+        // }*/
+        // //每次执行重新给一个执行的uuid
+        // this.batchId = "";
+        // generateUUID().split("-").forEach(e => {
+        //   this.batchId += e;
+        // })
+        // // this.batchId = generateUUID().replace("-","");
+        // /*if (this.selectNumber.trim() != "") {
+        //   //设置cookie
+        //   setCookie("selectNumber", this.selectNumber);
+        // }*/
+        // //显示开始进行执行
+        // this.$emit("result", "true");
+        // //逐行拆分
+        // var valueList = this.editorValue.split("\n");
+        // //检测python删除文件的方法
+        // //删除文件方法组
+        // var delArr = [
+        //   "remove",
+        //   "rmdir",
+        //   "removedirs",
+        //   "unlink",
+        //   "rmtree",
+        //   "delete",
+        //   "del",
+        //   "Send2trash"
+        // ];
+        // //小括号
+        // var regex = /\([^\)]*\)/g;
+        // //对代码进行检测
+        // valueList.forEach(item => {
+        //   if (item.search(regex) !== -1) {
+        //     delArr.forEach(delarr => {
+        //       if (item.indexOf(("." + delarr + "(")) !== -1) {
+        //         // this.$emit("result", "false");
+        //         this.$message({
+        //           message: "函数不能以" + delarr + "命名或使用",
+        //         });
+        //         //返回前解禁按钮
+        //         this.implementDisabled = false;
+        //         return false;
+        //       }
+        //     })
+        //   }
+        // })
+        // //进行特殊方法的包装
+        // var data = [];
+        // valueList.forEach((item) => {
+        //   if (item.indexOf("execute") != -1) {
+        //     // replace(/(\s*$)/g, "")
+        //     var a = item;
+        //     var b = a + "&}";
+        //     // var b = a.replace(")", ")#}")
+        //     var str = b.replace("execute", "execute{&");
+        //     data.push(str);
+        //   } else if (item.indexOf("outPutPrint") != -1) {
+        //     // replace(/(\s*$)/g, "")
+        //     var a = item;
+        //     var b = a + "%}";
+        //     // var b = a.replace(")", ")#}")
+        //     var str = b.replace("outPutPrint", "outPutPrint{%");
+        //     data.push(str);
+        //   } else if (item.indexOf("outPutPicture") != -1) {
+        //     // replace(/(\s*$)/g, "")
+        //     var a = item;
+        //     var b = a + "%}";
+        //     // var b = a.replace(")", ")#}")
+        //     var str = b.replace("outPutPicture", "outPutPicture{%");
+        //     data.push(str);
+        //   } else if (item.indexOf("outPutTable") != -1) {
+        //     // replace(/(\s*$)/g, "")
+        //     var a = item;
+        //     var b = a + "%}";
+        //     // var b = a.replace(")", ")#}")
+        //     var str = b.replace("outPutTable", "outPutTable{%");
+        //     data.push(str);
+        //   } else if (item.indexOf("fileDownloadOutPut") != -1) {
+        //     // replace(/(\s*$)/g, "")
+        //     var a = item;
+        //     var b = a + "%}";
+        //     // var b = a.replace(")", ")#}")
+        //     var str = b.replace("fileDownloadOutPut", "fileDownloadOutPut{%");
+        //     data.push(str);
+        //   } else {
+        //     data.push(item);
+        //   }
+        // });
+        // data = data.join("\n");
+        // if (this.funLists.length > 0) {
+        //   this.funLists.forEach((item) => {
+        //     var m = "import " + item.name;
+        //     if (data.indexOf(m) != -1) {
+        //       var f = "{|(" + m + ")|}";
+        //       data = data.replace(m, f);
+        //     }
+        //   });
         // }
-        // if (str1.indexOf("{@cursor@}") != -1) {
-        //   str1 = str1.replace("{@cursor@}", this.funList[0].value);
-        // }
-        // if (str1.indexOf("{@send_msg@}") != -1) {
-        //   str1 = str1.replace("{@send_msg@}", this.funList[1].value);
-        // }
-        // 执行时print出现的次数 frequency
-        var frequency = (data.match(/print{%/g) || []).length;
-
-        formData.append("script", data);
-        // this.batchId
-        formData.append("batchId", this.batchId);
-        //执行语句转换及权限转换，返回成功会生产临时文件
-        shiftSql(formData)
-          .then((res) => {
-            var arr = [];
-            if (res.status !== "50") {
-              //debugger
-              //获取返回的保存文件路径
-              var savePath = res.pySavePath
-              var pySaveRelativePath = res.pySaveRelativePath
-              var pyOpenFilePath = res.pyOpenFilePath
-              var pyOpenRelativePath = res.pyOpenRelativePath
-              //有保存路径
-              if (savePath !== undefined && savePath !== null && savePath.length !== 0) {
-                //设置存在变量
-                var flag = false
-                //返回路径存在
-                if (savePath !== null) {
-                  /*//分隔符
-                  var separator = "/";
-
-                  //解析路径进行比对
-                  for (let i = 0; i < savePath.length; i++) {
-                    //进行解析
-
-                    //根路径下
-                    if (pySaveRelativePath[i].indexOf("/") === -1 && pySaveRelativePath[i].indexOf("\\") === -1) {
-                      flag = true;
-                      // break;
-                    }
-                    if (savePath[i].indexOf("\\") !== -1) {
-                      separator = "\\";
-                    }
-                    //截取全路径
-                    var fullPath = savePath[i].substring(0, savePath[i].lastIndexOf(separator) + 1);
-                    //对比个人文件的路径是否存在
-                    var tempFileData = this.fileData
-                    for (let j = 0; j < tempFileData.length; j++) {
-                      if (tempFileData[j].filePath.indexOf(separator) === -1) {
-                        if (separator === "\\") {
-                          while (tempFileData[j].filePath.indexOf("/") !== -1) {
-                            tempFileData[j].filePath = tempFileData[j].filePath.replace("/", "\\");
-                          }
-                        } else {
-                          tempFileData[j].filePath = tempFileData[j].filePath.replace(/\\/g, "/");
-                        }
-                      }
-                      //,个人文件是否已存
-                      if(tempFileData[j].extendName === null){
-                        var textTemp = tempFileData[j].filePath + tempFileData[j].fileName;
-                      }
-                      var textTemp = tempFileData[j].filePath + tempFileData[j].fileName + "." + tempFileData[j].extendName
-                      if(tempFileData[j].filePath.trim() === separator){
-                        textTemp =  tempFileData[j].fileName + "." + tempFileData[j].extendName
-                      }
-                      textTemp = textTemp.replace(/\\/g, "/");
-                      if (tempFileData[j].isDir === 0 && (textTemp).indexOf(pySaveRelativePath[i]) !== -1 && (pySaveRelativePath[i]).indexOf(textTemp) !== -1) {
-                        this.$emit("result", "false");
-                        this.$message({
-                          message: "同名文件已存在",
-                        });
-                        return false;
-                      }
-                      if (tempFileData[j].isDir === 0 && fullPath.indexOf(tempFileData[j].filePath) !== -1) {
-                        flag = true;
-                        // break;
-                      }
-                    }
-                  }*/
-                  //重新使用相对路径进行解析
-                  var tempFileData = this.fileData
-                  for (let i = 0; i < pySaveRelativePath.length; i++) {
-                    //解析所需要的数据
-                    var fileName = ""
-                    var filePath = ""
-                    var extendName = ""
-                    if (pySaveRelativePath[i].indexOf("/") === -1) {
-                      filePath = "/";
-                      var apa = pySaveRelativePath[i].split(".");
-                      fileName = apa[0];
-                      extendName = apa[1];
-                    } else {
-                      filePath = "/" + pySaveRelativePath[i].substring(0, pySaveRelativePath[i].lastIndexOf("/") + 1);
-                      var apa = pySaveRelativePath[i].substring(pySaveRelativePath[i].lastIndexOf("/") + 1).split(".");
-                      fileName = apa[0];
-                      extendName = apa[1];
-                    }
-                    //查找相同路径
-                    for (let j = 0; j < tempFileData.length; j++) {
-                      //文件，路径,目录存在，文件不存在
-                      if (filePath === "/" && tempFileData[j].filePath === "/") {
-                        if (tempFileData[j].fileName === fileName && tempFileData[j].extendName === extendName) {
-                          this.$emit("result", "false");
-                          this.$message({
-                            message: "同名文件已存在",
-                          });
-                          //进行临时文件的删除及禁用按钮的解封
-                          this.toDelTempFile();
-                          this.implementDisabled = false;
-                          return false;
-                        }
-                        flag = true;
-                      }
-                      if (tempFileData[j].extendName !== null) {
-                        // if (tempFileData[j].filePath + tempFileData[j].fileName + "/" === filePath){
-                        if (tempFileData[j].filePath === filePath) {
-                          if (tempFileData[j].fileName === fileName && tempFileData[j].extendName === extendName) {
-                            this.$emit("result", "false");
-                            this.$message({
-                              message: "同名文件已存在",
-                            });
-                            //进行临时文件的删除及禁用按钮的解封
-                            this.toDelTempFile();
-                            this.implementDisabled = false;
-                            return false;
-                          }
-                          flag = true;
-                          continue;
-                        }
-                      } else {
-                        if (tempFileData[j].filePath + tempFileData[j].fileName + "/" === filePath) {
-                          flag = true;
-                        }
-                      }
-                    }
-                  }
-                }
-                //路径不存在，抛出错误信息
-                if (!flag) {
-                  this.$emit("result", "false");
-                  this.$message({
-                    message: "保存文件的目录不存在",
-                  });
-                  //进行临时文件的删除及禁用按钮的解封
-                  this.toDelTempFile();
-                  this.implementDisabled = false;
-                  return false;
-                }
-              }
-              //如果有要下载的文件
-              //请求下载文件到本地服务器，参数路径以？进行分隔
-              if (pyOpenFilePath !== undefined && pyOpenFilePath !== null && pyOpenFilePath.length !== 0 && pyOpenRelativePath !== undefined && pyOpenRelativePath !== null && pyOpenRelativePath.length !== 0) {
-                var openFile = "";
-                var openRelativeFiles = "";
-                for (let n = 0; n < pyOpenFilePath.length; n++) {
-                  if (n < pyOpenFilePath.length - 1) {
-                    openFile += (pyOpenFilePath[n] + "?");
-                    openRelativeFiles += (pyOpenRelativePath[n] + "?");
-                  } else {
-                    openFile += pyOpenFilePath[n];
-                    openRelativeFiles += pyOpenRelativePath[n];
-                  }
-                }
-                var openFileData = new URLSearchParams();
-                openFileData.append("openRelativeFiles", openRelativeFiles);
-                openFileData.append("openFilePath", openFile);
-                //进行下载
-                downloadFile(openFileData).then((response) => {
-                  // console.log(response)
-                  let obj = {
-                    batchId: this.batchId,
-                    sqript: res.newScript,
-                    printSum: frequency,
-                    savePath: savePath
-                  };
-                  //执行过滤后的python
-                  executePython(obj)
-                    .then((re) => {
-                      if (re.status != 50) {
-                        //如果有保存路径
-                        if (savePath !== undefined && savePath !== null && savePath.length !== 0) {
-                          var saveFiles = "";
-                          var saveRelativeFiles = "";
-                          for (let k = 0; k < savePath.length; k++) {
-                            if (k < savePath.length - 1) {
-                              saveFiles += (savePath[k] + "?");
-                              saveRelativeFiles += (pySaveRelativePath[k] + "?");
-                            } else {
-                              saveFiles += savePath[k];
-                              saveRelativeFiles += pySaveRelativePath[k];
-                            }
-                          }
-                          //准备数据
-                          let saveFileData = new FormData();
-                          saveFileData.append("saveFiles", saveFiles);
-                          saveFileData.append("saveRelativeFiles", saveRelativeFiles);
-                          //文件管理中存储文件
-                          //进行文件保存
-                          saveUploadFile(saveFileData).then((r) => {
-                            //删除临时文件
-                            this.toDelTempFile();
-                            //刷新对比文件树列表
-                            this.$emit("getfiletree");
-                            //刷新个人基础数据
-                            this.getFileData();
-                            // let saveMessage = "文件保存成功";
-                            //显示执行结果
-                            if (re.result.length > 0) {
-                              var arrList = [];
-                              re.result.forEach((item) => {
-                                var ind = item.indexOf("@");
-                                var before = item.substring(0, ind);
-                                var after = item.substring(ind + 1, item.length);
-                                if (item.indexOf("icssError:") != -1) {
-                                  var objH = {
-                                    value: item,
-                                    flagValue: 0,
-                                  };
-                                  arrList.push(objH);
-                                  executeFlag = true;
-                                } else {
-                                  if (before === "print") {
-                                    var objH = {
-                                      value: after,
-                                      flagValue: 1,
-                                    };
-                                    arrList.push(objH);
-                                  }
-                                  if (before === "picture") {
-                                    var obj1 = {
-                                      name: "图表",
-                                      value: after,
-                                      flag: 3,
-                                      valueFlag: 1,
-                                    };
-                                    arr.push(obj1);
-                                  }
-                                  if (before === "table") {
-                                    try {
-                                      var obj4 = {
-                                        name: "数据表",
-                                        value: JSON.parse(after),
-                                        flag: 2,
-                                        valueFlag: 1,
-                                      };
-                                      arr.push(obj4);
-                                    } catch (e) {
-                                      var objH = {
-                                        value: after,
-                                        flagValue: 1,
-                                      };
-                                      arrList.push(objH);
-                                    }
-                                  }
-                                  if (before === "fileUpload") {
-                                    let token =
-                                      "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                    // /AuditAnalysis/pythonTools/downLoadFile
-                                    // /pythontools/pythonEditor/downLoadFile
-                                    this.File(
-                                      "/pythontools/pythonEditor/downLoadFile?url=" +
-                                      after
-                                    );
-                                    this.$emit("result", "false");
-                                  }
-                                }
-                                // if (item.indexOf(this.batchId) != -1) {
-                                //   var obj0 = {
-                                //     name: "执行结果",
-                                //     value: item,
-                                //     flag: 1,
-                                //     valueFlag: 0,
-                                //   };
-                                //   arr.push(obj0);
-                                // } else {
-                                //   var redata;
-                                //   if (item.slice(0, 1) == "{") {
-                                //     redata = JSON.parse(item);
-                                //     var obj1 = {
-                                //       name: "执行结果",
-                                //       value: redata,
-                                //       flag: 2,
-                                //       valueFlag: 1,
-                                //     };
-                                //     arr.push(obj1);
-                                //   } else {
-                                //     if (item.indexOf("data:image/png;base64") != -1) {
-                                //       var obj1 = {
-                                //         name: "执行结果",
-                                //         value: item,
-                                //         flag: 3,
-                                //         valueFlag: 1,
-                                //       };
-                                //       arr.push(obj1);
-                                //     } else {
-                                //       redata = item;
-                                //       var obj2 = {
-                                //         name: "执行结果",
-                                //         value: item,
-                                //         flag: 1,
-                                //         valueFlag: 2,
-                                //       };
-                                //       arr.push(obj2);
-                                //     }
-                                //   }
-                                // }
-                                // if (item.indexOf("cols") != -1) {
-                                //   if (item.slice(0, 1) == "{") {
-                                //     try {
-                                //       var obj1 = {
-                                //         name: "执行结果",
-                                //         value: JSON.parse(item),
-                                //         flag: 2,
-                                //         valueFlag: 1,
-                                //       };
-                                //       arr.push(obj1);
-                                //       return true;
-                                //     } catch (e) {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 0,
-                                //       };
-                                //       arrList.push(objH);
-                                //       return false;
-                                //     }
-                                //   } else {
-                                //     if (item.indexOf("data:image/png;base64") != -1) {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 1,
-                                //       };
-                                //     } else {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 0,
-                                //       };
-                                //     }
-                                //     arrList.push(objH);
-                                //   }
-                                // } else {
-                                //   if (item.indexOf("data:image/png;base64") != -1) {
-                                //     var objH = {
-                                //       value: item,
-                                //       flagValue: 1,
-                                //     };
-                                //   } else {
-                                //     var objH = {
-                                //       value: item,
-                                //       flagValue: 0,
-                                //     };
-                                //   }
-                                //   arrList.push(objH);
-                                // }
-                              });
-                              // var objH = {
-                              //   value: saveMessage,
-                              //   flagValue: 1,
-                              // };
-                              // arrList.push(objH);
-                              if (arrList.length > 0) {
-                                var objL = {
-                                  name: "执行结果",
-                                  value: arrList,
-                                  flag: 1,
-                                  valueFlag: 2,
-                                };
-                                //将执行结果添加到显示的结果数组里面
-                                arr.push(objL);
-                              }
-                              this.$emit("result", arr);
-                            } else {
-                              this.$emit("result", "false");
-                            }
-                            // arrs.forEach((item, index) => {
-                            //   orderNumList[index];
-                            //   var Aobj = {
-                            //     name: "执行结果",
-                            //     value: item,
-                            //     flag: 2,
-                            //     valueFlag: 1,
-                            //   };
-                            //   var inde = orderNumList[index] - 1;
-                            //   // arr.splice(inde, 0, Aobj);
-                            //   arr.push(Aobj);
-                            // });
-                            // this.$emit("result", arr);
-                            if (executeFlag) {
-                              this.implementDisabled = false;
-                              return
-                            }
-                            this.implementDisabled = false;
-                            return;
-                          }).catch(() => {
-                            // debugger
-                            let saveMessage = "文件保存失败";
-                            //删除临时文件
-                            this.toDelTempFile();
-                            if (re.result.length > 0) {
-                              var arrList = [];
-                              re.result.forEach((item) => {
-                                var ind = item.indexOf("@");
-                                var before = item.substring(0, ind);
-                                var after = item.substring(ind + 1, item.length);
-                                if (item.indexOf("icssError:") != -1) {
-                                  var objH = {
-                                    value: item,
-                                    flagValue: 0,
-                                  };
-                                  arrList.push(objH);
-                                  executeFlag = true;
-                                } else {
-                                  if (before === "print") {
-                                    var objH = {
-                                      value: after,
-                                      flagValue: 1,
-                                    };
-                                    arrList.push(objH);
-                                  }
-                                  if (before === "picture") {
-                                    var obj1 = {
-                                      name: "图表",
-                                      value: after,
-                                      flag: 3,
-                                      valueFlag: 1,
-                                    };
-                                    arr.push(obj1);
-                                  }
-                                  if (before === "table") {
-                                    try {
-                                      var obj4 = {
-                                        name: "数据表",
-                                        value: JSON.parse(after),
-                                        flag: 2,
-                                        valueFlag: 1,
-                                      };
-                                      arr.push(obj4);
-                                    } catch (e) {
-                                      var objH = {
-                                        value: after,
-                                        flagValue: 1,
-                                      };
-                                      arrList.push(objH);
-                                    }
-                                  }
-                                  if (before === "fileUpload") {
-                                    let token =
-                                      "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                    // /AuditAnalysis/pythonTools/downLoadFile
-                                    // /pythontools/pythonEditor/downLoadFile
-                                    this.File(
-                                      "/pythontools/pythonEditor/downLoadFile?url=" +
-                                      after
-                                    );
-                                    this.$emit("result", "false");
-                                  }
-                                }
-                                // if (item.indexOf(this.batchId) != -1) {
-                                //   var obj0 = {
-                                //     name: "执行结果",
-                                //     value: item,
-                                //     flag: 1,
-                                //     valueFlag: 0,
-                                //   };
-                                //   arr.push(obj0);
-                                // } else {
-                                //   var redata;
-                                //   if (item.slice(0, 1) == "{") {
-                                //     redata = JSON.parse(item);
-                                //     var obj1 = {
-                                //       name: "执行结果",
-                                //       value: redata,
-                                //       flag: 2,
-                                //       valueFlag: 1,
-                                //     };
-                                //     arr.push(obj1);
-                                //   } else {
-                                //     if (item.indexOf("data:image/png;base64") != -1) {
-                                //       var obj1 = {
-                                //         name: "执行结果",
-                                //         value: item,
-                                //         flag: 3,
-                                //         valueFlag: 1,
-                                //       };
-                                //       arr.push(obj1);
-                                //     } else {
-                                //       redata = item;
-                                //       var obj2 = {
-                                //         name: "执行结果",
-                                //         value: item,
-                                //         flag: 1,
-                                //         valueFlag: 2,
-                                //       };
-                                //       arr.push(obj2);
-                                //     }
-                                //   }
-                                // }
-                                // if (item.indexOf("cols") != -1) {
-                                //   if (item.slice(0, 1) == "{") {
-                                //     try {
-                                //       var obj1 = {
-                                //         name: "执行结果",
-                                //         value: JSON.parse(item),
-                                //         flag: 2,
-                                //         valueFlag: 1,
-                                //       };
-                                //       arr.push(obj1);
-                                //       return true;
-                                //     } catch (e) {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 0,
-                                //       };
-                                //       arrList.push(objH);
-                                //       return false;
-                                //     }
-                                //   } else {
-                                //     if (item.indexOf("data:image/png;base64") != -1) {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 1,
-                                //       };
-                                //     } else {
-                                //       var objH = {
-                                //         value: item,
-                                //         flagValue: 0,
-                                //       };
-                                //     }
-                                //     arrList.push(objH);
-                                //   }
-                                // } else {
-                                //   if (item.indexOf("data:image/png;base64") != -1) {
-                                //     var objH = {
-                                //       value: item,
-                                //       flagValue: 1,
-                                //     };
-                                //   } else {
-                                //     var objH = {
-                                //       value: item,
-                                //       flagValue: 0,
-                                //     };
-                                //   }
-                                //   arrList.push(objH);
-                                // }
-                              });
-                              var objH = {
-                                value: saveMessage,
-                                flagValue: 0,
-                              };
-                              arrList.push(objH);
-                              if (arrList.length > 0) {
-                                var objL = {
-                                  name: "执行结果",
-                                  value: arrList,
-                                  flag: 1,
-                                  valueFlag: 2,
-                                };
-                                arr.push(objL);
-                              }
-                              this.$emit("result", arr);
-                            } else {
-                              this.$emit("result", "false");
-                            }
-                            // arrs.forEach((item, index) => {
-                            //   orderNumList[index];
-                            //   var Aobj = {
-                            //     name: "执行结果",
-                            //     value: item,
-                            //     flag: 2,
-                            //     valueFlag: 1,
-                            //   };
-                            //   var inde = orderNumList[index] - 1;
-                            //   // arr.splice(inde, 0, Aobj);
-                            //   arr.push(Aobj);
-                            // });
-                            // this.$emit("result", arr);
-                            if (executeFlag) {
-                              this.implementDisabled = false;
-                              return;
-                            }
-                            this.implementDisabled = false;
-                            return;
-                          });
-                        }
-                        //没有保存路径
-                        else {
-                          //删除临时文件
-                          this.toDelTempFile();
-                          if (re.result.length > 0) {
-                            var arrList = [];
-                            re.result.forEach((item) => {
-                              var ind = item.indexOf("@");
-                              var before = item.substring(0, ind);
-                              var after = item.substring(ind + 1, item.length);
-                              if (item.indexOf("icssError:") != -1) {
-                                var objH = {
-                                  value: item,
-                                  flagValue: 0,
-                                };
-                                arrList.push(objH);
-                                executeFlag = true
-                              } else {
-                                if (before === "print") {
-                                  var objH = {
-                                    value: after,
-                                    flagValue: 1,
-                                  };
-                                  arrList.push(objH);
-                                }
-                                if (before === "picture") {
-                                  var obj1 = {
-                                    name: "图表",
-                                    value: after,
-                                    flag: 3,
-                                    valueFlag: 1,
-                                  };
-                                  arr.push(obj1);
-                                }
-                                if (before === "table") {
-                                  try {
-                                    var obj4 = {
-                                      name: "数据表",
-                                      value: JSON.parse(after),
-                                      flag: 2,
-                                      valueFlag: 1,
-                                    };
-                                    arr.push(obj4);
-                                  } catch (e) {
-                                    var objH = {
-                                      value: after,
-                                      flagValue: 1,
-                                    };
-                                    arrList.push(objH);
-                                  }
-                                }
-                                if (before === "fileUpload") {
-                                  let token =
-                                    "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                  // /AuditAnalysis/pythonTools/downLoadFile
-                                  // /pythontools/pythonEditor/downLoadFile
-                                  this.File(
-                                    "/pythontools/pythonEditor/downLoadFile?url=" +
-                                    after
-                                  );
-                                  this.$emit("result", "false");
-                                }
-                              }
-                              // if (item.indexOf(this.batchId) != -1) {
-                              //   var obj0 = {
-                              //     name: "执行结果",
-                              //     value: item,
-                              //     flag: 1,
-                              //     valueFlag: 0,
-                              //   };
-                              //   arr.push(obj0);
-                              // } else {
-                              //   var redata;
-                              //   if (item.slice(0, 1) == "{") {
-                              //     redata = JSON.parse(item);
-                              //     var obj1 = {
-                              //       name: "执行结果",
-                              //       value: redata,
-                              //       flag: 2,
-                              //       valueFlag: 1,
-                              //     };
-                              //     arr.push(obj1);
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 3,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //     } else {
-                              //       redata = item;
-                              //       var obj2 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 1,
-                              //         valueFlag: 2,
-                              //       };
-                              //       arr.push(obj2);
-                              //     }
-                              //   }
-                              // }
-                              // if (item.indexOf("cols") != -1) {
-                              //   if (item.slice(0, 1) == "{") {
-                              //     try {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: JSON.parse(item),
-                              //         flag: 2,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //       return true;
-                              //     } catch (e) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //       arrList.push(objH);
-                              //       return false;
-                              //     }
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 1,
-                              //       };
-                              //     } else {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //     }
-                              //     arrList.push(objH);
-                              //   }
-                              // } else {
-                              //   if (item.indexOf("data:image/png;base64") != -1) {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 1,
-                              //     };
-                              //   } else {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 0,
-                              //     };
-                              //   }
-                              //   arrList.push(objH);
-                              // }
-                            });
-                            if (arrList.length > 0) {
-                              var objL = {
-                                name: "执行结果",
-                                value: arrList,
-                                flag: 1,
-                                valueFlag: 2,
-                              };
-                              arr.push(objL);
-                            }
-                            this.$emit("result", arr);
-                          } else {
-                            this.$emit("result", "false");
-                          }
-                          // arrs.forEach((item, index) => {
-                          //   orderNumList[index];
-                          //   var Aobj = {
-                          //     name: "执行结果",
-                          //     value: item,
-                          //     flag: 2,
-                          //     valueFlag: 1,
-                          //   };
-                          //   var inde = orderNumList[index] - 1;
-                          //   // arr.splice(inde, 0, Aobj);
-                          //   arr.push(Aobj);
-                          // });
-                          // this.$emit("result", arr);
-                          if (executeFlag) {
-                            this.implementDisabled = false;
-                            return;
-                          }
-                          this.implementDisabled = false;
-                          return;
-                        }
-                      } else {
-                        //执行python发生错误
-                        //删除临时文件
-                        this.toDelTempFile();
-                        //取消执行显示
-                        this.$emit("result", "false");
-                        //提示执行结果
-                        this.$message({
-                          message: re.msg,
-                        });
-                      }
-                    })
-                    .catch(() => {
-                      this.toDelTempFile();
-                      this.$emit("result", "false");
-                      this.$message({
-                        message: "python执行失败",
-                      });
-                    });
-                }).catch(() => {
-                  this.toDelTempFile();
-                  this.$emit("result", "false");
-                  this.$message({
-                    message: "无法读取到文件",
-                  })
-                })
-              } else {
-                //没有需要下载的文件
-                let obj = {
-                  batchId: this.batchId,
-                  sqript: res.newScript,
-                  printSum: frequency,
-                  savePath: savePath
-                };
-                //执行python
-                executePython(obj)
-                  .then((re) => {
-                    if (re.status != 50) {
-                      //有要保存的文件
-                      if (savePath !== undefined && savePath !== null && savePath.length !== 0) {
-                        var saveFiles = "";
-                        var saveRelativeFiles = "";
-                        for (let k = 0; k < savePath.length; k++) {
-                          if (k < savePath.length - 1) {
-                            saveFiles += (savePath[k] + "?");
-                            saveRelativeFiles += (pySaveRelativePath[k] + "?");
-                          } else {
-                            saveFiles += savePath[k];
-                            saveRelativeFiles += pySaveRelativePath[k];
-                          }
-                        }
-                        //准备数据
-                        let saveFileData = new FormData();
-                        saveFileData.append("saveFiles", saveFiles);
-                        saveFileData.append("saveRelativeFiles", saveRelativeFiles);
-                        //文件管理中存储文件
-                        saveUploadFile(saveFileData).then((r) => {
-                          this.toDelTempFile();
-                          this.$emit("getfiletree");
-                          this.getFileData();
-                          // let saveMessage = "文件保存成功";
-                          if (re.result.length > 0) {
-                            var arrList = [];
-                            re.result.forEach((item) => {
-                              var ind = item.indexOf("@");
-                              var before = item.substring(0, ind);
-                              var after = item.substring(ind + 1, item.length);
-                              if (item.indexOf("icssError:") != -1) {
-                                var objH = {
-                                  value: item,
-                                  flagValue: 0,
-                                };
-                                arrList.push(objH);
-                                executeFlag = true;
-                              } else {
-                                if (before === "print") {
-                                  var objH = {
-                                    value: after,
-                                    flagValue: 1,
-                                  };
-                                  arrList.push(objH);
-                                }
-                                if (before === "picture") {
-                                  var obj1 = {
-                                    name: "图表",
-                                    value: after,
-                                    flag: 3,
-                                    valueFlag: 1,
-                                  };
-                                  arr.push(obj1);
-                                }
-                                if (before === "table") {
-                                  try {
-                                    var obj4 = {
-                                      name: "数据表",
-                                      value: JSON.parse(after),
-                                      flag: 2,
-                                      valueFlag: 1,
-                                    };
-                                    arr.push(obj4);
-                                  } catch (e) {
-                                    var objH = {
-                                      value: after,
-                                      flagValue: 1,
-                                    };
-                                    arrList.push(objH);
-                                  }
-                                }
-                                if (before === "fileUpload") {
-                                  let token =
-                                    "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                  // /AuditAnalysis/pythonTools/downLoadFile
-                                  // /pythontools/pythonEditor/downLoadFile
-                                  this.File(
-                                    "/pythontools/pythonEditor/downLoadFile?url=" +
-                                    after
-                                  );
-                                  // this.$emit("result", "false");
-                                }
-                              }
-                              // if (item.indexOf(this.batchId) != -1) {
-                              //   var obj0 = {
-                              //     name: "执行结果",
-                              //     value: item,
-                              //     flag: 1,
-                              //     valueFlag: 0,
-                              //   };
-                              //   arr.push(obj0);
-                              // } else {
-                              //   var redata;
-                              //   if (item.slice(0, 1) == "{") {
-                              //     redata = JSON.parse(item);
-                              //     var obj1 = {
-                              //       name: "执行结果",
-                              //       value: redata,
-                              //       flag: 2,
-                              //       valueFlag: 1,
-                              //     };
-                              //     arr.push(obj1);
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 3,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //     } else {
-                              //       redata = item;
-                              //       var obj2 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 1,
-                              //         valueFlag: 2,
-                              //       };
-                              //       arr.push(obj2);
-                              //     }
-                              //   }
-                              // }
-                              // if (item.indexOf("cols") != -1) {
-                              //   if (item.slice(0, 1) == "{") {
-                              //     try {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: JSON.parse(item),
-                              //         flag: 2,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //       return true;
-                              //     } catch (e) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //       arrList.push(objH);
-                              //       return false;
-                              //     }
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 1,
-                              //       };
-                              //     } else {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //     }
-                              //     arrList.push(objH);
-                              //   }
-                              // } else {
-                              //   if (item.indexOf("data:image/png;base64") != -1) {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 1,
-                              //     };
-                              //   } else {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 0,
-                              //     };
-                              //   }
-                              //   arrList.push(objH);
-                              // }
-                            });
-                            // var objH = {
-                            //   value: saveMessage,
-                            //   flagValue: 1,
-                            // };
-                            // arrList.push(objH);
-                            if (arrList.length > 0) {
-                              var objL = {
-                                name: "执行结果",
-                                value: arrList,
-                                flag: 1,
-                                valueFlag: 2,
-                              };
-                              arr.push(objL);
-                            }
-                            this.$emit("result", arr);
-                          } else {
-                            this.$emit("result", "false");
-                          }
-                          // arrs.forEach((item, index) => {
-                          //   orderNumList[index];
-                          //   var Aobj = {
-                          //     name: "执行结果",
-                          //     value: item,
-                          //     flag: 2,
-                          //     valueFlag: 1,
-                          //   };
-                          //   var inde = orderNumList[index] - 1;
-                          //   // arr.splice(inde, 0, Aobj);
-                          //   arr.push(Aobj);
-                          // });
-                          // this.$emit("result", arr);
-                          if (executeFlag) {
-                            this.implementDisabled = false;
-                            return;
-                          }
-                          this.implementDisabled = false;
-                          return;
-                        }).catch(() => {
-                          let saveMessage = "文件保存失败";
-                          this.toDelTempFile();
-                          if (re.result.length > 0) {
-                            var arrList = [];
-                            re.result.forEach((item) => {
-                              var ind = item.indexOf("@");
-                              var before = item.substring(0, ind);
-                              var after = item.substring(ind + 1, item.length);
-                              if (item.indexOf("icssError:") != -1) {
-                                var objH = {
-                                  value: item,
-                                  flagValue: 0,
-                                };
-                                arrList.push(objH);
-                                executeFlag = true;
-                              } else {
-                                if (before === "print") {
-                                  var objH = {
-                                    value: after,
-                                    flagValue: 1,
-                                  };
-                                  arrList.push(objH);
-                                }
-                                if (before === "picture") {
-                                  var obj1 = {
-                                    name: "图表",
-                                    value: after,
-                                    flag: 3,
-                                    valueFlag: 1,
-                                  };
-                                  arr.push(obj1);
-                                }
-                                if (before === "table") {
-                                  try {
-                                    var obj4 = {
-                                      name: "数据表",
-                                      value: JSON.parse(after),
-                                      flag: 2,
-                                      valueFlag: 1,
-                                    };
-                                    arr.push(obj4);
-                                  } catch (e) {
-                                    var objH = {
-                                      value: after,
-                                      flagValue: 1,
-                                    };
-                                    arrList.push(objH);
-                                  }
-                                }
-                                if (before === "fileUpload") {
-                                  let token =
-                                    "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                  // /AuditAnalysis/pythonTools/downLoadFile
-                                  // /pythontools/pythonEditor/downLoadFile
-                                  this.File(
-                                    "/pythontools/pythonEditor/downLoadFile?url=" +
-                                    after
-                                  );
-                                  // this.$emit("result", "false");
-                                }
-                              }
-                              // if (item.indexOf(this.batchId) != -1) {
-                              //   var obj0 = {
-                              //     name: "执行结果",
-                              //     value: item,
-                              //     flag: 1,
-                              //     valueFlag: 0,
-                              //   };
-                              //   arr.push(obj0);
-                              // } else {
-                              //   var redata;
-                              //   if (item.slice(0, 1) == "{") {
-                              //     redata = JSON.parse(item);
-                              //     var obj1 = {
-                              //       name: "执行结果",
-                              //       value: redata,
-                              //       flag: 2,
-                              //       valueFlag: 1,
-                              //     };
-                              //     arr.push(obj1);
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 3,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //     } else {
-                              //       redata = item;
-                              //       var obj2 = {
-                              //         name: "执行结果",
-                              //         value: item,
-                              //         flag: 1,
-                              //         valueFlag: 2,
-                              //       };
-                              //       arr.push(obj2);
-                              //     }
-                              //   }
-                              // }
-                              // if (item.indexOf("cols") != -1) {
-                              //   if (item.slice(0, 1) == "{") {
-                              //     try {
-                              //       var obj1 = {
-                              //         name: "执行结果",
-                              //         value: JSON.parse(item),
-                              //         flag: 2,
-                              //         valueFlag: 1,
-                              //       };
-                              //       arr.push(obj1);
-                              //       return true;
-                              //     } catch (e) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //       arrList.push(objH);
-                              //       return false;
-                              //     }
-                              //   } else {
-                              //     if (item.indexOf("data:image/png;base64") != -1) {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 1,
-                              //       };
-                              //     } else {
-                              //       var objH = {
-                              //         value: item,
-                              //         flagValue: 0,
-                              //       };
-                              //     }
-                              //     arrList.push(objH);
-                              //   }
-                              // } else {
-                              //   if (item.indexOf("data:image/png;base64") != -1) {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 1,
-                              //     };
-                              //   } else {
-                              //     var objH = {
-                              //       value: item,
-                              //       flagValue: 0,
-                              //     };
-                              //   }
-                              //   arrList.push(objH);
-                              // }
-                            });
-                            var objH = {
-                              value: saveMessage,
-                              flagValue: 0,
-                            };
-                            arrList.push(objH);
-                            if (arrList.length > 0) {
-                              var objL = {
-                                name: "执行结果",
-                                value: arrList,
-                                flag: 1,
-                                valueFlag: 2,
-                              };
-                              arr.push(objL);
-                            }
-
-                            this.$emit("result", arr);
-                          } else {
-                            // this.$emit("result", "false");
-                          }
-                          // arrs.forEach((item, index) => {
-                          //   orderNumList[index];
-                          //   var Aobj = {
-                          //     name: "执行结果",
-                          //     value: item,
-                          //     flag: 2,
-                          //     valueFlag: 1,
-                          //   };
-                          //   var inde = orderNumList[index] - 1;
-                          //   // arr.splice(inde, 0, Aobj);
-                          //   arr.push(Aobj);
-                          // });
-                          // this.$emit("result", arr);
-                          if (executeFlag) {
-                            this.implementDisabled = false;
-                            return;
-                          }
-                          this.implementDisabled = false;
-                          return false;
-                        });
-                      } else {
-                        //没有要保存的文件
-                        //删除临时文件
-                        this.toDelTempFile();
-                        //显示执行结果
-                        if (re.result.length > 0) {
-                          var arrList = [];
-                          re.result.forEach((item) => {
-                            var ind = item.indexOf("@");
-                            var before = item.substring(0, ind);
-                            var after = item.substring(ind + 1, item.length);
-                            if (item.indexOf("icssError:") != -1) {
-                              var objH = {
-                                value: item,
-                                flagValue: 0,
-                              };
-                              arrList.push(objH);
-                              executeFlag = true;
-                            } else {
-                              if (before === "print") {
-                                var objH = {
-                                  value: after,
-                                  flagValue: 1,
-                                };
-                                arrList.push(objH);
-                              }
-                              if (before === "picture") {
-                                var obj1 = {
-                                  name: "图表",
-                                  value: after,
-                                  flag: 3,
-                                  valueFlag: 1,
-                                };
-                                arr.push(obj1);
-                              }
-                              if (before === "table") {
-                                try {
-                                  var obj4 = {
-                                    name: "数据表",
-                                    value: JSON.parse(after),
-                                    flag: 2,
-                                    valueFlag: 1,
-                                  };
-                                  arr.push(obj4);
-                                } catch (e) {
-                                  var objH = {
-                                    value: after,
-                                    flagValue: 1,
-                                  };
-                                  arrList.push(objH);
-                                }
-                              }
-                              if (before === "fileUpload") {
-                                let token =
-                                  "&result=login&maxInerval=14400&LTPAToken=Y3MqOTQ4NTJjNjU1NzAzN2JhNjAxNTcwM2JiYzk4YTAwMDYqMTI4KlN0cmluZw==";
-                                // /AuditAnalysis/pythonTools/downLoadFile
-                                // /pythontools/pythonEditor/downLoadFile
-                                this.File(
-                                  "/pythontools/pythonEditor/downLoadFile?url=" +
-                                  after
-                                );
-                                this.$emit("result", "false");
-                              }
-                            }
-                            // if (item.indexOf(this.batchId) != -1) {
-                            //   var obj0 = {
-                            //     name: "执行结果",
-                            //     value: item,
-                            //     flag: 1,
-                            //     valueFlag: 0,
-                            //   };
-                            //   arr.push(obj0);
-                            // } else {
-                            //   var redata;
-                            //   if (item.slice(0, 1) == "{") {
-                            //     redata = JSON.parse(item);
-                            //     var obj1 = {
-                            //       name: "执行结果",
-                            //       value: redata,
-                            //       flag: 2,
-                            //       valueFlag: 1,
-                            //     };
-                            //     arr.push(obj1);
-                            //   } else {
-                            //     if (item.indexOf("data:image/png;base64") != -1) {
-                            //       var obj1 = {
-                            //         name: "执行结果",
-                            //         value: item,
-                            //         flag: 3,
-                            //         valueFlag: 1,
-                            //       };
-                            //       arr.push(obj1);
-                            //     } else {
-                            //       redata = item;
-                            //       var obj2 = {
-                            //         name: "执行结果",
-                            //         value: item,
-                            //         flag: 1,
-                            //         valueFlag: 2,
-                            //       };
-                            //       arr.push(obj2);
-                            //     }
-                            //   }
-                            // }
-                            // if (item.indexOf("cols") != -1) {
-                            //   if (item.slice(0, 1) == "{") {
-                            //     try {
-                            //       var obj1 = {
-                            //         name: "执行结果",
-                            //         value: JSON.parse(item),
-                            //         flag: 2,
-                            //         valueFlag: 1,
-                            //       };
-                            //       arr.push(obj1);
-                            //       return true;
-                            //     } catch (e) {
-                            //       var objH = {
-                            //         value: item,
-                            //         flagValue: 0,
-                            //       };
-                            //       arrList.push(objH);
-                            //       return false;
-                            //     }
-                            //   } else {
-                            //     if (item.indexOf("data:image/png;base64") != -1) {
-                            //       var objH = {
-                            //         value: item,
-                            //         flagValue: 1,
-                            //       };
-                            //     } else {
-                            //       var objH = {
-                            //         value: item,
-                            //         flagValue: 0,
-                            //       };
-                            //     }
-                            //     arrList.push(objH);
-                            //   }
-                            // } else {
-                            //   if (item.indexOf("data:image/png;base64") != -1) {
-                            //     var objH = {
-                            //       value: item,
-                            //       flagValue: 1,
-                            //     };
-                            //   } else {
-                            //     var objH = {
-                            //       value: item,
-                            //       flagValue: 0,
-                            //     };
-                            //   }
-                            //   arrList.push(objH);
-                            // }
-                          });
-                          if (arrList.length > 0) {
-                            var objL = {
-                              name: "执行结果",
-                              value: arrList,
-                              flag: 1,
-                              valueFlag: 2,
-                            };
-                            arr.push(objL);
-                          }
-                          this.$emit("result", arr);
-                        } else {
-                          this.$emit("result", "false");
-                        }
-                        // arrs.forEach((item, index) => {
-                        //   orderNumList[index];
-                        //   var Aobj = {
-                        //     name: "执行结果",
-                        //     value: item,
-                        //     flag: 2,
-                        //     valueFlag: 1,
-                        //   };
-                        //   var inde = orderNumList[index] - 1;
-                        //   // arr.splice(inde, 0, Aobj);
-                        //   arr.push(Aobj);
-                        // });
-                        // this.$emit("result", arr);
-                        /*if (executeFlag) {
-                          this.implementDisabled = false;
-                          return;
-                        }*/
-                        this.implementDisabled = false;
-                        // return;//这个return也没用
-                      }
-                    } else {
-                      this.toDelTempFile();
-                      this.$emit("result", "false");
-                      this.$message({
-                        message: re.msg,
-                      });
-                    }
-                  })
-                  .catch(() => {
-                    this.toDelTempFile();
-                    this.$emit("result", "false");
-                    this.$message({
-                      message: "python执行失败",
-                    });
-                  });
-              }
-            } else {
-              this.toDelTempFile();
-              this.$emit("result", "false");
-              this.$message({
-                message: res.result,
-              });
-            }
-          })
-          .catch(() => {
-            this.toDelTempFile();
-            this.$emit("result", "false");
-            this.$message({
-              message: "python转换过程中出现错误，请检查",
-              // message: "sql转换过程中出现错误，请检查",
-            });
-          });
-        //取消禁用按钮
-        this.implementDisabled = false;
+        // // this.arr = [];
+        // //取消禁用按钮
+        // this.implementDisabled = false;
       },
       // 打开
       openPython() {
-        this.draft = true;
+        this.sqlvisible = true;
       },
       // 保存
       savePython() {

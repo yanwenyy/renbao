@@ -96,7 +96,7 @@ router.beforeEach((to, from, next) => {
       if (data && data.code === 200) {
         var datas=treeDataTranslate(data.result ,'menuId','menuParentId');
         changeName(datas)
-        console.log(datas)
+        // console.log(datas)
         fnAddDynamicMenuRoutes(datas)
         router.options.isAddDynamicMenuRoutes = true
         sessionStorage.setItem('menuList', JSON.stringify(datas || '[]'))
@@ -184,7 +184,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
   } else {
     mainRoutes.name = 'main-dynamic'
     mainRoutes.children = routes
-    console.log(routes,mainRoutes)
+    // console.log(routes,mainRoutes)
     router.addRoutes([
       mainRoutes,
       { path: '*', redirect: { name: '404' } }

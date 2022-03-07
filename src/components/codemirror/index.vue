@@ -2,31 +2,37 @@
   <div class="box-mirror">
     <div class="code-mirror-tree" v-if="!fullScreen">
       <div class="tree-left">
-        <div class="tree-left-one">数据表</div>
-        <div class="tree-left-two">函数表</div>
+        <div class="tree-left-one" @click="changeTree('数据表')">数据表</div>
+        <div class="tree-left-two" @click="changeTree('函数表')">函数表</div>
       </div>
       <div class="tree-right">
-        <el-input
-          placeholder="输入关键字进行过滤"
-          v-model="filterText">
-        </el-input>
-        <el-tree
-          :filter-node-method="filterNode"
-          ref="tree"
-          :data="data"
-          node-key="id"
-          :props="defaultProps"
-          default-expand-all
-          @node-drag-start="handleDragStart"
-          @node-drag-enter="handleDragEnter"
-          @node-drag-leave="handleDragLeave"
-          @node-drag-over="handleDragOver"
-          @node-drag-end="handleDragEnd"
-          @node-drop="handleDrop"
-          draggable
-          :allow-drop="returnFalse"
-          :allow-drag="allowDrag">
-        </el-tree>
+        <div class="custom-tree-container">
+          <el-input
+            placeholder="输入关键字进行过滤"
+            v-model="filterText">
+          </el-input>
+          <el-tree
+            :data="treedata"
+            :filter-node-method="filterNode"
+            ref="tree"
+            :load="loadNode"
+            lazy
+            node-key="id"
+            :props="defaultProps"
+            :default-expand-all="false"
+            @node-expand="handleNodeClick"
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="returnFalse"
+            :allow-drag="allowDrag">
+          </el-tree>
+        </div>
+
       </div>
     </div>
     <div class="code-mirror-div">
@@ -55,6 +61,8 @@
         <!--<el-button type="primary" size="small" style="margin-left:10x" @click="setValue">修改内容</el-button>-->
       <!--</div>-->
       <code-mirror-editor
+        :getwsData="getwsData"
+        :tableData="tableData"
         ref="cmEditor"
         :cmTheme="cmTheme"
         :cmMode="cmMode"
@@ -74,49 +82,42 @@
     components: {
       CodeMirrorEditor
     },
+    props:{
+      changeTree: {
+        type: Function,
+        default: null,
+      },
+      getLoadTree: {
+        type: Function,
+        default: null,
+      },
+      getwsData: {
+        type: Function,
+        default: null,
+      },
+      treedata: {
+        type: Array,
+        default: null,
+      },
+      loadTree: {
+        type: Array,
+        default: null,
+      },
+      tableData: {
+        type: Array,
+        default: null,
+      },
+    },
     data() {
       return {
         fullScreen:false,
         filterText: '',
         treeLable:'',
-        data: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1',
-            children: [{
-              label: '三级 1-1-1'
-            }]
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
-        }, {
-          label: '一级 3',
-          children: [{
-            label: '二级 3-1',
-            children: [{
-              label: '三级 3-1-1'
-            }]
-          }, {
-            label: '二级 3-2',
-            children: [{
-              label: '三级 3-2-1'
-            }]
-          }]
-        }],
+        data: [],
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'label',
+          isLeaf:'isLeaf'
         },
         visible:true,
         cmTheme: "default", // codeMirror主题
@@ -208,9 +209,32 @@
     watch: {
       filterText(val) {
         this.$refs.tree.filter(val);
-      }
+      },
+      treedata: function (newValue, oldValue) {
+       console.log(newValue, oldValue)
+      },
+      loadTree: function (newValue, oldValue) {
+       console.log(newValue, oldValue)
+      },
     },
     methods: {
+      loadNode(node, resolve) {
+        if (node.level === 0) {
+          return resolve(this.treedata);
+        }
+        // if (node.level > 1) return resolve([]);
+        if(node.data.children){
+          return resolve(node.data.children);
+        }else{
+          setTimeout(() => {
+            resolve(this.loadTree);
+          }, 500);
+        }
+
+      },
+      handleNodeClick(data,obj,node){
+        this.getLoadTree(data,obj,node)
+      },
       getFullScreen(data){
         console.log(data)
         this.fullScreen=data;
@@ -224,7 +248,7 @@
         return false;
       },
       allowDrag(draggingNode) {
-        return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+        return draggingNode.data.isLeaf;
       },
       handleDragStart(node, ev) {
         console.log('drag start', node);
@@ -386,7 +410,7 @@
     vertical-align: top;
   }
   .tree-left{
-    margin-top: 5%;
+    margin-top: 20%;
     width: 9%;
     white-space: pre-wrap;
     cursor: pointer;
@@ -407,5 +431,16 @@
   }
   .tree-right{
     width: 89%;
+  }
+  .custom-tree-container{
+    display: inline-block;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width:100%;
+    padding: 3%;
+  }
+  .el-tree {
+    min-width: 100%;
+    display:inline-block !important;
   }
 </style>
