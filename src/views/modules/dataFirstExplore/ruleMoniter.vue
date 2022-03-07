@@ -5,21 +5,18 @@
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
           <el-tree
-            :data="dataTree1"
+            :isShowSearch="true"
+            :isShowCheckBox="true"
+            :data="ruleTree"
+            parentGetTreeData="getTreeData"
             :props="defaultProps"
             v-loading="listLoadingTry"
-            @node-click="handleNodeClick1"
+            @node-click="handleNodeClick"
             default-expand-all
             :filter-node-method="filterNode"
-            ref="dataTree1"
+            ref="ruleTree"
             node-key="id"
           ></el-tree>
-          <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            dataForm.childCount1
-          }}</span>
-          <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            dataForm.childCount2
-          }}</span> -->
         </el-card>
       </el-col>
       <el-col :span="19">
@@ -70,24 +67,6 @@
                 >
                 <el-button @click="reset()">重置</el-button>
               </el-col>
-              <!--  <el-col :span="11">
-                <el-button-group style="float:right">
-                  <el-button>当前选择规则数量：{{ 10 }}</el-button>
-                  <el-button @click="runNow">立即运行</el-button>
-                  <el-button @click="timeRun">定时运行</el-button>
-                  <el-popover
-                    placement="bottom"
-                    title="当前所选规则"
-                    width="200"
-                    trigger="click"
-                    content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
-                  >
-                    <el-button slot="reference" @click="seeChoosed"
-                      >当前所选规则</el-button
-                    >
-                  </el-popover>
-                </el-button-group>
-              </el-col> -->
             </el-row>
           </div>
           <div class="content">
@@ -96,11 +75,6 @@
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
-              <!--  <div style="float:right;margin-bottom:10px">
-                <el-button @click="addData" type="primary">新增</el-button>
-                <el-button @click="editData" type="primary">修改</el-button>
-                <el-button @click="deleteData" type="danger">删除</el-button>
-              </div> -->
             </div>
             <el-table
               :data="tableData"
@@ -115,10 +89,12 @@
                 prop="ruleName"
                 label="规则名称"
               ></el-table-column>
-              <el-table-column
-                prop="ruleCategory"
-                label="规则类别"
-              ></el-table-column>
+              <el-table-column prop="ruleCategory" label="规则类别">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+                </template>
+              </el-table-column>
               <el-table-column
                 prop="expectedBeginTime"
                 label="预计开始时间"
@@ -131,9 +107,10 @@
               </el-table-column>
               <el-table-column prop="runStatus" label="运行状态">
                 <template slot-scope="scope">
-                  <div v-if="scope.row.runStatus == 1">执行失败</div>
+                  <div v-if="scope.row.runStatus == 1">待执行</div>
                   <div v-if="scope.row.runStatus == 2">执行中</div>
-                  <div v-if="scope.row.runStatus == 3">已完成</div>
+                  <div v-if="scope.row.runStatus == 3">执行失败</div>
+                  <div v-if="scope.row.runStatus == 4">已完成</div>
                 </template>
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
@@ -178,9 +155,11 @@
 </template>
 <script>
 import detail from "./component/ruleMoniter-detail.vue";
+import ruleTree from "../../common/rule-tree.vue";
 export default {
   components: {
-    detail
+    detail,
+    ruleTree
   },
   data() {
     return {
@@ -195,19 +174,7 @@ export default {
       },
       pbFileList: [],
       pbFiles: [],
-      dataTree1: [
-        {
-          name: "批次名称",
-          children: [
-            {
-              name: "人民医院医保数据筛查"
-            },
-            {
-              name: "妇幼保健院医院数据筛查"
-            }
-          ]
-        }
-      ],
+      ruleTree: [],
       //运行状态
       runStatus: [
         { id: 1, name: "执行中" },
@@ -217,7 +184,7 @@ export default {
       //规则类别
       ruleCategory: [
         { id: 1, name: "门诊规则" },
-        { id: 2, name: "住院规则" },
+        { id: 2, name: "住院规则" }
       ],
       defaultProps: {
         children: "children",
@@ -238,50 +205,55 @@ export default {
       info: ""
     };
   },
-  mounted() {
-    // this.initData()
-    // this.initTree()
+  created() {
+    this.initData();
+    this.initTree();
   },
-  created() {},
   methods: {
     initData() {
-      this.loading = true;
-      showLawDataPage(this.dataForm, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.dataForm.total = res.data.body.pagination.dataCount;
-        this.loading = false;
+      this.$http({
+        url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
+        method: "get",
+        params: this.$http.adornParams({
+          ruleResult: {
+            batchId: this.batchId,
+            runStatus: this.dataForm.runStatus, //1:待执行,2:执行中,3:执行失败,4:已完成
+            rule: {
+              ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
+              ruleName: this.dataForm.ruleName
+            }
+          },
+          pageNo: this.pageIndex,
+          pageSize: this.pageSize
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableData = data.result.records;
+          this.totalPage = data.result.total;
+          this.dataForm.total = data.result.total;
+        } else {
+          this.dataForm.total = 0;
+          this.tableData = [];
+          this.totalPage = 0;
+        }
       });
     },
     initTree() {
-      this.treeLoading = true;
-      selectLawRule().then(res => {
-        this.dataTree1 = this.listToTree(res.data);
-        this.dataForm.childCount1 = res.data.length - 1;
-      });
-      selectLawIndexRule().then(res => {
-        this.dataTree2 = this.listToTree(res.data);
-        this.dataForm.childCount2 = res.data.length - 1;
-        this.treeLoading = false;
+      this.$http({
+        url: this.$http.adornUrl("/batch/selectList"),
+        method: "get",
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.ruleTree = data.result.records;
+        } else {
+          this.ruleTree = [];
+        }
       });
     },
     //点击树节点切换表
-    handleNodeClick1(data) {
-      this.loading = true;
-      showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
-        res => {
-          this.tableData = res.data.body.result;
-          this.dataForm.total = res.data.body.pagination.dataCount;
-          this.loading = false;
-        }
-      );
-    },
-    handleNodeClick2(data) {
-      this.loading = true;
-      showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.dataForm.total = res.data.body.pagination.dataCount;
-        this.loading = false;
-      });
+    handleNodeClick(data) {
+      this.initData()
     },
     //查看详情弹框
     ledgerTable(data) {
@@ -502,6 +474,11 @@ export default {
     },
     succeedRun() {
       this.showRunDialog = false;
+    },
+    //拿到选择树的id
+    getTreeData(data) {
+      // console.log(data, "拿到树选择的id");
+      this.ruleId = data
     }
   }
 };

@@ -53,26 +53,26 @@
           width="50"
         ></el-table-column>
         <el-table-column
-          prop="hospitalName"
+          prop="医院名称"
           header-align="center"
           align="center"
           label="医院名称"
         ></el-table-column>
         <el-table-column
-          prop="hospitalCode"
+          prop="医院编码"
           header-align="center"
           align="center"
           label="医院编码"
         ></el-table-column>
         <el-table-column
-          prop="HospitalNature"
+          prop="医院性质"
           header-align="center"
           align="center"
           label="医院性质"
         >
         </el-table-column>
         <el-table-column
-          prop="hospitalType"
+          prop="医院类别"
           header-align="center"
           align="center"
           label="医院类别"
@@ -91,9 +91,7 @@ export default {
     return {
       dataForm: {
         hospitalName: "",
-        hospitalType: "",
-        hospitalCode: "",
-        HospitalNature: ""
+        hospitalType: ""
       },
       //loading
       listLoading: false,
@@ -106,24 +104,25 @@ export default {
       },
       //table表格数据
       tableList: [],
+      multipleSelection: [],
       tableColumns: [],
       hospitalType: [
         {
-          value: "0",
+          value: "三级甲等",
           label: "三级甲等"
         },
         {
-          value: "1",
+          value: "三级乙等",
           label: "三级乙等"
         },
         {
-          value: "2",
+          value: "三级丙等",
           label: "三级丙等"
         }
       ]
     };
   },
-  mounted() {
+  created() {
     this.initList();
     this.$nextTick(() => {
       this.$refs.multipleTable.toggleAllSelection();
@@ -132,55 +131,43 @@ export default {
   methods: {
     //初始化数据列表
     initList() {
-       this.$http({
-        url: this.$http.adornUrl("/dataanalysis/hospitalBasicInfo/getPageList"),
+      this.$http({
+        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
         method: "get",
         params: this.$http.adornParams({
-          pageNo: this.pageIndex,
-          pageSize: this.pageSize,
+          pageCount: "1",
+          pageSize: "10000",
           hospitalName: this.dataForm.hospitalName,
-          hospitalType: this.dataForm.hospitalType,
+          hospitalType: this.dataForm.hospitalType
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableList = data.result.records;
-          this.totalPage = data.result.total;
         } else {
           this.tableList = [];
-          this.totalPage = 0;
         }
       });
     },
     //重置
-    resetForm() {},
-    //查询
-    getDataList() {},
-    // 页数
-    handleSizeChange(val) {
-      this.apComServerData.size = val;
+    resetForm() {
+      this.dataForm = {
+        hospitalName: "",
+        hospitalType: ""
+      };
       this.initList();
     },
-    //当前页
-    handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
+    //查询
+    getDataList() {
       this.initList();
     },
     //确定
     ok() {
       this.$emit("ok");
+      this.$emit("returnData", this.multipleSelection);
     },
     //取消
     close() {
       this.$emit("close");
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
     },
     //多选
     handleSelectionChange(val) {

@@ -4,32 +4,19 @@
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
-          <el-tree
-            :data="dataTree1"
+          <rule-tree
+            :isShowSearch="true"
+            :isShowCheckBox="false"
+            :data="ruleTree"
+            parentGetTreeData="getTreeData"
             :props="defaultProps"
             v-loading="listLoadingTry"
-            @node-click="handleNodeClick1"
+            @node-click="handleNodeClick"
             default-expand-all
             :filter-node-method="filterNode"
-            ref="dataTree1"
+            ref="ruleTree"
             node-key="id"
-          ></el-tree>
-          <el-tree
-            :data="dataTree2"
-            :props="defaultProps"
-            v-loading="listLoadingTry"
-            @node-click="handleNodeClick2"
-            default-expand-all
-            :filter-node-method="filterNode"
-            ref="dataTree2"
-            node-key="id"
-          ></el-tree>
-          <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            dataForm.childCount1
-          }}</span>
-          <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            dataForm.childCount2
-          }}</span>
+          ></rule-tree>
         </el-card>
       </el-col>
       <el-col :span="19">
@@ -72,7 +59,11 @@
               </el-col>
               <el-col :span="11">
                 <el-button-group style="float:right">
-                  <el-button>当前选择规则数量：{{ 10 }}</el-button>
+                  <el-button
+                    >当前选择规则数量：{{
+                      this.multipleSelection.length
+                    }}</el-button
+                  >
                   <el-button
                     :disabled="this.multipleSelection.length <= 0"
                     @click="runNow"
@@ -83,14 +74,14 @@
                     @click="timeRun"
                     >定时运行</el-button
                   >
-                  <el-popover
-                    placement="bottom"
-                    title="当前所选规则"
-                    width="200"
-                    trigger="click"
-                    content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
-                  >
-                    <el-button slot="reference" @click="seeChoosed"
+                  <el-popover placement="right" trigger="click">
+                    <el-table :data="choseRule">
+                      <el-table-column
+                        property="ruleName"
+                        label="规则名称"
+                      ></el-table-column>
+                    </el-table>
+                    <el-button slot="reference" @click="seeChoseRule"
                       >当前所选规则</el-button
                     >
                   </el-popover>
@@ -224,11 +215,13 @@
 import detail from "./component/ruleConfig-detail.vue";
 import AddOrEdit from "./component/ruleConfig-addOredit.vue";
 import runNow from "./component/ruleConfig-runNow.vue";
+import ruleTree from "../../common/rule-tree.vue";
 export default {
   components: {
     detail,
     AddOrEdit,
-    runNow
+    runNow,
+    ruleTree
   },
   data() {
     return {
@@ -241,6 +234,7 @@ export default {
       },
       // pbFileList: [],
       // pbFiles: [],
+      ruleTree: "",
       runIds: "",
       //当前页
       pageIndex: 1,
@@ -248,61 +242,9 @@ export default {
       pageSize: 10,
       //总页数
       totalPage: 0,
-      dataTree1: [
-        {
-          name: "全国通用规则",
-          children: [
-            {
-              name: "医保",
-              children: [
-                {
-                  name: "床位费超量"
-                },
-                {
-                  name: "男女性诊断串换"
-                },
-                {
-                  name: "男女性项目互换"
-                }
-              ]
-            },
-            {
-              name: "医院",
-              children: [
-                {
-                  name: "超医保适应症用药"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      dataTree2: [
-        {
-          name: "地区个性化规则",
-          children: [
-            {
-              name: "医保",
-              children: [
-                {
-                  name: "限门诊和药店用药"
-                },
-                {
-                  name: "项目同时收费"
-                }
-              ]
-            },
-            {
-              name: "医保",
-              children: [
-                {
-                  name: "护理费超量"
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      //当前所选规则
+      choseRule: [],
+      dataTree: [],
       ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
@@ -330,7 +272,6 @@ export default {
   },
   mounted() {
     this.initData();
-    // this.initTree()
   },
   created() {},
   methods: {
@@ -349,32 +290,16 @@ export default {
         if (data && data.code === 200) {
           this.tableData = data.result.records;
           this.totalPage = data.result.total;
+          this.dataForm.total = data.result.total;
         } else {
+          this.dataForm.total = 0;
           this.tableData = [];
           this.totalPage = 0;
         }
       });
     },
-    initTree() {},
     //点击树节点切换表
-    handleNodeClick1(data) {
-      this.loading = true;
-      showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
-        res => {
-          this.tableData = res.data.body.result;
-          this.dataForm.total = res.data.body.pagination.dataCount;
-          this.loading = false;
-        }
-      );
-    },
-    handleNodeClick2(data) {
-      this.loading = true;
-      showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.dataForm.total = res.data.body.pagination.dataCount;
-        this.loading = false;
-      });
-    },
+    handleNodeClick(data) {},
     //新增弹框
     addData() {
       this.showAddOrEditDialog = true;
@@ -384,55 +309,6 @@ export default {
     editData() {
       this.showAddOrEditDialog = true;
       this.ruleId = this.multipleSelection[0].ruleId;
-    },
-    //弹窗提交
-    popUpSubmit() {
-      this.pbFileList = this.$refs.pbFile.fileListData;
-      this.$refs.submitData.validate(valid => {
-        if (valid) {
-          if (this.popUpDatas.type == 1) {
-            this.addSub();
-          } else {
-            this.submitForm();
-          }
-        }
-      });
-    },
-    //将返回的数据整理为树形结构
-    listToTree(list) {
-      var arr = [];
-      let items = {};
-      var idsStr = "";
-      // 获取每个节点的直属子节点（是直属，不是所有子节点）
-      for (let i = 0; i < list.length; i++) {
-        let key = list[i].pid;
-        if (items[key]) {
-          items[key].push(list[i]);
-        } else {
-          items[key] = [];
-          items[key].push(list[i]);
-        }
-        idsStr += idsStr === "" ? list[i].id : "," + list[i].id;
-      }
-      for (var key in items) {
-        if (idsStr.indexOf(key) === -1) {
-          //找到最大的父节点key
-          arr = this.formatTree(items, key);
-        }
-      }
-      // console.log(arr)
-      return arr;
-    },
-    formatTree(items, parentId) {
-      let result = [];
-      if (!items[parentId]) {
-        return result;
-      }
-      for (let t of items[parentId]) {
-        t.children = this.formatTree(items, t.id); //递归获取children
-        result.push(t);
-      }
-      return result;
     },
     // 关闭编辑弹窗
     closeDetail() {
@@ -444,7 +320,6 @@ export default {
     },
     //列表多选
     handleSelectionChange(val) {
-      // console.log(val)
       this.multipleSelection = val;
     },
     //删除
@@ -456,7 +331,6 @@ export default {
       if (ruleIds != null && ruleIds != "" && ruleIds != undefined) {
         ruleIds = ruleIds.substr(0, ruleIds.length - 1);
       }
-      // console.log(ruleIds);
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -466,9 +340,6 @@ export default {
           this.$http({
             url: this.$http.adornUrl(`/rule/deleteRuleByIds/${ruleIds}`),
             method: "delete"
-            // data: this.$http.adornData({
-            //   ruleIds: JSON.stringify(ruleIds)
-            // })
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -490,11 +361,6 @@ export default {
     detailHandle(id) {
       this.showDetailDialog = true;
       this.ruleId = id;
-    },
-    //重置表单
-    resetForm(formName) {
-      this.submitData = {};
-      this.$refs[formName].resetFields();
     },
     //搜索
     getAllSearch() {
@@ -536,8 +402,6 @@ export default {
       this.showRunDialog = true;
       this.info = true;
     },
-    //查看当前所选规则
-    seeChoosed() {},
     //关闭规则运行弹窗
     closeRun() {
       this.showRunDialog = false;
@@ -564,7 +428,18 @@ export default {
       this.pageIndex = val;
       this.initData();
     },
-    filterNode() {}
+    //
+    filterNode() {},
+    //查看已选规则
+    seeChoseRule() {
+      var chose = [];
+      // chose.
+      this.choseRule = this.multipleSelection;
+    },
+    //拿到选择树的id
+    getTreeData(data) {
+      console.log(data, "拿到树选择的id");
+    }
   }
 };
 </script>

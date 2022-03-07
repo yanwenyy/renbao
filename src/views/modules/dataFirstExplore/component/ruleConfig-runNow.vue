@@ -6,13 +6,9 @@
       ref="dataForm"
       :rules="rules"
     >
-      <el-form-item
-        v-if="info"
-        label="选择开始执行时间"
-        prop="expectedBeginTime"
-      >
+      <el-form-item v-if="info" label="选择开始执行时间" prop="createTime">
         <el-date-picker
-          v-model="dataForm.expectedBeginTime"
+          v-model="dataForm.createTime"
           type="datetime"
           placeholder="选择日期时间"
         >
@@ -45,7 +41,7 @@
     </el-form>
     <el-button type="primary" @click="submitForm('dataForm')">确定</el-button>
     <el-button @click="close">取消</el-button>
-    <!--查看详细弹窗 -->
+    <!--选择医院弹窗 -->
     <el-dialog
       :visible.sync="showHospitalDialog"
       title="选择医院"
@@ -59,6 +55,7 @@
         @close="close"
         @ok="succeed"
         :info="info"
+        @returnData="returnData"
         v-if="showHospitalDialog"
       ></choose>
     </el-dialog>
@@ -78,8 +75,9 @@ export default {
   data() {
     return {
       dataForm: {
-        expectedBeginTime: "",
+        createTime: "",
         hospitalName: "",
+        hospitalCode: "",
         batchName: "",
         batchRemark: ""
       },
@@ -94,7 +92,7 @@ export default {
   methods: {
     //确定
     submitForm(dataForm) {
-      if ((this.info = false)) {
+      if (this.info == false) {
         //立即运行
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
@@ -104,11 +102,9 @@ export default {
               data: this.$http.adornData({
                 batchName: this.dataForm.batchName,
                 batchRemark: this.dataForm.batchRemark,
-                // hospitalCode: this.dataForm.hospitalCode,
-                // hospitalName: this.dataForm.hospitalName,
-                rule: {
-                  ruleId: this.runIds
-                }
+                hospitalCode: this.dataForm.hospitalCode,
+                hospitalName: this.dataForm.hospitalName,
+                ruleId: this.runIds
               })
             }).then(({ data }) => {
               if (data && data.code === 200) {
@@ -136,14 +132,12 @@ export default {
               url: this.$http.adornUrl(`/rule/timeRan`),
               method: "post",
               data: this.$http.adornData({
-                uuid: this.runIds,
-                batch: {
-                  expectedBeginTime: this.dataForm.expectedBeginTime,
-                  batchName: this.dataForm.batchName,
-                  batchRemark: this.dataForm.batchRemark
-                  // hospitalCode: this.dataForm.hospitalCode,
-                  // hospitalName: this.dataForm.hospitalName,
-                }
+                createTime: this.dataForm.createTime,
+                batchName: this.dataForm.batchName,
+                batchRemark: this.dataForm.batchRemark,
+                ruleId: this.runIds
+                // hospitalCode: this.dataForm.hospitalCode,
+                // hospitalName: this.dataForm.hospitalName,
               })
             }).then(({ data }) => {
               if (data && data.code === 200) {
@@ -176,6 +170,22 @@ export default {
     //选择医院弹窗
     chooseHospital() {
       this.showHospitalDialog = true;
+    },
+    //处理选择的医院编码和医院名称
+    returnData(data) {
+      var hospitalCodes = "";
+      var hospitalNames = "";
+      for (var i = 0; i < data.length; i++) {
+        hospitalCodes += data[i].医院编码 + ",";
+        hospitalNames += data[i].医院名称 + ",";
+      }
+      if (hospitalCodes.length > 0 && hospitalNames.length > 0) {
+        hospitalCodes = hospitalCodes.substr(0,hospitalCodes.length-1)
+        hospitalNames = hospitalNames.substr(0,hospitalNames.length-1)
+      }
+      this.dataForm.hospitalName = hospitalNames;
+      this.dataForm.hospitalCode = hospitalCodes;
+      this.showHospitalDialog = false;
     }
   }
 };
