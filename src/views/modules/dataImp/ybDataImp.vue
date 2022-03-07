@@ -482,6 +482,8 @@
             }
             // 打开文件表弹窗
             this.fileTableDialogVisible = true
+          } else {
+            this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
           }
         })
       },
@@ -554,7 +556,17 @@
           data: {tableColumnMap: this.fileColumnMap, fileTableMap: this.fileTableMap, files: this.selectedFileData}
         }).then(({data}) => {
           if (data && data.code === 200) {
-
+            this.$message.success("导入成功")
+            // 控制文件夹树弹窗
+            this.fileTreeDialogVisible = false
+            // 控制文件表弹窗
+            this.fileTableDialogVisible = false
+            // 控制匹配预览弹窗
+            this.columnTableDialogVisible = false
+            // 查看字段弹窗
+            this.tableColumnViewDialogVisible = false
+          }else {
+            this.$message.error(data.message? data.message : "导入失败，请检查数据文件！")
           }
         })
       },
