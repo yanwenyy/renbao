@@ -18,7 +18,7 @@
                             v-model="ruleOperationForm.startTime"
                             type="date"
                             format="yyyy/MM/dd"
-                            value-format="yyyy/MM/dd"
+                            value-format="yyyy-MM-dd"
                             >
                         </el-date-picker>
                     </el-form-item>
@@ -37,9 +37,9 @@
                     </el-form-item>
                     <el-form-item 
                         label="备注"
-                        prop="remarks"
+                        prop="batchRemark"
                     >
-                        <el-input class="size"  v-model="ruleOperationForm.remarks" autocomplete="off"  type="textarea" :autosize="{ minRows: 4}"></el-input>
+                        <el-input class="size"  v-model="ruleOperationForm.batchRemark" autocomplete="off"  type="textarea" :autosize="{ minRows: 4}"></el-input>
                     </el-form-item>
                    
                 </el-form>
@@ -67,7 +67,8 @@ export default {
             ruleOperationForm: {
                 startTime: '',
                 hospital: '',
-                batchName: ''
+                batchName: '',
+                batchRemark: ''
 
             },
             ruleOperationFormRules: {
@@ -78,20 +79,22 @@ export default {
                      { required: true, message: '请选择医院'},
                 ]
             },
-            type: ''
+            type: '',
+            checkRuleData: []
         }
     },
     methods: {
         //默认打开页面
-        showDialog(type, d) {
+        showDialog(checkRuleData,type,checkHospitalList ) {
             this.reset();
             this.dialogVisible = true;
             this.type = type;
+            this.checkRuleData = checkRuleData;
             // Object.assign(this.$data, this.$options.data()) // 全部重置
         },
         changeHospital () {
             // this.dialogVisible = false
-            this.$refs.hospitalSelection.showDialog(this.type)
+            this.$refs.hospitalSelection.showDialog(this.checkRuleData,this.type)
         },
         reset () {
             this.ruleOperationForm = {
@@ -106,16 +109,55 @@ export default {
             this.dialogVisible = false
         },
         onSubmit (formName) {
-            // 
-             this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    console.log(this.ruleOperationForm, '表单数据')
-                    
-
-                }
+            console.log(this.type, 'this.typethis.type')
+            debugger
+            let ruleId = [];
+            this.checkRuleData.map(i => {
+                ruleId.push(i.ruleId)
             })
+            let timerRunNowByShData = {
+                batchName: this.ruleOperationForm.batchName, // 批次名称
+                batchRemark: this.ruleOperationForm.batchRemark, // 批次备注
+                ruleId: ruleId.join(','),
+                createTime: this.ruleOperationForm.startTime
+            }
+            //  this.$refs[formName].validate((valid) => {
+                // if (valid) {
+                    console.log(this.ruleOperationForm, '表单数据')
+                    this.loading = true
+                    this.$http({
+                        isLoading:false,
+                        url: this.$http.adornUrl('/rule/timerRunNowBySh'),
+                        method: 'post',
+                        data:  this.$http.adornData(timerRunNowByShData, false)
+                    }).then(({data}) => {
+                        // this.btnLoading = false;
+                        if (data.code == 200) {
+                            console.log(data, 'ruleId')
+                            this.loading = false
+                            this.treeVisible = false;
+                            // this.getRuleFolder()
+                        }
+                    }).catch(() => {
+                        this.loading = false
+                        // this.btnLoading = false;
+                    })  
+
+
+
+            //     }
+            // })
             
             
+        },
+        setHospital (checkHospitalList) {
+            let hospitalName = []
+            checkHospitalList.map(i => {
+                hospitalName.push(i['医院名称'])
+            })
+            this.ruleOperationForm.hospital = hospitalName.join(',')
+
+
         },
         cancel () {
             this.resetForm();

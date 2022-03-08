@@ -104,8 +104,7 @@ export default {
             btnLoading: false,
             optionType: 'add',
             editRuleItemNode: {},
-            rowList: [],
-            parentList: [],
+            parentId: [],
             
         }
     },
@@ -150,13 +149,15 @@ export default {
 
         },
         getParent (node) {
-            var that = this;
-            var parentId = []
-            if (node.parent.data && !Array.isArray(node.parent.data)) {
-                parentId.push(node.parent.data.folderId)
-                that.getParent(node.parent);
-            }
-            return parentId;
+            const checkedNodes = [];
+            const traverse = function(node) {
+                if (node.parent.data.folderId) {
+                    checkedNodes.push(node.parent.data.folderId);
+                    traverse(node.parent);
+                }
+            };
+            traverse(node)
+            return checkedNodes;
         },
         addRuleFolder (formName) {
             this.btnLoading = true;
@@ -168,6 +169,7 @@ export default {
                 folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径  // 所有父节点的id拼接
                 folderSort: this.editRuleItemNode.childNodes.length>0 ? this.editRuleItemNode.childNodes.length+1 : 1, // 顺序 // 子集长度加1
             }
+           
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.$http({

@@ -1,44 +1,30 @@
 <template>
     <div class="detail-box">
         <el-drawer
-            ref="auditRuleConfigDialog"
+            ref="ruleConfigOptionDialog"
             :visible.sync="dialogVisible"
             :direction="direction"
+            :close-on-press-escape="false"
             :before-close="handleClose">
             <div class="rule-operation">
                 <el-form size="small" ref="ruleOperationForm" :model="ruleOperationForm" :rules="ruleOperationFormRules" label-width="130px" style="text-align: left" class="rule-form-inline">
                     <el-form-item 
-                        label="选择开始执行时间"
+                        label="规则名称"
                         prop="startTime"
-                        v-if="type == 'timing'"
                     >
-                        <el-date-picker
-                            v-model="ruleOperationForm.startTime"
-                            type="date"
-                            format="yyyy/MM/dd"
-                            value-format="yyyy/MM/dd"
-                            >
-                        </el-date-picker>
+                        <el-input class="size"  v-model="ruleOperationForm.ruleName" autocomplete="off" clearable></el-input>
                     </el-form-item>
-                    <el-form-item 
-                        label="选中医院"
-                        prop="hospital"
-                    >
-                        <el-input class="size" :disabled="true" placeholder="请选择医院"  v-model="ruleOperationForm.hospital" autocomplete="off"></el-input>
-                        <el-button type="primary" @click="changeHospital">选择</el-button>
+                  
+                    <el-form-item label="规则类型：">
+                        <el-select v-model="ruleOperationForm.ruleCategory"  placeholder="请选择" clearable>
+                            <el-option label="门诊审核规则" value="1"></el-option>
+                            <el-option label="住院审核规则" value="2"></el-option>
+                        </el-select>
                     </el-form-item>
-                    <el-form-item 
-                        label="批次名称"
-                        prop="batchName"
-                    >
-                        <el-input class="size"  v-model="ruleOperationForm.batchName" autocomplete="off"></el-input>
+                    <el-form-item label="规则：">
+                        
                     </el-form-item>
-                    <el-form-item 
-                        label="备注"
-                        prop="remarks"
-                    >
-                        <el-input class="size"  v-model="ruleOperationForm.remarks" autocomplete="off"  type="textarea" :autosize="{ minRows: 4}"></el-input>
-                    </el-form-item>
+                   
                    
                 </el-form>
                

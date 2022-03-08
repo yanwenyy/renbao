@@ -12,13 +12,13 @@
                 <div class="seachbox">
                     <el-form ref="searchHospitalForm" :model="searchHospitalForm" :inline="true">
                         <el-form-item label="医院名称：">
-                            <el-input v-model="searchHospitalForm.name" clearable placeholder="请输入医院名称"></el-input>
+                            <el-input v-model="searchHospitalForm.hospitalName" clearable placeholder="请输入医院名称"></el-input>
                         </el-form-item>
                         <el-form-item label="医院类别：">
-                            <el-select v-model="searchHospitalForm.type"  placeholder="请选择" clearable>
-                                <el-option label="一级医院" :value=1></el-option>
-                                <el-option label="二级医院" :value=2></el-option>
-                                <el-option label="三级医院" :value=3></el-option>
+                            <el-select v-model="searchHospitalForm.hospitalType"  placeholder="请选择" clearable>
+                                <el-option label="三级甲等" value="三级甲等"></el-option>
+                                <el-option label="三级乙等" value="三级乙等"></el-option>
+                                <el-option label="三级丙等" value="三级丙等"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -68,47 +68,79 @@ export default {
             innerVisible: false,
             tableLoading: false,
             searchHospitalForm: {
-                name: '',
-                type: 1
+                hospitalName: '',
+                hospitalType: '',
+                pageCount: 1,
+                pageSize: 10000
             },
             tableData: [],
             tablePositionKey: [
-                {dataname:'q1' , label:'医院名称' , issortable:false , type:''},
-                {dataname:'q2' , label:'医院编码' , issortable:false , type:''},
-                {dataname:'q3' , label:'医院性质' , issortable:false , type:''},
-                {dataname:'q4' , label:'医院类别' , issortable:false , type:''},
+                {dataname:'医院名称' , label:'医院名称' , issortable:false , type:''},
+                {dataname:'医院编码' , label:'医院编码' , issortable:false , type:''},
+                {dataname:'医院性质' , label:'医院性质' , issortable:false , type:''},
+                {dataname:'医院类别' , label:'医院类别' , issortable:false , type:''},
             ],
             type: '',
+            checkHospitalList: [], // 选中的医院列表
+            checkRuleData: [] // 选中的规则列表
         }
     },
     methods: {
         //默认打开页面
-        showDialog(type, d) {
+        showDialog(checkRuleData,type, d) {
             this.innerVisible = true;
-            this.type = type
+            this.type = type;
+            this.checkRuleData = checkRuleData;
+            this.getHospital()
             
+            
+        },
+        mounted () {
+
+        },
+        // 获取医院列表
+        getHospital () {
+            this.tableLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+                method: 'get',
+                params:  this.$http.adornParams(this.searchHospitalForm, false)
+            }).then(({data}) => {
+                this.tableLoading = false
+                if (data.code == 200) {
+                    this.tableData = data.result.records 
+                    this.$refs.hospitalSelectionTable.toggleAllSelection(this.tableData)
+                }
+            }).catch(() => {
+                this.tableLoading = false
+            })
         },
        
         handleClose () {
             this.innerVisible = false;
-            this.$parent.showDialog(this.type);
+            this.$parent.showDialog(this.checkRuleData,this.type);
         },
         handleSelectionChange (val) {
-            console.log(val, 'valvalval')
+            this.checkHospitalList = val
 
         },
         onSubmit (formName) {
-            
+            this.innerVisible = false;
+            this.$parent.showDialog(this.checkRuleData,this.type, this.checkHospitalList);
+            this.$parent.setHospital(this.checkHospitalList); // 回显医院名称
         },
         onQuery () {
-
+            this.getHospital()
         },
         onReset () {
+            this.searchHospitalForm.hospitalName = '' 
+            this.searchHospitalForm.hospitalType = '' 
 
         },
         cancel () {
             this.innerVisible = false;
-            this.$parent.showDialog(this.type);
+            this.$parent.showDialog(this.checkRuleData,this.type);
            
         }
     },

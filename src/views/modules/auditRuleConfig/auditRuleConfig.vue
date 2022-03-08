@@ -1,13 +1,6 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <!-- <el-tree :data="projectRulesTreeList" highlight-current :default-expand-all="true" @node-click="treeClick" v-loading="treeLoading" node-key="id" ref="treesa" >
-                    <span class="custom-tree-node" slot-scope="{ node }" >
-                        <span>
-                            {{node.label}}
-                        </span>
-                    </span>
-            </el-tree> -->
             <rule-tree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="true" :isShowEdit="true" parentGetTreeData="getTreeData"></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
@@ -95,7 +88,7 @@
         </div>
         <submit-personality-rule ref="submitPersonalityRule"></submit-personality-rule>
         <rule-operation ref="ruleOperation"></rule-operation>
-        <!-- <rule-config-dialog ref="auditRuleConfigDialog"></auditRuleConfig-dialog> -->
+        <rule-config-option-dialog ref="ruleConfigDialog"></rule-config-option-dialog>
 
     </div>
 </template>
@@ -103,37 +96,12 @@
 import submitPersonalityRule from './submit-personality-rule.vue'// 提交至地区个性化规则弹框
 import ruleOperation from './rule-operation.vue' // 规则运行弹框
 import ruleTree from '../../common/rule-tree.vue'
-import auditRuleConfigDialog from './auditRuleConfig-dialog.vue'
+import ruleConfigOptionDialog from './rule-config-option-dialog.vue'
 export default {
     data () {
         return {
             treeLoading: false,
             tableLoading: false,
-            projectRulesTreeList: [ 
-                {
-                    label: '项目规则',
-                    children: [{
-                        label: '医保',
-                        children: [
-                            {
-                                label: '床位费超量',
-                            },{
-                                label: '男女性诊断串换',
-
-                            },
-                            {
-                                label: '男女性项目互换'
-                            },
-                        ]
-                        },{
-                            label: '医院',
-                            children: [{
-                                label: '超医保适应症用药',
-                            }]
-                        }]
-                }
-               
-            ],
             searchForm: {
                 ruleName: '',
                 ruleCategory: ''
@@ -154,7 +122,7 @@ export default {
             multipleTable: [],
             // copyTableData: [],
             getRowKeys(row) {
-                return row.q1;
+                return row.ruleId;
             },
         }
     },
@@ -206,7 +174,7 @@ export default {
             this.searchForm= { ruleName: '',ruleType: ''}
         },
         addFun () {
-            this.$refs.auditRuleConfigDialog.showDialog(this.multipleTable);
+            this.$refs.ruleConfigDialog.showDialog(this.multipleTable);
         },
         editorFun () {
 
@@ -230,16 +198,11 @@ export default {
                     data: this.$http.adornData(deleteList, false)
                 }).then(({data}) => {
                     if (data && data.code === 200) {
-                    this.$message({
-                        message: '操作成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.Pager.pageIndex = 1;
-                            this.Pager.pageSize = 10;
-                            this.getSelectPage()
-                        }
-                    })
+                    this.$message({message: '操作成功',type: 'success',})
+                    this.Pager.pageIndex = 1;
+                    this.Pager.pageSize = 10;
+                    this.getSelectPage();
+                    // this.multipleTable = []
                     } else {
                     this.$message.error(data.msg)
                     }
@@ -263,6 +226,7 @@ export default {
         currentChangeHandle (val) {
             this.Pager.pageIndex = val
             this.getSelectPage();
+              console.log(this.multipleTable, 'multipleTable')
         },
         // 提交个性化规则
         submitgxhgz () {
@@ -270,18 +234,20 @@ export default {
         },
         // 立即执行
         executeImmediatelyClick () {
-            this.$refs.ruleOperation.showDialog('immediately');
+            if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+            this.$refs.ruleOperation.showDialog( this.multipleTable,'immediately');
         },
         // 定时执行
         timedExecutionClick () {
-            this.$refs.ruleOperation.showDialog('timing');
+            if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+            this.$refs.ruleOperation.showDialog(this.multipleTable,'timing');
         }
     },
     components: {
         submitPersonalityRule,
         ruleOperation,
         ruleTree,
-        auditRuleConfigDialog
+        ruleConfigOptionDialog
     }
 }
 
@@ -300,6 +266,7 @@ export default {
         border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
+        padding: 10px 0 0 10px;
     }
     .auditRuleConfig-right {
         flex: 1;
