@@ -1,11 +1,9 @@
 <template>
     <div class="detail-box">
-        <el-dialog
-            ref="ruleOperation"
-            title="规则运行"
+        <el-drawer
+            ref="auditRuleConfigDialog"
             :visible.sync="dialogVisible"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
+            :direction="direction"
             :before-close="handleClose">
             <div class="rule-operation">
                 <el-form size="small" ref="ruleOperationForm" :model="ruleOperationForm" :rules="ruleOperationFormRules" label-width="130px" style="text-align: left" class="rule-form-inline">
@@ -46,16 +44,16 @@
                
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="onSubmit('ruleOperationForm')" :loading="loading" size="small">确 定</el-button>
+                <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
                 <el-button @click="cancel" size="small">取 消</el-button>
                
             </span>
-        </el-dialog>
-        <hospital-selection ref="hospitalSelection"></hospital-selection>
+        </el-drawer>
+       
     </div>
 </template>
 <script>
-import hospitalSelection from './hospital-selection.vue' // 选择医院弹框
+
 export default {
     props: [
         'getData'
@@ -64,6 +62,7 @@ export default {
         return {
             loading: false,
             dialogVisible: false,
+            direction: 'rtl',
             ruleOperationForm: {
                 startTime: '',
                 hospital: '',
@@ -74,19 +73,17 @@ export default {
                 batchName: [
                     { required: true, message: '请输入批次名称'},
                 ],
-                hospital: [
-                     { required: true, message: '请选择医院'},
-                ]
             },
-            type: ''
+            type: '',
+            checkedData: []
         }
     },
     methods: {
         //默认打开页面
-        showDialog(type, d) {
+        showDialog(d) {
             this.reset();
             this.dialogVisible = true;
-            this.type = type;
+            this.checkedData = d;
             // Object.assign(this.$data, this.$options.data()) // 全部重置
         },
         changeHospital () {
@@ -106,14 +103,7 @@ export default {
             this.dialogVisible = false
         },
         onSubmit (formName) {
-            // 
-             this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    console.log(this.ruleOperationForm, '表单数据')
-                    
-
-                }
-            })
+            console.log(this.ruleOperationForm, '表单数据')
             
             
         },
@@ -127,7 +117,7 @@ export default {
         }
     },
     components: {
-        hospitalSelection
+        
     },
     watch : {
     }

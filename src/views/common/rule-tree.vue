@@ -7,6 +7,7 @@
             v-model="filterText">
         </el-input>
         <el-tree
+            v-loading="treeLoading"
             ref="ruleTree"
             class="treeClass"
             :data="treeData"
@@ -14,23 +15,27 @@
             node-key="id"
             default-expand-all
             :filter-node-method="filterNode"
-            :expand-on-click-node="false">
+            :props="layoutTreeProps"
+            :expand-on-click-node="false"
+            >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span>{{ node.label }}</span>
+                <span @click="nodeClick(node, data)">{{ node.label }}</span>
                 <span class="tree-btn" v-if="isShowEdit">
                 <el-button
                     type="text"
                     size="mini"
-                    @click="() => append(data,'add')">
+                    @click="() => append(data,node,'add')">
                     <i class="el-icon-circle-plus-outline" title="新增"></i>
                 </el-button>
                     <el-button
+                    v-if="data.folderParentId"
                     type="text"
                     size="mini"
-                    @click="() => append(data,'edit')">
+                    @click="() => append(data,node,'edit')">
                     <i class="el-icon-edit" title="编辑"></i>
                 </el-button>
                 <el-button
+                    v-if="data.folderParentId"
                     type="text"
                     size="mini"
                     @click="() => remove(node, data)">
@@ -39,22 +44,17 @@
                 </span>
             </span>
         </el-tree>
-        <el-dialog :title="treeTitle" :visible.sync="treeVisible">
-            <el-form :model="treeForm">
-                <el-form-item label="分类名称">
-                    <el-input v-model="treeForm.name" autocomplete="off"></el-input>
+        <el-dialog :title="treeTitle" :visible.sync="treeVisible"  :close-on-press-escape="false"  :close-on-click-modal="false">
+            <el-form :model="treeForm" :rules="rulesTreeForm" ref="treeForm">
+                <el-form-item label="分类名称" prop="folderName">
+                    <el-input v-model="treeForm.folderName" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="treeVisible = false">取 消</el-button>
-                <el-button type="primary" @click="treeVisible = false">确 定</el-button>
+                <el-button type="primary" @click="ruleSubmit('treeForm')" :loading="btnLoading">确 定</el-button>
             </div>
         </el-dialog>
-
-
-
-        
-
     </div>
 </template>
 <script>
@@ -64,9 +64,6 @@ export default {
             type: Boolean,
             default: false
         },
-        treeData: { // 规则数数据
-            type: Array,
-        },
         isShowCheckBox: { // 是否显示多选框
             type: Boolean,
             default: false
@@ -74,6 +71,11 @@ export default {
         isShowEdit: { // 规则是否可编辑
             type: Boolean,
             default: false
+        },
+        parentGetTreeData: { // 父组件的获取规则树id的方法名
+            type: String,
+            default: 'getTreeId'
+
         }
 
     },
@@ -82,28 +84,197 @@ export default {
             filterText: '',
             treeVisible: false,
             treeTitle: '',
+            treeLoading: false,
             treeForm: {
-                name: ''
-            }
+                folderName: ''
+            },
+            rulesTreeForm: {
+                folderName: [
+                    { required: true, message: '请输入分类名称', trigger: 'blur'},
+                ],
+            },
+            treeData: [],
+            layoutTreeProps: {
+                label(data, node) {
+                    const config = data.__config__ || data
+                    return  config.label || config.folderName
+                },
+            },
+            editRuleItem: {},
+            btnLoading: false,
+            optionType: 'add',
+            editRuleItemNode: {},
+            rowList: [],
+            parentList: [],
+            
         }
     },
     mounted () {
 
     },
+    created () {
+        this.getRuleFolder();
+    },
     methods: {
-        filterNode(value, data) {
-            if (!value) return true;
-            return data.label.indexOf(value) !== -1;
+        // 获取规则树
+        getRuleFolder () {
+            this.treeLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
+                method: 'get',
+            }).then(({data}) => {
+                this.treeLoading = false
+                if (data.code == 200) { 
+                    this.treeData = data.result;
+                }
+            }).catch(() => {
+                this.treeLoading = false
+            })
+
+
         },
-        append (data, type) {
+        filterNode(value, data) {
+            if (!value) return true
+            return data.folderName.indexOf(value) !== -1;
+        },
+        ruleSubmit (formName) {
+            if (this.optionType == 'add') {
+                // 新增提交
+                this.addRuleFolder(formName)
+            } else {
+                // 编辑提交
+                this.editRuleFolder(formName)
+            }
+
+
+        },
+        getParent (node) {
+            var that = this;
+            var parentId = []
+            if (node.parent.data && !Array.isArray(node.parent.data)) {
+                parentId.push(node.parent.data.folderId)
+                that.getParent(node.parent);
+            }
+            return parentId;
+        },
+        addRuleFolder (formName) {
+            this.btnLoading = true;
+            let folderPath =  this.getParent(this.editRuleItemNode);
+            let addRuleFolderdata = {
+                folderName: this.treeForm.folderName, // 规则树名称
+                folderLevel: this.editRuleItem.folderLevel, // 级别
+                folderParentId: this.editRuleItem.folderId, // 父节点id
+                folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径  // 所有父节点的id拼接
+                folderSort: this.editRuleItemNode.childNodes.length>0 ? this.editRuleItemNode.childNodes.length+1 : 1, // 顺序 // 子集长度加1
+            }
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.$http({
+                        isLoading:false,
+                        url: this.$http.adornUrl('ruleFolder/add'),
+                        method: 'post',
+                        data:  this.$http.adornData(addRuleFolderdata, false)
+                    }).then(({data}) => {
+                        this.btnLoading = false;
+                        if (data.code == 200) {
+                            this.treeVisible = false;
+                            this.getRuleFolder()
+                        }
+                    }).catch(() => {
+                        this.btnLoading = false;
+                    })  
+                }
+            }); 
+
+        },
+        editRuleFolder (formName) {
+            this.btnLoading = true;
+            let folderPath =  this.getParent(this.editRuleItemNode);
+            let editRuleFolderdata = {
+                folderId: this.editRuleItem.folderId,
+                folderName: this.treeForm.folderName, // 规则树名称
+                folderLevel: this.editRuleItem.folderLevel, // 级别
+                folderParentId: this.editRuleItem.folderParentId, // 父节点id
+                folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径 // 父节点id集合
+                folderSort: this.editRuleItem.folderSort, // 顺序
+            }
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.$http({
+                        isLoading:false,
+                        url: this.$http.adornUrl('ruleFolder/updateByUuId'),
+                        method: 'post',
+                        data:  this.$http.adornData(editRuleFolderdata, false)
+                    }).then(({data}) => {
+                        this.btnLoading = false;
+                        if (data.code == 200) {
+                            this.treeVisible = false;
+                            this.getRuleFolder()
+                        }
+                    }).catch(() => {
+                        this.btnLoading = false;
+                    })  
+                }
+            });
+
+        },
+        append (data,node, type) {
             this.treeTitle=type=='add'?'填写分类信息':'编辑分类信息';
             this.treeVisible=true;
-            this.treeForm.name=type=='add'?'':data.label;
+            this.treeForm.folderName=type=='add'?'':data.folderName; // 类型名称赋值
+            this.editRuleItem = data; // 获取本条数据
+            this.editRuleItemNode = node; // 获取点击node
+            this.optionType = type; // 编辑或新增
+           
         },
         remove (node, data) {
+            this.$confirm(`确认要该条规则吗?`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    this.$http({
+                        isLoading:false,
+                        url: this.$http.adornUrl(`ruleFolder/delete/${data.folderId}`),
+                        method: 'post',
+                    }).then(({data}) => {
+                        this.btnLoading = false;
+                        if (data.code == 200) {
+                            this.$message({
+                                message: '操作成功',
+                                type: 'success',
+                            })
+                            this.getRuleFolder()
+                        } else {
+                            this.$message.error(data.msg)
 
+                        }
+                    }).catch(() => {
+                        this.btnLoading = false;
+                    })  
+                    
+            }).catch(() => {})
+        },
+        nodeClick (node, data) {
+            // 调用父组件的获取规则树id的方法
+            this.$parent[this.parentGetTreeData](data);
         }
 
+    },
+    watch: {
+      filterText(val) {
+        this.$refs.ruleTree.filter(val.trim());
+      },
+      'treeVisible'(nval, oval) {
+          if (!nval) {
+            if (this.$refs['treeForm']) {
+                this.$refs['treeForm'].resetFields()
+            }
+            this.treeForm.folderName = ''
+          }
+            
+        }
     },
     
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="dataForm" ref="dataForm" label-width="80px">
+    <el-form :model="dataForm" ref="dataForm" label-width="80px" :rules="rules">
       <el-form-item label="规则名称" prop="ruleName">
         <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
       </el-form-item>
@@ -37,7 +37,8 @@
         </el-select>
       </el-form-item>
       <el-form-item label="创建人" prop="createUserName">
-        <el-input disabled
+        <el-input
+          disabled
           v-model="dataForm.createUserName"
           placeholder="创建人"
         ></el-input>
@@ -46,7 +47,11 @@
         <el-input v-model="dataForm.sql" placeholder="备注"></el-input>
       </el-form-item> -->
       <el-form-item label="创建时间" prop="createTime">
-        <el-input disabled v-model="dataForm.createTime" placeholder="创建时间"></el-input>
+        <el-input
+          disabled
+          v-model="dataForm.createTime"
+          placeholder="创建时间"
+        ></el-input>
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="submit('dataForm')">保存</el-button>
@@ -66,6 +71,12 @@ export default {
         createUserName: "",
         // sql: "",
         createTime: ""
+      },
+      //必填项校验
+      rules: {
+        ruleName: [{ required: true, message: "请输入", trigger: "blur" }],
+        ruleCategory: [{ required: true, message: "请选择", trigger: "blur" }],
+        folderId: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       ruleCategory: [
         { id: 1, name: "门诊规则" },
@@ -98,7 +109,7 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
-            console.log(data)
+            // console.log(data)
             var rule = data.result;
             this.dataForm.ruleName = rule.ruleName;
             this.dataForm.ruleCategory = rule.ruleCategory;

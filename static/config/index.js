@@ -5,7 +5,7 @@
   window.SITE_CONFIG = {};
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = 'http://10.10.106.103:1070/jeecg-boot/';
+  window.SITE_CONFIG['baseUrl'] = 'http://10.10.106.5:1070/dataanalysis/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名

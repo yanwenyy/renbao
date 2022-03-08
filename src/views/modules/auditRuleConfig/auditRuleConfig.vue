@@ -8,10 +8,10 @@
                         </span>
                     </span>
             </el-tree> -->
-            <rule-tree ref="ruleTree" :isShowSearch="true" :treeData="projectRulesTreeList" :isShowCheckBox="true" :isShowEdit="true"></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="true" :isShowEdit="true" parentGetTreeData="getTreeData"></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
-            <div class="search-box">
+            <div class="search-box"> 
                 <el-form ref="searchForm" :model="searchForm" :inline="true">
                     <el-form-item label="审核规则名称：">
                         <el-input v-model="searchForm.ruleName" clearable></el-input>
@@ -95,6 +95,7 @@
         </div>
         <submit-personality-rule ref="submitPersonalityRule"></submit-personality-rule>
         <rule-operation ref="ruleOperation"></rule-operation>
+        <!-- <rule-config-dialog ref="auditRuleConfigDialog"></auditRuleConfig-dialog> -->
 
     </div>
 </template>
@@ -102,6 +103,7 @@
 import submitPersonalityRule from './submit-personality-rule.vue'// 提交至地区个性化规则弹框
 import ruleOperation from './rule-operation.vue' // 规则运行弹框
 import ruleTree from '../../common/rule-tree.vue'
+import auditRuleConfigDialog from './auditRuleConfig-dialog.vue'
 export default {
     data () {
         return {
@@ -166,7 +168,7 @@ export default {
     methods: {
         getSelectPage () {
             this.tableLoading = true;
-             this.$http({
+            this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl(`/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
@@ -188,6 +190,10 @@ export default {
             })
 
         },
+        getTreeData (data) {
+            console.log(data, '拿到树选择的id')
+
+        },
         treeClick (data) {
             // console.log(data, 'datadatadata')
 
@@ -200,7 +206,7 @@ export default {
             this.searchForm= { ruleName: '',ruleType: ''}
         },
         addFun () {
-
+            this.$refs.auditRuleConfigDialog.showDialog(this.multipleTable);
         },
         editorFun () {
 
@@ -274,7 +280,8 @@ export default {
     components: {
         submitPersonalityRule,
         ruleOperation,
-        ruleTree
+        ruleTree,
+        auditRuleConfigDialog
     }
 }
 

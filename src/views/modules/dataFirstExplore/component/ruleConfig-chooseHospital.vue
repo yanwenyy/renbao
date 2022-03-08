@@ -7,19 +7,19 @@
     >
       <el-form-item label="医院名称：">
         <el-input
-          v-model="dataForm.basicName"
+          v-model="dataForm.hospitalName"
           placeholder="请输入搜索内容"
           clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="医院类别：">
         <el-select
-          v-model="dataForm.basicType"
+          v-model="dataForm.hospitalType"
           placeholder="请输入搜索内容"
           clearable
         >
           <el-option
-            v-for="item in options"
+            v-for="item in hospitalType"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -53,26 +53,26 @@
           width="50"
         ></el-table-column>
         <el-table-column
-          prop="basicName"
+          prop="医院名称"
           header-align="center"
           align="center"
           label="医院名称"
         ></el-table-column>
         <el-table-column
-          prop="basicCode"
+          prop="医院编码"
           header-align="center"
           align="center"
           label="医院编码"
         ></el-table-column>
         <el-table-column
-          prop="administration"
+          prop="医院性质"
           header-align="center"
           align="center"
           label="医院性质"
         >
         </el-table-column>
         <el-table-column
-          prop="basicType"
+          prop="医院类别"
           header-align="center"
           align="center"
           label="医院类别"
@@ -90,10 +90,8 @@ export default {
   data() {
     return {
       dataForm: {
-        basicName: "",
-        basicType: "",
-        data2: "",
-        data1: ""
+        hospitalName: "",
+        hospitalType: ""
       },
       //loading
       listLoading: false,
@@ -105,111 +103,71 @@ export default {
         total: 0
       },
       //table表格数据
-      tableList: [
-        {
-          id: "0",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "1",
-          basicName: "幼妇保健院",
-          basicCode: "1650000",
-          administration: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "1224759234.53"
-        },
-        {
-          id: "2",
-          basicName: "中医医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "3",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          administration: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "4",
-          basicName: "商洛康健精神病医院",
-          basicCode: "1650000",
-          administration: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "45423465.78"
-        }
-      ],
+      tableList: [],
+      multipleSelection: [],
       tableColumns: [],
-      options: [
+      hospitalType: [
         {
-          value: "0",
+          value: "三级甲等",
           label: "三级甲等"
         },
         {
-          value: "1",
+          value: "三级乙等",
           label: "三级乙等"
         },
         {
-          value: "2",
+          value: "三级丙等",
           label: "三级丙等"
         }
       ]
     };
   },
-  mounted() {
-    // this.initList();
-     this.$nextTick(() => {
+  created() {
+    this.initList();
+    this.$nextTick(() => {
       this.$refs.multipleTable.toggleAllSelection();
     });
   },
   methods: {
     //初始化数据列表
     initList() {
-      this.listLoading = true;
-      // this.$http({
-
-      // }).then(() =>{
-      //     // this.listLoading =false
-      // })
+      this.$http({
+        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+        method: "get",
+        params: this.$http.adornParams({
+          pageCount: "1",
+          pageSize: "10000",
+          hospitalName: this.dataForm.hospitalName,
+          hospitalType: this.dataForm.hospitalType
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableList = data.result.records;
+        } else {
+          this.tableList = [];
+        }
+      });
     },
     //重置
-    resetForm() {},
-    //查询
-    getDataList() {},
-    // 页数
-    handleSizeChange(val) {
-      this.apComServerData.size = val;
+    resetForm() {
+      this.dataForm = {
+        hospitalName: "",
+        hospitalType: ""
+      };
       this.initList();
     },
-    //当前页
-    handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
+    //查询
+    getDataList() {
       this.initList();
     },
     //确定
     ok() {
       this.$emit("ok");
+      this.$emit("returnData", this.multipleSelection);
     },
     //取消
     close() {
       this.$emit("close");
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
     },
     //多选
     handleSelectionChange(val) {
