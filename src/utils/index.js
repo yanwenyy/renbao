@@ -101,7 +101,7 @@ PxSocket.prototype = {
     var _this = this;
     try {
       if ('WebSocket' in window) {
-        // console.log(_this.options.url)
+        console.log(_this.options.url)
         _this.ws = new WebSocket(_this.options.url);
         // console.log( _this.ws)
         // console.log(http_url.Socket_url+options.id)
@@ -113,7 +113,7 @@ PxSocket.prototype = {
         console.log("send error！");
       };
       _this.ws.onopen = function () {
-
+        _this.ws.send(_this.options.data);
         _this.heartCheck();      //心跳检测重置
         // console.log(_this.options.name +"  "+ new Date().toUTCString());
         console.log("connection success！")

@@ -3,28 +3,34 @@
     <div class="codemirror-div" v-if="!fullScreen">
       <div class="btn-group">
         <el-button type="text"
-                   @click="implement">
-          <i class="el-icon-paperclip" title="格式化"></i>
+                   @click="formatContentSelf">
+          <i v-if="!useChinese" class="el-icon-paperclip" title="格式化"></i>
+          <span v-if="useChinese" title="格式化">格式化</span>
         </el-button>
         <el-button type="text"
                    :disabled="implementDisabled"
                    @click="implement">
-          <i class="el-icon-video-play" title="运行"></i>
+          <i  v-if="!useChinese" class="el-icon-video-play" title="运行"></i>
+          <span v-if="useChinese" title="运行">运行</span>
         </el-button>
-        <el-button type="text" @click="openPython"><i class="el-icon-folder-opened" title="打开sql"></i></el-button>
-        <!-- <el-button type="primary" @click="savePython">保存python</el-button> -->
-        <el-dropdown style="margin-left: 10px" trigger="click">
+        <el-button type="text" @click="openPython">
+          <i v-if="!useChinese" class="el-icon-folder-opened" title="打开sql"></i>
+          <span v-if="useChinese" title="打开sql">打开sql</span>
+        </el-button>
+        <el-dropdown style="margin-left: 10px" trigger="click" placement="bottom-start">
           <el-button type="text">
-           <i class="el-icon-document-add" title="保存"></i>
+            <i v-if="!useChinese" class="el-icon-document-add" title="保存"></i>
+            <span v-if="useChinese" title="保存">保存</span>
           </el-button>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="savePython">保存</el-dropdown-item>
-            <el-dropdown-item @click.native="saveAs">另存为</el-dropdown-item>
+            <el-dropdown-item @click.native="saveSqlSelf('save')">保存</el-dropdown-item>
+            <el-dropdown-item @click.native="saveSqlSelf('saveAs')">另存为</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown style="margin-left: 10px" trigger="click">
+        <el-dropdown style="margin-left: 10px" trigger="click"  placement="bottom-start">
           <el-button type="text">
-            <i class="el-icon-suitcase-1" title="工具箱"></i>
+            <i v-if="!useChinese" class="el-icon-suitcase-1" title="工具箱"></i>
+            <span v-if="useChinese" title="工具箱">工具箱</span>
           </el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="lookups">查找</el-dropdown-item>
@@ -41,17 +47,17 @@
               注释选中行
             </el-dropdown-item>-->
             <!--<el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>-->
-            <el-dropdown-item @click.native="changeSize(1)"
-            >字体放大
-            </el-dropdown-item
-            >
-            <el-dropdown-item @click.native="changeSize(2)"
-            >字体缩小
-            </el-dropdown-item
-            >
+            <!--<el-dropdown-item @click.native="changeSize(1)"-->
+            <!--&gt;字体放大-->
+            <!--</el-dropdown-item-->
+            <!--&gt;-->
+            <!--<el-dropdown-item @click.native="changeSize(2)"-->
+            <!--&gt;字体缩小-->
+            <!--</el-dropdown-item-->
+            <!--&gt;-->
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button style="margin-left: 10px" type="primary" @click="">保存数据</el-button>
+        <!--<el-button style="margin-left: 10px" type="primary" @click="">保存数据</el-button>-->
       </div>
       <codemirror
         ref="myCm"
@@ -92,26 +98,25 @@
         </el-form-item>
         <el-form-item>
           <el-button @click="getDataList()">查询</el-button>
-          <el-button v-if="" type="info" @click="">重置</el-button>
+          <el-button v-if="" type="info" @click="dataForm.name=''">重置</el-button>
         </el-form-item>
       </el-form>
       <el-table
-        :data="dataList"
+        :data="sqlListData"
         border
         v-loading="dataListLoading"
         @selection-change="selectionChangeHandle"
         style="width: 100%;">
+        <!--<el-table-column-->
+          <!--type="selection"-->
+          <!--header-align="center"-->
+          <!--align="center"-->
+          <!--width="50">-->
+        <!--</el-table-column>-->
         <el-table-column
-          type="selection"
+          prop="draftName"
           header-align="center"
           align="center"
-          width="50">
-        </el-table-column>
-        <el-table-column
-          prop="id"
-          header-align="center"
-          align="center"
-          width="80"
           label="草稿名称">
         </el-table-column>
         <el-table-column
@@ -127,11 +132,11 @@
           fixed="right"
           header-align="center"
           align="center"
-          width="150"
           label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">查看详情</el-button>
-            <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" @click="lookSqlDetail(scope.row)">查看详情</el-button>
+            <el-button type="text" size="small" @click="deleteSqlSef(scope.row.draftId)">删除</el-button>
+            <el-button type="text" size="small" @click="useSql(scope.row)">使用sql</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -147,7 +152,38 @@
       </el-pagination>
       <span slot="footer" class="dialog-footer">
         <el-button @click="sqlvisible = false">取消</el-button>
-        <el-button type="primary" @click="sub()">确定</el-button>
+        <!--<el-button type="primary" @click="sub()">使用sql</el-button>-->
+      </span>
+    </el-dialog>
+    <el-dialog title="草稿sql" :visible.sync="LookSql">
+      <el-form>
+        <el-form-item>
+            <el-input
+            type="textarea"
+            :rows="6"
+            placeholder="请输入内容"
+            v-model="draftSql">
+            </el-input>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog title="保存草稿" :visible.sync="saveSqlVisible">
+      <el-form :model="sqlSaveForm" ref="sqlSaveRef">
+        <el-form-item label="草稿名称" prop="draftName"
+                      :rules="{
+                        required: true,
+                        message: '此项不能为空',
+                        trigger: 'blur',
+                      }">
+            <el-input
+            placeholder="请输入内容"
+            v-model="sqlSaveForm.draftName">
+            </el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="saveSqlVisible = false,sqlSaveForm.draftName=''">取消</el-button>
+        <el-button type="primary" @click="saveSqlClick()">确定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -221,7 +257,15 @@
         type: String,
         default: null,
       },
+      sqlData: {
+        type: String,
+        default: null,
+      },
       tableData: {
+        type: Array,
+        default: null,
+      },
+      sqlListData: {
         type: Array,
         default: null,
       },
@@ -229,9 +273,38 @@
         type: Function,
         default: null,
       },
+      deleteSql: {
+        type: Function,
+        default: null,
+      },
+      getSqlList: {
+        type: Function,
+        default: null,
+      },
+      useChinese: {
+        type: Boolean,
+        default: false,
+      },
+      saveSql: {
+        type: Function,
+        default: null,
+      },
+      formatContent: {
+        type: Function,
+        default: null,
+      },
     },
     data() {
       return {
+        sqlSaveType:'',
+        sqlSaveForm:{
+          draftName:'',
+        },
+        saveSqlVisible:false,//保存sql框状态
+        //选择的sql列表id
+        draftSqlId:'',
+        draftSql:'',
+        LookSql:false,
         //sql列表
         sqlvisible:false,
         dataForm: {
@@ -313,7 +386,7 @@
         handler(val) {
           if (val !== "") {
             this.treeValve = val;
-            if (val !== "" && val !== "BBB") {
+            if (val !== "") {
               let pos1 = this.$refs.myCm.codemirror.getCursor();
               let pos2 = {};
               pos2.line = pos1.line;
@@ -358,6 +431,18 @@
           }
         },
       },
+      sqlData: {
+        // 实时监控数据变化
+        immediate: true,
+        deep: true,
+        handler(val) {
+          if (val != "") {
+            if (val !== "") {
+              this.editorValue=val;
+            }
+          }
+        },
+      },
       cmTheme: function (newValue, oldValue) {
         try {
           let theme = this.cmTheme == "default" ? "blackboard" : this.cmTheme;require("codemirror/theme/" + theme + ".css");
@@ -378,34 +463,46 @@
     },
     methods: {
       //sql列表开始
+      //使用sql
+      useSql(row){
+        this.editorValue=row.draftSql;
+        this.draftSqlId=row.draftId;
+        this.sqlvisible=false;
+      },
+      //删除sql
+      deleteSqlSef(id){
+        if(id){
+          this.$confirm('确认进行删除操作么?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.deleteSql(id)
+          }).catch(() => {
+
+          });
+        }else{
+          this.$message.error("主键id不能为空")
+        }
+
+      },
       //保存信息
       sub(){
         this.$emit('refreshDataList',this.dataListSelections);
       },
+      //查看详情
+      lookSqlDetail(row){
+        this.LookSql=true;
+        this.draftSql=row.draftSql||'';
+      },
       // 获取数据列表
       getDataList () {
-        console.log(this.value1)
-        this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/biz/pdbaidudata/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'pageNum': this.pageIndex,
-            'pageSize': this.pageSize,
-            'agencyId': this.dataForm.agencyId,
-            'startTime': this.dataForm.startTime,
-            'endTime': this.dataForm.endTime
-          })
-        }).then(({data}) => {
-          if (data && data.code === 200) {
-            this.dataList = data.data.list
-            this.totalPage = data.data.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
-        })
+        var options={
+          draftName:this.dataForm.name,
+          pageSize:this.pageSize,
+          pageNo:this.pageIndex,
+        };
+        this.getSqlList(options);
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -461,6 +558,11 @@
       },
       //sql列表结束
 
+      //格式化
+      formatContentSelf(){
+        var datas=this.$refs.myCm.codemirror.getValue();
+        this.formatContent(datas)
+      },
       //是否全屏
       setFullScreen(type){
         this.fullScreen=type==1?true:false;
@@ -468,7 +570,7 @@
       },
       // 执行
       implement: function () {
-        this.getwsData();
+        this.getwsData(this.editorValue);
         // //清空上一次的执行结果
         // this.arr = [];
         // //执行按钮禁用
@@ -586,63 +688,30 @@
       openPython() {
         this.sqlvisible = true;
       },
-      // 保存
-      savePython() {
-        if (this.pythonValue) {
-          // var valueList = this.editorValue.split("\n");
-          // var data = [];
-          // valueList.forEach((item) => {
-          //   if (item.indexOf("print") != -1) {
-          //     var a = item;
-          //     var b = a + "%}";
-          //     // var b = a.replace(")", ")#}")
-          //     var str = b.replace("print", "print{%");
-          //     data.push(str);
-          //   } else {
-          //     data.push(item);
-          //   }
-          // });
-          // data = data.join("\n");
-          // this.arr = [];
-          // var str = "";
-          // var str1 = "";
-          // // if (
-          // //   data.indexOf("{@cursor@}") != -1 &&
-          // //   data.indexOf("{@send_msg@}") != -1
-          // // ) {
-          // //   str = data.replace("{@cursor@}", this.funList[0].value);
-          // //   str1 = str.replace("{@send_msg@}", this.funList[1].value);
-          // // } else {
-          // str1 = data;
-          // // }
-          // // if (str1.indexOf("{@cursor@}") != -1) {
-          // //   str1 = str1.replace("{@cursor@}", this.funList[0].value);
-          // // }
-          // // if (str1.indexOf("{@send_msg@}") != -1) {
-          // //   str1 = str1.replace("{@send_msg@}", this.funList[1].value);
-          // // }
-          this.ruleForm.pyDraftText = this.editorValue;
-          draftUpdate(this.ruleForm).then((res) => {
-            if (res.msg === "成功") {
-              this.draftFlag = false;
-              this.$message.success("操作成功");
-              //操纵成功，修改当前使用python草稿
-              this.pythonValue = res.data.pyDraftTitle;
-              this.ruleForm.pyDraftTitle = res.data.pyDraftTitle;
-              this.ruleForm.pyDraftText = res.data.pyDraftText;
-              this.ruleForm.pyDraftUuid = res.data.pyDraftUuid;
-              this.ruleForm.pyFolderUuid = res.data.pyFolderUuid;
+      //保存弹框点击
+      saveSqlClick(){
+        this.$refs['sqlSaveRef'].validate((valid) => {
+          if (valid) {
+            var options={
+              draftName:this.sqlSaveForm.draftName,
+              draftSql:this.editorValue
+            };
+            if(this.draftSqlId!=''){
+              options.type=this.sqlSaveType;
+              options.draftId=this.draftSqlId;
             }
-          });
-        } else {
-          let obj = {};
-          selectTree(obj).then((res) => {
-            this.sheetData = res.data;
-            this.sheetData.forEach((m) => {
-              this.idArr.push(m.id);
-            });
-          });
-          this.draftFlag = true;
+            this.saveSqlVisible=false;
+            this.saveSql(options);
+          }
+        })
+      },
+      // 保存
+      saveSqlSelf(type) {
+        if (this.editorValue) {
+          this.saveSqlVisible = true;
+          this.sqlSaveType = type;
+        }else{
+          this.$message.error("请输入sql内容")
         }
       },
       /**
@@ -713,16 +782,17 @@
       },
       // 改变字体大小 type === 1 变大 type === 2变小
       changeSize(type) {
-        var thisEle = $(".CodeMirror").css("font-size");
+        var thisEle = this.$refs.myCm.codemirror.style;
+        console.log(thisEle);
         var textFontSize = parseFloat(thisEle, 10);
         var unit = thisEle.slice(-2); //获取单位
         if (type === 1) {
           textFontSize += 2;
-          $(".CodeMirror").css("font-size", textFontSize + unit);
+          $this.$refs.myCm.codemirror.css("font-size", textFontSize + unit);
         }
         if (type === 2) {
           textFontSize -= 2;
-          $(".CodeMirror").css("font-size", textFontSize + unit);
+          this.$refs.myCm.codemirror.css("font-size", textFontSize + unit);
         }
       },
       resetLint() {
