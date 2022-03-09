@@ -107,7 +107,7 @@ export default {
             tableData: [],
             tablePositionKey: [
                 {dataname:'ruleName' , label:'审核规则名称' , issortable:false , type:''},
-                {dataname:'ruleType' , label:'审核规则类别' , issortable:false , type:''},
+                {dataname:'dealRuleType' , label:'审核规则类别' , issortable:false , type:''},
                 {dataname:'expectedBeginTime' , label:'预计开始时间' , issortable:false , type:''},
                 {dataname:'actualBeginTime' , label:'实际开始时间' , issortable:false , type:''},
                 {dataname:'expectedEndTime' , label:'预计结束时间' , issortable:false , type:''},
@@ -127,6 +127,7 @@ export default {
                     return  config.label || config.batchName
                 },
             },
+            batchItem: {}
         }
     },
     mounted () {
@@ -148,8 +149,22 @@ export default {
             }
 
         },
+        dealRuleType (data) {
+            if (data) {
+                if (data.ruleCategory ==1) {
+                    return '门诊规则'
+                } else if(data.ruleCategory ==1) {
+                    return '住院规则'
+
+                } else {
+                    return ''
+                }
+            }else {
+                return ''
+            }
+
+        },
         getTableData (batchData) {
-            console.log('获取列表')
             this.tableLoading = true;
             this.$http({
                 isLoading:false,
@@ -158,20 +173,25 @@ export default {
                 params:  this.$http.adornParams({
                     batchId: batchData.batchId,
                     runStatus: this.searchForm.runStatus, // 运行状态
-                    ruleCategory: this.searchForm.ruleCategory
+                    // rule: {
+                    //     ruleCategory: this.searchForm.ruleCategory
+                    // }
+                    rule: {
+                        ruleCategory: ''
+                    }
+                    
                 }, false)
             }).then(({data}) => {
                 this.tableLoading = false
                 if (data.code == 200) {
                     data.result.records.map(i => {
-                        i.ruleName = i.rule.ruleName
-                        i.ruleType = i.rule.ruleType == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
+                        i.ruleName = i.rule && i.rule.ruleName || ''
+                        i.dealRuleType = this.dealRuleType(i.rule)
                         i.expectedBeginTime = i.expectedBeginTime && i.expectedBeginTime.split('T')[0] || '';
                         i.actualBeginTime = i.actualBeginTime && i.actualBeginTime.split('T')[0] || '';
                         i.expectedEndTime = i.expectedEndTime && i.expectedEndTime.split('T')[0] || '';
                         i.actualEndTime = i.actualEndTime && i.actualEndTime.split('T')[0] || '';
                         i.runStatusName = this.dealRunStatus(i.runStatus)
-
                     })
                     this.tableData = data.result.records;
                     this.Pager.pageSize = data.result.size;
@@ -181,10 +201,6 @@ export default {
             }).catch(() => {
                 this.tableLoading = false
             })
-
-
-
-
         },
         getbatchList () {
             this.treeLoading = true;
@@ -204,12 +220,15 @@ export default {
 
         nodeClick (node,data) {
             this.getTableData(data)
-
-
+            this.batchItem = data;
         },
         // 列表查询
         onQuery () {
-
+            if (this.batchItem.batchId) {
+                this.getTableData(this.batchItem)
+            } else {
+                this.$message({message: '请选择批次列表',type: 'warning'})
+            } 
         },
         // 列表重置
         onReset () {

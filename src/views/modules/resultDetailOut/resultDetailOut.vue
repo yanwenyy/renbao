@@ -1,8 +1,8 @@
 <template>
     <div class="box">
         <div class="resultDetailsExport-left">
-            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" @node-click="treeClick" v-loading="treeLoading" node-key="id" ref="treesa" >
-                    <span class="custom-tree-node" slot-scope="{ node }" >
+            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
+                    <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
                         <span>
                             {{node.label}}
                         </span>
@@ -13,10 +13,10 @@
             <div class="search-box">
                 <el-form ref="searchForm" :model="searchForm" :inline="true">
                     <el-form-item label="规则名称：">
-                        <el-input v-model="searchForm.name" clearable></el-input>
+                        <el-input v-model="searchForm.ruleName" clearable></el-input>
                     </el-form-item>
                     <el-form-item label="规则类型：">
-                        <el-select v-model="searchForm.type"  placeholder="请选择" clearable>
+                        <el-select v-model="searchForm.ruleCategory"  placeholder="请选择" clearable>
                             <el-option label="门诊规则" value="shanghai"></el-option>
                             <el-option label="住院规则" value="beijing"></el-option>
                         </el-select>
@@ -91,45 +91,23 @@ export default {
         return {
             treeLoading: false,
             tableLoading: false,
-            batchTreeList: [ 
-                {
-                    label: '批次名称',
-                    children: [
-                        {label: '人民医院医保数据筛查'},
-                        {label: '妇幼保健院医院数据筛查'},
-                        {label: '中医医院医保数据筛查'},
-                        {label: '中医医院医院数据筛查'},
-                    ]
-                }
-               
-            ],
+            batchTreeList: [{
+                label: '批次名称',
+                children: []
+            }],
             searchForm: {
-                type: '',
-                name: ''
+                ruleCategory: '',
+                ruleName: ''
 
             },
-            tableData: [
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 1,},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-               
-               
-            ],
+            tableData: [],
             tablePositionKey: [
-                {dataname:'q1' , label:'规则名称' , issortable:false , type:''},
-                {dataname:'q2' , label:'规则类别' , issortable:false , type:''},
-                {dataname:'q3' , label:'开始时间' , issortable:false , type:''},
-                {dataname:'q5' , label:'结束时间' , issortable:false , type:''},
-                {dataname:'q3' , label:'结果条数' , issortable:false , type:''},
-                {dataname:'q4' , label:'执行人' , issortable:false , type:''},
+                {dataname:'ruleName' , label:'规则名称' , issortable:false , type:''},
+                {dataname:'dealRuleType' , label:'规则类别' , issortable:false , type:''},
+                {dataname:'expectedBeginTime' , label:'开始时间' , issortable:false , type:''},
+                {dataname:'actualBeginTime' , label:'结束时间' , issortable:false , type:''},
+                {dataname:'resultCount' , label:'结果条数' , issortable:false , type:''},
+                {dataname:'actualEndTime' , label:'执行人' , issortable:false , type:''},
                 {dataname:'q5' , label:'操作' , issortable:false , type:'option'},
             ],
             Pager: {
@@ -138,17 +116,32 @@ export default {
                 total: 0
             },
             multipleTable: [],
+            layoutTreeProps: {
+                label(data, node) {
+                    const config = data.__config__ || data
+                    return  config.label || config.batchName
+                },
+            },
+            batchItem: {}
         }
     },
+    mounted () {
+        this.getbatchList();
+    },
     methods: {
-        treeClick (data) {
-
+        nodeClick (node,data) {
+            this.getTableData(data)
+            this.batchItem = data;
         },
         onQuery () {
-
+            if (this.batchItem.batchId) {
+                this.getTableData(this.batchItem)
+            } else {
+                this.$message({message: '请选择批次列表',type: 'warning'})
+            } 
         },
         onReset () {
-            this.searchForm={type: '',name: ''};
+            this.searchForm={ruleCategory: '',ruleName: ''};
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
@@ -159,6 +152,65 @@ export default {
         },
         sizeChangeHandle (val) {
             this.Pager.pageSize = val
+        },
+        dealRunStatus (type) {
+            if (type == 1) {
+                return '待执行'
+            } else if (type == 2) {
+                return '执行中'
+            } else if (type == 3) {
+                return '执行失败'
+            } else if (type == 4) {
+                return '已完成'
+            }
+
+        },
+        dealRuleType (data) {
+            if (data) {
+                if (data.ruleCategory ==1) {
+                    return '门诊规则'
+                } else if(data.ruleCategory ==1) {
+                    return '住院规则'
+
+                } else {
+                    return ''
+                }
+            }else {
+                return ''
+            }
+
+        },
+        getTableData (batchData) {
+            this.tableLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl(`/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
+                method: 'get',
+                params:  this.$http.adornParams({
+                    batchId: batchData.batchId,
+                    ruleName: this.searchForm.ruleName,
+                    ruleCategory: this.searchForm.ruleCategory
+                }, false)
+            }).then(({data}) => {
+                this.tableLoading = false
+                if (data.code == 200) {
+                    data.result.records.map(i => {
+                        i.ruleName = i.rule && i.rule.ruleName || ''
+                        i.dealRuleType = this.dealRuleType(i.rule)
+                        i.expectedBeginTime = i.expectedBeginTime && i.expectedBeginTime.split('T')[0] || '';
+                        i.actualBeginTime = i.actualBeginTime && i.actualBeginTime.split('T')[0] || '';
+                        i.expectedEndTime = i.expectedEndTime && i.expectedEndTime.split('T')[0] || '';
+                        i.actualEndTime = i.actualEndTime && i.actualEndTime.split('T')[0] || '';
+                        i.runStatusName = this.dealRunStatus(i.runStatus)
+                    })
+                    this.tableData = data.result.records;
+                    this.Pager.pageSize = data.result.size;
+                    this.Pager.pageIndex = data.result.current;
+                    this.Pager.total = data.result.total;  
+                }
+            }).catch(() => {
+                this.tableLoading = false
+            })
         },
         // 列表查看
         resultViewClick (data) {
@@ -173,7 +225,22 @@ export default {
        
         deleteFn () {
 
-        }
+        },
+        getbatchList () {
+            this.treeLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/batch/selectList'),
+                method: 'get',
+            }).then(({data}) => {
+                this.treeLoading = false;
+                if (data.code == 200) {
+                    this.batchTreeList[0].children = data.result
+                }
+            }).catch(() => {
+                this.treeLoading = false;
+            })
+        },
     },
     components: {
         resultDetailOutDialog
