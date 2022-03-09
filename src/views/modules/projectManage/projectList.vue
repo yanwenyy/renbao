@@ -3,21 +3,21 @@
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
 
       <el-form-item label="项目编号:">
-        <el-input v-model="dataForm.name" placeholder="项目编号" clearable></el-input>
+        <el-input v-model="dataForm.projectCode" placeholder="项目编号" clearable></el-input>
       </el-form-item>
       <el-form-item label="项目名称:">
-        <el-input v-model="dataForm.name" placeholder="项目名称" clearable></el-input>
+        <el-input v-model="dataForm.projectName" placeholder="项目名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="项目时间:">
         <el-date-picker
-          v-model="dataForm.startTime"
+          v-model="dataForm.projectPeriodBenig"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择日期">
         </el-date-picker>
         <span>--</span>
         <el-date-picker
-          v-model="dataForm.startTime"
+          v-model="dataForm.projectPeriodEnd"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择日期">
@@ -42,14 +42,14 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
+        prop="projectCode"
         header-align="center"
         align="center"
         width="80"
         label="项目编号">
       </el-table-column>
       <el-table-column
-        prop="agencyName"
+        prop="projectName"
         align="center"
         label="项目名称">
       </el-table-column>
@@ -59,15 +59,18 @@
         header-align="center"
         align="center"
         label="项目周期">
+        <template slot-scope="scope">
+          {{scope.row.projectPeriodBenig }}-{{scope.row.projectPeriodEnd}}
+        </template>
       </el-table-column>
       <el-table-column
-        prop="effectiveData"
+        prop="auditedUnit"
         header-align="center"
         align="center"
         label="被审核单位">
       </el-table-column>
       <el-table-column
-        prop="todayConsumeMoney"
+        prop="createUserName"
         header-align="center"
         align="center"
         label="创建人">
@@ -88,8 +91,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('biz:pdbaidudate:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('biz:pdbaidudate:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.projectId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.projectId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -115,8 +118,10 @@
     data () {
       return {
         dataForm: {
-          startTime: '',
-          endTime: '',
+          projectCode: '',
+          projectName: '',
+          projectPeriodBenig: '',
+          projectPeriodEnd: '',
         },
         dataList: [],
         pageIndex: 1,
@@ -125,22 +130,6 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
         value: '',
         value1: '',
       }
@@ -149,14 +138,7 @@
       AddOrUpdate
     },
     activated () {
-      // this.getDataList();
-      // this.$http({
-      //   url: this.$http.adornUrl('/biz/pdagency/down/list'),
-      //   method: 'get',
-      //   params: this.$http.adornParams()
-      // }).then(({data}) => {
-      //   this.options = data && data.code === 200 ? data.data : []
-      // })
+      this.getDataList();
     },
     methods: {
       // 获取数据列表
@@ -164,19 +146,20 @@
         console.log(this.value1)
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/biz/pdbaidudata/list'),
+          url: this.$http.adornUrl('/xmProject/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
-            'pageNum': this.pageIndex,
+            'pageNo': this.pageIndex,
             'pageSize': this.pageSize,
-            'agencyId': this.dataForm.agencyId,
-            'startTime': this.dataForm.startTime,
-            'endTime': this.dataForm.endTime
+            'projectCode': this.dataForm.projectCode||null,
+            'projectName': this.dataForm.projectName||null,
+            'projectPeriodBenig': this.dataForm.projectPeriodBenig||null,
+            'projectPeriodEnd': this.dataForm.projectPeriodEnd||null
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
-            this.dataList = data.data.list
-            this.totalPage = data.data.totalCount
+            this.dataList = data.result.records;
+            this.totalPage = data.result.total
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -208,8 +191,8 @@
       },
       // 删除
       deleteHandle (id) {
-        var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.userId
+        var projectIds = id ? [id] : this.dataListSelections.map(item => {
+          return item.projectId
         })
         this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
           confirmButtonText: '确定',
@@ -217,9 +200,9 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/biz/pdbaidudata/delete'),
+            url: this.$http.adornUrl('/xmProject/deleteProjectByIds'),
             method: 'post',
-            data: this.$http.adornData(userIds, false)
+            data: this.$http.adornData(projectIds, false)
           }).then(({data}) => {
             if (data && data.code === 200) {
               this.$message({

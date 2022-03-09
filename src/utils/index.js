@@ -113,7 +113,7 @@ PxSocket.prototype = {
         console.log("send error！");
       };
       _this.ws.onopen = function () {
-
+        _this.ws.send(_this.options.data);
         _this.heartCheck();      //心跳检测重置
         // console.log(_this.options.name +"  "+ new Date().toUTCString());
         console.log("connection success！")
