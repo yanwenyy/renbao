@@ -272,7 +272,13 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl("/batch/selectList"),
-        method: "get"
+        method: "get",
+        params: this.$http.adornParams(
+          {
+            batchType: 1
+          },
+          false
+        )
       })
         .then(({ data }) => {
           this.treeLoading = false;

@@ -329,7 +329,7 @@ export default {
     //删除
     deleteData() {
       var deleteList = [];
-      this.multipleTable.forEach(item => {
+      this.multipleSelection.forEach(item => {
         deleteList.push(item.ruleId);
       });
       this.$confirm(`确定进行删除操作?`, "提示", {
@@ -366,6 +366,7 @@ export default {
     },
     //搜索
     getAllSearch() {
+      this.folderId = 1;
       this.initData();
     },
     //重置搜索
@@ -376,6 +377,7 @@ export default {
         createUserName: "",
         createTime: ""
       };
+      this.folderId = 1;
       this.initData();
     },
     //立即运行

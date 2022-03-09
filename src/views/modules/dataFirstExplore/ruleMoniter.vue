@@ -196,7 +196,9 @@ export default {
         pageIndex: 1,
         total: 0
       },
+      batchType: "",
       multipleTable: [],
+      batchId: "",
       layoutTreeProps: {
         label(data, node) {
           const config = data.__config__ || data;
@@ -207,6 +209,7 @@ export default {
   },
   created() {
     this.getbatchList();
+    this.getTableData();
   },
   methods: {
     dealRunStatus(type) {
@@ -220,20 +223,20 @@ export default {
         return "已完成";
       }
     },
-    getTableData(batchData) {
-      // console.log("获取列表");
+    getTableData() {
       this.tableLoading = true;
       this.$http({
         isLoading: false,
-        url: this.$http.adornUrl(
-          `/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
-        ),
+        url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
         params: this.$http.adornParams(
           {
-            batchId: batchData.batchId,
+            batchId: this.batchId,
             runStatus: this.searchForm.runStatus, // 运行状态
-            ruleCategory: this.searchForm.ruleCategory
+            ruleCategory: this.searchForm.ruleCategory,
+            pageNo: this.Pager.pageIndex,
+            pageSize: this.Pager.pageSize,
+            batchType: 1
           },
           false
         )
@@ -275,7 +278,13 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl("/batch/selectList"),
-        method: "get"
+        method: "get",
+        params: this.$http.adornParams(
+          {
+            batchType: 1
+          },
+          false
+        )
       })
         .then(({ data }) => {
           this.treeLoading = false;
@@ -289,7 +298,8 @@ export default {
     },
     //左点右显
     nodeClick(node, data) {
-      this.getTableData(data);
+      this.batchId = data.batchId;
+      this.getTableData();
     },
     // 列表查询
     onQuery() {},
