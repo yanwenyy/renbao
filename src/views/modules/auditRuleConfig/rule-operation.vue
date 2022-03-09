@@ -15,7 +15,7 @@
                         v-if="type == 'timing'"
                     >
                         <el-date-picker
-                            v-model="ruleOperationForm.startTime"
+                            v-model="ruleOperationForm.expectedBeginTime"
                             type="date"
                             format="yyyy/MM/dd"
                             value-format="yyyy-MM-dd"
@@ -65,10 +65,13 @@ export default {
             loading: false,
             dialogVisible: false,
             ruleOperationForm: {
-                startTime: '',
+                expectedBeginTime: '',
                 hospital: '',
                 batchName: '',
-                batchRemark: ''
+                batchRemark: '',
+                hospitalCode: '',
+                hospitalName: '',
+                ruleId: ''
 
             },
             ruleOperationFormRules: {
@@ -85,22 +88,34 @@ export default {
     },
     methods: {
         //默认打开页面
-        showDialog(checkRuleData,type,checkHospitalList ) {
+        showDialog(checkRuleData,type,checkHospitalList, ruleOperationForm, hospitalBack ) {
             this.reset();
             this.dialogVisible = true;
             this.type = type;
             this.checkRuleData = checkRuleData;
-            // Object.assign(this.$data, this.$options.data()) // 全部重置
+            let ruleId = [];
+            this.checkRuleData.map(i => {
+                ruleId.push(i.ruleId)
+            })
+            this.ruleOperationForm.ruleId = ruleId.join(',')
+            // 判断从医院弹框返回重新给表单内容赋值
+            if (hospitalBack) {
+                this.ruleOperationForm = ruleOperationForm
+            }
         },
         changeHospital () {
             // this.dialogVisible = false
-            this.$refs.hospitalSelection.showDialog(this.checkRuleData,this.type)
+            this.$refs.hospitalSelection.showDialog(this.checkRuleData,this.type, this.ruleOperationForm)
         },
         reset () {
             this.ruleOperationForm = {
-                startTime: '',
+                expectedBeginTime: '',
                 hospital: '',
-                batchName: ''
+                batchName: '',
+                batchRemark: '',
+                hospitalCode: '',
+                hospitalName: '',
+                ruleId: ''
             };
         },
       
@@ -109,55 +124,50 @@ export default {
             this.dialogVisible = false
         },
         onSubmit (formName) {
-            console.log(this.type, 'this.typethis.type')
-            debugger
-            let ruleId = [];
-            this.checkRuleData.map(i => {
-                ruleId.push(i.ruleId)
-            })
-            let timerRunNowByShData = {
-                batchName: this.ruleOperationForm.batchName, // 批次名称
-                batchRemark: this.ruleOperationForm.batchRemark, // 批次备注
-                ruleId: ruleId.join(','),
-                createTime: this.ruleOperationForm.startTime
-            }
-            //  this.$refs[formName].validate((valid) => {
-                // if (valid) {
+             this.$refs[formName].validate((valid) => {
+                if (valid) {
                     console.log(this.ruleOperationForm, '表单数据')
                     this.loading = true
                     this.$http({
                         isLoading:false,
                         url: this.$http.adornUrl('/rule/timerRunNowBySh'),
                         method: 'post',
-                        data:  this.$http.adornData(timerRunNowByShData, false)
+                        data:  this.$http.adornData(this.ruleOperationForm, false)
                     }).then(({data}) => {
                         // this.btnLoading = false;
                         if (data.code == 200) {
-                            console.log(data, 'ruleId')
+                            this.$message({
+                                message: '执行成功',
+                                type: 'success',
+                                duration: 1500,
+                            })
                             this.loading = false
-                            this.treeVisible = false;
-                            // this.getRuleFolder()
+                            this.dialogVisible = false;
+                            this.$parent.setTableChecked()
+                        } else {
+                            this.$message({
+                                message: '执行失败',
+                                type: 'error',
+                                duration: 1500,
+                            })
+                            this.loading = false
                         }
                     }).catch(() => {
                         this.loading = false
-                        // this.btnLoading = false;
                     })  
-
-
-
-            //     }
-            // })
-            
-            
+                }
+            }) 
         },
         setHospital (checkHospitalList) {
-            let hospitalName = []
+            let hospitalName = [];
+            let hospitalCode = [];
             checkHospitalList.map(i => {
                 hospitalName.push(i['医院名称'])
+                hospitalCode.push(i['医院编码'])
             })
-            this.ruleOperationForm.hospital = hospitalName.join(',')
-
-
+            this.ruleOperationForm.hospital = hospitalName.join(',');
+            this.ruleOperationForm.hospitalName = hospitalName.join(',');
+            this.ruleOperationForm.hospitalCode = hospitalCode.join(',');
         },
         cancel () {
             this.resetForm();

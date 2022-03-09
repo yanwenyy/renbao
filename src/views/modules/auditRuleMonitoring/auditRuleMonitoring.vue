@@ -132,6 +132,7 @@ export default {
     },
     mounted () {
         this.getbatchList();
+        this.getTableData()
     },
     created () {
 
@@ -164,21 +165,21 @@ export default {
             }
 
         },
-        getTableData (batchData) {
+        getTableData () {
             this.tableLoading = true;
             this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl(`/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
                 params:  this.$http.adornParams({
-                    batchId: batchData.batchId,
+                    batchId: this.batchItem.batchId && this.batchItem.batchId || '',
                     runStatus: this.searchForm.runStatus, // 运行状态
                     // rule: {
                     //     ruleCategory: this.searchForm.ruleCategory
                     // }
-                    rule: {
-                        ruleCategory: ''
-                    }
+                    // rule: {
+                    //     ruleCategory: ''
+                    // }
                     
                 }, false)
             }).then(({data}) => {
@@ -219,16 +220,17 @@ export default {
         },
 
         nodeClick (node,data) {
-            this.getTableData(data)
+            this.getTableData()
             this.batchItem = data;
         },
         // 列表查询
         onQuery () {
-            if (this.batchItem.batchId) {
-                this.getTableData(this.batchItem)
-            } else {
-                this.$message({message: '请选择批次列表',type: 'warning'})
-            } 
+            // if (this.batchItem.batchId) {
+            //     this.getTableData()
+            // } else {
+            //     this.$message({message: '请选择批次列表',type: 'warning'})
+            // } 
+            this.getTableData()
         },
         // 列表重置
         onReset () {

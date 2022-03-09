@@ -82,18 +82,18 @@ export default {
             ],
             type: '',
             checkHospitalList: [], // 选中的医院列表
-            checkRuleData: [] // 选中的规则列表
+            checkRuleData: [], // 选中的规则列表
+            ruleOperationForm: {}
         }
     },
     methods: {
         //默认打开页面
-        showDialog(checkRuleData,type, d) {
+        showDialog(checkRuleData,type,ruleOperationForm) {
             this.innerVisible = true;
             this.type = type;
             this.checkRuleData = checkRuleData;
-            this.getHospital()
-            
-            
+            this.getHospital();
+            this.ruleOperationForm = ruleOperationForm;
         },
         mounted () {
 
@@ -119,7 +119,7 @@ export default {
        
         handleClose () {
             this.innerVisible = false;
-            this.$parent.showDialog(this.checkRuleData,this.type);
+            this.$parent.showDialog(this.checkRuleData,this.type, [], this.ruleOperationForm, 'hospitalBack');
         },
         handleSelectionChange (val) {
             this.checkHospitalList = val
@@ -127,7 +127,7 @@ export default {
         },
         onSubmit (formName) {
             this.innerVisible = false;
-            this.$parent.showDialog(this.checkRuleData,this.type, this.checkHospitalList);
+            this.$parent.showDialog(this.checkRuleData,this.type, this.checkHospitalList, this.ruleOperationForm, 'hospitalBack');
             this.$parent.setHospital(this.checkHospitalList); // 回显医院名称
         },
         onQuery () {
@@ -140,7 +140,7 @@ export default {
         },
         cancel () {
             this.innerVisible = false;
-            this.$parent.showDialog(this.checkRuleData,this.type);
+            this.$parent.showDialog(this.checkRuleData,this.type, [], this.ruleOperationForm, 'hospitalBack');
            
         }
     },
