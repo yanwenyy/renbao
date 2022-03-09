@@ -164,7 +164,7 @@
         v-model="fileTableActiveName"
         type="card"
         @tab-click="fileTabClick">
-        <el-tab-pane v-for="(item,index) in fileNameList" :label="item" :name="item" :key="index">
+        <el-tab-pane v-for="(item,index) in importDataModelList" :label="item.fileName" :name="item.fileName" :key="index">
           <el-row>
             <el-col :offset="9">
               请选择要匹配的数据表：
@@ -173,7 +173,7 @@
                 value-key="tableInfoId"
                 placeholder="请选择要匹配的数据表">
                 <el-option
-                  v-for="it in fileTableMap[item]"
+                  v-for="it in item.tableInfos"
                   :key="it.tableInfoId"
                   :label="it.tableNameCn"
                   :value="it.tableNameCn">
@@ -184,13 +184,13 @@
           <el-table
             border
             style="width: 70%; overflow: auto; margin-left: 15%; margin-top:10px"
-            :data="fileColumnMap[selectTableNames[index]]">
+            :data="item.fileColumnMaps[selectTableNames[index]]">
             <el-table-column
               prop="fileColumnName"
               align="center"
               label="数据表字段">
               <template slot-scope="scope">
-               {{scope.row.fileColumnName}}
+               {{ getMapKey(scope.row) }}
               </template>
             </el-table-column>
             <el-table-column
@@ -199,11 +199,11 @@
               label="目标表字段">
                 <template slot-scope="scope">
                   <el-select
-                    v-model="scope.row.dbColumn"
+                    v-model="scope.row[getMapKey(scope.row)]"
                     value-key="columnInfoId"
                     placeholder="请选择匹配字段">
                     <el-option
-                      v-for="itemdbm in dbColumnMap[selectTableNames[index]]"
+                      v-for="itemdbm in item.dbColumns[selectTableNames[index]]"
                       :key="itemdbm.columnInfoId"
                       :label="itemdbm.columnNameCn"
                       :value="itemdbm">
@@ -232,7 +232,7 @@
         v-model="columnTableActiveName"
         type="card"
         @tab-click="columnTabClick">
-        <el-tab-pane v-for="(item,index) in fileNameList" :label="item" :name="item" :key="index">
+        <el-tab-pane v-for="(item,index) in importDataModelList" :label="item.fileName" :name="item.fileName" :key="index">
           <el-row>
             <el-col :offset="9">
               请选择要预览的数据表：
@@ -240,7 +240,7 @@
                 v-model="selectTableViewNames[index]"
                 placeholder="请选择要预览的数据表">
                 <el-option
-                  v-for="it in fileTableMap[item]"
+                  v-for="it in item.tableInfos"
                   :key="it.tableInfoId"
                   :label="it.tableNameCn"
                   :value="it.tableNameCn">
@@ -251,13 +251,13 @@
           <el-table
             border
             style="width: 70%; overflow: auto; margin-left: 15%; margin-top:10px"
-            :data="fileColumnMap[selectTableViewNames[index]]">
+            :data="item.fileColumnMaps[selectTableViewNames[index]]">
             <el-table-column
               prop="fileColumnName"
               align="center"
               label="数据表字段">
               <template slot-scope="scope">
-               {{scope.row.fileColumnName}}
+               {{ getMapKey(scope.row) }}
               </template>
             </el-table-column>
             <el-table-column
@@ -265,7 +265,7 @@
               align="center"
               label="目标表字段">
                 <template slot-scope="scope">
-                 {{scope.row.dbColumn ? scope.row.dbColumn.columnNameCn : ''}}
+                 {{ scope.row[getMapKey(scope.row)].columnNameCn ? scope.row[getMapKey(scope.row)].columnNameCn : ''}}
                 </template>
               </el-table-column>
           </el-table>
@@ -321,26 +321,18 @@
         fileTreeLoading: false,
         // 被选中的文件
         selectedFileData: [],
-        // 文件表结构信息
-        fileColumnMap: {},
-        // 数据表结构信息
-        dbColumnMap: {},
-        // 数据表集合
-        tableNameList: [],
         // 字段匹配tab选中页名称
         fileTableActiveName: '',
         // 匹配预览tab选中页名称
         columnTableActiveName: '',
-        // 文件表信息
-        fileTableMap: {},
-        // 文件列表
-        fileNameList: [],
         // 匹配字段时选中的表
         selectTableNames: [],
         // 匹配预览是选中的表
         selectTableViewNames: [],
         // 查看表数据，表结构选中的表
-        checkTableName: ''
+        checkTableName: '',
+        // 导入数据集合
+        importDataModelList: []
       }
     },
     components: {
@@ -449,24 +441,12 @@
           if (data && data.code === 200) {
             // 获取表和列的信息
             if (data.result != null) {
-              this.tableNameList = []
-              this.fileNameList = []
-              this.fileColumnMap = data.result.fileColumnMap
-              this.dbColumnMap = data.result.dbColumnMap
-              this.fileTableMap = data.result.fileTableMap
-              // 获取表名
-              for (const key in this.dbColumnMap) {
-                this.tableNameList.push(key)
-              }
-              // 获取文件名
-              for (const key in this.fileTableMap) {
-                this.fileNameList.push(key)
-              }
+              this.importDataModelList = data.result
               // 页签默认选中第一个
-              this.fileTableActiveName = this.fileNameList[0]
-              this.selectTableNames[0] = this.fileTableMap[this.fileTableActiveName][0].tableNameCn
-              this.columnTableActiveName = this.fileNameList[0]
-              this.selectTableViewNames[0] = this.fileTableMap[this.fileTableActiveName][0].tableNameCn
+              this.fileTableActiveName = this.importDataModelList[0].fileName
+              this.selectTableNames[0] = this.importDataModelList[0].tableInfos[0].tableNameCn
+              this.columnTableActiveName = this.importDataModelList[0].fileName
+              this.selectTableViewNames[0] =this.importDataModelList[0].tableInfos[0].tableNameCn
             }
             // 打开文件表弹窗
             this.fileTableDialogVisible = true
@@ -475,34 +455,41 @@
           }
         })
       },
+      // 获取map的key
+      getMapKey(map) {
+        for (const key in map) {
+         return key
+        }
+         
+      },
       // 获取数据列表
       getDataList () {
-        this.dataListLoading = true;
-        // this.dataForm.timeStart=this.value1[0];
-        // this.dataForm.timeEnd=this.value1[1];
-        this.$http({
-          url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'tableType': 1
-            //'pageNum': this.pageIndex,
-            //'pageSize': this.pageSize,
-            // 'monthTime': this.dataForm.monthTime||'',
-            // 'dayTime': this.dataForm.dayTime||'',
-            //'timeStart': this.dataForm.timeStart,
-            //'timeEnd': this.dataForm.timeEnd,
-            //'materialsName':this.dataForm.materialsName
-          })
-        }).then(({data}) => {
-          if (data && data.code === 200) {
-            this.dataList = data.result;
-          } else {
-            this.dataList = []
-          }
-          this.dataListLoading = false
-        })
-       // this.dataList = [{ tableName : "医保病案首页",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"},
-       // { tableName : "医保医疗机构信息",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"}]
+        // this.dataListLoading = true;
+        // // this.dataForm.timeStart=this.value1[0];
+        // // this.dataForm.timeEnd=this.value1[1];
+        // this.$http({
+        //   url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
+        //   method: 'get',
+        //   params: this.$http.adornParams({
+        //     'tableType': 1
+        //     //'pageNum': this.pageIndex,
+        //     //'pageSize': this.pageSize,
+        //     // 'monthTime': this.dataForm.monthTime||'',
+        //     // 'dayTime': this.dataForm.dayTime||'',
+        //     //'timeStart': this.dataForm.timeStart,
+        //     //'timeEnd': this.dataForm.timeEnd,
+        //     //'materialsName':this.dataForm.materialsName
+        //   })
+        // }).then(({data}) => {
+        //   if (data && data.code === 200) {
+        //     this.dataList = data.result;
+        //   } else {
+        //     this.dataList = []
+        //   }
+        //   this.dataListLoading = false
+        // })
+        this.dataList = [{ tableName : "医保病案首页",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"},
+        { tableName : "医保医疗机构信息",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"}]
       },
       // 列表多选
       selectionChangeHandle (val) {
@@ -510,11 +497,11 @@
       },
       // 匹配页签切换
       fileTabClick (tab, event) {
-        this.selectTableNames[tab.index] = this.fileTableMap[tab.label][0].tableNameCn
+        this.selectTableNames[tab.index] = this.importDataModelList[tab.index].tableInfos[0].tableNameCn
       },
       // 匹配预览
       columnTabClick (tab, event) {
-        this.selectTableViewNames[tab.index] = this.fileTableMap[tab.label][0].tableNameCn
+        this.selectTableViewNames[tab.index] = this.importDataModelList[tab.index].tableInfos[0].tableNameCn
       },
       // 查看字段匹配情况
       checkTableColumn () {
@@ -522,14 +509,13 @@
       },
       // 导入数据
       impYBData () {
-        // 参数为 this.fileColumnMap 结构为Map<String,List<JSONObject>> JSONObject=>fileColumnName String,dbColumn Object
         this.$http({
           url: this.$http.adornUrl('ybDataImp/impYBData'),
           method: 'post',
-          data: {tableColumnMap: this.fileColumnMap, fileTableMap: this.fileTableMap, files: this.selectedFileData}
+          data: this.importDataModelList
         }).then(({data}) => {
-          if (data && data.code === 200) {
-            this.$message.success("导入成功")
+          //if (data && data.code === 200) {
+           // this.$message.success("导入成功")
             // 控制文件夹树弹窗
             this.fileTreeDialogVisible = false
             // 控制文件表弹窗
@@ -538,9 +524,9 @@
             this.columnTableDialogVisible = false
             // 查看字段弹窗
             this.tableColumnViewDialogVisible = false
-          }else {
-            this.$message.error(data.message? data.message : "导入失败，请检查数据文件！")
-          }
+         // }else {
+          //  this.$message.error(data.message? data.message : "导入失败，请检查数据文件！")
+         // }
         })
       },
       // 查看字段
