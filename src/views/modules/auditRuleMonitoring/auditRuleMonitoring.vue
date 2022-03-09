@@ -1,8 +1,8 @@
 <template>
     <div class="box">
         <div class="auditRuleMonitoring-left">
-            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" @node-click="treeClick" v-loading="treeLoading" node-key="id" ref="treesa" >
-                    <span class="custom-tree-node" slot-scope="{ node }" >
+            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
+                    <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
                         <span>
                             {{node.label}}
                         </span>
@@ -13,16 +13,17 @@
             <div class="search-box">
                 <el-form ref="searchForm" :model="searchForm" :inline="true">
                     <el-form-item label="规则类型：">
-                        <el-select v-model="searchForm.type"  placeholder="请选择" clearable>
-                            <el-option label="门诊规则" value="shanghai"></el-option>
-                            <el-option label="住院规则" value="beijing"></el-option>
+                        <el-select v-model="searchForm.ruleCategory"  placeholder="请选择" clearable>
+                            <el-option label="门诊规则" :value=1></el-option>
+                            <el-option label="住院规则" :value=2></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="运行状态：">
-                        <el-select v-model="searchForm.runningState"  placeholder="请选择" clearable>
-                            <el-option label="已完成" :value=1></el-option>
+                        <el-select v-model="searchForm.runStatus"  placeholder="请选择" clearable>
+                            <el-option label="待执行" :value=1></el-option>
                             <el-option label="执行中" :value=2></el-option>
                             <el-option label="执行失败" :value=3></el-option>
+                            <el-option label="已完成" :value=4></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -70,6 +71,7 @@
                 </el-table>
             </div>
             <el-pagination
+                v-if="Pager.total>=1"
                 @size-change="sizeChangeHandle"
                 @current-change="currentChangeHandle"
                 :current-page="Pager.pageIndex"
@@ -93,43 +95,24 @@ export default {
             batchTreeList: [ 
                 {
                     label: '批次名称',
-                    children: [
-                        {label: '人民医院医保数据筛查'},
-                        {label: '妇幼保健院医院数据筛查'},
-                        {label: '中医医院医保数据筛查'},
-                        {label: '中医医院医院数据筛查'},
-                    ]
+                    children: []
                 }
                
             ],
             searchForm: {
-                type: '',
-                runningState: ''
+                ruleCategory: '',
+                runStatus: ''
 
             },
-            tableData: [
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 1,},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': '', 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-                {'q1': 1, 'q2': 'wef', 'q3': 'wef','q4': 'wef','q5': 'wef',},
-               
-               
-            ],
+            tableData: [],
             tablePositionKey: [
-                {dataname:'q1' , label:'审核规则名称' , issortable:false , type:''},
-                {dataname:'q2' , label:'审核规则类别' , issortable:false , type:''},
-                {dataname:'q3' , label:'预计开始时间' , issortable:false , type:''},
-                {dataname:'q4' , label:'实际开始时间' , issortable:false , type:''},
-                {dataname:'q5' , label:'预计结束时间' , issortable:false , type:''},
-                {dataname:'q3' , label:'实际结束时间' , issortable:false , type:''},
-                {dataname:'q4' , label:'运行状态' , issortable:false , type:''},
+                {dataname:'ruleName' , label:'审核规则名称' , issortable:false , type:''},
+                {dataname:'ruleType' , label:'审核规则类别' , issortable:false , type:''},
+                {dataname:'expectedBeginTime' , label:'预计开始时间' , issortable:false , type:''},
+                {dataname:'actualBeginTime' , label:'实际开始时间' , issortable:false , type:''},
+                {dataname:'expectedEndTime' , label:'预计结束时间' , issortable:false , type:''},
+                {dataname:'actualEndTime' , label:'实际结束时间' , issortable:false , type:''},
+                {dataname:'runStatusName' , label:'运行状态' , issortable:false , type:''},
                 {dataname:'q5' , label:'操作' , issortable:false , type:'option'},
             ],
             Pager: {
@@ -138,45 +121,90 @@ export default {
                 total: 0
             },
             multipleTable: [],
+            layoutTreeProps: {
+                label(data, node) {
+                    const config = data.__config__ || data
+                    return  config.label || config.batchName
+                },
+            },
         }
     },
     mounted () {
         this.getbatchList();
-        
-      
     },
     created () {
 
     },
     methods: {
-        getbatchList () {
-            // /batch/selectList
-
-            this.$http({
-                isLoading:false,
-                url: this.$http.adornUrl('batch/selectList'),
-                method: 'post',
-                // params:  this.$http.adornData('', false)
-            }).then(({data}) => {
-                console.log(data, 'datadatadatadata')
-                // this.tableLoading = false
-                // if (data.code == 200) {
-                //     data.result.records.map(i => {
-                //         i.createTime = i.createTime.split('T')[0];
-                //         i.ruleCategory = i.ruleCategory == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
-                //     })
-                //     this.tableData = data.result.records;
-                //     this.Pager.pageSize = data.result.size;
-                //     this.Pager.pageIndex = data.result.current;
-                //     this.Pager.total = data.result.total;  
-                // }
-            }).catch(() => {
-                // this.tableLoading = false
-            })
+        dealRunStatus (type) {
+            if (type == 1) {
+                return '待执行'
+            } else if (type == 2) {
+                return '执行中'
+            } else if (type == 3) {
+                return '执行失败'
+            } else if (type == 4) {
+                return '已完成'
+            }
 
         },
+        getTableData (batchData) {
+            console.log('获取列表')
+            this.tableLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl(`/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
+                method: 'get',
+                params:  this.$http.adornParams({
+                    batchId: batchData.batchId,
+                    runStatus: this.searchForm.runStatus, // 运行状态
+                    ruleCategory: this.searchForm.ruleCategory
+                }, false)
+            }).then(({data}) => {
+                this.tableLoading = false
+                if (data.code == 200) {
+                    data.result.records.map(i => {
+                        i.ruleName = i.rule.ruleName
+                        i.ruleType = i.rule.ruleType == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
+                        i.expectedBeginTime = i.expectedBeginTime && i.expectedBeginTime.split('T')[0] || '';
+                        i.actualBeginTime = i.actualBeginTime && i.actualBeginTime.split('T')[0] || '';
+                        i.expectedEndTime = i.expectedEndTime && i.expectedEndTime.split('T')[0] || '';
+                        i.actualEndTime = i.actualEndTime && i.actualEndTime.split('T')[0] || '';
+                        i.runStatusName = this.dealRunStatus(i.runStatus)
 
-        treeClick (data) {
+                    })
+                    this.tableData = data.result.records;
+                    this.Pager.pageSize = data.result.size;
+                    this.Pager.pageIndex = data.result.current;
+                    this.Pager.total = data.result.total;  
+                }
+            }).catch(() => {
+                this.tableLoading = false
+            })
+
+
+
+
+        },
+        getbatchList () {
+            this.treeLoading = true;
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/batch/selectList'),
+                method: 'get',
+            }).then(({data}) => {
+                this.treeLoading = false;
+                if (data.code == 200) {
+                    this.batchTreeList[0].children = data.result
+                }
+            }).catch(() => {
+                this.treeLoading = false;
+            })
+        },
+
+        nodeClick (node,data) {
+            this.getTableData(data)
+
 
         },
         // 列表查询
@@ -228,6 +256,7 @@ export default {
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;
             color: #0000FF;
+            width: 100%;
         }
     }
     .auditRuleMonitoring-right {

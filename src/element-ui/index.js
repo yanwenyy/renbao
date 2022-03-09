@@ -77,7 +77,8 @@ import {
   Message,
   Notification,
   Image,
-  Scrollbar
+  Scrollbar,
+  Drawer
 } from 'element-ui'
 
 import  'element-ui/lib/theme-chalk/index.css'
@@ -146,6 +147,7 @@ Vue.use(Aside)
 Vue.use(Main)
 Vue.use(Footer)
 Vue.use(Image)
+Vue.use(Drawer)
 Vue.use(Scrollbar)
 
 Vue.use(Loading.directive)
