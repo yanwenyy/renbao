@@ -178,3 +178,18 @@ export function randomString(len) {
   }
   return randomStr + timestamp;
 }
+export function getDate () {
+  var nowDate = new Date();
+  let date = {
+      year: nowDate.getFullYear(),
+      month: nowDate.getMonth() + 1,
+      date: nowDate.getDate(),
+  }
+  if (date.month>= 1 && date.month <= 9) {
+    date.month = "0" + date.month;
+  }
+  if (date.date>= 1 && date.date <= 9) {
+    date.date = "0" + date.date;
+  }
+  return date.year+"-"+date.month+"-"+date.date;
+}

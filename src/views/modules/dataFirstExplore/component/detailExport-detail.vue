@@ -1,83 +1,122 @@
 <template>
   <div class="threeData">
-    <el-form
-      :inline="true"
-      :model="dataForm"
-      @keyup.enter.native="getDataList()"
-    >
-      <el-form-item label="医院名称：">
-        <el-input
-          v-model="dataForm.basicName"
-          placeholder="请输入搜索内容"
-          clearable
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="医院类别：">
-        <el-select
-          v-model="dataForm.basicType"
-          placeholder="请输入搜索内容"
-          clearable
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
-        <el-button @click="resetForm()">重置</el-button>
-      </el-form-item>
-    </el-form>
     <!-- 列表 -->
     <div class="listDisplay">
+      <div class="f_right">
+        <el-button type="primary" @click="searchList">查询</el-button>
+        <el-button type="warning" @click="reportList">导出</el-button>
+      </div>
+      <div @click="handleChange" style="cursor:pointer;">
+        查询条件<i
+          v-show="!show"
+          class="el-icon-arrow-down"
+          style="padding-left:5px"
+        ></i
+        ><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
+      </div>
+      <transition name="sub-comments">
+        <vue-query-builder
+          :rules="rules"
+          class="mask"
+          v-show="show"
+          v-model="output"
+        ></vue-query-builder>
+      </transition>
       <el-table
         :data="tableList"
+        v-if="selectNum == 1"
         border
         style="100%"
-        overflow-y:auto
-        height="400px"
         :header-cell-style="{ textAlign: 'center' }"
         class="demo-ruleForm"
-        v-loading="listLoading"
-        ref="multipleTable"
-        @selection-change="handleSelectionChange"
       >
-        >
-        <el-table-column
-          type="selection"
-          header-align="center"
-          align="center"
-          width="50"
-        ></el-table-column>
-        <el-table-column
-          prop="basicName"
-          header-align="center"
-          align="center"
-          label="医院名称"
-        ></el-table-column>
-        <el-table-column
-          prop="basicCode"
-          header-align="center"
-          align="center"
-          label="医院编码"
-        ></el-table-column>
-        <el-table-column
-          prop="HospitalNature"
-          header-align="center"
-          align="center"
-          label="医院性质"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="basicType"
-          header-align="center"
-          align="center"
-          label="医院类别"
-        ></el-table-column>
+        <template v-for="(item, index) in tableColumns">
+          <el-table-column
+            :prop="item"
+            :label="item"
+            :key="index"
+            width
+            show-overflow-tooltip
+          ></el-table-column>
+        </template>
       </el-table>
+      <el-table
+        :data="tableList2"
+        v-if="selectNum == 2"
+        border
+        style="100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        class="demo-ruleForm"
+      >
+        <template v-for="(item, index) in tableColumns2">
+          <el-table-column
+            :prop="item"
+            :label="item"
+            :key="index"
+            width
+            show-overflow-tooltip
+          ></el-table-column>
+        </template>
+      </el-table>
+      <el-table
+        :data="tableList3"
+        v-if="selectNum == 3"
+        border
+        style="100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        class="demo-ruleForm"
+      >
+        <template v-for="(item, index) in tableColumns3">
+          <el-table-column
+            :prop="item"
+            :label="item"
+            :key="index"
+            width
+            show-overflow-tooltip
+          ></el-table-column>
+        </template>
+      </el-table>
+      <el-table
+        :data="tableList4"
+        v-if="selectNum == 4"
+        border
+        style="100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        class="demo-ruleForm"
+      >
+        <template v-for="(item, index) in tableColumns4">
+          <el-table-column
+            :prop="item"
+            :label="item"
+            :key="index"
+            width
+            show-overflow-tooltip
+          ></el-table-column>
+        </template>
+      </el-table>
+      <el-table
+        :data="tableList5"
+        v-if="selectNum == 5"
+        border
+        style="100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        class="demo-ruleForm"
+      >
+        <template v-for="(item, index) in tableColumns5">
+          <el-table-column
+            :prop="item"
+            :label="item"
+            :key="index"
+            width
+            show-overflow-tooltip
+          ></el-table-column>
+        </template>
+      </el-table>
+      <el-pagination
+        small
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="apComServerData.total"
+      ></el-pagination>
     </div>
     <div>
       <el-button type="primary" @click="ok">确定</el-button>
@@ -86,7 +125,11 @@
   </div>
 </template>
 <script>
+import VueQueryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
 export default {
+  components: {
+    VueQueryBuilder
+  },
   data() {
     return {
       dataForm: {
@@ -98,55 +141,10 @@ export default {
       //loading
       listLoading: false,
       importVisible: false,
-      apComServerData: {
-        current: 1,
-        size: 10,
-        pageNum: 1,
-        total: 0
-      },
+      show: false,
+      output: null,
       //table表格数据
-      tableList: [
-        {
-          id: "0",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          HospitalNature: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "1",
-          basicName: "幼妇保健院",
-          basicCode: "1650000",
-          HospitalNature: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "1224759234.53"
-        }, 
-        {
-          id: "2",
-          basicName: "中医医院",
-          basicCode: "1650000",
-          HospitalNature: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "3",
-          basicName: "商洛市中心医院",
-          basicCode: "1650000",
-          HospitalNature: "专科医院",
-          basicType: "三级甲等",
-          absicamount: "105468215.22"
-        },
-        {
-          id: "4",
-          basicName: "商洛康健精神病医院",
-          basicCode: "1650000",
-          HospitalNature: "综合医院",
-          basicType: "三级甲等",
-          absicamount: "45423465.78"
-        }
-      ],
+      tableList: [],
       tableColumns: [],
       options: [
         {
@@ -161,14 +159,63 @@ export default {
           value: "2",
           label: "三级丙等"
         }
-      ]
+      ],
+      rules: [
+        {
+          type: "text",
+          id: "医疗机构编码",
+          label: "医疗机构编码 "
+        },
+        {
+          type: "text",
+          id: "医疗机构名称",
+          label: "医疗机构名称"
+        },
+        {
+          type: "text",
+          id: "结算单据号",
+          label: "结算单据号"
+        },
+        {
+          type: "text",
+          id: " 住院号",
+          label: " 住院号"
+        },
+        {
+          type: "text",
+          id: " 结算类别",
+          label: " 结算类别"
+        },
+        {
+          type: "text",
+          id: "结算日期",
+          label: "结算日期"
+        },
+        {
+          type: "text",
+          id: "入院科室名称",
+          label: "入院科室名称"
+        },
+        {
+          type: "text",
+          id: "患者姓名",
+          label: "患者姓名"
+        }
+      ],
+      tableList2:[],
+                tableList:[],
+                tableList3:[],
+                tableList4:[],
+                tableList5:[],
+                tableColumns2:[],
+                tableColumns3:[],
+                tableColumns4:[],
+                tableColumns5:[],
+                tableColumns:[]
     };
   },
   mounted() {
     // this.initList();
-     this.$nextTick(() => {
-      this.$refs.multipleTable.toggleAllSelection();
-    });
   },
   methods: {
     //初始化数据列表
@@ -204,6 +251,10 @@ export default {
     //多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
+    },
+    //查询条件事件
+    handleChange() {
+      this.show = !this.show;
     }
   }
 };
@@ -213,7 +264,23 @@ export default {
   float: right;
   padding: 5px;
 }
-.line {
-  text-align: center;
+.mask {
+  width: 85%;
+  padding-top: 23px;
+  position: fixed;
+  z-index: 998;
+  overflow: hidden;
+}
+.sub-comments-leave-active,
+.sub-comments-enter-active {
+  transition: all 1s ease;
+}
+.sub-comments-leave-active,
+.sub-comments-enter {
+  height: 0px !important;
+}
+.sub-comments-leave,
+.sub-comments-enter-active {
+  height: 500px;
 }
 </style>

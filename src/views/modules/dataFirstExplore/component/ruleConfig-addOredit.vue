@@ -82,10 +82,7 @@ export default {
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
-      folderId: [
-        { id: 1, name: "医保" },
-        { id: 2, name: "医院" }
-      ]
+      folderId: []
     };
   },
   mounted() {
@@ -120,6 +117,28 @@ export default {
         });
       }
     },
+    //获取选择分类下拉列表数据
+    /* initSelect() {
+      this.$http({
+        url: this.$http.adornUrl(`/rule/selectByUuid/${this.ruleId}`),
+        method: "get",
+        params: this.$http.adornParams({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          batchType: 1
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          // console.log(data)
+          var rule = data.result;
+          this.dataForm.ruleName = rule.ruleName;
+          this.dataForm.ruleCategory = rule.ruleCategory;
+          this.dataForm.createUserName = rule.createUserName;
+          this.dataForm.sql = rule.sql;
+          this.dataForm.createTime = rule.createTime;
+        }
+      });
+    }, */
     //保存
     submit(data) {
       this.$refs["dataForm"].validate(valid => {

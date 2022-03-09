@@ -4,7 +4,7 @@
       <el-form-item label="表名:">
         <el-input v-model="dataForm.tableName" placeholder="数据表名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="最后更新时间:">
+      <!-- <el-form-item label="最后更新时间:">
         <el-date-picker
           v-model="lastUpdateTime"
           value-format="yyyy-MM-dd"
@@ -13,7 +13,7 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期">
         </el-date-picker>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button type="primary" @click="getFileTree()">导入数据</el-button>
@@ -36,7 +36,7 @@
         label="表名">
       </el-table-column>
       <el-table-column
-        prop="dataNumber"
+        prop="numRows"
         align="center"
         label="数据量">
       </el-table-column>
@@ -46,7 +46,7 @@
         label="最后更新时间">
       </el-table-column>
       <el-table-column
-        prop="dataSize"
+        prop="tableSize"
         align="center"
         label="大小">
       </el-table-column>
@@ -62,15 +62,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper">
-    </el-pagination>
     <!-- 文件树弹窗 -->
     <el-dialog
       title="导入数据"
@@ -312,9 +303,6 @@
         },
         lastUpdateTime:'',
         dataList: [],
-        pageIndex: 1,
-        pageSize: 10,
-        totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
         // 控制文件夹树弹窗显示
@@ -482,52 +470,39 @@
             }
             // 打开文件表弹窗
             this.fileTableDialogVisible = true
+          } else {
+            this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
           }
         })
       },
       // 获取数据列表
       getDataList () {
-        // this.dataListLoading = true;
+        this.dataListLoading = true;
         // this.dataForm.timeStart=this.value1[0];
         // this.dataForm.timeEnd=this.value1[1];
-        // this.$http({
-        //   url: this.$http.adornUrl('/jinding/sum/list'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'pageNum': this.pageIndex,
-        //     'pageSize': this.pageSize,
-        //     // 'monthTime': this.dataForm.monthTime||'',
-        //     // 'dayTime': this.dataForm.dayTime||'',
-        //     'timeStart': this.dataForm.timeStart,
-        //     'timeEnd': this.dataForm.timeEnd,
-        //     'materialsName':this.dataForm.materialsName
-        //   })
-        // }).then(({data}) => {
-        //   if (data && data.code === 10000) {
-        //     this.dataList = data.data;
-        //     for(var i in this.dataList){
-        //       this.dataList[i].trainWeigh=this.dataList[i].sumWeigh-this.dataList[i].carWeigh
-        //     }
-        //     this.totalPage = data.total
-        //   } else {
-        //     this.dataList = []
-        //     this.totalPage = 0
-        //   }
-        //   this.dataListLoading = false
-        // })
-        this.dataList = [{ tableName : "医保病案首页",dataSize: 11 ,dataNumber: 123,lastUpdateTime: "2020-01-02"},
-        { tableName : "医保医疗机构信息",dataSize: 11 ,dataNumber: 123,lastUpdateTime: "2020-01-02"}]
-      },
-      // 每页数
-      sizeChangeHandle (val) {
-        this.pageSize = val
-        this.pageIndex = 1
-        this.getDataList()
-      },
-      // 当前页
-      currentChangeHandle (val) {
-        this.pageIndex = val
-        this.getDataList()
+        this.$http({
+          url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'tableType': 1
+            //'pageNum': this.pageIndex,
+            //'pageSize': this.pageSize,
+            // 'monthTime': this.dataForm.monthTime||'',
+            // 'dayTime': this.dataForm.dayTime||'',
+            //'timeStart': this.dataForm.timeStart,
+            //'timeEnd': this.dataForm.timeEnd,
+            //'materialsName':this.dataForm.materialsName
+          })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.dataList = data.result;
+          } else {
+            this.dataList = []
+          }
+          this.dataListLoading = false
+        })
+       // this.dataList = [{ tableName : "医保病案首页",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"},
+       // { tableName : "医保医疗机构信息",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"}]
       },
       // 列表多选
       selectionChangeHandle (val) {
@@ -554,7 +529,17 @@
           data: {tableColumnMap: this.fileColumnMap, fileTableMap: this.fileTableMap, files: this.selectedFileData}
         }).then(({data}) => {
           if (data && data.code === 200) {
-
+            this.$message.success("导入成功")
+            // 控制文件夹树弹窗
+            this.fileTreeDialogVisible = false
+            // 控制文件表弹窗
+            this.fileTableDialogVisible = false
+            // 控制匹配预览弹窗
+            this.columnTableDialogVisible = false
+            // 查看字段弹窗
+            this.tableColumnViewDialogVisible = false
+          }else {
+            this.$message.error(data.message? data.message : "导入失败，请检查数据文件！")
           }
         })
       },
