@@ -24,7 +24,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="search()">查询</el-button>
         <el-button @click="resetForm()">重置</el-button>
       </el-form-item>
       <el-form-item style="float:right">
@@ -124,13 +124,14 @@
       :title="title"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
-      width="40%"
+      width="30%"
       :close-on-press-escape="false"
     >
       <addOrEdit
         @close="close"
         @ok="succeed"
         v-if="showAddOrEditDialog"
+        :info="info"
       ></addOrEdit>
     </el-dialog>
   </div>
@@ -138,8 +139,8 @@
 <script>
 import addOrEdit from "./component/reportExport-addOrEdit.vue";
 export default {
-  components() {
-    addOrEdit;
+  components: {
+    addOrEdit
   },
   data() {
     return {
@@ -157,6 +158,7 @@ export default {
       //table表格数据
       tableList: [],
       tableColumns: [],
+      info: "",
       status: [
         {
           value: "0",
@@ -185,7 +187,7 @@ export default {
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize
-        })
+        },false)
       }).then(({ data }) => {
         if (data && data.code === 200) {
           // this.tableData = data.result.records;
@@ -203,8 +205,10 @@ export default {
       this.showAddOrEditDialog = true;
       if (val == 0) {
         this.title = "新增报告";
+        this.info = "";
       } else {
         this.title = "修改报告";
+        this.info = this.multipleSelection[0].reportId;
       }
     },
     //删除
@@ -212,7 +216,9 @@ export default {
     //重置
     resetForm() {},
     //查询
-    getDataList() {},
+    search() {
+      this.initList();
+    },
     // 页数
     handleSizeChange(val) {
       this.apComServerData.size = val;
@@ -226,12 +232,13 @@ export default {
     //下载
     downLoad() {},
     //确定
-    ok() {
-      this.$emit("ok");
+    succeed() {
+      this.close();
+      this.initList();
     },
     //取消
     close() {
-      this.$emit("close");
+      this.showAddOrEditDialog = false;
     },
     toggleSelection(rows) {
       if (rows) {

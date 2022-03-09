@@ -139,7 +139,7 @@ export default {
           pageSize: "10000",
           hospitalName: this.dataForm.hospitalName,
           hospitalType: this.dataForm.hospitalType
-        })
+        },false)
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableList = data.result.records;

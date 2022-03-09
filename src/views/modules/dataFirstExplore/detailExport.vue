@@ -5,15 +5,24 @@
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
           <el-tree
-            :data="dataTree1"
-            :props="defaultProps"
-            v-loading="listLoadingTry"
-            @node-click="handleNodeClick"
-            default-expand-all
-            :filter-node-method="filterNode"
-            ref="dataTree1"
+            :data="batchTreeList"
+            highlight-current
+            :default-expand-all="true"
+            v-loading="treeLoading"
             node-key="id"
-          ></el-tree>
+            ref="treesa"
+            :props="layoutTreeProps"
+          >
+            <span
+              class="custom-tree-node"
+              slot-scope="{ node, data }"
+              @click="nodeClick(node, data)"
+            >
+              <span>
+                {{ node.label }}
+              </span>
+            </span>
+          </el-tree>
         </el-card>
       </el-col>
       <el-col :span="19">
@@ -23,7 +32,7 @@
               <el-col :span="4">
                 <div class="search-operation">
                   <el-input
-                    v-model="dataForm.ruleName"
+                    v-model="dataForm.resultTableName"
                     size="small"
                     placeholder="规则名称"
                     clearable
@@ -36,7 +45,7 @@
                     v-model="dataForm.ruleCategory"
                     filterable
                     clearable
-                    placeholder="规则类型"
+                    placeholder="规则类别"
                     size="small"
                   >
                     <el-option
@@ -66,7 +75,15 @@
                 <el-button @click="detailExport" type="warning"
                   >结果明细导出</el-button
                 >
-                <el-button @click="deleteData" type="danger">删除</el-button>
+                <el-button
+                  @click="deleteData"
+                  type="danger"
+                  :disabled="
+                    this.multipleSelection.length <= 0 ||
+                      this.multipleSelection.length > 1
+                  "
+                  >删除</el-button
+                >
               </div>
             </div>
             <el-table
@@ -79,13 +96,15 @@
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
-                prop="ruleName"
+                prop="resultTableName"
                 label="规则名称"
               ></el-table-column>
-              <el-table-column
-                prop="ruleCategory"
-                label="规则类别"
-              ></el-table-column>
+              <el-table-column prop="rule.ruleCategory" label="规则类别">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.rule.ruleCategory == 1">门诊规则</div>
+                  <div v-if="scope.row.rule.ruleCategory == 2">门诊规则</div>
+                </template>
+              </el-table-column>
               <el-table-column
                 prop="actualBeginTime"
                 label="开始时间"
@@ -98,10 +117,11 @@
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" @click="detailHandle(scope.row.id)"
+                  <el-button
+                    type="text"
+                    @click="detailHandle(scope.row.resultId)"
                     >查看明细</el-button
                   >
-                  <div type="text" v-if="scope.row.aa == 1">运行成功</div>
                 </template>
               </el-table-column>
             </el-table>
@@ -141,7 +161,12 @@
             :close-on-press-escape="false"
             v-if="detailExportDialog"
           >
-            <el-form :model="dataForm" ref="dataForm" label-width="80px" :rules="rules">
+            <el-form
+              :model="dataForm"
+              ref="dataForm"
+              label-width="80px"
+              :rules="rules"
+            >
               <el-form-item prop="folderId">
                 <el-select
                   v-model="dataForm.folderId"
@@ -174,26 +199,22 @@ export default {
   data() {
     return {
       dataForm: {
-        ruleName: "",
-        ruleCategory: "",
-        actualBeginTime: "",
-        actualEndTime: "",
-        resultCount: "",
-        createUserName: ""
+        resultTableName: "",
+        ruleCategory: ""
       },
-      dataTree1: [
+      batchTreeList: [
         {
-          name: "批次名称",
-          children: [
-            {
-              name: "人民医院医保数据筛查"
-            },
-            {
-              name: "妇幼保健院医院数据筛查"
-            }
-          ]
+          label: "批次名称",
+          children: []
         }
       ],
+      treeLoading: false,
+      layoutTreeProps: {
+        label(data, node) {
+          const config = data.__config__ || data;
+          return config.label || config.batchName;
+        }
+      },
       ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
@@ -202,7 +223,7 @@ export default {
         children: "children",
         label: "name"
       },
-      tableData: [2],
+      tableData: [],
       multipleSelection: [],
       loading: false,
       treeLoading: false,
@@ -214,34 +235,29 @@ export default {
       //立即运行、定时运行弹窗是否显示
       showRunDialog: false,
       rows: [],
-      info: ""
+      info: "",
+      batchId: ""
     };
   },
-  mounted() {
+  created() {
     this.initData();
-    // this.initTree()
+    this.initTree();
   },
-  created() {},
   methods: {
     initData() {
       this.$http({
         url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
         params: this.$http.adornParams({
-          ruleResult: {
-            batchId: this.batchId,
-            runStatus: this.dataForm.runStatus, //1:待执行,2:执行中,3:执行失败,4:已完成
-            rule: {
-              ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
-              ruleName: this.dataForm.ruleName
-            }
-          },
+          batchId: this.batchId,
+          ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
+          resultTableName: this.dataForm.resultTableName,
           pageNo: this.pageIndex,
           pageSize: this.pageSize
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          // this.tableData = data.result.records;
+          this.tableData = data.result.records;
           this.totalPage = data.result.total;
           this.dataForm.total = data.result.total;
         } else {
@@ -253,26 +269,20 @@ export default {
     },
     initTree() {
       this.treeLoading = true;
-      selectLawRule().then(res => {
-        this.dataTree1 = this.listToTree(res.data);
-        this.dataForm.childCount1 = res.data.length - 1;
-      });
-      selectLawIndexRule().then(res => {
-        this.dataTree2 = this.listToTree(res.data);
-        this.dataForm.childCount2 = res.data.length - 1;
-        this.treeLoading = false;
-      });
-    },
-    //点击树节点切换表
-    handleNodeClick(data) {
-      this.loading = true;
-      showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
-        res => {
-          this.tableData = res.data.body.result;
-          this.dataForm.total = res.data.body.pagination.dataCount;
-          this.loading = false;
-        }
-      );
+      this.$http({
+        isLoading: false,
+        url: this.$http.adornUrl("/batch/selectList"),
+        method: "get"
+      })
+        .then(({ data }) => {
+          this.treeLoading = false;
+          if (data.code == 200) {
+            this.batchTreeList[0].children = data.result;
+          }
+        })
+        .catch(() => {
+          this.treeLoading = false;
+        });
     },
     //结果明细导出弹窗
     detailExport() {
@@ -301,50 +311,36 @@ export default {
     },
     //删除
     deleteData() {
-      if (this.multipleSelection.length == 0) {
-        this.$confirm("请勾选数据", "信息", {
-          confirmButtonText: "关闭",
-          type: "warning"
-        });
-      } else {
-        var uuids = [];
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          uuids.push(this.multipleSelection[i].LAWREGULATIONUUID);
-        }
-        this.$confirm("确定进行删除操作?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            let formdata = new FormData();
-            formdata.append("uuids[]", uuids);
-            daleteLawRule(formdata, "").then(res => {
-              if (res.data.head.status == 20) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
-                });
-                this.initData();
-                this.initTree();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: "删除失败!"
-                });
-              }
-            });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
+      var uuid = this.multipleSelection[0].resultId;
+      this.$confirm(`确定进行删除操作?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/ruleResult/delete/${uuid}`),
+            method: "post"
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.initData();
+                }
+              });
+            } else {
+              this.$message.error("操作失败");
+            }
           });
-      }
+        })
+        .catch(() => {});
     },
-    //查看详情
+    //查看结果明细
     detailHandle(id) {
+      this.info = id;
       this.showDetailDialog = true;
     },
     //重置表单
@@ -369,9 +365,14 @@ export default {
     //重置搜索
     reset() {
       this.dataForm = {
-        ruleName: "",
+        resultTableName: "",
         ruleCategory: ""
       };
+      this.initData();
+    },
+    //左点右显
+    nodeClick(node, data) {
+      this.batchId = data.batchId;
       this.initData();
     }
   }
