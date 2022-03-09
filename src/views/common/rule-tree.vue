@@ -260,6 +260,7 @@ export default {
         },
         nodeClick (node, data) {
             // 调用父组件的获取规则树id的方法
+            console.log(this.parentGetTreeData, 'name')
             this.$parent[this.parentGetTreeData](data);
         }
 

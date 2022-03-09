@@ -3,19 +3,13 @@
   <div class="lawsAregulations">
     <el-row :gutter="20">
       <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
+        <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
           <rule-tree
             :isShowSearch="true"
             :isShowCheckBox="false"
             :data="ruleTree"
             parentGetTreeData="getTreeData"
-            :props="defaultProps"
-            v-loading="listLoadingTry"
-            @node-click="handleNodeClick"
-            default-expand-all
-            :filter-node-method="filterNode"
-            ref="ruleTree"
-            node-key="id"
+            ref="ruleTree"         
           ></rule-tree>
         </el-card>
       </el-col>
@@ -106,7 +100,12 @@
                   type="primary"
                   >修改</el-button
                 >
-                <el-button @click="deleteData" type="danger">删除</el-button>
+                <el-button
+                  @click="deleteData"
+                  :disabled="this.multipleSelection.length <= 0"
+                  type="danger"
+                  >删除</el-button
+                >
               </div>
             </div>
             <el-table
@@ -299,7 +298,9 @@ export default {
       });
     },
     //点击树节点切换表
-    handleNodeClick(data) {},
+    handleNodeClick(data) {
+      // console.log(data)
+    },
     //新增弹框
     addData() {
       this.showAddOrEditDialog = true;
