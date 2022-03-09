@@ -1,3 +1,4 @@
+<!-- 项目还原 -->
 <template>
     <div class='restore'>
         <el-row :gutter="20">
@@ -73,7 +74,7 @@
             </span>
         </el-dialog>
          <el-dialog title="项目备份列表" :visible.sync="chooseListVisible" :close-on-click-modal="false" width="60%" :modal-append-to-body="false">
-            <backUpList  v-if="chooseListVisible" @close="closeChooseDrawer" @ok="ChooseSucceed">></backUpList>
+            <backUpList  v-if="chooseListVisible" @close="closeChooseDrawer" @ok="ChooseSucceed" @satDatalist='satDatalist'></backUpList>
          </el-dialog>
     </div>
 </template>
@@ -116,6 +117,14 @@ export default {
     },
 
     methods:{
+        //获取项目备份内容
+        satDatalist(data){
+            let dataAmountName = []
+            data.map(i => {
+                dataAmountName.push(i['projectName'])
+            })
+            this.addMemberForm.dataAmount = dataAmountName.join(',')
+        },
         //还原
         restoreClick(){
             this.ShowAddVisible = true
@@ -147,7 +156,14 @@ export default {
         },
         closeChooseDrawer(){
             this.chooseListVisible = false
-        }
+        },
+        setHospital (dataListSelections) {
+            let hospitalName = []
+            dataListSelections.map(i => {
+                hospitalName.push(i['医院名称'])
+            })
+            this.addMemberForm.dataAmount = hospitalName.join(',')
+        },
     }
 }
 </script>
