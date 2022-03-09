@@ -7,8 +7,8 @@
           <rule-tree
             :isShowSearch="true"
             :isShowCheckBox="false"
-            :data="ruleTree"
-            parentGetTreeData="getTreeData"
+            @getTreeId="getTreeId"
+            :isParent="false"
             ref="ruleTree"         
           ></rule-tree>
         </el-card>
@@ -274,6 +274,7 @@ export default {
   },
   created() {},
   methods: {
+     
     initData() {
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
@@ -438,9 +439,9 @@ export default {
       this.choseRule = this.multipleSelection;
     },
     //拿到选择树的id
-    getTreeData(data) {
+    getTreeId(data) {
       console.log(data, "拿到树选择的id");
-    }
+    },
   }
 };
 </script>

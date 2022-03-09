@@ -76,6 +76,10 @@ export default {
             type: String,
             default: 'getTreeId'
 
+        },
+        isParent: { // 判断调用组件是否为当前组件的父组件
+            type: Boolean,
+            default: true
         }
 
     },
@@ -260,8 +264,11 @@ export default {
         },
         nodeClick (node, data) {
             // 调用父组件的获取规则树id的方法
-            console.log(this.parentGetTreeData, 'name')
-            this.$parent[this.parentGetTreeData](data);
+            if (this.isParent) {
+                this.$parent[this.parentGetTreeData](data);
+            } else {
+                this.$emit("getTreeId", data);
+            } 
         }
 
     },
