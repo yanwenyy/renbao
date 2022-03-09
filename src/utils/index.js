@@ -101,7 +101,7 @@ PxSocket.prototype = {
     var _this = this;
     try {
       if ('WebSocket' in window) {
-        // console.log(_this.options.url)
+        console.log(_this.options.url)
         _this.ws = new WebSocket(_this.options.url);
         // console.log( _this.ws)
         // console.log(http_url.Socket_url+options.id)

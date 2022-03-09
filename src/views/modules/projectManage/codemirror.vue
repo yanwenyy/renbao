@@ -20,7 +20,7 @@
 
 <script>
   import sqlEdit from '@/components/codemirror/sqlEditor'
-
+  import {PxSocket,randomString} from '@/utils'
   export default {
     components: {
       sqlEdit
@@ -160,18 +160,19 @@
       //点击运行获取websoket数据
       getwsData(sql) {
         this.ws=new PxSocket({
-          url:this.$http.wsUrl('/webSocket/yancs'),
+          url:this.$http.wsUrl('webSocket/yancs'),
           data:sql,
           succ:this.getDataList
         });
-        var that = this;
-        setInterval(function () {
-          that.tableData.push({
-            date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄',
-          })
-        }, 1000)
+        this.ws.connect();
+        // var that = this;
+        // setInterval(function () {
+        //   that.tableData.push({
+        //     date: '2016-05-02',
+        //     name: '王小虎',
+        //     address: '上海市普陀区金沙江路 1518 弄',
+        //   })
+        // }, 1000)
       },
     }
   }
