@@ -10,10 +10,8 @@
             :data="ruleTree"
             parentGetTreeData="getTreeData"
             :props="defaultProps"
-            v-loading="listLoadingTry"
             @node-click="handleNodeClick"
             default-expand-all
-            :filter-node-method="filterNode"
             ref="ruleTree"
             node-key="id"
           ></el-tree>
@@ -31,7 +29,6 @@
                     clearable
                     placeholder="规则类别"
                     size="small"
-                    @change="getProjectId"
                   >
                     <el-option
                       v-for="(item, index) in ruleCategory"
@@ -207,7 +204,7 @@ export default {
   },
   created() {
     this.initData();
-    this.initTree();
+    // this.initTree();
   },
   methods: {
     initData() {
@@ -238,7 +235,7 @@ export default {
         }
       });
     },
-    initTree() {
+    /* initTree() {
       this.$http({
         url: this.$http.adornUrl("/batch/selectList"),
         method: "get",
@@ -250,7 +247,7 @@ export default {
           this.ruleTree = [];
         }
       });
-    },
+    }, */
     //点击树节点切换表
     handleNodeClick(data) {
       this.initData()
@@ -380,50 +377,6 @@ export default {
       this.ruleGradation1 = this.ruleGradationName.find(
         item => item.extStr1 == extStr1
       );
-    },
-    //删除
-    deleteData() {
-      if (this.multipleSelection.length == 0) {
-        this.$confirm("请勾选数据", "信息", {
-          confirmButtonText: "关闭",
-          type: "warning"
-        });
-      } else {
-        var uuids = [];
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          uuids.push(this.multipleSelection[i].LAWREGULATIONUUID);
-        }
-        this.$confirm("确定进行删除操作?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            let formdata = new FormData();
-            formdata.append("uuids[]", uuids);
-            daleteLawRule(formdata, "").then(res => {
-              if (res.data.head.status == 20) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
-                });
-                this.initData();
-                this.initTree();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: "删除失败!"
-                });
-              }
-            });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
-          });
-      }
     },
     //查看详情
     detailHandle(id) {

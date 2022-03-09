@@ -8,18 +8,12 @@
             :data="dataTree1"
             :props="defaultProps"
             v-loading="listLoadingTry"
-            @node-click="handleNodeClick1"
+            @node-click="handleNodeClick"
             default-expand-all
             :filter-node-method="filterNode"
             ref="dataTree1"
             node-key="id"
           ></el-tree>
-          <!--  <span style="position:absolute;top:27px;left:115px;color:#E6A23C">{{
-            dataForm.childCount1
-          }}</span>
-          <span style="position:absolute;top:157px;left:115px;color:#E6A23C">{{
-            dataForm.childCount2
-          }}</span> -->
         </el-card>
       </el-col>
       <el-col :span="19">
@@ -39,15 +33,14 @@
               <el-col :span="4" style="margin-left:10px">
                 <div class="search-operation">
                   <el-select
-                    v-model="dataForm.ruleType"
+                    v-model="dataForm.ruleCategory"
                     filterable
                     clearable
                     placeholder="规则类型"
                     size="small"
-                    @change="getProjectId"
                   >
                     <el-option
-                      v-for="(item, index) in ruleType"
+                      v-for="(item, index) in ruleCategory"
                       :key="index"
                       :label="item.name"
                       :value="item.id"
@@ -61,24 +54,6 @@
                 >
                 <el-button @click="reset()">重置</el-button>
               </el-col>
-              <!--  <el-col :span="11">
-                <el-button-group style="float:right">
-                  <el-button>当前选择规则数量：{{ 10 }}</el-button>
-                  <el-button @click="runNow">立即运行</el-button>
-                  <el-button @click="timeRun">定时运行</el-button>
-                  <el-popover
-                    placement="bottom"
-                    title="当前所选规则"
-                    width="200"
-                    trigger="click"
-                    content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
-                  >
-                    <el-button slot="reference" @click="seeChoosed"
-                      >当前所选规则</el-button
-                    >
-                  </el-popover>
-                </el-button-group>
-              </el-col> -->
             </el-row>
           </div>
           <div class="content">
@@ -88,7 +63,7 @@
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
-                <el-button @click="detailExport" type="primary"
+                <el-button @click="detailExport" type="warning"
                   >结果明细导出</el-button
                 >
                 <el-button @click="deleteData" type="danger">删除</el-button>
@@ -108,7 +83,7 @@
                 label="规则名称"
               ></el-table-column>
               <el-table-column
-                prop="ruleType"
+                prop="ruleCategory"
                 label="规则类别"
               ></el-table-column>
               <el-table-column
@@ -121,13 +96,6 @@
               </el-table-column>
               <el-table-column prop="createUserName" label="执行人">
               </el-table-column>
-              <!--  <el-table-column prop="TIMELINESSNAME" label="运行状态">
-                <template scope="scope">
-                  <div v-if="scope.row.TIMELINESSNAME == 1">执行失败</div>
-                  <div v-if="scope.row.TIMELINESSNAME == 2">执行中</div>
-                  <div v-if="scope.row.TIMELINESSNAME == 3">已完成</div>
-                </template>
-              </el-table-column> -->
               <el-table-column prop="moblie" label="操作">
                 <template slot-scope="scope">
                   <el-button type="text" @click="detailHandle(scope.row.id)"
@@ -153,7 +121,7 @@
             title="查看结果明细"
             :close-on-click-modal="false"
             :modal-append-to-body="false"
-            width="80%"
+            width="90%"
             :close-on-press-escape="false"
           >
             <detail
@@ -162,6 +130,35 @@
               :info="info"
               v-if="showDetailDialog"
             ></detail>
+          </el-dialog>
+          <!--结果明细导出弹窗 -->
+          <el-dialog
+            :visible.sync="detailExportDialog"
+            title="查看结果明细"
+            :close-on-click-modal="false"
+            :modal-append-to-body="false"
+            width="20%"
+            :close-on-press-escape="false"
+            v-if="detailExportDialog"
+          >
+            <el-form :model="dataForm" ref="dataForm" label-width="80px" :rules="rules">
+              <el-form-item prop="folderId">
+                <el-select
+                  v-model="dataForm.folderId"
+                  filterable
+                  clearable
+                  placeholder="请选择医院"
+                >
+                  <el-option
+                    v-for="(item, index) in folderId"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
+            <el-button type="primary" @click="exportExcel()">导出</el-button>
           </el-dialog>
         </el-card>
       </el-col>
@@ -178,14 +175,12 @@ export default {
     return {
       dataForm: {
         ruleName: "",
-        ruleType: "",
+        ruleCategory: "",
         actualBeginTime: "",
         actualEndTime: "",
         resultCount: "",
         createUserName: ""
       },
-      pbFileList: [],
-      pbFiles: [],
       dataTree1: [
         {
           name: "批次名称",
@@ -199,7 +194,7 @@ export default {
           ]
         }
       ],
-      ruleType: [
+      ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
@@ -207,7 +202,7 @@ export default {
         children: "children",
         label: "name"
       },
-      tableData: [1],
+      tableData: [2],
       multipleSelection: [],
       loading: false,
       treeLoading: false,
@@ -215,7 +210,7 @@ export default {
       //查看规则详细弹窗是否显示
       showDetailDialog: false,
       //新增、修改弹窗是否显示
-      showAddOrEditDialog: false,
+      detailExportDialog: false,
       //立即运行、定时运行弹窗是否显示
       showRunDialog: false,
       rows: [],
@@ -223,17 +218,37 @@ export default {
     };
   },
   mounted() {
-    // this.initData()
+    this.initData();
     // this.initTree()
   },
   created() {},
   methods: {
     initData() {
-      this.loading = true;
-      showLawDataPage(this.dataForm, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.dataForm.total = res.data.body.pagination.dataCount;
-        this.loading = false;
+      this.$http({
+        url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
+        method: "get",
+        params: this.$http.adornParams({
+          ruleResult: {
+            batchId: this.batchId,
+            runStatus: this.dataForm.runStatus, //1:待执行,2:执行中,3:执行失败,4:已完成
+            rule: {
+              ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
+              ruleName: this.dataForm.ruleName
+            }
+          },
+          pageNo: this.pageIndex,
+          pageSize: this.pageSize
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          // this.tableData = data.result.records;
+          this.totalPage = data.result.total;
+          this.dataForm.total = data.result.total;
+        } else {
+          this.dataForm.total = 0;
+          this.tableData = [];
+          this.totalPage = 0;
+        }
       });
     },
     initTree() {
@@ -249,7 +264,7 @@ export default {
       });
     },
     //点击树节点切换表
-    handleNodeClick1(data) {
+    handleNodeClick(data) {
       this.loading = true;
       showLawDataPage({ regulationCategoryCode: data.extStr1 }, "").then(
         res => {
@@ -259,108 +274,11 @@ export default {
         }
       );
     },
-    handleNodeClick2(data) {
-      this.loading = true;
-      showLawDataPage({ ruleGradationCode: data.extStr1 }, "").then(res => {
-        this.tableData = res.data.body.result;
-        this.dataForm.total = res.data.body.pagination.dataCount;
-        this.loading = false;
-      });
-    },
-    //查看详情弹框
-    ledgerTable(data) {
-      this.showDetailDialog = true;
-      this.info = data;
-    },
-    //新增弹框
-    addData() {
-      this.showAddOrEditDialog = true;
-    },
-    //修改弹框
+    //结果明细导出弹窗
     detailExport() {
-      this.showAddOrEditDialog = true;
+      this.detailExportDialog = true;
     },
-    //弹窗提交
-    popUpSubmit() {
-      this.pbFileList = this.$refs.pbFile.fileListData;
-      this.$refs.submitData.validate(valid => {
-        if (valid) {
-          if (this.popUpDatas.type == 1) {
-            this.addSub();
-          } else {
-            this.submitForm();
-          }
-        }
-      });
-    },
-
-    //修改保存
-    submitForm() {
-      let params = {
-        lawRegulationUuid: this.multipleSelection[0].LAWREGULATIONUUID,
-        title: this.submitData.title, //标题
-        issueUnit: this.submitData.issueUnit, //颁布单位
-        referenceNumber: this.submitData.referenceNumber, //文号
-        effectiveDate: new Date(this.submitData.effectiveDate), //生效日期
-        regulationCategoryCode: this.regulationCategory1.extStr1,
-        regulationCategory: this.regulationCategory1.name,
-        ruleGradationCode: this.ruleGradation1.extStr1,
-        ruleGradationName: this.ruleGradation1.name,
-        addressName: this.submitData.addressName,
-        content: this.submitData.content,
-        timelinessName: this.submitData.timelinessName,
-        remark: this.submitData.remark,
-        pbFiles: this.pbFileList,
-        deleteFileIds: this.deleteFileIds
-      };
-      updateLawRule(params, "").then(res => {
-        if (res.data.head.status == 20) {
-          this.$message.success("操作成功");
-          this.popUpDatas.show = false;
-          this.initData();
-        } else {
-          this.$message.error("操作失败");
-          this.popUpDatas.show = false;
-        }
-      });
-    },
-    //将返回的数据整理为树形结构
-    listToTree(list) {
-      var arr = [];
-      let items = {};
-      var idsStr = "";
-      // 获取每个节点的直属子节点（是直属，不是所有子节点）
-      for (let i = 0; i < list.length; i++) {
-        let key = list[i].pid;
-        if (items[key]) {
-          items[key].push(list[i]);
-        } else {
-          items[key] = [];
-          items[key].push(list[i]);
-        }
-        idsStr += idsStr === "" ? list[i].id : "," + list[i].id;
-      }
-      for (var key in items) {
-        if (idsStr.indexOf(key) === -1) {
-          //找到最大的父节点key
-          arr = this.formatTree(items, key);
-        }
-      }
-      // console.log(arr)
-      return arr;
-    },
-    formatTree(items, parentId) {
-      let result = [];
-      if (!items[parentId]) {
-        return result;
-      }
-      for (let t of items[parentId]) {
-        t.children = this.formatTree(items, t.id); //递归获取children
-        result.push(t);
-      }
-      return result;
-    },
-    // 关闭编辑弹窗
+    // 关闭详细弹窗
     closeDetail() {
       this.showDetailDialog = false;
     },
@@ -380,18 +298,6 @@ export default {
     //列表多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
-    //获取选择的法规类型数据
-    getRegulationCategory(extStr1) {
-      this.regulationCategory1 = this.regulationCategory.find(
-        item => item.extStr1 == extStr1
-      );
-    },
-    //获取选择的法规层次数据
-    getRuleGradation(extStr1) {
-      this.ruleGradation1 = this.ruleGradationName.find(
-        item => item.extStr1 == extStr1
-      );
     },
     //删除
     deleteData() {
@@ -463,29 +369,10 @@ export default {
     //重置搜索
     reset() {
       this.dataForm = {
-        title: "",
-        content: ""
+        ruleName: "",
+        ruleCategory: ""
       };
       this.initData();
-    },
-    //立即运行
-    runNow() {
-      this.showRunDialog = true;
-      this.info = false;
-    },
-    //定时运行
-    timeRun() {
-      this.showRunDialog = true;
-      this.info = true;
-    },
-    //查看当前所选规则
-    seeChoosed() {},
-    //关闭规则运行弹窗
-    closeRun() {
-      this.showRunDialog = false;
-    },
-    succeedRun() {
-      this.showRunDialog = false;
     }
   }
 };

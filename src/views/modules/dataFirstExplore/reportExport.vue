@@ -8,19 +8,15 @@
     >
       <el-form-item>
         <el-input
-          v-model="dataForm.basicName"
+          v-model="dataForm.reportName"
           placeholder="报告名称"
           clearable
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-select
-          v-model="dataForm.basicType"
-          placeholder="报告状态"
-          clearable
-        >
+        <el-select v-model="dataForm.status" placeholder="报告状态" clearable>
           <el-option
-            v-for="item in options"
+            v-for="item in status"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -32,17 +28,22 @@
         <el-button @click="resetForm()">重置</el-button>
       </el-form-item>
       <el-form-item style="float:right">
-        <el-button type="primary" @click="getDataList()">新增</el-button>
+        <el-button type="primary" @click="addOrEditData(0)">新增</el-button>
         <el-button
           type="primary"
           :disabled="
             this.multipleSelection.length <= 0 ||
               this.multipleSelection.length > 1
           "
-          @click="resetForm()"
+          @click="addOrEditData(1)"
           >修改</el-button
         >
-        <el-button type="danger" @click="resetForm()">删除</el-button>
+        <el-button
+          type="danger"
+          :disabled="this.multipleSelection.length <= 0"
+          @click="deleteData()"
+          >删除</el-button
+        >
       </el-form-item>
     </el-form>
     <!-- 列表 -->
@@ -98,8 +99,8 @@
           label="状态"
         >
           <template slot-scope="scope">
-            <div type="primary" v-if="scope.row.state == 1">执行中</div>
-            <div type="primary" v-if="scope.row.state == 2">执行失败</div>
+            <div type="primary" v-if="scope.row.status == 1">执行中</div>
+            <div type="primary" v-if="scope.row.status == 2">执行失败</div>
             <div type="primary">已完成</div>
           </template>
         </el-table-column>
@@ -110,40 +111,53 @@
           label="操作"
         >
           <template slot-scope="scope">
-            <el-button type="primary" @click="downLoad(scope.row.id)"
+            <el-button type="warning" @click="downLoad(scope.row.id)"
               >下载</el-button
             >
           </template>
         </el-table-column>
       </el-table>
     </div>
+    <!--新增/修改弹窗 -->
+    <el-dialog
+      :visible.sync="showAddOrEditDialog"
+      :title="title"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      width="40%"
+      :close-on-press-escape="false"
+    >
+      <addOrEdit
+        @close="close"
+        @ok="succeed"
+        v-if="showAddOrEditDialog"
+      ></addOrEdit>
+    </el-dialog>
   </div>
 </template>
 <script>
+import addOrEdit from "./component/reportExport-addOrEdit.vue";
 export default {
+  components() {
+    addOrEdit;
+  },
   data() {
     return {
       dataForm: {
         basicName: "",
-        basicType: "",
-        data2: "",
-        data1: ""
+        basicType: ""
       },
+      showAddOrEditDialog: false,
       //loading
       listLoading: false,
-      importVisible: false,
-      apComServerData: {
-        current: 1,
-        size: 10,
-        pageNum: 1,
-        total: 0
-      },
+      //弹窗标题
+      title: "",
       //多选
       multipleSelection: [],
       //table表格数据
       tableList: [],
       tableColumns: [],
-      options: [
+      status: [
         {
           value: "0",
           label: "三级甲等"
@@ -159,19 +173,42 @@ export default {
       ]
     };
   },
-  mounted() {
-    // this.initList();
+  created() {
+    this.initList();
   },
   methods: {
     //初始化数据列表
     initList() {
-      this.listLoading = true;
-      // this.$http({
-
-      // }).then(() =>{
-      //     // this.listLoading =false
-      // })
+      this.$http({
+        url: this.$http.adornUrl("/ruleReport/selectPage"),
+        method: "get",
+        params: this.$http.adornParams({
+          pageNo: this.pageIndex,
+          pageSize: this.pageSize
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          // this.tableData = data.result.records;
+          this.totalPage = data.result.total;
+          this.dataForm.total = data.result.total;
+        } else {
+          this.dataForm.total = 0;
+          this.tableData = [];
+          this.totalPage = 0;
+        }
+      });
     },
+    //新增、修改弹窗
+    addOrEditData(val) {
+      this.showAddOrEditDialog = true;
+      if (val == 0) {
+        this.title = "新增报告";
+      } else {
+        this.title = "修改报告";
+      }
+    },
+    //删除
+    deleteData() {},
     //重置
     resetForm() {},
     //查询

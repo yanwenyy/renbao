@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <rule-tree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="true" :isShowEdit="true" parentGetTreeData="getTreeData"></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData"></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box"> 
@@ -124,6 +124,7 @@ export default {
             getRowKeys(row) {
                 return row.ruleId;
             },
+            treeData: []
         }
     },
     mounted () {
@@ -146,7 +147,7 @@ export default {
                 if (data.code == 200) {
                     data.result.records.map(i => {
                         i.createTime = i.createTime.split('T')[0];
-                        i.ruleCategory = i.ruleCategory == 1 ? '门诊审核规则':  i.ruleCategory == 2 ? '住院审核规则' : ''
+                        i.ruleCategory = i.ruleCategory == 1 ? '门诊规则':  i.ruleCategory == 2 ? '住院规则' : ''
                     })
                     this.tableData = data.result.records;
                     this.Pager.pageSize = data.result.size;
@@ -174,10 +175,11 @@ export default {
             this.searchForm= { ruleName: '',ruleType: ''}
         },
         addFun () {
-            this.$refs.ruleConfigDialog.showDialog(this.multipleTable);
+            this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
         },
         editorFun () {
-
+            if( this.multipleTable.length != 1 ) return this.$message({message: '请选择一条数据进行编辑',type: 'warning'});
+            this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
         },
         deleteFn () {
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
@@ -214,9 +216,11 @@ export default {
 
         },
         handleSelectionChange (rows) {
-            // console.log(rows, 'rowsrowsrows')
             this.multipleTable = rows;
-            console.log(this.multipleTable, 'multipleTable')
+        },
+        setTableChecked () {
+            this.$refs.multipleTable.clearSelection(this.multipleTable);
+            this.multipleTable = [];
         },
         sizeChangeHandle (val) {
             this.Pager.pageSize = val
@@ -226,7 +230,6 @@ export default {
         currentChangeHandle (val) {
             this.Pager.pageIndex = val
             this.getSelectPage();
-              console.log(this.multipleTable, 'multipleTable')
         },
         // 提交个性化规则
         submitgxhgz () {

@@ -7,14 +7,14 @@
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="项目编号">
-          <el-input v-model="dataForm.dataAmount" placeholder="项目编号"></el-input>
+          <el-input v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>
         </el-form-item>
         <el-form-item label="项目名称">
-          <el-input v-model="dataForm.dataAmount" placeholder="项目名称"></el-input>
+          <el-input v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
         <el-form-item label="项目周期">
           <el-date-picker
-            v-model="dataForm.dataTime"
+            v-model="dataForm.project.dataTime"
             type="daterange"
             value-format="yyyy-MM-dd"
             range-separator="至"
@@ -23,59 +23,67 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="被审核单位">
-          <el-input v-model="dataForm.dataAmount" placeholder="被审核单位"></el-input>
+          <el-input v-model="dataForm.project.auditedUnit" placeholder="被审核单位"></el-input>
         </el-form-item>
         <el-form-item label="项目成本">
-          <el-button type="primary" @click="addTabel(xmcbTabel,{dataAmount:''})">添加行</el-button>
+          <el-button type="primary" @click="addTabel(dataForm.projectCosts,{projectItem:'',costMoney:'',costRemark:''})">添加行</el-button>
           <el-table
             class="table-list"
             border
-            :data="xmcbTabel"
+            :data="dataForm.projectCosts"
             stripe
             style="width: 100%">
             <el-table-column
               width="50">
               <template slot-scope="scope">
-                <i class="el-icon-remove" @click="removeRow(xmcbTabel,scope.$index)"></i>
+                <i class="el-icon-remove" @click="removeRow(dataForm.projectCosts,scope.$index)"></i>
               </template>
             </el-table-column>
             <el-table-column
               prop="name"
-              label="人员成本（元/天）"
+              label="成本事项"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.dataAmount"  @input="formatValue(scope.row.dataAmount,scope.$index,xmcbTabel,'dataAmount')" placeholder="人员成本"></el-input>
+                <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
               </template>
             </el-table-column>
             <el-table-column
               prop="name"
-              label="费用成本（元/天）"
+              label="成本金额（元/天）"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.dataAmount"  @input="formatValue(scope.row.dataAmount,scope.$index,xmcbTabel,'dataAmount')" placeholder="人员成本"></el-input>
+                <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="人员成本"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="备注"
+            >
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.costRemark" placeholder="人员成本"></el-input>
               </template>
             </el-table-column>
           </el-table>
         </el-form-item>
         <el-form-item>
           <div>项目成员信息：</div>
-          <el-button type="primary" @click="addMemberVisable=true">项目成员信息维护</el-button>
-          <el-button type="primary" @click="addTabel(xmcywhTabel,{name:''})">添加行</el-button>
+          <!--<el-button type="primary" @click="addMemberVisable=true">项目成员信息维护</el-button>-->
+          <!--<el-button type="primary" @click="addTabel(xmcywhTabel,{name:''})">添加行</el-button>-->
           <el-table
             class="table-list"
             border
-            :data="xmcywhTabel"
+            :data="dataForm.xmProjectRoleUsers"
             @selection-change="selectionChangeHandle"
             stripe
             style="width: 100%">
+            <!--<el-table-column-->
+              <!--type="selection"-->
+              <!--header-align="center"-->
+              <!--align="center"-->
+              <!--width="50">-->
+            <!--</el-table-column>-->
             <el-table-column
-              type="selection"
-              header-align="center"
-              align="center"
-              width="50">
-            </el-table-column>
-            <el-table-column
-              prop="name"
+              prop="roleName"
               label="角色"
               align="center"
             >
@@ -85,17 +93,33 @@
               label="人员"
               align="center"
             >
-            </el-table-column>
-            <el-table-column
-              fixed="right"
-              header-align="center"
-              align="center"
-              width="100"
-              label="操作">
               <template slot-scope="scope">
-                <el-button type="text" size="small"  @click="removeRow(xmcywhTabel,scope.$index)">删除</el-button>
+                <el-select
+                            multiple
+                            v-model="scope.row.userIds"
+                            placeholder="请选择"
+                            @change="getMemberList">
+                  <el-option
+                    v-for="(item,index) in userList"
+                    :key="index"
+                    :label="item.userName"
+                    :value="item.userId">
+                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
+                  </el-option>
+                </el-select>
               </template>
+
             </el-table-column>
+            <!--<el-table-column-->
+              <!--fixed="right"-->
+              <!--header-align="center"-->
+              <!--align="center"-->
+              <!--width="100"-->
+              <!--label="操作">-->
+              <!--<template slot-scope="scope">-->
+                <!--<el-button type="text" size="small"  @click="removeRow(xmcywhTabel,scope.$index)">删除</el-button>-->
+              <!--</template>-->
+            <!--</el-table-column>-->
           </el-table>
         </el-form-item>
         <el-form-item>
@@ -103,7 +127,7 @@
           <el-table
             class="table-list"
             border
-            :data="xzTabel"
+            :data="dataForm.xmProjectGroupUsers"
             stripe
             style="width: 100%">
             <!--<el-table-column-->
@@ -113,12 +137,13 @@
             <!--width="50">-->
             <!--</el-table-column>-->
             <el-table-column
-              prop="name"
+              prop="groupName"
               label="小组名称"
               align="center"
             >
               <template slot-scope="scope">
-                医学组 <el-button class="table-btn" type="text" size="small" @click="addGroupMemberVisable=true">维护</el-button>
+                {{scope.row.groupName}}
+                <!--<el-button class="table-btn" type="text" size="small" @click="addGroupMemberVisable=true">维护</el-button>-->
               </template>
             </el-table-column>
             <el-table-column
@@ -126,12 +151,34 @@
               label="小组组长"
               align="center"
             >
+              <template slot-scope="scope">
+                <el-select multiple v-model="scope.row.leaderIds" placeholder="请选择">
+                  <el-option
+                    v-for="(item,index) in meberList"
+                    :key="index"
+                    :label="item.userName"
+                    :value="item.userId">
+                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
+                  </el-option>
+                </el-select>
+              </template>
             </el-table-column>
             <el-table-column
               prop="name"
               label="小组人员"
               align="center"
             >
+              <template slot-scope="scope">
+                <el-select multiple v-model="scope.row.memberIds" placeholder="请选择">
+                  <el-option
+                    v-for="(item,index) in meberList"
+                    :key="index"
+                    :label="item.userName"
+                    :value="item.userId">
+                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
+                  </el-option>
+                </el-select>
+              </template>
             </el-table-column>
             <!--<el-table-column-->
               <!--fixed="right"-->
@@ -144,6 +191,10 @@
               <!--</template>-->
             <!--</el-table-column>-->
           </el-table>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea"
+                    :rows="4" v-model="dataForm.project.projectRemark" placeholder="备注"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -235,6 +286,8 @@
         }
       };
       return {
+        meberList:[],//小组人员列表
+        userList:[],//人员列表
         groupMemberForm:{},//添加小组成员表单
         addMemberForm:{},//添加项目成员表单
         memberListVisible:false,//成员列表状态
@@ -249,15 +302,30 @@
         dialogImageUrl: '',
         dialogVisible: false,
         dataForm: {
-          id: 0,
-          dataTime: '',
-          dataAmount: '',
-          effectiveData: '',
-          todayConsumeMoney: ''
+          project:{
+            projectId: 0,
+            projectCode: '',
+            projectName: '',
+            dataTime: [],
+            auditedUnit: '',
+            projectRemark: '',
+          },
+          projectCosts:[],
+          xmProjectGroupUsers:[],
+          xmProjectRoleUsers:[],
         },
         dataRule: {
+          projectCode: [
+            { required: true, message: '项目编号不能为空', trigger: 'blur' }
+          ],
+          projectName: [
+            { required: true, message: '项目名称不能为空', trigger: 'blur' }
+          ],
           dataTime: [
-            { required: true, message: '数据时间不能为空', trigger: 'blur' }
+            { required: true, message: '项目周期不能为空', trigger: 'blur' }
+          ],
+          auditedUnit: [
+            { required: true, message: '被审核单位不能为空', trigger: 'blur' }
           ],
           dataAmount: [
             { required: true,validator: validateInteger, trigger: 'blur' }
@@ -272,15 +340,102 @@
       }
     },
     methods: {
+      //获取小组成员列表
+      getMemberList(id){
+        if(id){
+          var _list=this.filterMemberList();
+          this.meberList=this.userList.filter(item=>{
+            return _list.includes(item.userId)
+          });
+          this.$set(this.meberList,this.meberList)
+        }
+      },
+      filterMemberList(){
+        var list=[];
+        this.dataForm.xmProjectRoleUsers.forEach(item=>{
+          list=this.MergeArray(list,item.userIds);
+        })
+        return list;
+      },
+      MergeArray(arr1,arr2){
+        var _arr = new Array();
+        for(var i=0;i<arr1.length;i++){
+          _arr.push(arr1[i]);
+        }
+        for(var i=0;i<arr2.length;i++){
+          var flag = true;
+          for(var j=0;j<arr1.length;j++){
+            if(arr2[i]==arr1[j]){
+              flag=false;
+              break;
+            }
+          }
+          if(flag){
+            _arr.push(arr2[i]);
+          }
+        }
+        return _arr;
+      },
+      //获取角色和人员和小组列表
+      getRoleList(){
+        this.$http({
+          url: this.$http.adornUrl("/role/selectPage"),
+          method: "get",
+          params: this.$http.adornParams({
+            pageNo: 1,
+            pageSize: 1000,
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.dataForm.xmProjectRoleUsers = data.result.records;
+          } else {
+            this.dataForm.xmProjectRoleUsers = [];
+          }
+        });
+        this.$http({
+          url: this.$http.adornUrl("/user/selectPage"),
+          method: "get",
+          params: this.$http.adornParams({
+            pageNo: 1,
+            pageSize: 1000,
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.userList = data.result.records;
+          } else {
+            this.userList = [];
+          }
+        });
+        this.$http({
+          url: this.$http.adornUrl("/xmProjectGroupTemplate/selectPage"),
+          method: "get",
+          params: this.$http.adornParams({
+            pageNo: 1,
+            pageSize: 1000,
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.dataForm.xmProjectGroupUsers = data.result.records;
+          } else {
+            this.dataForm.xmProjectGroupUsers = [];
+          }
+        });
+      },
       //清除信息
       clearMsg(){
-        this.xzTabel=[];
-        this.xmcywhTabel=[];
-        this.xmcywhTabelSel=[];
-        this.xmcbTabel=[];
-        this.memberListVisible=false;
-        this.addGroupMemberVisable=false;
-        this.addMemberVisable=false;
+        this.dataForm={
+          project:{
+            projectId: 0,
+            projectCode: '',
+            projectName: '',
+            dataTime: [],
+            auditedUnit: '',
+            projectRemark: '',
+          },
+          projectCosts:[],
+          xmProjectGroupUsers:[],
+          xmProjectRoleUsers:[]
+        }
       },
       //删除表格里的某行
       removeRow(table,index){
@@ -319,21 +474,26 @@
         this.$forceUpdate();
       },
       init (id) {
-        this.dataForm.id = id||0;
+        console.log(id);
+        this.dataForm.project.projectId = id||0;
         this.visible = true;
+        this.getRoleList();
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
-          if (this.dataForm.id) {
+          if (this.dataForm.project.projectId) {
             this.$http({
-              url: this.$http.adornUrl(`/biz/pdbaidudata/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/xmProject/selectDetailsByProjectId/${this.dataForm.project.projectId}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 200) {
-                this.dataForm.dataTime = data.data.dataTime;
-                this.dataForm.dataAmount = data.data.dataAmount;
-                this.dataForm.effectiveData = data.data.effectiveData;
-                this.dataForm.todayConsumeMoney = data.data.todayConsumeMoney;
+                var datas=data.result;
+                this.dataForm.project = datas.project;
+                this.dataForm.project.dataTime[0]=this.dataForm.project.projectPeriodBenig;
+                this.dataForm.project.dataTime[1]=this.dataForm.project.projectPeriodEnd;
+                this.dataForm.projectCosts = datas.projectCosts;
+                this.dataForm.xmProjectGroupUsers = datas.xmProjectGroupUsers;
+                this.dataForm.xmProjectRoleUsers = datas.xmProjectRoleUsers;
               }
             })
           }
@@ -343,16 +503,14 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            if(this.dataForm.project.dataTime!=''&&this.dataForm.project.dataTime!=null){
+              this.dataForm.project.projectPeriodBenig=this.dataForm.project.dataTime[0];
+              this.dataForm.project.projectPeriodEnd=this.dataForm.project.dataTime[1];
+            }
             this.$http({
-              url: this.$http.adornUrl(`/biz/pdbaidudata/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/xmProject/${!this.dataForm.project.projectId ? 'addProject' : 'updateProject'}`),
               method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'dataTime': this.dataForm.dataTime+" 00:00:00",
-                'dataAmount': this.dataForm.dataAmount,
-                'effectiveData': this.dataForm.effectiveData,
-                'todayConsumeMoney': this.dataForm.todayConsumeMoney
-              })
+              data: this.$http.adornData(this.dataForm)
             }).then(({data}) => {
               if (data && data.code ===200) {
                 this.$message({

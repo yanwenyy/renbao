@@ -101,7 +101,7 @@ PxSocket.prototype = {
     var _this = this;
     try {
       if ('WebSocket' in window) {
-        // console.log(_this.options.url)
+        console.log(_this.options.url)
         _this.ws = new WebSocket(_this.options.url);
         // console.log( _this.ws)
         // console.log(http_url.Socket_url+options.id)
@@ -113,7 +113,7 @@ PxSocket.prototype = {
         console.log("send error！");
       };
       _this.ws.onopen = function () {
-
+        _this.ws.send(_this.options.data);
         _this.heartCheck();      //心跳检测重置
         // console.log(_this.options.name +"  "+ new Date().toUTCString());
         console.log("connection success！")
@@ -177,4 +177,19 @@ export function randomString(len) {
     randomStr += $chars.charAt(Math.floor(Math.random() * maxPos));
   }
   return randomStr + timestamp;
+}
+export function getDate () {
+  var nowDate = new Date();
+  let date = {
+      year: nowDate.getFullYear(),
+      month: nowDate.getMonth() + 1,
+      date: nowDate.getDate(),
+  }
+  if (date.month>= 1 && date.month <= 9) {
+    date.month = "0" + date.month;
+  }
+  if (date.date>= 1 && date.date <= 9) {
+    date.date = "0" + date.date;
+  }
+  return date.year+"-"+date.month+"-"+date.date;
 }
