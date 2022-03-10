@@ -30,8 +30,12 @@
               placeholder="请选择"
               clearable
             >
-              <el-option label="门诊规则" :value="1"></el-option>
-              <el-option label="住院规则" :value="2"></el-option>
+              <el-option
+                v-for="(item, index) in ruleCategory"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="运行状态：">
@@ -59,41 +63,43 @@
           ref="multipleTable"
           :data="tableData"
           tooltip-effect="dark"
+          border
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <!-- <el-table-column type="selection" width="55"></el-table-column> -->
-          <el-table-column
-            v-for="(items, index) in tablePositionKey"
-            :prop="items.dataname"
-            :key="index"
-            :label="items.label"
-            :sortable="items.issortable"
-            :min-width="items.minWidth"
-            :align="items.align ? items.align : 'center'"
-            :width="items.width"
-          >
+          <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
+          <el-table-column prop="ruleName" label="规则名称"></el-table-column>
+          <el-table-column prop="ruleCategory" label="规则类别">
             <template slot-scope="scope">
-              <div v-if="items.type == 'option'">
-                <div class="operation-box">
-                  <!-- <span @click="publish(scope.row)">发表</span> -->
-                  <el-button
-                    type="text"
-                    class="result-view-text"
-                    @click="resultViewClick(scope.row)"
-                    v-if="scope.row.q5 == 1"
-                    >查看日志</el-button
-                  >
-                  <span v-else>运行成功</span>
-                </div>
-              </div>
-              <div v-else>
-                <span
-                  :style="scope.row[items.dataname] == '0' ? 'color:#ccc' : ''"
-                >
-                  {{ scope.row[items.dataname] }}
-                </span>
-              </div>
+              <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+              <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="expectedBeginTime" label="预计开始时间">
+            <template slot-scope="scope">{{
+              scope.row.expectedBeginTime | dateformat
+            }}</template>
+          </el-table-column>
+          <el-table-column prop="actualBeginTime" label="实际开始时间">
+            <template slot-scope="scope">{{
+              scope.row.actualBeginTime | dateformat
+            }}</template>
+          </el-table-column>
+          <el-table-column prop="expectedEndTime" label="预计结束时间">
+            <template slot-scope="scope">{{
+              scope.row.expectedEndTime | dateformat
+            }}</template>
+          </el-table-column>
+          <el-table-column prop="actualEndTime" label="实际结束时间">
+            <template slot-scope="scope">{{
+              scope.row.actualEndTime | dateformat
+            }}</template>
+          </el-table-column>
+          <el-table-column prop="moblie" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" @click="resultViewClick(scope.row.ruleId)"
+                >查看日志</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -145,52 +151,11 @@ export default {
         ruleCategory: "",
         runStatus: ""
       },
-      tableData: [],
-      tablePositionKey: [
-        {
-          dataname: "ruleName",
-          label: "规则名称",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "ruleType",
-          label: "规则类别",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "expectedBeginTime",
-          label: "预计开始时间",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "actualBeginTime",
-          label: "实际开始时间",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "expectedEndTime",
-          label: "预计结束时间",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "actualEndTime",
-          label: "实际结束时间",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "runStatusName",
-          label: "运行状态",
-          issortable: false,
-          type: ""
-        },
-        { dataname: "q5", label: "操作", issortable: false, type: "option" }
+      ruleCategory: [
+        { id: 1, name: "门诊规则" },
+        { id: 2, name: "住院规则" }
       ],
+      tableData: [],
       Pager: {
         pageSize: 10,
         pageIndex: 1,
@@ -212,17 +177,6 @@ export default {
     this.getTableData();
   },
   methods: {
-    dealRunStatus(type) {
-      if (type == 1) {
-        return "待执行";
-      } else if (type == 2) {
-        return "执行中";
-      } else if (type == 3) {
-        return "执行失败";
-      } else if (type == 4) {
-        return "已完成";
-      }
-    },
     getTableData() {
       this.tableLoading = true;
       this.$http({
@@ -244,25 +198,6 @@ export default {
         .then(({ data }) => {
           this.tableLoading = false;
           if (data.code == 200) {
-            data.result.records.map(i => {
-              i.ruleName = i.rule.ruleName;
-              i.ruleType =
-                i.rule.ruleType == 1
-                  ? "门诊审核规则"
-                  : i.ruleCategory == 2
-                  ? "住院审核规则"
-                  : "";
-              i.expectedBeginTime =
-                (i.expectedBeginTime && i.expectedBeginTime.split("T")[0]) ||
-                "";
-              i.actualBeginTime =
-                (i.actualBeginTime && i.actualBeginTime.split("T")[0]) || "";
-              i.expectedEndTime =
-                (i.expectedEndTime && i.expectedEndTime.split("T")[0]) || "";
-              i.actualEndTime =
-                (i.actualEndTime && i.actualEndTime.split("T")[0]) || "";
-              i.runStatusName = this.dealRunStatus(i.runStatus);
-            });
             this.tableData = data.result.records;
             this.Pager.pageSize = data.result.size;
             this.Pager.pageIndex = data.result.current;
@@ -302,7 +237,9 @@ export default {
       this.getTableData();
     },
     // 列表查询
-    onQuery() {},
+    onQuery() {
+      this.getTableData();
+    },
     // 列表重置
     onReset() {
       this.searchForm = {
@@ -323,7 +260,6 @@ export default {
     // 日志查看
     resultViewClick(data) {
       this.showDetailDialog = true;
-      // alert(JSON.stringify(data))
       this.id = data.resultId;
     },
     //关闭日志弹窗

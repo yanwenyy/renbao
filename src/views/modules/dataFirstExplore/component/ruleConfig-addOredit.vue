@@ -72,7 +72,10 @@ export default {
     ruleId: { type: String },
     getData: {
       type: Object
-    }
+    },
+    folderId: {
+      type: String
+    },
   },
   name: "detail",
   data() {
@@ -115,16 +118,12 @@ export default {
     }
   },
   created() {
+    this.getRuleFolder();
     if (this.ruleId != null && this.ruleId != "" && this.ruleId != undefined) {
       this.init();
     } else {
       this.dataForm.createTime = getDate(); // 回显创建时间
       this.dataForm.createUserName = this.username; // 回显创建人
-    }
-  },
-  beforeDestroy() {
-    if (this.timer) {
-      clearInterval(this.timer); // 在Vue实例销毁前，清除我们的定时器
     }
   },
   methods: {
@@ -147,10 +146,7 @@ export default {
           this.dataForm.sql = rule.sql;
           this.dataForm.createTime = rule.createTime;
           // 递归获取对应的规则对象
-          let getTreeData = this.getTreeData(
-            treeData,
-            this.checkedData[0].folderId
-          );
+          let getTreeData = this.getTreeData(treeData, this.folderId);
           // 回显规则名称
           if (getTreeData.length > 0) {
             this.dataForm.folderName = [getTreeData[0].folderName];
@@ -202,6 +198,24 @@ export default {
           });
         }
       });
+    },
+    // 获取规则树
+    getRuleFolder() {
+      this.treeLoading = true;
+      this.$http({
+        isLoading: false,
+        url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+        method: "get"
+      })
+        .then(({ data }) => {
+          this.treeLoading = false;
+          if (data.code == 200) {
+            this.treeData = data.result;
+          }
+        })
+        .catch(() => {
+          this.treeLoading = false;
+        });
     },
     //关闭弹窗
     close() {
