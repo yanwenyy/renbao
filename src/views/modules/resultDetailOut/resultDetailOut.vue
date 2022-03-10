@@ -230,7 +230,7 @@ export default {
                 this.$http({
                     isLoading:false,
                     url: this.$http.adornUrl(`ruleResult/deleteByIds/${deleteList.join(',')}`),
-                    method: 'post',
+                    method: 'get',
                 }).then(({data}) => {
                     if (data && data.code === 200) {
                     this.$message({message: '删除成功',type: 'success',})

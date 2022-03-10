@@ -10,6 +10,7 @@
             @getTreeId="getTreeId"
             :isParent="false"
             ref="ruleTree"
+            folderSort="1,2"
           ></rule-tree>
         </el-card>
       </el-col>

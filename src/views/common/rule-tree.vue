@@ -91,6 +91,10 @@ export default {
         isRelation: {
             type: Boolean, // 父子节点是否关联,是否单选
             default: false
+        },
+        folderSort: {
+            type: String,
+            default: ''
         }
 
     },
@@ -126,7 +130,7 @@ export default {
     mounted () {
 
     },
-    created () {
+    activated () {
         this.getRuleFolder();
     },
     methods: {
@@ -137,8 +141,10 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
+                params:  this.$http.adornParams({folderSort: this.folderSort}, false)
             }).then(({data}) => {
                 this.treeLoading = false
+                console.log(data, 'datadatadata')
                 if (data.code == 200) { 
                     this.treeData = data.result;
                 }

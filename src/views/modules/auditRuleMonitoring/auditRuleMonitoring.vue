@@ -167,7 +167,8 @@ export default {
                 params:  this.$http.adornParams({
                     batchId: this.batchItem.batchId && this.batchItem.batchId || '',
                     runStatus: this.searchForm.runStatus, // 运行状态
-                    batchType: 2
+                    batchType: 2,
+                    ruleCategory: this.searchForm.ruleCategory
                     // rule: {
                     //     ruleCategory: this.searchForm.ruleCategory
                     // }
