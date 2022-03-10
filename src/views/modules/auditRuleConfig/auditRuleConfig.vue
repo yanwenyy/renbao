@@ -128,7 +128,7 @@ export default {
             treeData: []
         }
     },
-    mounted () {
+    activated () {
         this.getSelectPage()
     },
     created () {
@@ -142,7 +142,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl(`/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
-                params:  this.$http.adornParams(this.searchForm)
+                params:  this.$http.adornParams(this.searchForm, false)
             }).then(({data}) => {
                 this.tableLoading = false
                 if (data.code == 200) {
@@ -191,7 +191,6 @@ export default {
             this.multipleTable.forEach( item =>{
                 deleteList.push( item.ruleId )
             })
-            console.log(deleteList, '删除id')
             this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -204,10 +203,11 @@ export default {
                     data: this.$http.adornData(deleteList, false)
                 }).then(({data}) => {
                     if (data && data.code === 200) {
-                    this.$message({message: '操作成功',type: 'success',})
+                    this.$message({message: '删除成功',type: 'success',})
                     this.Pager.pageIndex = 1;
                     this.Pager.pageSize = 10;
                     this.getSelectPage();
+                    this.setTableChecked();
                     // this.multipleTable = []
                     } else {
                     this.$message.error(data.msg)

@@ -55,8 +55,10 @@
                             <div v-if="items.type=='option'">
                                 <div class="operation-box">
                                     <!-- <span @click="publish(scope.row)">发表</span> -->
-                                    <span class="result-view-text" @click="resultViewClick(scope.row)" v-if="scope.row.q5 == 1">结果查看</span>
-                                    <span v-else>运行成功</span>
+                                    <span class="result-view-text" @click="resultViewClick(scope.row)" v-if="scope.row.option == 3">结果查看</span>
+                                    <span v-else-if="scope.row.option == 2"></span>
+                                    <span v-else-if="scope.row.option == 4">运行成功</span>
+                                    <span v-else-if="scope.row.option == 1">待执行</span>
                                 </div>
                             </div>
                             <div v-else>
@@ -113,7 +115,7 @@ export default {
                 {dataname:'expectedEndTime' , label:'预计结束时间' , issortable:false , type:''},
                 {dataname:'actualEndTime' , label:'实际结束时间' , issortable:false , type:''},
                 {dataname:'runStatusName' , label:'运行状态' , issortable:false , type:''},
-                {dataname:'q5' , label:'操作' , issortable:false , type:'option'},
+                {dataname:'option' , label:'操作' , issortable:false , type:'option'},
             ],
             Pager: {
                 pageSize: 10,
@@ -130,12 +132,9 @@ export default {
             batchItem: {}
         }
     },
-    mounted () {
+    activated() {
         this.getbatchList();
-        this.getTableData()
-    },
-    created () {
-
+        this.getTableData();
     },
     methods: {
         dealRunStatus (type) {
@@ -150,20 +149,14 @@ export default {
             }
 
         },
-        dealRuleType (data) {
-            if (data) {
-                if (data.ruleCategory ==1) {
-                    return '门诊规则'
-                } else if(data.ruleCategory ==1) {
-                    return '住院规则'
-
-                } else {
-                    return ''
-                }
-            }else {
+        dealRuleType (ruleCategory) {
+            if (ruleCategory ==1) {
+                return '门诊规则'
+            } else if(ruleCategory ==1) {
+                return '住院规则'
+            } else {
                 return ''
             }
-
         },
         getTableData () {
             this.tableLoading = true;
@@ -174,6 +167,7 @@ export default {
                 params:  this.$http.adornParams({
                     batchId: this.batchItem.batchId && this.batchItem.batchId || '',
                     runStatus: this.searchForm.runStatus, // 运行状态
+                    batchType: 2
                     // rule: {
                     //     ruleCategory: this.searchForm.ruleCategory
                     // }
@@ -186,13 +180,14 @@ export default {
                 this.tableLoading = false
                 if (data.code == 200) {
                     data.result.records.map(i => {
-                        i.ruleName = i.rule && i.rule.ruleName || ''
-                        i.dealRuleType = this.dealRuleType(i.rule)
+                        i.ruleName = i.ruleName
+                        i.dealRuleType = this.dealRuleType(i.ruleCategory)
                         i.expectedBeginTime = i.expectedBeginTime && i.expectedBeginTime.split('T')[0] || '';
                         i.actualBeginTime = i.actualBeginTime && i.actualBeginTime.split('T')[0] || '';
                         i.expectedEndTime = i.expectedEndTime && i.expectedEndTime.split('T')[0] || '';
                         i.actualEndTime = i.actualEndTime && i.actualEndTime.split('T')[0] || '';
-                        i.runStatusName = this.dealRunStatus(i.runStatus)
+                        i.runStatusName = this.dealRunStatus(i.runStatus);
+                        i.option = i.runStatus;
                     })
                     this.tableData = data.result.records;
                     this.Pager.pageSize = data.result.size;
@@ -209,6 +204,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/batch/selectList'),
                 method: 'get',
+                params:  this.$http.adornParams({batchType: 2}, false)
             }).then(({data}) => {
                 this.treeLoading = false;
                 if (data.code == 200) {
@@ -238,9 +234,11 @@ export default {
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
+            this.getTableData();
         },
         handleSelectionChange (val) {
-            this.multipleTable = val
+            this.multipleTable = val;
+            this.getTableData();
 
         },
         sizeChangeHandle (val) {
@@ -248,7 +246,6 @@ export default {
         },
         // 列表查看
         resultViewClick (data) {
-            console.log(data, 'datadatadata')
             this.$refs.resultView.showDialog(data)
 
         }
