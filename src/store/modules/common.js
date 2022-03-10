@@ -1,3 +1,4 @@
+import httpRequest from '@/utils/httpRequest'
 export default {
   namespaced: true,
   state: {
@@ -16,7 +17,8 @@ export default {
     contentIsNeedRefresh: false,
     // 主入口标签页
     mainTabs: [],
-    mainTabsActiveName: ''
+    mainTabsActiveName: '',
+    projectList: [], // 项目列表
   },
   mutations: {
     updateDocumentClientHeight (state, height) {
@@ -45,6 +47,22 @@ export default {
     },
     updateMainTabsActiveName (state, name) {
       state.mainTabsActiveName = name
+    },
+    updateProjectList (state, data) {
+      state.projectList = data
     }
-  }
+  },
+  actions: {
+    changeProjectList({commit}) {
+      httpRequest({
+          isLoading:false,
+          url: httpRequest.adornUrl('/xmProject/projectList'),
+          method: 'get',
+      }).then(({data}) => {
+          if (data.code == 200) {
+            commit('updateProjectList', data)  
+          }
+      }) 
+    },
+  },
 }

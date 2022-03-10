@@ -145,6 +145,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
+                params:  this.$http.adornParams({folderSorts: '3'}, false)
             }).then(({data}) => {
                 if (data.code == 200) { 
                     this.treeData = data.result;

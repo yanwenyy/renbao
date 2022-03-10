@@ -160,16 +160,14 @@ export default {
             this.searchForm.folderId = data.folderId;
             this.getSelectPage();
         },
-        treeClick (data) {
-            // console.log(data, 'datadatadata')
-
-        },
         queryClick () {
             this.getSelectPage();
 
         },
         onReset () {
             this.searchForm= { ruleName: '',ruleType: ''}
+            // 调用规则树的重置方法
+            this.$refs.ruleTree.clearCheckedKeys();
         },
         addFun () {
             this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');

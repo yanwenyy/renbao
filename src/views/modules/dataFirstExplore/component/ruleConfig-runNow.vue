@@ -103,7 +103,7 @@ export default {
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/rule/ruleRun`),
+              url: this.$http.adornUrl(`rule/ruleRun`),
               method: "post",
               data: this.$http.adornData(
                 {

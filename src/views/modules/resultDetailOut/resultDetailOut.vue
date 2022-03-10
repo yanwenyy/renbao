@@ -139,6 +139,8 @@ export default {
         },
         onReset () {
             this.searchForm={ruleCategory: '',ruleName: ''};
+            this.$refs.treesa.setCheckedKeys([]);
+            this.$refs.treesa.setCurrentKey(null);
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
@@ -180,7 +182,7 @@ export default {
                 url: this.$http.adornUrl(`/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
                 params:  this.$http.adornParams({
-                    batchId: this.batchItem.batchId,
+                    batchId: this.batchItem && this.batchItem.batchId ? this.batchItem.batchId : '',
                     ruleName: this.searchForm.ruleName,
                     ruleCategory: this.searchForm.ruleCategory,
                     batchType: 2
@@ -230,7 +232,7 @@ export default {
                 this.$http({
                     isLoading:false,
                     url: this.$http.adornUrl(`ruleResult/deleteByIds/${deleteList.join(',')}`),
-                    method: 'get',
+                    method: 'DELETE',
                 }).then(({data}) => {
                     if (data && data.code === 200) {
                     this.$message({message: '删除成功',type: 'success',})

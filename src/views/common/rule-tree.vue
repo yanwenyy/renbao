@@ -39,7 +39,7 @@
                     <i class="el-icon-edit" title="编辑"></i>
                     </el-button>
                     <el-button
-                        v-if="data.folderParentId"
+                        v-if="data.folderParentId  && !data.children"
                         type="text"
                         size="mini"
                         @click="() => remove(node, data)">
@@ -144,8 +144,7 @@ export default {
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
-                console.log(data, 'datadatadata')
-                if (data.code == 200) { 
+                if (data.code == 200) {
                     this.treeData = data.result;
                 }
             }).catch(() => {
@@ -253,6 +252,7 @@ export default {
            
         },
         remove (node, data) {
+            if( data.children ) return this.$message({message: '此规则不可删除',type: 'warning'});
             this.$confirm(`确认要该条规则吗?`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -280,12 +280,12 @@ export default {
                     
             }).catch(() => {})
         },
-        nodeClick (node, data) {
+        nodeClick (data, node) {
             // 调用父组件的获取规则树id的方法
             if (this.isParent) {
-                this.$parent[this.parentGetTreeData](data);
+                this.$parent[this.parentGetTreeData](data,node);
             } else {
-                this.$emit("getTreeId", node, data);
+                this.$emit("getTreeId", data,node );
             }
         },
         callCheckChange (data, checked, indeterminate) {
@@ -299,7 +299,14 @@ export default {
         },
         setCheckedByData (data) {
             this.$refs.ruleTreeRoot.setCheckedNodes([data]);
+        },
+        // 清楚选中的规则列表
+        clearCheckedKeys () {
+            // alert(1)
+            this.$refs.ruleTreeRoot.setCheckedKeys([]);
+            this.$refs.ruleTreeRoot.setCurrentKey(null);
         }
+        
         
 
     },
