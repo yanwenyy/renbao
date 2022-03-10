@@ -9,13 +9,14 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <div class='f_right'>                    
+            <div class='f_right'>             
+                <el-button size="mini" type="warning" v-show="isShow" @click="ImportLists">导出模板</el-button>       
                 <el-button size="mini" type="warning"  @click="ImportList">导入数据</el-button>
             </div>
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -41,7 +42,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%"  height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -66,7 +67,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -89,11 +90,11 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
                 </el-table>
                 <!-- 病种目录 -->
-                <el-table :data="tableList" v-if="selectNum == 4" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                </el-table>
+                <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                </el-table> -->
                 <!-- 服务价格目录 -->
-                <el-table :data="tableList" v-if="selectNum == 5" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                </el-table>  
+                <!-- <el-table :data="tableList" v-if="selectNum == 5" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                </el-table>   -->
              <el-pagination
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
@@ -143,11 +144,13 @@ export default {
                 total:0,
                 pageIndex:1
             },
+            fileName: "",
             activeKey:[],
             activeNames: ['1'],
             radio:'1',
             output:null,
             show:false,
+            isShow:false,
             options: [
                 {
                     value: '0',
@@ -161,13 +164,15 @@ export default {
                 },{
                     value: '3',
                     label: '医保耗材目录'
-                },{
-                    value: '4',
-                    label: '病种目录'
-                },{
-                    value: '5',
-                    label: '服务价格目录'
-                }],
+                },
+                // {
+                //     value: '4',
+                //     label: '病种目录'
+                // },{
+                //     value: '5',
+                //     label: '服务价格目录'
+                // }
+                ],
             tableList:[],
             tableList0:[],
             fileList:[],
@@ -184,6 +189,7 @@ export default {
     methods:{
         // 获取数据列表
         getDataList(val){
+            
             // this.dataLoading = true;
             this.$http({
                 url: this.$http.adornUrl("/threeCatalog/getThreeCatalogDataList"),
@@ -239,6 +245,32 @@ export default {
                     }
                 })
         },
+        //导出
+        ImportLists(){
+            this.$http({
+                url:this.$http.adornUrl('/threeCatalog/exportExcelFileCommon'),
+                method: "get",
+                responseType: 'blob',//解决乱码问题
+                params :this.$http.adornParams({
+                    catalogType:this.dataForm.dataType,
+                })
+            }).then(({data})=>{
+                const blob =  new Blob([data]);
+                let fileName = this.fileName + '.xls';
+                if("download" in document.createElement("a")){
+                    const elink = document.createElement("a")
+                    elink.download = fileName;
+                    elink.style.display = "none";
+                    elink.href = URL.createObjectURL(blob);  // 创建下载的链接
+                    document.body.appendChild(elink)
+                    elink.click(); // 点击下载
+                    URL.revokeObjectURL(elink.href);// 释放掉blob对象
+                    document.body.removeChild(elink)// 下载完成移除元素
+                }else{
+                    navigator.msSaveBlob(blob,fileName)
+                }
+            })
+        },
         //导入数据
         ImportList(){
             this.addUploadVisible = true
@@ -248,21 +280,30 @@ export default {
         //select时间
         changeOption(val){
             if(val == 1){
+                this.isShow = true
+                this.fileName = '医保药品目录'
                 this.selectNum = val
                 this.getDataList(val)
             }else if(val == 2){
+                this.exports = true
+                this.fileName = '医保诊疗项目目录'
                 this.selectNum = val
                 this.getDataList(val)
             }else if(val == 3){
+                this.exports = true
+                this.fileName = '医保耗材目录'
                 this.selectNum = val
                 this.getDataList(val)
-            }else if(val == 4){
-                this.selectNum = val
-                this.getDataList(val)
-            }else if(val == 5){
-                this.selectNum = val
-                this.getDataList(val)
-            }else if(val == 0){
+            }
+            // else if(val == 4){
+            //     this.selectNum = val
+            //     this.getDataList(val)
+            // }else if(val == 5){
+            //     this.selectNum = val
+            //     this.getDataList(val)
+            // }
+            else if(val == 0){
+                this.isShow = false
                 this.selectNum = val
                 this.apComServerData.total = 0; 
             }
@@ -302,5 +343,10 @@ export default {
 }
 .sub-comments-leave,.sub-comments-enter-active {
     height:500px;
+}
+.threeData{
+    width: 100%;
+    // display: flex;
+    // min-width: 800px;
 }
 </style>

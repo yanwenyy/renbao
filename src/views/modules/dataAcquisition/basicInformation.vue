@@ -60,7 +60,7 @@
                 <el-button size="small" type="primary" @click="handlePreview">选择文件</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
             </el-upload>
-        </el-dialog>
+            </el-dialog>
     </div>
 </template>
 <script>
@@ -177,10 +177,35 @@ export default {
         },
         //导出
         exportData(){
-            var url ='/hospitalBasicInfo/excelDataExport?hospitalName='+this.dataForm.hospitalName+'&hospitalType='+this.dataForm.hospitalType+'&moneyEnd='+this.dataForm.moneyEnd+'&moneyStart='+this.dataForm.moneyStart;
-            console.log(this.$http.adornUrl(url))
-            window.open(this.$http.adornUrl(url))
-
+             this.$http({
+                url:this.$http.adornUrl('/hospitalBasicInfo/excelDataExport'),
+                method: "get",
+                responseType: 'blob',//解决乱码问题
+                params :this.$http.adornParams({
+                    hospitalName:this.dataForm.hospitalName,
+                    hospitalType:this.dataForm.hospitalType,
+                    moneyEnd:this.dataForm.moneyEnd,
+                    moneyStart:this.dataForm.moneyStart
+                })
+            }).then(({data})=>{
+                const blob =  new Blob([data]);
+                let fileName = "excel.xls";
+                if("download" in document.createElement("a")){
+                    const elink = document.createElement("a")
+                    elink.download = fileName;
+                    elink.style.display = "none";
+                    elink.href = URL.createObjectURL(blob);  // 创建下载的链接
+                    document.body.appendChild(elink)
+                    elink.click(); // 点击下载
+                    URL.revokeObjectURL(elink.href);// 释放掉blob对象
+                    document.body.removeChild(elink)// 下载完成移除元素
+                }else{
+                    navigator.msSaveBlob(blob,fileName)
+                }
+            })
+            // var url ='/hospitalBasicInfo/excelDataExport?hospitalName='+this.dataForm.hospitalName+'&hospitalType='+this.dataForm.hospitalType+'&moneyEnd='+this.dataForm.moneyEnd+'&moneyStart='+this.dataForm.moneyStart;
+            // console.log(this.$http.adornUrl(url))
+            // window.open(this.$http.adornUrl(url))
         },
         // 关闭弹窗确认
         importSucceed(){
@@ -200,7 +225,6 @@ export default {
             this.apComServerData.pageIndex = val;
             this.getInitList()
         }
-
     }
 }
 </script>
