@@ -97,7 +97,7 @@
             :key="String(index)"
             v-for="(item, index) in resultTableTabs"
             v-if="item"
-            :label="'结果'"
+            :label="'结果'+(index+1)"
             :name="String(index)"
           >
             <div v-if="item.list==''">{{item.msg}}</div>

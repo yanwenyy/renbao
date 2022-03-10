@@ -44,6 +44,12 @@
       }
     },
     activated(){
+      this.sqlListData=[];
+      this.sqlListTotal=0;
+      this.sqlData='';
+      this.resultTableTabs=[];
+      this.loadTree=[];
+      this.treeData=[];
       this.getSjbData();
       this.getSqlList();
       this.ws=new PxSocket({
