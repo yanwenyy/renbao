@@ -185,6 +185,8 @@
               @close="closeAddOrEdit"
               @ok="succeed"
               :ruleId="ruleId"
+              :folderId="folderId"
+              :treeData1="treeData1"
               v-if="showAddOrEditDialog"
             ></AddOrEdit>
           </el-dialog>
@@ -226,13 +228,10 @@ export default {
     return {
       dataForm: {
         ruleName: "",
-        ruleCategory: "",
-        createUserName: "",
-        createTime: ""
-        // hospitalName: ""
+        ruleCategory: ""
       },
-      // pbFileList: [],
-      // pbFiles: [],
+      folderId: "",
+      folderPath: "",
       ruleTree: "",
       runIds: "",
       //当前页
@@ -267,7 +266,7 @@ export default {
       rows: [],
       info: "",
       ruleId: "",
-      folderId: 1
+      treeData1: []
     };
   },
   created() {
@@ -283,8 +282,9 @@ export default {
             pageNo: this.pageIndex,
             pageSize: this.pageSize,
             ruleName: this.dataForm.ruleName,
-            ruleCategory: this.dataForm.ruleCategory,
-            folderId: this.folderId
+            ruleCategory: this.dataForm.ruleCategory
+            // folderId: this.folderId,
+            // folderPath: this.folderPath
           },
           false
         )
@@ -308,11 +308,15 @@ export default {
     addData() {
       this.showAddOrEditDialog = true;
       this.ruleId = "";
+      this.folderId = "";
+      this.treeData1 = this.treeData;
     },
     //修改弹框
     editData() {
       this.showAddOrEditDialog = true;
       this.ruleId = this.multipleSelection[0].ruleId;
+      this.folderId = this.multipleSelection[0].folderId;
+      this.treeData1 = this.treeData;
     },
     // 关闭编辑弹窗
     closeDetail() {
@@ -377,7 +381,6 @@ export default {
         createUserName: "",
         createTime: ""
       };
-      this.folderId = 1;
       this.initData();
     },
     //立即运行
@@ -443,7 +446,32 @@ export default {
     //拿到选择树的id
     getTreeId(data) {
       this.folderId = data.folderId;
-      this.initData();
+      this.folderPath = data.folderPath;
+      this.$http({
+        url: this.$http.adornUrl("/rule/selectPage"),
+        method: "get",
+        params: this.$http.adornParams(
+          {
+            pageNo: this.pageIndex,
+            pageSize: this.pageSize,
+            ruleName: this.dataForm.ruleName,
+            ruleCategory: this.dataForm.ruleCategory,
+            folderId: this.folderId,
+            folderPath: this.folderPath
+          },
+          false
+        )
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableData = data.result.records;
+          this.totalPage = data.result.total;
+          this.dataForm.total = data.result.total;
+        } else {
+          this.dataForm.total = 0;
+          this.tableData = [];
+          this.totalPage = 0;
+        }
+      });
     }
   }
 };

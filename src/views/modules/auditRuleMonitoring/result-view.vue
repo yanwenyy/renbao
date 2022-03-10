@@ -8,60 +8,25 @@
             :close-on-press-escape="false"
             :before-close="handleClose">
             <div class="result-view-box">
-                <!-- <el-descriptions class="margin-top" :column="1"  border>
-
-                </el-descriptions> -->
-                 <!-- <el-descriptions class="margin-top" :column="1" border>
-                    <el-descriptions-item>
-                    <template slot="label">
-                        规则名称
-                    </template>
-                    11
-                    </el-descriptions-item>
-                    <el-descriptions-item>
-                    <template slot="label">
-                        开始时间
-                    </template>
-                    222
-                    </el-descriptions-item>
-                    <el-descriptions-item>
-                    <template slot="label">
-                        结束时间
-                    </template>
-                    333
-                    </el-descriptions-item>
-                    <el-descriptions-item>
-                    <template slot="label">
-                        状态
-                    </template>
-                    失败
-                    </el-descriptions-item>
-                    <el-descriptions-item>
-                    <template slot="label">
-                        错误描述
-                    </template>
-                   1111111111
-                    </el-descriptions-item>
-                </el-descriptions> -->
                 <div class="result-view-item">
                     <span class="result-label">规则名称：</span>
-                    <span>11</span>
+                    <span>{{resultViewData.ruleName}}</span>
                 </div>
                 <div class="result-view-item">
                     <span class="result-label">开始时间：</span>
-                    <span>22</span>
+                    <span>{{resultViewData.actualBeginTime}}</span>
                 </div>
                 <div class="result-view-item">
                     <span class="result-label">结束时间：</span>
-                    <span>33</span>
+                    <span>{{resultViewData.actualEndTime}}</span>
                 </div>
                 <div class="result-view-item">
                     <span class="result-label">状态：</span>
-                    <span>44</span>
+                    <span>{{resultViewData.runStatusName}}</span>
                 </div>
                 <div class="result-view-item">
                     <span class="result-label">错误描述：</span>
-                    <span>55</span>
+                    <span>{{resultViewData.resultMessage}}</span>
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -88,7 +53,6 @@ export default {
         showDialog(data, d) {
             this.dialogVisible = true
             this.resultViewData = data
-            
         },
         handleClose () {
             this.dialogVisible = false

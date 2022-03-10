@@ -26,7 +26,6 @@
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
                 <el-button @click="cancel" size="small">取 消</el-button>
-               
             </span>
         </el-dialog>
     </div>
@@ -41,28 +40,69 @@ export default {
         return {
             loading: false,
             dialogVisible: false,
-            uniqueValue: '', //最后拿到的唯一选择的moduldCode值,相当于id 
+            uniqueValue: '', //最后拿到的唯一选择的moduldCode值,相当于id
+            bitchCheckData: {}
         }
     },
     methods: {
         //默认打开页面
         showDialog(type, d) {
             this.dialogVisible = true
-            
         },
         handleCheckChange (data, checked, indeterminate) {
-           console.log(data, 'datadatadata')  
-           
+           this.bitchCheckData = data; 
         },
         getTreeCheckData (data) {
-            console.log(data, 'datadata')
-
+            this.bitchCheckData = data;
+            this.$refs.ruleTree.setCheckedByData(data);
         },
        
         handleClose () {
             this.dialogVisible = false
         },
         onSubmit (formName) {
+            // console.log(this.bitchCheckData, 'bitchCheckDatabitchCheckDatabitchCheckData')
+            //  ruleUrl = '/rule/updateByUuId'
+
+            // this.$refs[formName].validate((valid) => {
+            //     if (valid) {
+            //         this.loading = true
+            //         this.$http({
+            //             isLoading:false,
+            //             url: this.$http.adornUrl(ruleUrl),
+            //             method: 'post',
+            //             data:  this.$http.adornData(this.ruleOperationForm, false)
+            //         }).then(({data}) => {
+            //             // this.btnLoading = false;
+            //             if (data.code == 200) {
+            //                 this.loading = false
+            //                 this.$message({
+            //                     message: this.type == 'add' ?'添加成功' : '编辑成功',
+            //                     type: 'success',
+            //                     duration: 1500,
+            //                 })
+            //                 this.dialogVisible = false;
+            //                 this.$parent.getSelectPage();
+            //                 this.$parent.setTableChecked()
+            //             } else {
+            //                 this.loading = false
+            //                 this.$message({
+            //                     message: this.type == 'add' ?'添加失败' : '编辑失败',
+            //                     type: 'error',
+            //                     duration: 1500,
+            //                 })
+            //                  this.dialogVisible = false;
+
+            //             }
+            //         }).catch(() => {
+            //             this.loading = false
+            //         })  
+
+
+
+            //     }
+            // })   
+
 
             
         },

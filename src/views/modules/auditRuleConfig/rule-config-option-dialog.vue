@@ -15,13 +15,13 @@
                         <el-input class="size"  v-model="ruleOperationForm.ruleName" autocomplete="off" clearable></el-input>
                     </el-form-item>
                   
-                    <el-form-item label="规则类型：">
+                    <el-form-item label="规则类别：" prop="ruleCategory">
                         <el-select v-model="ruleOperationForm.ruleCategory"  placeholder="请选择" clearable>
                             <el-option label="门诊审核规则" :value=1></el-option>
                             <el-option label="住院审核规则" :value=2></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="规则：">
+                    <el-form-item label="规则：" prop="folderName">
                         <el-select v-model="ruleOperationForm.folderName" placeholder="请选择" multiple collapse-tags>
                             <el-option :value="ruleOperationForm.folderName" style="height: auto">
                                 <el-tree :data="treeData" default-expand-all show-checkbox check-strictly 
@@ -30,10 +30,16 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="创建人：">
+                    <!-- <el-form-item 
+                        label="规则名称"
+                        prop="ruleName"
+                    >
+                        <el-input class="size"  v-model="ruleOperationForm.ruleName" autocomplete="off" clearable></el-input>
+                    </el-form-item> -->
+                    <el-form-item label="创建人：" prop="username">
                         <el-input class="size"  v-model="username" autocomplete="off" disabled></el-input>
                     </el-form-item>
-                    <el-form-item label="创建时间：">
+                    <el-form-item label="创建时间：" prop="createTime">
                         <el-input class="size" v-model="ruleOperationForm.createTime" autocomplete="off" disabled></el-input>
                     </el-form-item>
                     <el-form-item>
@@ -69,12 +75,26 @@ export default {
                 createTime: '',
                 folderName: '',
                 folderPath: '',
-                ruleId: ''
+                ruleId: '',
+                username: ''
             },
             ruleOperationFormRules: {
-                batchName: [
-                    { required: true, message: '请输入批次名称'},
+                ruleName: [
+                    { required: true, message: '请输入规则名称'},
                 ],
+                ruleCategory: [
+                    { required: true, message: '请选择规则类别'},
+                ],
+                // folderName: [
+                //     { required: true, message: '请选择规则类别'},
+                // ],
+                username: [
+                    { required: true, message: '请输入创建人'},
+                ],
+                createTime: [
+                    { required: true, message: '请输入创建时间'},
+                ]
+
             },
             type: '',
             checkedData: [],
@@ -114,9 +134,10 @@ export default {
 
             });// 获取规则树
             this.dialogVisible = true;
-            
             this.ruleOperationForm.createTime = getDate(); // 回显创建时间
             this.ruleOperationForm.createUserName = this.username; // 回显创建人
+            this.ruleOperationForm.username = this.username; // 回显创建人
+
         },
         // 获取规则树
         getRuleFolder (callBack) {
@@ -212,24 +233,10 @@ export default {
                 this.ruleOperationForm.folderId =  '';
                 this.ruleOperationForm.folderPath =  ''
             }
-           
-            // this.ruleOperationForm.folderPath = ''
         },
-        reset () {
-            this.ruleOperationForm = {
-                ruleName: '',
-                ruleCategory: '',
-                folderId: '',
-                createUserName: '',
-                createTime: '',
-                folderName: '',
-                folderPath: '',
-                ruleId: ''
-            };
-        },
-      
         handleClose () {
             this.resetForm();
+            this.reset();
             // this.$refs.treeSelect.setCheckedKeys([])
             this.dialogVisible = false
 
@@ -282,12 +289,25 @@ export default {
         },
         cancel () {
             this.resetForm();
+            this.reset();
             this.dialogVisible = false;
            
         },
         resetForm(formName) {
             this.$refs['ruleOperationForm'].resetFields();
-        }
+        },
+        reset () {
+            this.ruleOperationForm = {
+                ruleName: '',
+                ruleCategory: '',
+                folderId: '',
+                createUserName: '',
+                createTime: '',
+                folderName: '',
+                folderPath: '',
+                ruleId: ''
+            };
+        },
     },
     computed: {
         username: {

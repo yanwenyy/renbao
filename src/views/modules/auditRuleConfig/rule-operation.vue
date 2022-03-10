@@ -23,7 +23,7 @@
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item 
-                        label="选中医院"
+                        label="选择医院"
                         prop="hospital"
                     >
                         <el-input class="size" :disabled="true" placeholder="请选择医院"  v-model="ruleOperationForm.hospital" autocomplete="off"></el-input>
@@ -136,14 +136,19 @@ export default {
                     }).then(({data}) => {
                         // this.btnLoading = false;
                         if (data.code == 200) {
-                            this.$message({
-                                message: '执行成功',
-                                type: 'success',
-                                duration: 1500,
-                            })
+                            // this.$message({
+                            //     message: '执行成功',
+                            //     type: 'success',
+                            //     duration: 1500,
+                            // })
                             this.loading = false
-                            this.dialogVisible = false;
-                            this.$parent.setTableChecked()
+                            this.$alert('请在审核执行监控中查看运行详情', {
+                                confirmButtonText: '关闭',
+                                callback: action => {
+                                    this.dialogVisible = false;
+                                    this.$parent.setTableChecked()
+                                }
+                            });
                         } else {
                             this.$message({
                                 message: '执行失败',

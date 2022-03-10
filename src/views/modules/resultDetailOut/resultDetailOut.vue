@@ -125,33 +125,32 @@ export default {
             batchItem: {}
         }
     },
-    mounted () {
+    activated () {
         this.getbatchList();
+        this.getTableData()
     },
     methods: {
         nodeClick (node,data) {
-            this.getTableData(data)
             this.batchItem = data;
+            this.getTableData()
         },
         onQuery () {
-            if (this.batchItem.batchId) {
-                this.getTableData(this.batchItem)
-            } else {
-                this.$message({message: '请选择批次列表',type: 'warning'})
-            } 
+            this.getTableData()
         },
         onReset () {
             this.searchForm={ruleCategory: '',ruleName: ''};
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
+            this.getTableData()
         },
         handleSelectionChange (val) {
-            this.multipleTable = val
+            this.multipleTable = val;
 
         },
         sizeChangeHandle (val) {
             this.Pager.pageSize = val
+            this.getTableData()
         },
         dealRunStatus (type) {
             if (type == 1) {
@@ -165,38 +164,33 @@ export default {
             }
 
         },
-        dealRuleType (data) {
-            if (data) {
-                if (data.ruleCategory ==1) {
-                    return '门诊规则'
-                } else if(data.ruleCategory ==1) {
-                    return '住院规则'
-
-                } else {
-                    return ''
-                }
-            }else {
+        dealRuleType (ruleCategory) {
+            if (ruleCategory ==1) {
+                return '门诊规则'
+            } else if(ruleCategory ==1) {
+                return '住院规则'
+            } else {
                 return ''
             }
-
         },
-        getTableData (batchData) {
+        getTableData () {
             this.tableLoading = true;
             this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl(`/ruleResult/selectPageByRuleResult?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
                 method: 'get',
                 params:  this.$http.adornParams({
-                    batchId: batchData.batchId,
+                    batchId: this.batchItem.batchId,
                     ruleName: this.searchForm.ruleName,
-                    ruleCategory: this.searchForm.ruleCategory
+                    ruleCategory: this.searchForm.ruleCategory,
+                    batchType: 2
                 }, false)
             }).then(({data}) => {
                 this.tableLoading = false
                 if (data.code == 200) {
                     data.result.records.map(i => {
-                        i.ruleName = i.rule && i.rule.ruleName || ''
-                        i.dealRuleType = this.dealRuleType(i.rule)
+                        // i.ruleName = i.rule && i.rule.ruleName || ''
+                        i.dealRuleType = this.dealRuleType(i.ruleCategory)
                         i.expectedBeginTime = i.expectedBeginTime && i.expectedBeginTime.split('T')[0] || '';
                         i.actualBeginTime = i.actualBeginTime && i.actualBeginTime.split('T')[0] || '';
                         i.expectedEndTime = i.expectedEndTime && i.expectedEndTime.split('T')[0] || '';
@@ -219,12 +213,36 @@ export default {
 
         },
         resultDetailsExportClick () {
-            // console.log('导出弹框')
-            this.$refs.resultDetailOutDialog.showDialog()
+            this.$refs.resultDetailOutDialog.showDialog(this.batchItem)
         },
        
         deleteFn () {
-
+            if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+            var deleteList = []
+            this.multipleTable.forEach( item =>{
+                deleteList.push( item.ruleId )
+            })
+            this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                this.$http({
+                    isLoading:false,
+                    url: this.$http.adornUrl(`ruleResult/deleteByIds/${deleteList.join(',')}`),
+                    method: 'post',
+                }).then(({data}) => {
+                    if (data && data.code === 200) {
+                    this.$message({message: '删除成功',type: 'success',})
+                    this.Pager.pageIndex = 1;
+                    this.Pager.pageSize = 10;
+                    this.getTableData();
+                    this.setTableChecked();
+                    } else {
+                    this.$message.error(data.msg)
+                    }
+            })
+            }).catch(() => {})
         },
         getbatchList () {
             this.treeLoading = true;
@@ -232,6 +250,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/batch/selectList'),
                 method: 'get',
+                params:  this.$http.adornParams({batchType: 2}, false)
             }).then(({data}) => {
                 this.treeLoading = false;
                 if (data.code == 200) {
@@ -240,6 +259,10 @@ export default {
             }).catch(() => {
                 this.treeLoading = false;
             })
+        },
+        setTableChecked () {
+            this.$refs.multipleTable.clearSelection(this.multipleTable);
+            this.multipleTable = [];
         },
     },
     components: {

@@ -19,9 +19,11 @@
             :check-strictly="isRelation"
             node-key="folderId"
             @check-change="callCheckChange"
+            highlight-current
+            @node-click="nodeClick"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span @click="nodeClick(node, data)" class="custom-tree-label">{{ node.label }}</span>
+                <span class="custom-tree-label">{{ node.label }}</span>
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
                         type="text"
@@ -241,6 +243,7 @@ export default {
             this.editRuleItem = data; // 获取本条数据
             this.editRuleItemNode = node; // 获取点击node
             this.optionType = type; // 编辑或新增
+
            
         },
         remove (node, data) {
@@ -276,8 +279,8 @@ export default {
             if (this.isParent) {
                 this.$parent[this.parentGetTreeData](data);
             } else {
-                this.$emit("getTreeId", data);
-            } 
+                this.$emit("getTreeId", node, data);
+            }
         },
         callCheckChange (data, checked, indeterminate) {
             // alert(1111)
@@ -287,8 +290,11 @@ export default {
                     this.$refs.ruleTreeRoot.setCheckedNodes([data]);
                 }
             }
-
+        },
+        setCheckedByData (data) {
+            this.$refs.ruleTreeRoot.setCheckedNodes([data]);
         }
+        
 
     },
     watch: {
