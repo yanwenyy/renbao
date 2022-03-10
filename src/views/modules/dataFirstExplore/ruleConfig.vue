@@ -10,7 +10,7 @@
             @getTreeId="getTreeId"
             :isParent="false"
             ref="ruleTree"
-            :folderSorts=[1,2]
+            folderSorts="1,2"
           ></rule-tree>
         </el-card>
       </el-col>

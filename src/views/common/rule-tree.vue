@@ -92,7 +92,7 @@ export default {
             type: Boolean, // 父子节点是否关联,是否单选
             default: false
         },
-        folderSorts: {
+        folderSorts: { // 规则树查询参数
             default: ''
         }
 
@@ -140,8 +140,8 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                // params:  this.$http.adornParams({folderSorts: this.folderSorts}, false)
-                params:  this.$http.adornParams({}, false)
+                params:  this.$http.adornParams({folderSorts: this.folderSorts}, false)
+                // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
                 console.log(data, 'datadatadata')

@@ -123,8 +123,9 @@ export default {
         },
       
         handleClose () {
-            this.resetForm();
             this.dialogVisible = false
+            this.resetForm();
+            this.reset();
         },
         onSubmit (formName) {
              this.$refs[formName].validate((valid) => {
@@ -178,18 +179,27 @@ export default {
             this.ruleOperationForm.hospitalCode = hospitalCode.join(',');
         },
         cancel () {
-            this.resetForm();
             this.dialogVisible = false;
-           
+            this.resetForm();
+            this.reset();  
         },
         resetForm(formName) {
-            this.$refs['ruleOperationForm'].resetFields();
+            if (this.$refs['ruleOperationForm']) {
+                this.$refs['ruleOperationForm'].resetFields();
+            }
+            
         }
     },
     components: {
         hospitalSelection
     },
     watch : {
+        'dialogVisible'(nval, oval) {
+            if (nval ) {
+               this.resetForm();
+               this.reset()
+            }
+        },
     }
 }
 </script>
