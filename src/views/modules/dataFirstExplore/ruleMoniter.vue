@@ -1,438 +1,378 @@
-<!--初探规则监控-->
 <template>
-  <div class="lawsAregulations">
-    <el-row :gutter="20">
-      <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
-          <el-tree
-            :isShowSearch="true"
-            :isShowCheckBox="true"
-            :data="ruleTree"
-            parentGetTreeData="getTreeData"
-            :props="defaultProps"
-            @node-click="handleNodeClick"
-            default-expand-all
-            ref="ruleTree"
-            node-key="id"
-          ></el-tree>
-        </el-card>
-      </el-col>
-      <el-col :span="19">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <el-row>
-              <el-col :span="4">
-                <div class="search-operation">
-                  <el-select
-                    v-model="dataForm.ruleCategory"
-                    filterable
-                    clearable
-                    placeholder="规则类别"
-                    size="small"
-                  >
-                    <el-option
-                      v-for="(item, index) in ruleCategory"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <div class="search-operation">
-                  <el-select
-                    v-model="dataForm.runStatus"
-                    filterable
-                    clearable
-                    placeholder="运行状态"
-                    size="small"
-                    @change="getProjectId"
-                  >
-                    <el-option
-                      v-for="(item, index) in runStatus"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <el-button @click="getAllSearch()" type="primary"
-                  >查询</el-button
-                >
-                <el-button @click="reset()">重置</el-button>
-              </el-col>
-            </el-row>
-          </div>
-          <div class="content">
-            <div class="tableTitle">
-              <span
-                >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
-                >条</span
-              >
-            </div>
-            <el-table
-              :data="tableData"
-              border
-              ref="tableData"
-              @selection-change="handleSelectionChange"
-              v-loading="loading"
-              style="width: 100%;margin-top: 20px"
+  <div class="box">
+    <div class="auditRuleMonitoring-left">
+      <el-tree
+        :data="batchTreeList"
+        highlight-current
+        :default-expand-all="true"
+        v-loading="treeLoading"
+        node-key="id"
+        ref="treesa"
+        :props="layoutTreeProps"
+      >
+        <span
+          class="custom-tree-node"
+          slot-scope="{ node, data }"
+          @click="nodeClick(node, data)"
+        >
+          <span>
+            {{ node.label }}
+          </span>
+        </span>
+      </el-tree>
+    </div>
+    <div class="auditRuleMonitoring-right">
+      <div class="search-box">
+        <el-form ref="searchForm" :model="searchForm" :inline="true">
+          <el-form-item label="规则类型：">
+            <el-select
+              v-model="searchForm.ruleCategory"
+              placeholder="请选择"
+              clearable
             >
-              <el-table-column type="selection" width="55"> </el-table-column>
-              <el-table-column
-                prop="ruleName"
-                label="规则名称"
-              ></el-table-column>
-              <el-table-column prop="ruleCategory" label="规则类别">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
-                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="expectedBeginTime"
-                label="预计开始时间"
-              ></el-table-column>
-              <el-table-column prop="expectedEndTime" label="预计结束时间">
-              </el-table-column>
-              <el-table-column prop="actualBeginTime" label="实际开始时间">
-              </el-table-column>
-              <el-table-column prop="actualEndTime" label="实际结束时间">
-              </el-table-column>
-              <el-table-column prop="runStatus" label="运行状态">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.runStatus == 1">待执行</div>
-                  <div v-if="scope.row.runStatus == 2">执行中</div>
-                  <div v-if="scope.row.runStatus == 3">执行失败</div>
-                  <div v-if="scope.row.runStatus == 4">已完成</div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="moblie" label="操作">
-                <template slot-scope="scope">
-                  <el-button type="text" @click="detailHandle(scope.row.id)"
+              <el-option label="门诊规则" :value="1"></el-option>
+              <el-option label="住院规则" :value="2"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="运行状态：">
+            <el-select
+              v-model="searchForm.runStatus"
+              placeholder="请选择"
+              clearable
+            >
+              <el-option label="待执行" :value="1"></el-option>
+              <el-option label="执行中" :value="2"></el-option>
+              <el-option label="执行失败" :value="3"></el-option>
+              <el-option label="已完成" :value="4"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="onQuery">查询</el-button>
+            <el-button type="info" @click="onReset">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
+      <div class="table-box">
+        <el-table
+          v-loading="tableLoading"
+          ref="multipleTable"
+          :data="tableData"
+          tooltip-effect="dark"
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
+          <!-- <el-table-column type="selection" width="55"></el-table-column> -->
+          <el-table-column
+            v-for="(items, index) in tablePositionKey"
+            :prop="items.dataname"
+            :key="index"
+            :label="items.label"
+            :sortable="items.issortable"
+            :min-width="items.minWidth"
+            :align="items.align ? items.align : 'center'"
+            :width="items.width"
+          >
+            <template slot-scope="scope">
+              <div v-if="items.type == 'option'">
+                <div class="operation-box">
+                  <!-- <span @click="publish(scope.row)">发表</span> -->
+                  <el-button
+                    type="text"
+                    class="result-view-text"
+                    @click="resultViewClick(scope.row)"
+                    v-if="scope.row.q5 == 1"
                     >查看日志</el-button
                   >
-                  <div type="text" v-if="scope.row.aa == 1">运行成功</div>
-                </template>
-              </el-table-column>
-            </el-table>
-            <div class="pager">
-              <el-pagination
-                small
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :total="dataForm.total"
-              ></el-pagination>
-            </div>
-          </div>
-          <!--查看详细弹窗 -->
-          <el-dialog
-            :visible.sync="showDetailDialog"
-            title="监控报告详情"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <detail
-              @close="closeDetail"
-              @ok="editSucceed"
-              :info="info"
-              v-if="showDetailDialog"
-            ></detail>
-          </el-dialog>
-        </el-card>
-      </el-col>
-    </el-row>
+                  <span v-else>运行成功</span>
+                </div>
+              </div>
+              <div v-else>
+                <span
+                  :style="scope.row[items.dataname] == '0' ? 'color:#ccc' : ''"
+                >
+                  {{ scope.row[items.dataname] }}
+                </span>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <el-pagination
+        v-if="Pager.total >= 1"
+        @size-change="sizeChangeHandle"
+        @current-change="currentChangeHandle"
+        :current-page="Pager.pageIndex"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="Pager.pageSize"
+        :total="Pager.total"
+        layout="total, sizes, prev, pager, next, jumper"
+      >
+      </el-pagination>
+    </div>
+    <!--查看详细弹窗 -->
+    <el-dialog
+      :visible.sync="showDetailDialog"
+      title="监控报告详情"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      width="40%"
+      :close-on-press-escape="false"
+    >
+      <detail @close="closeDetail" :id="id" v-if="showDetailDialog"></detail>
+    </el-dialog>
   </div>
 </template>
 <script>
 import detail from "./component/ruleMoniter-detail.vue";
-import ruleTree from "../../common/rule-tree.vue";
 export default {
   components: {
-    detail,
-    ruleTree
+    detail
   },
   data() {
     return {
-      dataForm: {
-        ruleName: "",
+      showDetailDialog: false,
+      treeLoading: false,
+      tableLoading: false,
+      batchTreeList: [
+        {
+          label: "批次名称",
+          children: []
+        }
+      ],
+      id: "",
+      searchForm: {
         ruleCategory: "",
-        expectedBeginTime: "",
-        expectedEndTime: "",
-        actualBeginTime: "",
-        actualEndTime: "",
         runStatus: ""
       },
-      pbFileList: [],
-      pbFiles: [],
-      ruleTree: [],
-      //运行状态
-      runStatus: [
-        { id: 1, name: "执行中" },
-        { id: 2, name: "已完成" },
-        { id: 3, name: "执行失败" }
+      tableData: [],
+      tablePositionKey: [
+        {
+          dataname: "ruleName",
+          label: "规则名称",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "ruleType",
+          label: "规则类别",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "expectedBeginTime",
+          label: "预计开始时间",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "actualBeginTime",
+          label: "实际开始时间",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "expectedEndTime",
+          label: "预计结束时间",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "actualEndTime",
+          label: "实际结束时间",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "runStatusName",
+          label: "运行状态",
+          issortable: false,
+          type: ""
+        },
+        { dataname: "q5", label: "操作", issortable: false, type: "option" }
       ],
-      //规则类别
-      ruleCategory: [
-        { id: 1, name: "门诊规则" },
-        { id: 2, name: "住院规则" }
-      ],
-      defaultProps: {
-        children: "children",
-        label: "name"
+      Pager: {
+        pageSize: 10,
+        pageIndex: 1,
+        total: 0
       },
-      tableData: [1],
-      multipleSelection: [],
-      loading: false,
-      treeLoading: false,
-      formLoading: false,
-      //查看规则详细弹窗是否显示
-      showDetailDialog: false,
-      //新增、修改弹窗是否显示
-      showAddOrEditDialog: false,
-      //立即运行、定时运行弹窗是否显示
-      showRunDialog: false,
-      rows: [],
-      info: ""
+      batchType: "",
+      multipleTable: [],
+      batchId: "",
+      layoutTreeProps: {
+        label(data, node) {
+          const config = data.__config__ || data;
+          return config.label || config.batchName;
+        }
+      }
     };
   },
   created() {
-    this.initData();
-    // this.initTree();
+    this.getbatchList();
+    this.getTableData();
   },
   methods: {
-    initData() {
+    dealRunStatus(type) {
+      if (type == 1) {
+        return "待执行";
+      } else if (type == 2) {
+        return "执行中";
+      } else if (type == 3) {
+        return "执行失败";
+      } else if (type == 4) {
+        return "已完成";
+      }
+    },
+    getTableData() {
+      this.tableLoading = true;
       this.$http({
+        isLoading: false,
         url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
-        params: this.$http.adornParams({
-          ruleResult: {
+        params: this.$http.adornParams(
+          {
             batchId: this.batchId,
-            runStatus: this.dataForm.runStatus, //1:待执行,2:执行中,3:执行失败,4:已完成
-            rule: {
-              ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
-              ruleName: this.dataForm.ruleName
-            }
+            runStatus: this.searchForm.runStatus, // 运行状态
+            ruleCategory: this.searchForm.ruleCategory,
+            pageNo: this.Pager.pageIndex,
+            pageSize: this.Pager.pageSize,
+            batchType: 1
           },
-          pageNo: this.pageIndex,
-          pageSize: this.pageSize
+          false
+        )
+      })
+        .then(({ data }) => {
+          this.tableLoading = false;
+          if (data.code == 200) {
+            data.result.records.map(i => {
+              i.ruleName = i.rule.ruleName;
+              i.ruleType =
+                i.rule.ruleType == 1
+                  ? "门诊审核规则"
+                  : i.ruleCategory == 2
+                  ? "住院审核规则"
+                  : "";
+              i.expectedBeginTime =
+                (i.expectedBeginTime && i.expectedBeginTime.split("T")[0]) ||
+                "";
+              i.actualBeginTime =
+                (i.actualBeginTime && i.actualBeginTime.split("T")[0]) || "";
+              i.expectedEndTime =
+                (i.expectedEndTime && i.expectedEndTime.split("T")[0]) || "";
+              i.actualEndTime =
+                (i.actualEndTime && i.actualEndTime.split("T")[0]) || "";
+              i.runStatusName = this.dealRunStatus(i.runStatus);
+            });
+            this.tableData = data.result.records;
+            this.Pager.pageSize = data.result.size;
+            this.Pager.pageIndex = data.result.current;
+            this.Pager.total = data.result.total;
+          }
         })
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.tableData = data.result.records;
-          this.totalPage = data.result.total;
-          this.dataForm.total = data.result.total;
-        } else {
-          this.dataForm.total = 0;
-          this.tableData = [];
-          this.totalPage = 0;
-        }
-      });
+        .catch(() => {
+          this.tableLoading = false;
+        });
     },
-    /* initTree() {
+    getbatchList() {
+      this.treeLoading = true;
       this.$http({
+        isLoading: false,
         url: this.$http.adornUrl("/batch/selectList"),
         method: "get",
-        params: this.$http.adornParams({})
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.ruleTree = data.result.records;
-        } else {
-          this.ruleTree = [];
-        }
-      });
-    }, */
-    //点击树节点切换表
-    handleNodeClick(data) {
-      this.initData()
-    },
-    //查看详情弹框
-    ledgerTable(data) {
-      this.showDetailDialog = true;
-      this.info = data;
-    },
-    //新增弹框
-    addData() {
-      this.showAddOrEditDialog = true;
-    },
-    //修改弹框
-    editData() {
-      this.showAddOrEditDialog = true;
-    },
-    //弹窗提交
-    popUpSubmit() {
-      this.pbFileList = this.$refs.pbFile.fileListData;
-      this.$refs.submitData.validate(valid => {
-        if (valid) {
-          if (this.popUpDatas.type == 1) {
-            this.addSub();
-          } else {
-            this.submitForm();
+        params: this.$http.adornParams(
+          {
+            batchType: 1
+          },
+          false
+        )
+      })
+        .then(({ data }) => {
+          this.treeLoading = false;
+          if (data.code == 200) {
+            this.batchTreeList[0].children = data.result;
           }
-        }
-      });
+        })
+        .catch(() => {
+          this.treeLoading = false;
+        });
     },
-
-    //修改保存
-    submitForm() {
-      let params = {
-        lawRegulationUuid: this.multipleSelection[0].LAWREGULATIONUUID,
-        title: this.submitData.title, //标题
-        issueUnit: this.submitData.issueUnit, //颁布单位
-        referenceNumber: this.submitData.referenceNumber, //文号
-        effectiveDate: new Date(this.submitData.effectiveDate), //生效日期
-        regulationCategoryCode: this.regulationCategory1.extStr1,
-        regulationCategory: this.regulationCategory1.name,
-        ruleGradationCode: this.ruleGradation1.extStr1,
-        ruleGradationName: this.ruleGradation1.name,
-        addressName: this.submitData.addressName,
-        content: this.submitData.content,
-        timelinessName: this.submitData.timelinessName,
-        remark: this.submitData.remark,
-        pbFiles: this.pbFileList,
-        deleteFileIds: this.deleteFileIds
+    //左点右显
+    nodeClick(node, data) {
+      this.batchId = data.batchId;
+      this.getTableData();
+    },
+    // 列表查询
+    onQuery() {},
+    // 列表重置
+    onReset() {
+      this.searchForm = {
+        ruleCategory: "",
+        runStatus: ""
       };
-      updateLawRule(params, "").then(res => {
-        if (res.data.head.status == 20) {
-          this.$message.success("操作成功");
-          this.popUpDatas.show = false;
-          this.initData();
-        } else {
-          this.$message.error("操作失败");
-          this.popUpDatas.show = false;
-        }
-      });
+      this.getTableData();
     },
-    //将返回的数据整理为树形结构
-    listToTree(list) {
-      var arr = [];
-      let items = {};
-      var idsStr = "";
-      // 获取每个节点的直属子节点（是直属，不是所有子节点）
-      for (let i = 0; i < list.length; i++) {
-        let key = list[i].pid;
-        if (items[key]) {
-          items[key].push(list[i]);
-        } else {
-          items[key] = [];
-          items[key].push(list[i]);
-        }
-        idsStr += idsStr === "" ? list[i].id : "," + list[i].id;
-      }
-      for (var key in items) {
-        if (idsStr.indexOf(key) === -1) {
-          //找到最大的父节点key
-          arr = this.formatTree(items, key);
-        }
-      }
-      // console.log(arr)
-      return arr;
+    currentChangeHandle(val) {
+      this.Pager.pageIndex = val;
     },
-    formatTree(items, parentId) {
-      let result = [];
-      if (!items[parentId]) {
-        return result;
-      }
-      for (let t of items[parentId]) {
-        t.children = this.formatTree(items, t.id); //递归获取children
-        result.push(t);
-      }
-      return result;
+    handleSelectionChange(val) {
+      this.multipleTable = val;
     },
-    // 关闭编辑弹窗
+    sizeChangeHandle(val) {
+      this.Pager.pageSize = val;
+    },
+    // 日志查看
+    resultViewClick(data) {
+      this.showDetailDialog = true;
+      // alert(JSON.stringify(data))
+      this.id = data.resultId;
+    },
+    //关闭日志弹窗
     closeDetail() {
       this.showDetailDialog = false;
-    },
-    // 关闭弹窗确认
-    editSucceed() {
-      this.closeDetail();
-    },
-    // 关闭新增弹窗
-    closeAddDrawer() {
-      this.showAddDialog = false;
-    },
-    // 保存新增
-    addSucceed() {
-      this.showAddDialog = false;
-      this.initData();
-    },
-    //列表多选
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    //获取选择的法规类型数据
-    getRegulationCategory(extStr1) {
-      this.regulationCategory1 = this.regulationCategory.find(
-        item => item.extStr1 == extStr1
-      );
-    },
-    //获取选择的法规层次数据
-    getRuleGradation(extStr1) {
-      this.ruleGradation1 = this.ruleGradationName.find(
-        item => item.extStr1 == extStr1
-      );
-    },
-    //查看详情
-    detailHandle(id) {
-      this.showDetailDialog = true;
-    },
-    //重置表单
-    resetForm(formName) {
-      this.submitData = {};
-      this.$refs[formName].resetFields();
-    },
-    //分页
-    handleSizeChange(val) {
-      this.dataForm.pageSize = val;
-      this.initData();
-    },
-    //分页
-    handleCurrentChange(val) {
-      this.dataForm.pageNum = val;
-      this.initData();
-    },
-    //搜索
-    getAllSearch() {
-      this.initData();
-    },
-    //重置搜索
-    reset() {
-      this.dataForm = {
-        title: "",
-        content: ""
-      };
-      this.initData();
-    },
-    //立即运行
-    runNow() {
-      this.showRunDialog = true;
-      this.info = false;
-    },
-    //定时运行
-    timeRun() {
-      this.showRunDialog = true;
-      this.info = true;
-    },
-    //查看当前所选规则
-    seeChoosed() {},
-    //关闭规则运行弹窗
-    closeRun() {
-      this.showRunDialog = false;
-    },
-    succeedRun() {
-      this.showRunDialog = false;
-    },
-    //拿到选择树的id
-    getTreeData(data) {
-      // console.log(data, "拿到树选择的id");
-      this.ruleId = data
     }
   }
 };
 </script>
+<style scoped lang="scss">
+.box {
+  width: 100%;
+  display: flex;
+  min-width: 800px;
+  // overflow-x: auto;
+  .auditRuleMonitoring-left {
+    width: 300px;
+    // min-height: 100vh;
+    min-height: calc(100vh - 165px);
+    // margin-right: 20px;
+    border: 1px solid #ddd;
+    overflow: auto;
+    min-width: 300px;
+    /deep/ .el-tree-node__children .custom-tree-node {
+      text-decoration: underline;
+      color: #0000ff;
+      width: 100%;
+    }
+  }
+  .auditRuleMonitoring-right {
+    flex: 1;
+    border: none;
+    // padding-left: 20px;
+    //
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      // padding-right: 109px;
+    }
+    .table-box {
+      margin-top: 10px;
+      // padding-left: 20px;
+      .result-view-text {
+        color: #0cbde5;
+      }
+    }
+  }
+}
+</style>

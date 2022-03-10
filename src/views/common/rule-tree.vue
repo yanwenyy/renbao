@@ -8,39 +8,41 @@
         </el-input>
         <el-tree
             v-loading="treeLoading"
-            ref="ruleTree"
+            ref="ruleTreeRoot"
             class="treeClass"
             :data="treeData"
             :show-checkbox="isShowCheckBox"
-            node-key="id"
             default-expand-all
             :filter-node-method="filterNode"
             :props="layoutTreeProps"
             :expand-on-click-node="false"
+            :check-strictly="isRelation"
+            node-key="folderId"
+            @check-change="callCheckChange"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span @click="nodeClick(node, data)">{{ node.label }}</span>
+                <span @click="nodeClick(node, data)" class="custom-tree-label">{{ node.label }}</span>
                 <span class="tree-btn" v-if="isShowEdit">
-                <el-button
-                    type="text"
-                    size="mini"
-                    @click="() => append(data,node,'add')">
-                    <i class="el-icon-circle-plus-outline" title="新增"></i>
-                </el-button>
+                    <el-button
+                        type="text"
+                        size="mini"
+                        @click="() => append(data,node,'add')">
+                        <i class="el-icon-circle-plus-outline" title="新增"></i>
+                    </el-button>
                     <el-button
                     v-if="data.folderParentId"
                     type="text"
                     size="mini"
                     @click="() => append(data,node,'edit')">
                     <i class="el-icon-edit" title="编辑"></i>
-                </el-button>
-                <el-button
-                    v-if="data.folderParentId"
-                    type="text"
-                    size="mini"
-                    @click="() => remove(node, data)">
-                    <i class="el-icon-delete" title="删除"></i>
-                </el-button>
+                    </el-button>
+                    <el-button
+                        v-if="data.folderParentId"
+                        type="text"
+                        size="mini"
+                        @click="() => remove(node, data)">
+                        <i class="el-icon-delete" title="删除"></i>
+                    </el-button>
                 </span>
             </span>
         </el-tree>
@@ -77,9 +79,16 @@ export default {
             default: 'getTreeId'
 
         },
+        parentCheckChange : {
+            type: Function,
+        },
         isParent: { // 判断调用组件是否为当前组件的父组件
             type: Boolean,
             default: true
+        },
+        isRelation: {
+            type: Boolean, // 父子节点是否关联,是否单选
+            default: false
         }
 
     },
@@ -269,12 +278,22 @@ export default {
             } else {
                 this.$emit("getTreeId", data);
             } 
+        },
+        callCheckChange (data, checked, indeterminate) {
+            // alert(1111)
+            if(this.isRelation) {
+                this.$emit("checkChange", data, checked, indeterminate);
+                if (checked) {
+                    this.$refs.ruleTreeRoot.setCheckedNodes([data]);
+                }
+            }
+
         }
 
     },
     watch: {
       filterText(val) {
-        this.$refs.ruleTree.filter(val.trim());
+        this.$refs.ruleTreeRoot.filter(val.trim());
       },
       'treeVisible'(nval, oval) {
           if (!nval) {
@@ -295,6 +314,17 @@ export default {
         // padding: 20px !important;
         width: 80%;
         margin: 10px 0 10px 10px;
+    }
+    .custom-tree-label {
+        width: 100%;
+    }
+    /deep/ .el-tree-node__children .custom-tree-node{
+        // width: 100%;
+        // display: inline-block;
+        // .custom-tree-label {
+        //     width: 100%;
+        //     display: inline-block;
+        // }
     }
 
 }

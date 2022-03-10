@@ -9,7 +9,7 @@
             :isShowCheckBox="false"
             @getTreeId="getTreeId"
             :isParent="false"
-            ref="ruleTree"         
+            ref="ruleTree"
           ></rule-tree>
         </el-card>
       </el-col>
@@ -266,26 +266,28 @@ export default {
       showRunDialog: false,
       rows: [],
       info: "",
-      ruleId: ""
+      ruleId: "",
+      folderId: 1
     };
   },
-  mounted() {
+  created() {
     this.initData();
   },
-  created() {},
   methods: {
-     
     initData() {
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
-        params: this.$http.adornParams({
-          pageNo: this.pageIndex,
-          pageSize: this.pageSize,
-          ruleName: this.dataForm.ruleName,
-          ruleCategory: this.dataForm.ruleCategory,
-          folderId: 1
-        })
+        params: this.$http.adornParams(
+          {
+            pageNo: this.pageIndex,
+            pageSize: this.pageSize,
+            ruleName: this.dataForm.ruleName,
+            ruleCategory: this.dataForm.ruleCategory,
+            folderId: this.folderId
+          },
+          false
+        )
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableData = data.result.records;
@@ -326,13 +328,10 @@ export default {
     },
     //删除
     deleteData() {
-      var ruleIds = "";
-      for (var i = 0; i < this.multipleSelection.length; i++) {
-        ruleIds += this.multipleSelection[i].ruleId + ",";
-      }
-      if (ruleIds != null && ruleIds != "" && ruleIds != undefined) {
-        ruleIds = ruleIds.substr(0, ruleIds.length - 1);
-      }
+      var deleteList = [];
+      this.multipleSelection.forEach(item => {
+        deleteList.push(item.ruleId);
+      });
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -340,8 +339,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl(`/rule/deleteRuleByIds/${ruleIds}`),
-            method: "delete"
+            url: this.$http.adornUrl(`/rule/deleteByIds`),
+            method: "delete",
+            data: this.$http.adornData(deleteList, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -366,6 +366,7 @@ export default {
     },
     //搜索
     getAllSearch() {
+      this.folderId = 1;
       this.initData();
     },
     //重置搜索
@@ -376,6 +377,7 @@ export default {
         createUserName: "",
         createTime: ""
       };
+      this.folderId = 1;
       this.initData();
     },
     //立即运行
@@ -440,8 +442,9 @@ export default {
     },
     //拿到选择树的id
     getTreeId(data) {
-      console.log(data, "拿到树选择的id");
-    },
+      this.folderId = data.folderId;
+      this.initData();
+    }
   }
 };
 </script>

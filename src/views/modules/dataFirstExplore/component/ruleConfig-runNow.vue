@@ -6,9 +6,9 @@
       ref="dataForm"
       :rules="rules"
     >
-      <el-form-item v-if="info" label="选择开始执行时间" prop="createTime">
+      <el-form-item v-if="info" label="选择开始执行时间" prop="expectedBeginTime">
         <el-date-picker
-          v-model="dataForm.createTime"
+          v-model="dataForm.expectedBeginTime"
           type="datetime"
           placeholder="选择日期时间"
         >
@@ -75,7 +75,7 @@ export default {
   data() {
     return {
       dataForm: {
-        createTime: "",
+        expectedBeginTime: "",
         hospitalName: "",
         hospitalCode: "",
         batchName: "",
@@ -105,7 +105,7 @@ export default {
                 hospitalCode: this.dataForm.hospitalCode,
                 hospitalName: this.dataForm.hospitalName,
                 ruleId: this.runIds
-              })
+              },false)
             }).then(({ data }) => {
               if (data && data.code === 200) {
                 this.$alert(
@@ -132,13 +132,13 @@ export default {
               url: this.$http.adornUrl(`/rule/timeRan`),
               method: "post",
               data: this.$http.adornData({
-                createTime: this.dataForm.createTime,
+                expectedBeginTime: this.dataForm.expectedBeginTime,
                 batchName: this.dataForm.batchName,
                 batchRemark: this.dataForm.batchRemark,
                 ruleId: this.runIds
                 // hospitalCode: this.dataForm.hospitalCode,
                 // hospitalName: this.dataForm.hospitalName,
-              })
+              },false)
             }).then(({ data }) => {
               if (data && data.code === 200) {
                 this.$alert(

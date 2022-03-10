@@ -58,7 +58,7 @@ export default {
       ]
     };
   },
-  mounted() {
+  created() {
     this.init();
   },
   methods: {
@@ -71,7 +71,7 @@ export default {
           page: this.pageIndex,
           limit: this.pageSize,
           batchType: 1
-        })
+        },false)
       }).then(({ data }) => {
         if (data && data.code === 200) {
           var rule = data.result;

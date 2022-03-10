@@ -9,7 +9,7 @@
             :before-close="handleClose">
             <div class="rule-tree-box">
                 <span>选择规则：</span>
-                <el-tree
+                <!-- <el-tree
                     ref="ruleTree"
                     check-strictly
                     :default-expand-all="true"
@@ -20,7 +20,8 @@
                     node-key="label"
                     @check-change="handleCheckChange"
                     >
-                </el-tree>
+                </el-tree> -->
+                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
@@ -31,6 +32,7 @@
     </div>
 </template>
 <script>
+import ruleTree from '../../common/rule-tree.vue'
 export default {
     props: [
         'getData'
@@ -39,31 +41,6 @@ export default {
         return {
             loading: false,
             dialogVisible: false,
-            projectRulesTreeList: [ 
-                {
-                    label: '项目规则',
-                    children: [{
-                        label: '医保',
-                        children: [
-                            {
-                                label: '床位费超量',
-                            },{
-                                label: '男女性诊断串换',
-
-                            },
-                            {
-                                label: '男女性项目互换'
-                            },
-                        ]
-                        },{
-                            label: '医院',
-                            children: [{
-                                label: '超医保适应症用药',
-                            }]
-                        }]
-                }
-               
-            ],
             uniqueValue: '', //最后拿到的唯一选择的moduldCode值,相当于id 
         }
     },
@@ -74,32 +51,29 @@ export default {
             
         },
         handleCheckChange (data, checked, indeterminate) {
-            // if (checked) {
-            //     this.$refs.ruleTree.setCheckedKeys([data.label])
-            // }
-            if(checked){
-                // 注意：后端返回的node-key不是id，是moduldCode
-                this.$refs.ruleTree.setCheckedKeys([data.label]); //data.moduldCode 根据自己需求改，我这个是moduldCode，上面data配置中我已经修改了的
-                this.uniqueValue =  this.$refs.ruleTree.getCheckedKeys().toString(); //不加上toString()会报：期望一个数字或者字符串，结果返回的是数组
-            }else{
-                this.uniqueValue =  this.$refs.ruleTree.getCheckedKeys().toString();
-                if(this.uniqueValue.length == 0){
-                    this.uniqueValue = ''
-                }
-            }
+           console.log(data, 'datadatadata')  
+           
         },
+        getTreeCheckData (data) {
+            console.log(data, 'datadata')
+
+        },
+       
         handleClose () {
             this.dialogVisible = false
         },
         onSubmit (formName) {
+
             
         },
         cancel () {
             this.dialogVisible = false;
            
-        }
+        },
+       
     },
-    watch : {
+    components: {
+        ruleTree,
     }
 }
 </script>

@@ -104,8 +104,9 @@ export default {
             tableLoading: false,
             searchForm: {
                 ruleName: '',
-                ruleCategory: ''
-
+                ruleCategory: '',
+                folderPath: '',
+                folderId: ''
             },
             tableData: [],
             tablePositionKey: [
@@ -160,8 +161,11 @@ export default {
 
         },
         getTreeData (data) {
-            console.log(data, '拿到树选择的id')
-
+            this.$refs.multipleTable.clearSelection(this.multipleTable);
+            this.multipleTable = [];
+            this.searchForm.folderPath = data.folderPath;
+            this.searchForm.folderId = data.folderId;
+            this.getSelectPage();
         },
         treeClick (data) {
             // console.log(data, 'datadatadata')
@@ -210,10 +214,6 @@ export default {
                     }
             })
             }).catch(() => {})
-            
-            
-
-
         },
         handleSelectionChange (rows) {
             this.multipleTable = rows;
@@ -233,17 +233,18 @@ export default {
         },
         // 提交个性化规则
         submitgxhgz () {
-            this.$refs.submitPersonalityRule.showDialog()
+            if( this.multipleTable.length != 1 ) return this.$message({message: '请选择一条数据进行操作',type: 'warning'});
+            this.$refs.submitPersonalityRule.showDialog(this.multipleTable)
         },
         // 立即执行
         executeImmediatelyClick () {
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
-            this.$refs.ruleOperation.showDialog( this.multipleTable,'immediately');
+            this.$refs.ruleOperation.showDialog( this.multipleTable,'immediately', [], {});
         },
         // 定时执行
         timedExecutionClick () {
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
-            this.$refs.ruleOperation.showDialog(this.multipleTable,'timing');
+            this.$refs.ruleOperation.showDialog(this.multipleTable,'timing', [], {});
         }
     },
     components: {

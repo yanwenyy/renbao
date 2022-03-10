@@ -235,16 +235,12 @@ export default {
 
         },
         onSubmit (formName) {
-            
-            console.log(this.ruleOperationForm, '数据11');
-            debugger
             let ruleUrl = ''
             if (this.type == 'add') {
                 ruleUrl = '/rule/add'
             } else {
                 ruleUrl = '/rule/updateByUuId'
             }
-           
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true
@@ -261,22 +257,18 @@ export default {
                                 message: this.type == 'add' ?'添加成功' : '编辑成功',
                                 type: 'success',
                                 duration: 1500,
-                                onClose: () => {
-                                    this.dialogVisible = false;
-                                    this.$parent.getSelectPage();
-                                    this.$parent.setTableChecked()
-                                }
                             })
+                            this.dialogVisible = false;
+                            this.$parent.getSelectPage();
+                            this.$parent.setTableChecked()
                         } else {
                             this.loading = false
                             this.$message({
                                 message: this.type == 'add' ?'添加失败' : '编辑失败',
                                 type: 'error',
                                 duration: 1500,
-                                onClose: () => {
-                                    this.dialogVisible = false;
-                                }
                             })
+                             this.dialogVisible = false;
 
                         }
                     }).catch(() => {
