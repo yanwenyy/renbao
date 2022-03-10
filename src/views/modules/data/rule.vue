@@ -3,11 +3,11 @@
     <div class="box">
       <div class="left">
         <div class="custom-tree-container">
-          <el-input
+          <!-- <el-input
             placeholder="输入关键字进行过滤"
             v-model="filterText">
-          </el-input>
-          <el-tree
+          </el-input> -->
+          <!-- <el-tree
             class="treeClass"
             :data="treeData"
             show-checkbox
@@ -37,39 +37,40 @@
                 </el-button>
               </span>
             </span>
-          </el-tree>
+          </el-tree> -->
+          <ruleTree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="true" :isShowEdit="true" parentGetTreeData="getTreeData"></ruleTree>
         </div>
       </div>
       <div class="right">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <el-form-item label="规则名称:">
-            <el-input v-model="dataForm.carnum" placeholder="规则名称" clearable></el-input>
+            <el-input v-model="dataForm.ruleName" placeholder="规则名称" clearable></el-input>
           </el-form-item>
-          <el-form-item label="审计事项:">
-            <el-input v-model="dataForm.carnum" placeholder="审计事项" clearable></el-input>
+          <el-form-item label="创建人:">
+            <el-input v-model="dataForm.createUserName" placeholder="创建人" clearable></el-input>
           </el-form-item>
-          <el-form-item label="风险等级:">
-            <el-select clearable  v-model="dataForm.fuelType" placeholder="请选择">
-              <el-option
-                v-for="item in ryzl"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
+          <!--<el-form-item label="风险等级:">-->
+            <!--<el-select clearable  v-model="dataForm.fuelType" placeholder="请选择">-->
+              <!--<el-option-->
+                <!--v-for="item in ryzl"-->
+                <!--:key="item.value"-->
+                <!--:label="item.label"-->
+                <!--:value="item.value">-->
+              <!--</el-option>-->
+            <!--</el-select>-->
+          <!--</el-form-item>-->
           <el-form-item>
-            <el-button type="primary" @click="getDataList()">查询</el-button>
+            <el-button type="primary" @click="pageIndex=1,getDataList()">查询</el-button>
             <el-button>重置</el-button>
           </el-form-item>
         </el-form>
         <div class="search-btn">
-          <el-button type="primary" @click="getDataList()">新增</el-button>
-          <el-button type="primary" @click="getDataList()">修改</el-button>
+          <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+          <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="getDataList()">导入</el-button>
           <el-button type="warning" @click="getDataList()">全部导出</el-button>
           <el-button type="warning" @click="getDataList()">导出</el-button>
-          <el-button type="danger" @click="getDataList()">删除</el-button>
+          <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
           :data="dataList"
@@ -84,45 +85,52 @@
             width="50">
           </el-table-column>
           <el-table-column
-            prop="carNum"
+            prop="ruleName"
             align="center"
             label="规则名称">
           </el-table-column>
           <el-table-column
-            prop="registTime"
+            prop="avgRunTime"
             header-align="center"
             align="center"
             label="平均运行时间">
           </el-table-column>
           <el-table-column
-            prop="registTime"
+            prop="createTime"
             header-align="center"
             align="center"
             label="创建时间">
           </el-table-column>
           <el-table-column
-            prop="vehicleNum"
+            prop="createUserName"
             header-align="center"
             align="center"
             label="创建人">
           </el-table-column>
           <el-table-column
-            prop="engineNum"
+            prop="ruleType"
             header-align="center"
             align="center"
             label="规则类型">
+            <template slot-scope="scope">
+              {{scope.row.ruleType=='1'?'sql编辑器':scope.row.ruleType=='2'?'图形化工具':''}}
+            </template>
           </el-table-column>
-          <!--<el-table-column-->
-          <!--fixed="right"-->
-          <!--header-align="center"-->
-          <!--align="center"-->
-          <!--width="150"-->
-          <!--label="操作">-->
-          <!--<template slot-scope="scope">-->
-          <!--<el-button v-if="isAuth('biz:factorycar:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>-->
-          <!--<el-button v-if="isAuth('biz:factorycar:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>-->
-          <!--</template>-->
-          <!--</el-table-column>-->
+          <el-table-column
+            fixed="right"
+            header-align="center"
+            align="center"
+            width="150"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small"
+                         @click="addOrUpdateHandle(scope.row.ruleId)">修改
+              </el-button>
+              <el-button type="text" size="small"
+                         @click="deleteHandle(scope.row.ruleId)">删除
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
           @size-change="sizeChangeHandle"
@@ -147,10 +155,14 @@
         <el-button type="primary" @click="treeVisible = false">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
 
 <script>
+  import AddOrUpdate from './rule-add-or-update'
+import ruleTree from '../../common/rule-tree.vue'
   export default {
     data () {
       return {
@@ -159,49 +171,11 @@
         },
         treeTitle:'',
         treeVisible:false,
-        filterText: '',
-        treeData:[{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }],
+
         path:window.SITE_CONFIG.cdnUrl,
         dataForm: {
-          timeStart: '',
-          timeEnd: '',
-          emissionStand:'',
-          fuelType:'',
-          carnum:''
+          ruleName: '',
+          createUserName: '',
         },
         token:'',
         imgUrlfront:'',
@@ -248,10 +222,12 @@
       }
     },
     components: {
+      ruleTree,
 
+      AddOrUpdate
     },
     activated () {
-      // this.getDataList();
+      this.getDataList();
     },
     methods: {
       append(data,type) {
@@ -277,21 +253,18 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/jinding/outcar/list'),
+          url: this.$http.adornUrl('/rule/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
-            'pageNum': this.pageIndex,
+            'pageNo': this.pageIndex,
             'pageSize': this.pageSize,
-            'carnum': this.dataForm.carnum,
-            'timeStart': this.dataForm.timeStart|| '',
-            'timeEnd': this.dataForm.timeEnd|| '',
-            'emissionStand': this.dataForm.emissionStand,
-            'fuelType': this.dataForm.fuelType||'',
+            'ruleName': this.dataForm.ruleName,
+            'createUserName': this.dataForm.createUserName,
           })
         }).then(({data}) => {
-          if (data && data.code === 10000) {
-            this.dataList = data.data
-            this.totalPage = data.total
+          if (data && data.code === 200) {
+            this.dataList = data.result.records
+            this.totalPage = data.result.total
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -342,8 +315,8 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/biz/factorycar/delete'),
-            method: 'post',
+            url: this.$http.adornUrl('/rule/deleteByIds'),
+            method: 'delete',
             data: this.$http.adornData(userIds, false)
           }).then(({data}) => {
             if (data && data.code === 200) {
@@ -384,10 +357,13 @@
         // console.log(url)
         window.open(this.$http.adornUrl(url));
       },
+      getTreeData (data) {
+        console.log(data, 'datadatadata')
+      }
     }
   }
 </script>
-<style>
+<style scoped>
   .search-btn{
     text-align: right;
     margin-bottom: 10px;

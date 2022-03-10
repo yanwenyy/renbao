@@ -1,6 +1,6 @@
 <template>
-  <div class="box-mirror">
-    <div class="code-mirror-tree" v-if="!fullScreen">
+  <div class="box-mirror box"  ref="box">
+    <div class="code-mirror-tree left" v-if="!fullScreen">
       <div class="tree-left">
         <div class="tree-left-one" @click="changeTree('1')">数据表</div>
         <div class="tree-left-two" @click="changeTree('2')">函数表</div>
@@ -57,7 +57,10 @@
 
       </div>
     </div>
-    <div class="code-mirror-div">
+    <div v-if="!fullScreen" class="resize" title="收缩侧边栏">
+      <div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>
+    </div>
+    <div class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
       <!--<div class="tool-bar">-->
         <!--<span>请选择主题</span>-->
         <!--<el-select v-model="cmTheme" placeholder="请选择" size="small" style="width:150px">-->
@@ -83,10 +86,11 @@
         <!--<el-button type="primary" size="small" style="margin-left:10x" @click="setValue">修改内容</el-button>-->
       <!--</div>-->
       <code-mirror-editor
+        :resultTabClick="resultTabClick"
         :useChinese="useChinese"
         :getwsData="getwsData"
         :saveSql="saveSql"
-        :tableData="tableData"
+        :resultTableTabs="resultTableTabs"
         ref="cmEditor"
         :cmTheme="cmTheme"
         :cmMode="cmMode"
@@ -95,6 +99,7 @@
         :sqlData="sqlData"
         :getSqlList="getSqlList"
         :deleteSql="deleteSql"
+        :getSqlMsg="getSqlMsg"
         :formatContent="formatContent"
         :autoFormatJson="autoFormatJson"
         :jsonIndentation="jsonIndentation"
@@ -113,6 +118,10 @@
     },
     props:{
       formatContent: {
+        type: Function,
+        default: null,
+      },
+      getSqlMsg: {
         type: Function,
         default: null,
       },
@@ -152,7 +161,7 @@
         type: Array,
         default: null,
       },
-      tableData: {
+      resultTableTabs: {
         type: Array,
         default: null,
       },
@@ -171,6 +180,7 @@
     },
     data() {
       return {
+        resultTableTabsList:[],//拖拽条显示高度判断
         funData:[
           {
             "id" : "function",
@@ -722,8 +732,67 @@
           // console.log(val,3333)
         }
       },
+      resultTableTabs:{
+        deep: true,
+        handler(val) {
+          if(val!=''){
+            if(val!=''&&val.length>0){
+              this.resultTableTabsList=this.resultTableTabs[this.resultTableTabs.length-1].list
+            }
+          }
+        }
+      },
+    },
+    activated(){
+      this.dragControllerDiv();
     },
     methods: {
+      //sql执行结果tab切换事件
+      resultTabClick(list){
+        this.resultTableTabsList=list;
+      },
+      //拖拽改变宽度
+      dragControllerDiv: function () {
+        var resize = document.getElementsByClassName('resize');
+        var left = document.getElementsByClassName('left');
+        var mid = document.getElementsByClassName('mid');
+        var box = document.getElementsByClassName('box');
+        for (let i = 0; i < resize.length; i++) {
+          // 鼠标按下事件
+          resize[i].onmousedown = function (e) {
+            //颜色改变提醒
+            resize[i].style.background = '#818181';
+            var startX = e.clientX;
+            resize[i].left = resize[i].offsetLeft;
+            // 鼠标拖动事件
+            document.onmousemove = function (e) {
+              var endX = e.clientX;
+              var moveLen = resize[i].left + (endX - startX); // （endx-startx）=移动的距离。resize[i].left+移动的距离=左边区域最后的宽度
+              var maxT = box[i].clientWidth - resize[i].offsetWidth; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
+
+              if (moveLen < 10) moveLen = 10; // 左边区域的最小宽度为32px
+              if (moveLen > maxT - 10) moveLen = maxT - 10; //右边区域最小宽度为150px
+
+              resize[i].style.left = moveLen; // 设置左侧区域的宽度
+
+              for (let j = 0; j < left.length; j++) {
+                left[j].style.width = moveLen + 'px';
+                mid[j].style.width = (box[i].clientWidth - moveLen - 10) + 'px';
+              }
+            };
+            // 鼠标松开事件
+            document.onmouseup = function (evt) {
+              //颜色恢复
+              resize[i].style.background = '#c0c5d4';
+              document.onmousemove = null;
+              document.onmouseup = null;
+              resize[i].releaseCapture && resize[i].releaseCapture(); //当你不在需要继续获得鼠标消息就要应该调用ReleaseCapture()释放掉
+            };
+            resize[i].setCapture && resize[i].setCapture(); //该函数在属于当前线程的指定窗口里设置鼠标捕获
+            return false;
+          };
+        }
+      },
       //切换树
       changeTree(type){
         this.treeType=type;
@@ -901,23 +970,23 @@
     }
 
   }
-  .box-mirror{
-    display: flex;
-  }
-.code-mirror-tree{
-  width: 30%;
-  display: inline-block;
-}
-  .code-mirror-div{
-    width: 70%;
-    display: inline-block;
-  }
+  /*.box-mirror{*/
+    /*display: flex;*/
+  /*}*/
+/*.code-mirror-tree{*/
+  /*width: 30%;*/
+  /*display: inline-block;*/
+/*}*/
+  /*.code-mirror-div{*/
+    /*width: 70%;*/
+    /*display: inline-block;*/
+  /*}*/
   .code-mirror-tree>div{
     display: inline-block;
     vertical-align: top;
   }
   .tree-left{
-    margin-top: 20%;
+    margin-top: 50px;
     width: 29px;
     white-space: pre-wrap;
     cursor: pointer;
@@ -950,5 +1019,57 @@
   .el-tree {
     min-width: 100%;
     display:inline-block !important;
+  }
+  /* 拖拽相关样式 */
+  /*包围div样式*/
+  .box {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  /*左侧div样式*/
+  .left {
+    width: calc(32% - 10px);  /*左侧初始化宽度*/
+    height: 100%;
+    background: #FFFFFF;
+    float: left;
+    box-sizing: border-box;
+  }
+  /*拖拽区div样式*/
+  .resize {
+    cursor: col-resize;
+    float: left;
+    position: relative;
+    top: 0;
+    min-height: 85vh;
+    height: 100%;
+    max-height: 100%;
+    background-color:#c0c5d4;
+    width: 3px;
+    background-size: cover;
+    background-position: center;
+    /*z-index: 99999;*/
+    font-size: 32px;
+    color: white;
+  }
+  .resize-div{
+    height:78px;
+  }
+  /*拖拽区鼠标悬停样式*/
+  .resize:hover {
+    color: #444444;
+  }
+  /*右侧div'样式*/
+  .mid {
+    padding-left: 10px;
+    float: left;
+    width: 68%;   /*右侧初始化宽度*/
+    height: 100%;
+    background: #fff;
+    box-sizing: border-box;
+  }
+  .mid-100{
+    width: 100%!important;
   }
 </style>

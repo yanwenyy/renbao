@@ -23,7 +23,7 @@
             @node-click="nodeClick"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span class="custom-tree-label">{{ node.label }}</span>
+                <span :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
                         type="text"
@@ -91,6 +91,9 @@ export default {
         isRelation: {
             type: Boolean, // 父子节点是否关联,是否单选
             default: false
+        },
+        folderSorts: { // 规则树查询参数
+            default: ''
         }
 
     },
@@ -126,7 +129,7 @@ export default {
     mounted () {
 
     },
-    created () {
+    activated () {
         this.getRuleFolder();
     },
     methods: {
@@ -137,8 +140,11 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
+                params:  this.$http.adornParams({folderSorts: this.folderSorts}, false)
+                // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
+                console.log(data, 'datadatadata')
                 if (data.code == 200) { 
                     this.treeData = data.result;
                 }
@@ -316,13 +322,22 @@ export default {
 </script>
 <style scoped lang="scss">
 .rule-tree-box {
+    // min-width: 288px;
     /deep/ .filter-text {
         // padding: 20px !important;
         width: 80%;
         margin: 10px 0 10px 10px;
     }
     .custom-tree-label {
-        width: 100%;
+        max-width: 200px;
+        display: inline-block;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow:ellipsis
+    }
+    .cut-width {
+        max-width: 100px;
     }
     /deep/ .el-tree-node__children .custom-tree-node{
         // width: 100%;

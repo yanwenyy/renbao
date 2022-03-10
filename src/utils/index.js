@@ -101,7 +101,7 @@ PxSocket.prototype = {
     var _this = this;
     try {
       if ('WebSocket' in window) {
-        console.log(_this.options.url)
+        // console.log(_this.options.url)
         _this.ws = new WebSocket(_this.options.url);
         // console.log( _this.ws)
         // console.log(http_url.Socket_url+options.id)
@@ -113,7 +113,6 @@ PxSocket.prototype = {
         console.log("send error！");
       };
       _this.ws.onopen = function () {
-        _this.ws.send(_this.options.data);
         _this.heartCheck();      //心跳检测重置
         // console.log(_this.options.name +"  "+ new Date().toUTCString());
         console.log("connection success！")
@@ -121,11 +120,11 @@ PxSocket.prototype = {
       _this.ws.onmessage = function (event) {
         _this.heartCheck();      //拿到任何消息都说明当前连接是正常的
         // console.log("llws收到消息啦:" + event.data);
-        console.log(event.data)
-        if (event.data == 'pong') {
+        // console.log(event.data)
+        if (event.data) {
           _this.options.succ(event.data);
         } else {
-          console.log(_this.options.name + " is " + event.data);
+          // console.log(_this.options.name + " is " + event.data);
         }
       };
       _this.ws.onclose = function () {

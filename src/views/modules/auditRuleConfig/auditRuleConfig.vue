@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData"></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData" folderSorts="3" ></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box"> 
@@ -77,19 +77,12 @@
                             <el-button v-else>当前所选规则</el-button>
                         </el-button-group>
                     </div>
-                   
-
                 </div>
-               
             </div>
-
-
-
         </div>
         <submit-personality-rule ref="submitPersonalityRule"></submit-personality-rule>
         <rule-operation ref="ruleOperation"></rule-operation>
         <rule-config-option-dialog ref="ruleConfigDialog"></rule-config-option-dialog>
-
     </div>
 </template>
 <script>

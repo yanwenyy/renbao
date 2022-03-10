@@ -62,8 +62,8 @@ export default {
             this.getHospital();
             this.dialogVisible = true;
             this.batchItem = batchItem
-            // this.exportForm.batchId = batchItem.batchId
-            this.exportForm.batchId = '6998b4b9-f2ef-4b7f-b945-3f353e773655'
+            this.exportForm.batchId = batchItem.batchId
+            // this.exportForm.batchId = '6998b4b9-f2ef-4b7f-b945-3f353e773655'
         },
         // 获取医院列表
         getHospital () {
@@ -97,9 +97,19 @@ export default {
                         // this.btnLoading = false;
                         if (data.code == 200) {
                             console.log(data, 'datadatadata')
-                           
+                            this.loading = false;
+                            this.$message({
+                                message: '导出成功',
+                                type: 'success',
+                                duration: 1500,
+                            })
+                            this.dialogVisible = false
                         } else {
-                           
+                            this.$message({
+                                message: '导出失败',
+                                type: 'error',
+                                duration: 1500,
+                            })
                         }
                     }).catch(() => {
                         this.loading = false

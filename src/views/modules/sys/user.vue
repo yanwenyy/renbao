@@ -24,7 +24,7 @@
         <!--</el-select>-->
       <!--</el-form-item>-->
       <el-form-item  class="searchBtn">
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="pageIndex=1,getDataList()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="primary" @click="down()">下载模板</el-button>
         <!--<el-upload-->

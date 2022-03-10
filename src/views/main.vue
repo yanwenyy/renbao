@@ -81,7 +81,8 @@
           if (data && data.code === 200) {
             this.loading = false
             this.userId = data.result.userId;
-            this.userName = data.result.userName
+            this.userName = data.result.userName;
+            sessionStorage.setItem("userId",this.userId)
           }
         })
       }
