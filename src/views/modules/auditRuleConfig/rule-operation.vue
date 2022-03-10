@@ -71,7 +71,8 @@ export default {
                 batchRemark: '',
                 hospitalCode: '',
                 hospitalName: '',
-                ruleId: ''
+                ruleId: '',
+                runtype: ''
 
             },
             ruleOperationFormRules: {
@@ -98,10 +99,12 @@ export default {
                 ruleId.push(i.ruleId)
             })
             this.ruleOperationForm.ruleId = ruleId.join(',')
+            this.ruleOperationForm.runtype = this.type == 'timing' ? 2 : 1; // runtype 1是立即运行 2是定时运行
             // 判断从医院弹框返回重新给表单内容赋值
             if (hospitalBack) {
                 this.ruleOperationForm = ruleOperationForm
             }
+            
         },
         changeHospital () {
             // this.dialogVisible = false

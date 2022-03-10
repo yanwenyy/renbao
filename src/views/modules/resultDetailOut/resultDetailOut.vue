@@ -17,8 +17,8 @@
                     </el-form-item>
                     <el-form-item label="规则类型：">
                         <el-select v-model="searchForm.ruleCategory"  placeholder="请选择" clearable>
-                            <el-option label="门诊规则" value="shanghai"></el-option>
-                            <el-option label="住院规则" value="beijing"></el-option>
+                            <el-option label="门诊规则" :value=1></el-option>
+                            <el-option label="住院规则" :value=2></el-option>
                         </el-select>
                     </el-form-item>
                    
@@ -167,7 +167,7 @@ export default {
         dealRuleType (ruleCategory) {
             if (ruleCategory ==1) {
                 return '门诊规则'
-            } else if(ruleCategory ==1) {
+            } else if(ruleCategory ==2) {
                 return '住院规则'
             } else {
                 return ''

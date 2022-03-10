@@ -152,7 +152,7 @@ export default {
         dealRuleType (ruleCategory) {
             if (ruleCategory ==1) {
                 return '门诊规则'
-            } else if(ruleCategory ==1) {
+            } else if(ruleCategory ==2) {
                 return '住院规则'
             } else {
                 return ''
