@@ -269,7 +269,7 @@
               align="center"
               label="目标表字段">
                 <template slot-scope="scope">
-                 {{ scope.row[getMapKey(scope.row)].columnNameCn ? scope.row[getMapKey(scope.row)].columnNameCn : ''}}
+                 {{ scope.row[getMapKey(scope.row)] ? scope.row[getMapKey(scope.row)].columnNameCn : ''}}
                 </template>
               </el-table-column>
           </el-table>
