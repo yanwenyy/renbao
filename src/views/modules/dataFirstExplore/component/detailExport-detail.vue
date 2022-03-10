@@ -1,5 +1,5 @@
 <template>
-  <div class="threeData">
+  <div class="threeData" style="height:600px">
     <!-- 列表 -->
     <div class="listDisplay">
       <div class="f_right">
@@ -112,16 +112,16 @@
           ></el-table-column>
         </template>
       </el-table>
+    </div>
+    <div>
       <el-pagination
         small
         layout="total, sizes, prev, pager, next, jumper"
         :total="apComServerData.total"
       ></el-pagination>
     </div>
-    <div>
-      <el-button type="primary" @click="ok">确定</el-button>
-      <el-button @click="close">取消</el-button>
-    </div>
+    <el-button type="primary" @click="ok">确定</el-button>
+    <el-button @click="close">取消</el-button>
   </div>
 </template>
 <script>
@@ -140,6 +140,9 @@ export default {
         basicType: "",
         data2: "",
         data1: ""
+      },
+      apComServerData: {
+        total: ""
       },
       //loading
       listLoading: false,
@@ -218,17 +221,27 @@ export default {
     };
   },
   created() {
-    // this.initList();
+    this.initList();
   },
   methods: {
     //初始化数据列表
     initList() {
-      this.listLoading = true;
-      // this.$http({
-
-      // }).then(() =>{
-      //     // this.listLoading =false
-      // })
+      this.$http({
+        url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
+        method: "post",
+        params: this.$http.adornParams({
+          tableName: "医保住院结算明细",
+          resultId: this.info
+        })
+      }).then(({ data }) => {
+        /* if (data && data.code === 200) {
+          this.tableList = data.result;
+          this.apComServerData.total;
+        } else {
+          this.dataList = [];
+          this.apComServerData.total = 0;
+        } */
+      });
     },
     //重置
     resetForm() {},

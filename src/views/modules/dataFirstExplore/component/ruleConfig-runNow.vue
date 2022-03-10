@@ -6,11 +6,17 @@
       ref="dataForm"
       :rules="rules"
     >
-      <el-form-item v-if="info" label="选择开始执行时间" prop="expectedBeginTime">
+      <el-form-item
+        v-if="info"
+        label="选择开始执行时间"
+        prop="expectedBeginTime"
+      >
         <el-date-picker
           v-model="dataForm.expectedBeginTime"
-          type="datetime"
+          type="date"
           placeholder="选择日期时间"
+          format="yyyy/MM/dd"
+          value-format="yyyy-MM-dd"
         >
         </el-date-picker>
       </el-form-item>
@@ -97,15 +103,20 @@ export default {
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/rule/timeRunning`),
+              url: this.$http.adornUrl(`/rule/ruleRun`),
               method: "post",
-              data: this.$http.adornData({
-                batchName: this.dataForm.batchName,
-                batchRemark: this.dataForm.batchRemark,
-                hospitalCode: this.dataForm.hospitalCode,
-                hospitalName: this.dataForm.hospitalName,
-                ruleId: this.runIds
-              },false)
+              data: this.$http.adornData(
+                {
+                  batchName: this.dataForm.batchName,
+                  batchRemark: this.dataForm.batchRemark,
+                  hospital: this.dataForm.hospitalName,
+                  hospitalCode: this.dataForm.hospitalCode,
+                  hospitalName: this.dataForm.hospitalName,
+                  ruleId: this.runIds,
+                  runtype: 1
+                },
+                false
+              )
             }).then(({ data }) => {
               if (data && data.code === 200) {
                 this.$alert(
@@ -129,16 +140,21 @@ export default {
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/rule/timeRan`),
+              url: this.$http.adornUrl(`/rule/ruleRun`),
               method: "post",
-              data: this.$http.adornData({
-                expectedBeginTime: this.dataForm.expectedBeginTime,
-                batchName: this.dataForm.batchName,
-                batchRemark: this.dataForm.batchRemark,
-                ruleId: this.runIds
-                // hospitalCode: this.dataForm.hospitalCode,
-                // hospitalName: this.dataForm.hospitalName,
-              },false)
+              data: this.$http.adornData(
+                {
+                  batchName: this.dataForm.batchName,
+                  batchRemark: this.dataForm.batchRemark,
+                  expectedBeginTime: this.dataForm.expectedBeginTime,
+                  hospital: this.dataForm.hospitalName,
+                  hospitalCode: this.dataForm.hospitalCode,
+                  hospitalName: this.dataForm.hospitalName,
+                  ruleId: this.runIds,
+                  runtype: 2
+                },
+                false
+              )
             }).then(({ data }) => {
               if (data && data.code === 200) {
                 this.$alert(
@@ -180,8 +196,8 @@ export default {
         hospitalNames += data[i].医院名称 + ",";
       }
       if (hospitalCodes.length > 0 && hospitalNames.length > 0) {
-        hospitalCodes = hospitalCodes.substr(0,hospitalCodes.length-1)
-        hospitalNames = hospitalNames.substr(0,hospitalNames.length-1)
+        hospitalCodes = hospitalCodes.substr(0, hospitalCodes.length - 1);
+        hospitalNames = hospitalNames.substr(0, hospitalNames.length - 1);
       }
       this.dataForm.hospitalName = hospitalNames;
       this.dataForm.hospitalCode = hospitalCodes;

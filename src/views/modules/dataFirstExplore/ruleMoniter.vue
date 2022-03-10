@@ -44,10 +44,12 @@
               placeholder="请选择"
               clearable
             >
-              <el-option label="待执行" :value="1"></el-option>
-              <el-option label="执行中" :value="2"></el-option>
-              <el-option label="执行失败" :value="3"></el-option>
-              <el-option label="已完成" :value="4"></el-option>
+              <el-option
+                v-for="(item, index) in runStatus"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -95,9 +97,21 @@
               scope.row.actualEndTime | dateformat
             }}</template>
           </el-table-column>
+          <el-table-column prop="runStatus" label="运行状态">
+            <template slot-scope="scope">
+              <div v-if="scope.row.runStatus == 1">待执行</div>
+              <div v-if="scope.row.runStatus == 2">执行中</div>
+              <div v-if="scope.row.runStatus == 3">执行失败</div>
+              <div v-if="scope.row.runStatus == 4">已完成</div>
+            </template>
+          </el-table-column>
           <el-table-column prop="moblie" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" @click="resultViewClick(scope.row.ruleId)"
+              <div v-if="scope.row.runStatus == 4">运行成功</div>
+              <el-button
+                type="text"
+                v-if="scope.row.runStatus == 3"
+                @click="resultViewClick(scope.row)"
                 >查看日志</el-button
               >
             </template>
@@ -155,13 +169,19 @@ export default {
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
+      runStatus: [
+        { id: 1, name: "待执行" },
+        { id: 2, name: "执行中" },
+        { id: 3, name: "执行失败" },
+        { id: 4, name: "已完成" }
+      ],
       tableData: [],
       Pager: {
         pageSize: 10,
         pageIndex: 1,
         total: 0
       },
-      batchType: "",
+      batchType: 1,
       multipleTable: [],
       batchId: "",
       layoutTreeProps: {
@@ -190,7 +210,7 @@ export default {
             ruleCategory: this.searchForm.ruleCategory,
             pageNo: this.Pager.pageIndex,
             pageSize: this.Pager.pageSize,
-            batchType: 1
+            batchType: this.batchType
           },
           false
         )
@@ -238,6 +258,7 @@ export default {
     },
     // 列表查询
     onQuery() {
+      this.batchId = ''
       this.getTableData();
     },
     // 列表重置
@@ -246,6 +267,7 @@ export default {
         ruleCategory: "",
         runStatus: ""
       };
+      this.batchId = "";
       this.getTableData();
     },
     currentChangeHandle(val) {
