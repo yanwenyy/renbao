@@ -1,17 +1,19 @@
 <template>
   <sql-edit
+    ref="sqlEdit"
     :treeDefaultProps="treeDefaultProps"
     :changeTree="changeTree"
     :getLoadTree="getLoadTree"
     :treedata="treeData"
     :loadTree="loadTree"
     :getwsData="getwsData"
-    :tableData="tableData"
+    :resultTableTabs="resultTableTabs"
     :sqlData="sqlData"
     :sqlListTotal="sqlListTotal"
     :sqlListData="sqlListData"
     :formatContent="formatContent"
     :getSqlList="getSqlList"
+    :getSqlMsg="getSqlMsg"
     :deleteSql="deleteSql"
     :saveSql="saveSql"
     :useChinese="true"
@@ -27,29 +29,58 @@
     },
     data() {
       return {
-        ws:{},
+        ws:{},//websoket对象
         treeDefaultProps:{
           label:'title'
         },//tree显示数据绑定的参数名字
         sqlListData:[],//sql列表data
         sqlListTotal:0,//sql列表data
         sqlData:'',//sql编译器内容
-        tableData: [],
+        resultTableTabs: [],//sql执行返回的动态tab
         loadTree: [],//左边树懒加载的数据
         treeData: [],//左边树初始的数据
         useChinese:true,//是否汉字化
+        userId:sessionStorage.getItem("userId"),
       }
     },
     activated(){
       this.getSjbData();
       this.getSqlList();
+      this.ws=new PxSocket({
+        url:this.$http.wsUrl('websocket?'+this.userId),
+        succ:this.getDataList
+      });
+      this.ws.connect();
     },
     beforeDestroy(){
       this.ws.close();
     },
     methods: {
       getDataList(datas){
-        console.log(datas)
+        this.key+=1;
+
+        if(datas&&datas!='ping'){
+          datas=JSON.parse(datas);
+          console.log(datas);
+          var v={};
+          if(datas.data&&datas.data.result){
+            v={
+              list:datas.data.result||[],
+              msg:datas.message
+            };
+          }else{
+            v={
+              list:[],
+              msg:datas.message
+            };
+          }
+          this.resultTableTabs.push(v);
+          console.log(this.resultTableTabs)
+        }
+      },
+      //实时获取sql内容
+      getSqlMsg(data){
+        // console.log(data)
       },
       //删除sql data传过来的主键id
       deleteSql(data){
@@ -97,8 +128,6 @@
           this.treeData=datas?[datas]:[];
         })
       },
-
-
       //保存sql数据
       saveSql(data){
         //data里内容
@@ -130,9 +159,20 @@
         })
       },
       //格式化sql点击,data 编译器内容
-      formatContent(data){
-        console.log(data)
-        this.sqlData=data;
+      formatContent(datas){
+        // /sqlScript/formatSql
+        console.log(datas)
+        this.$http({
+          url: this.$http.adornUrl('/sqlScript/formatSql'),
+          method: 'post',
+          data: this.$http.adornData({sqlScript:datas})
+        }).then(({data}) => {
+          if(data.code==200){
+            this.sqlData=data.result;
+          }else{
+            this.$message.error(data.message);
+          }
+        })
       },
       //左侧树切换类型函数
       changeTree(type){
@@ -159,20 +199,23 @@
       },
       //点击运行获取websoket数据
       getwsData(sql) {
-        this.ws=new PxSocket({
-          url:this.$http.wsUrl('webSocket/yancs'),
-          data:sql,
-          succ:this.getDataList
-        });
-        this.ws.connect();
-        // var that = this;
-        // setInterval(function () {
-        //   that.tableData.push({
-        //     date: '2016-05-02',
-        //     name: '王小虎',
-        //     address: '上海市普陀区金沙江路 1518 弄',
-        //   })
-        // }, 1000)
+        this.resultTableTabs=[];
+        var params={
+          sqlScript:sql,
+          loadOnce:false,
+          dataSize:"500"
+        };
+        this.$http({
+          url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+          method: 'post',
+          data: this.$http.adornData(params)
+        }).then(({data}) => {
+          if(data.code==200){
+
+          }else{
+            this.$message.error(data.message);
+          }
+        })
       },
     }
   }

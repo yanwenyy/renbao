@@ -8,3 +8,7 @@
   export default {
   }
 </script>
+<style>
+  .el-button:focus {outline:none;} /*for IE*/
+  .el-button::-moz-focus-inner {border-color: transparent;} /*for mozilla*/
+</style>

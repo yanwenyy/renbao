@@ -1,90 +1,119 @@
 <template>
   <div>
-    <div class="codemirror-div" v-if="!fullScreen">
-      <div class="btn-group">
-        <el-button type="text"
-                   @click="formatContentSelf">
-          <i v-if="!useChinese" class="el-icon-paperclip" title="格式化"></i>
-          <span v-if="useChinese" title="格式化">格式化</span>
-        </el-button>
-        <el-button type="text"
-                   :disabled="implementDisabled"
-                   @click="implement">
-          <i  v-if="!useChinese" class="el-icon-video-play" title="运行"></i>
-          <span v-if="useChinese" title="运行">运行</span>
-        </el-button>
-        <el-button type="text" @click="openPython">
-          <i v-if="!useChinese" class="el-icon-folder-opened" title="打开sql"></i>
-          <span v-if="useChinese" title="打开sql">打开sql</span>
-        </el-button>
-        <el-dropdown style="margin-left: 10px" trigger="click" placement="bottom-start">
-          <el-button type="text">
-            <i v-if="!useChinese" class="el-icon-document-add" title="保存"></i>
-            <span v-if="useChinese" title="保存">保存</span>
+    <div id="box">
+      <div id="top" class="codemirror-div" v-if="!fullScreen">
+        <div class="btn-group">
+          <el-button type="text"
+                     @click="formatContentSelf">
+            <i v-if="!useChinese" class="el-icon-paperclip" title="格式化"></i>
+            <span v-if="useChinese" title="格式化">格式化</span>
           </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="saveSqlSelf('save')">保存</el-dropdown-item>
-            <el-dropdown-item @click.native="saveSqlSelf('saveAs')">另存为</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <el-dropdown style="margin-left: 10px" trigger="click"  placement="bottom-start">
-          <el-button type="text">
-            <i v-if="!useChinese" class="el-icon-suitcase-1" title="工具箱"></i>
-            <span v-if="useChinese" title="工具箱">工具箱</span>
+          <el-button type="text"
+                     :disabled="implementDisabled"
+                     @click="implement">
+            <i  v-if="!useChinese" class="el-icon-video-play" title="运行"></i>
+            <span v-if="useChinese" title="运行">运行</span>
           </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="lookups">查找</el-dropdown-item>
-            <el-dropdown-item @click.native="goReplace">替换</el-dropdown-item>
-            <el-dropdown-item @click.native="Capitalization(1)"
-            >转大写
-            </el-dropdown-item
-            >
-            <el-dropdown-item @click.native="Capitalization(2)"
-            >转小写
-            </el-dropdown-item
-            >
-            <!--<el-dropdown-item @click.native="notes">
-              注释选中行
-            </el-dropdown-item>-->
-            <!--<el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>-->
-            <!--<el-dropdown-item @click.native="changeSize(1)"-->
-            <!--&gt;字体放大-->
-            <!--</el-dropdown-item-->
-            <!--&gt;-->
-            <!--<el-dropdown-item @click.native="changeSize(2)"-->
-            <!--&gt;字体缩小-->
-            <!--</el-dropdown-item-->
-            <!--&gt;-->
-          </el-dropdown-menu>
-        </el-dropdown>
-        <!--<el-button style="margin-left: 10px" type="primary" @click="">保存数据</el-button>-->
+          <el-button type="text" @click="openPython">
+            <i v-if="!useChinese" class="el-icon-folder-opened" title="打开sql"></i>
+            <span v-if="useChinese" title="打开sql">打开sql</span>
+          </el-button>
+          <el-dropdown style="margin-left: 10px" trigger="click" placement="bottom-start">
+            <el-button type="text">
+              <i v-if="!useChinese" class="el-icon-document-add" title="保存"></i>
+              <span v-if="useChinese" title="保存">保存</span>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="saveSqlSelf('save')">保存</el-dropdown-item>
+              <el-dropdown-item @click.native="saveSqlSelf('saveAs')">另存为</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+          <el-dropdown style="margin-left: 10px" trigger="click"  placement="bottom-start">
+            <el-button type="text">
+              <i v-if="!useChinese" class="el-icon-suitcase-1" title="工具箱"></i>
+              <span v-if="useChinese" title="工具箱">工具箱</span>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="lookups">查找</el-dropdown-item>
+              <el-dropdown-item @click.native="goReplace">替换</el-dropdown-item>
+              <el-dropdown-item @click.native="Capitalization(1)"
+              >转大写
+              </el-dropdown-item
+              >
+              <el-dropdown-item @click.native="Capitalization(2)"
+              >转小写
+              </el-dropdown-item
+              >
+              <!--<el-dropdown-item @click.native="notes">
+                注释选中行
+              </el-dropdown-item>-->
+              <!--<el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>-->
+              <!--<el-dropdown-item @click.native="changeSize(1)"-->
+              <!--&gt;字体放大-->
+              <!--</el-dropdown-item-->
+              <!--&gt;-->
+              <!--<el-dropdown-item @click.native="changeSize(2)"-->
+              <!--&gt;字体缩小-->
+              <!--</el-dropdown-item-->
+              <!--&gt;-->
+            </el-dropdown-menu>
+          </el-dropdown>
+          <!--<el-button style="margin-left: 10px" type="primary" @click="">保存数据</el-button>-->
+        </div>
+        <codemirror
+          ref="myCm"
+          :value="editorValue"
+          :options="cmOptions"
+          @changes="onCmCodeChanges"
+          @blur="onCmBlur"
+          @keydown.native="onKeyDown"
+          @mousedown.native="onMouseDown"
+          @paste.native="OnPaste"
+        ></codemirror>
       </div>
-      <codemirror
-        ref="myCm"
-        :value="editorValue"
-        :options="cmOptions"
-        @changes="onCmCodeChanges"
-        @blur="onCmBlur"
-        @keydown.native="onKeyDown"
-        @mousedown.native="onMouseDown"
-        @paste.native="OnPaste"
-      ></codemirror>
-    </div>
-    <div class="codemirror-table-div">
-      <div>
-        <el-button type="primary">全部导出</el-button>
-        <i v-if="!fullScreen" class="el-icon-full-screen" @click="setFullScreen(1)"></i>
-        <i v-if="fullScreen" class="el-icon-minus" @click="setFullScreen(2)"></i>
+      <div id="resize" title="收缩栏"  v-if="!fullScreen">
+
       </div>
-      <el-table border :data="tableData" stripe style="width: 100%" class="box-table">
-        <el-table-column v-if="tableData[0]" v-for="(item,key,index) in tableData[0]" :key="index" :label="key">
-          <template slot-scope="scope">
-            <div>
-              <span>{{scope.row[key]}}</span>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div id="bottom" class="codemirror-table-div">
+        <div class="codemirror-table-btn">
+          <el-button type="primary">全部导出</el-button>
+          <div v-if="!useChinese" class="inline-block">
+            <i v-if="!fullScreen" class="el-icon-full-screen" @click="setFullScreen(1)"></i>
+            <i v-if="fullScreen" class="el-icon-minus" @click="setFullScreen(2)"></i>
+          </div>
+          <div v-if="useChinese" class="inline-block">
+            <el-button type="text"
+                       @click="setFullScreen(1)">
+              <span v-if="!fullScreen" title="全屏">全屏</span>
+            </el-button>
+            <el-button type="text"
+                       @click="setFullScreen(2)">
+              <span v-if="fullScreen" title="退出全屏">退出全屏</span>
+            </el-button>
+          </div>
+        </div>
+        <el-tabs @tab-click="tabClick" v-if="resultTableTabs.length>0" v-model="resultTableTabsValue" type="border-card">
+          <el-tab-pane
+            :key="String(index)"
+            v-for="(item, index) in resultTableTabs"
+            v-if="item"
+            :label="'结果'"
+            :name="String(index)"
+          >
+            <div v-if="item.list==''">{{item.msg}}</div>
+            <el-table v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">
+              <el-table-column v-if="item.list[0]" v-for="(vtem,key,index) in item.list[0]" :key="index" :label="key">
+                <template slot-scope="scope">
+                  <div>
+                    <span>{{scope.row[key]}}</span>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+
+      </div>
     </div>
     <el-dialog
       width="70%"
@@ -261,7 +290,7 @@
         type: String,
         default: null,
       },
-      tableData: {
+      resultTableTabs: {
         type: Array,
         default: null,
       },
@@ -281,6 +310,14 @@
         type: Function,
         default: null,
       },
+      resultTabClick: {
+        type: Function,
+        default: null,
+      },
+      getSqlMsg: {
+        type: Function,
+        default: null,
+      },
       useChinese: {
         type: Boolean,
         default: false,
@@ -296,6 +333,7 @@
     },
     data() {
       return {
+        resultTableTabsValue: '2',//动态标签显示项
         sqlSaveType:'',
         sqlSaveForm:{
           draftName:'',
@@ -443,6 +481,19 @@
           }
         },
       },
+      resultTableTabs: {
+        // 实时监控数据变化
+        deep: true,
+        handler(val) {
+          if (val != "") {
+            if (val !== "") {
+              this.resultTableTabsValue=this.resultTableTabs.length>0?String(this.resultTableTabs.length-1):'0';
+              this.resultTableTabs=val;
+              // console.log( this.resultTableTabsValue)
+            }
+          }
+        },
+      },
       cmTheme: function (newValue, oldValue) {
         try {
           let theme = this.cmTheme == "default" ? "blackboard" : this.cmTheme;require("codemirror/theme/" + theme + ".css");
@@ -461,7 +512,52 @@
 
       }
     },
+    activated(){
+      this.dragControllerDiv2();
+    },
     methods: {
+      //sql结果tab切换事件
+      tabClick(e){
+        var list=this.resultTableTabs[e.index].list;
+        this.resultTabClick(list)
+      },
+      //拖拽改变高度
+      dragControllerDiv2: function () {
+        var resize = document.getElementById('resize');
+        var _top = document.getElementsByClassName('CodeMirror');
+        var _bottom = document.getElementById('bottom');
+        var _box = document.getElementById('box');
+        resize.onmousedown = function (e) {
+          //颜色改变提醒
+          resize.style.background = '#818181';
+          var startY = e.clientY;
+          resize.top = resize.offsetTop;
+          // 鼠标拖动事件
+          document.onmousemove = function (e) {
+            var endY = e.clientY;
+            var moveLen = resize.top + (endY - startY); // （endY - startY）=移动的距离。resize.top+移动的距离=左边区域最后的高度
+            var maxT = _box.clientHeight - resize.offsetHeight; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
+
+            if (moveLen < 150) moveLen = 150; // 上边区域的最小高度为150px
+            if (moveLen > maxT - 150) moveLen = maxT - 150; //下边区域最小高度为150px
+
+            resize.style.top = moveLen; // 设置上册区域的高度
+            _top[0].style.height = moveLen + 'px';
+            _bottom.style.height = (_box.clientHeight - moveLen - 10) + 'px';
+
+          };
+          // 鼠标松开事件
+          document.onmouseup = function (evt) {
+            //颜色恢复
+            resize.style.background = '#c0c5d4';
+            document.onmousemove = null;
+            document.onmouseup = null;
+            resize.releaseCapture && resize.releaseCapture(); //当你不在需要继续获得鼠标消息就要应该调用ReleaseCapture()释放掉
+          };
+          resize.setCapture && resize.setCapture(); //该函数在属于当前线程的指定窗口里设置鼠标捕获
+          return false;
+        }
+      },
       //sql列表开始
       //使用sql
       useSql(row){
@@ -897,6 +993,7 @@
       },
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
+        this.getSqlMsg(this.editorValue);
         this.resetLint();
       },
       // 格式化字符串为json格式字符串
@@ -943,6 +1040,52 @@
   .CodeMirror{
     height: 150px;
     border: 1px solid #999;
-    margin: 10px 0;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  #box{
+    width:100%;
+    min-height: 85vh;
+    height: 100%;
+  }
+  #top{
+    width:100%;
+    height: 48%;
+    float: left;
+    background: #fff;
+  }
+  #bottom{
+    width:100%;
+    height: 48%;
+    padding-top: 10px;
+    box-sizing: border-box;
+    float: left;
+    background: #fff;
+    z-index: 99999;
+  }
+  #resize{
+    float: left;
+    cursor: row-resize;
+    width: calc(100% + 10px);
+    height: 3px;
+    background-color:#c0c5d4;
+    position: relative;
+    left:-10px;
+    background-size: cover;
+    background-position: center;
+    z-index: 9999999999;
+    font-size: 32px;
+    color: white;
+  }
+  /*拖拽区鼠标悬停样式*/
+  #resize:hover {
+    color: #444444;
+  }
+  .codemirror-table-btn{
+   text-align: right;
+    margin-bottom: 10px;
+  }
+  .inline-block{
+    display: inline-block;
   }
 </style>
