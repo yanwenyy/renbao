@@ -72,7 +72,7 @@ export default {
                 hospitalCode: '',
                 hospitalName: '',
                 ruleId: '',
-                runtype: ''
+                runType: ''
 
             },
             ruleOperationFormRules: {
@@ -94,16 +94,17 @@ export default {
             this.dialogVisible = true;
             this.type = type;
             this.checkRuleData = checkRuleData;
+            
+            // 判断从医院弹框返回重新给表单内容赋值
+            if (hospitalBack) {
+                this.ruleOperationForm = ruleOperationForm
+            }
             let ruleId = [];
             this.checkRuleData.map(i => {
                 ruleId.push(i.ruleId)
             })
             this.ruleOperationForm.ruleId = ruleId.join(',')
-            this.ruleOperationForm.runtype = this.type == 'timing' ? 2 : 1; // runtype 1是立即运行 2是定时运行
-            // 判断从医院弹框返回重新给表单内容赋值
-            if (hospitalBack) {
-                this.ruleOperationForm = ruleOperationForm
-            }
+            this.ruleOperationForm.runType = this.type == 'timing' ? 2 : 1; // runtype 1是立即运行 2是定时运行
             
         },
         changeHospital () {
@@ -128,25 +129,22 @@ export default {
             this.reset();
         },
         onSubmit (formName) {
-             this.$refs[formName].validate((valid) => {
+            this.ruleOperationForm.batchType= 2
+            console.log(this.ruleOperationForm, 'ruleOperationForm')
+            debugger
+            this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    console.log(this.ruleOperationForm, '表单数据')
                     this.loading = true
                     this.$http({
                         isLoading:false,
-                        url: this.$http.adornUrl('/rule/timerRunNowBySh'),
+                        url: this.$http.adornUrl('/rule/ruleRun'),
                         method: 'post',
                         data:  this.$http.adornData(this.ruleOperationForm, false)
                     }).then(({data}) => {
                         // this.btnLoading = false;
                         if (data.code == 200) {
-                            // this.$message({
-                            //     message: '执行成功',
-                            //     type: 'success',
-                            //     duration: 1500,
-                            // })
                             this.loading = false
-                            this.$alert('请在审核执行监控中查看运行详情', {
+                            this.$alert('请在审核执行监控中查看运行详情', '执行成功',{
                                 confirmButtonText: '关闭',
                                 callback: action => {
                                     this.dialogVisible = false;

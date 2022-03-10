@@ -232,6 +232,8 @@ export default {
         // 列表重置
         onReset () {
             this.searchForm= {type: '',runningState: ''};
+            this.$refs.treesa.setCheckedKeys([]);
+            this.$refs.treesa.setCurrentKey(null);
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;

@@ -47,6 +47,18 @@
           </el-dropdown>
         </el-menu-item>
       </el-menu>
+      <div class="project-box">
+        <span>当前项目：</span>
+        <el-select v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
+          <el-option
+            v-for="item in projectList.result"
+            :key="item.projectId"
+            :label="item.projectName"
+            :value="item.projectId">
+          </el-option>
+        </el-select>
+      </div>
+      
     </div>
     <!-- 弹窗, 修改密码 -->
     <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
@@ -59,7 +71,8 @@
   export default {
     data () {
       return {
-        updatePassowrdVisible: false
+        updatePassowrdVisible: false,
+        projectCode: '',
       }
     },
     components: {
@@ -79,7 +92,14 @@
       },
       userName: {
         get () { return this.$store.state.user.name }
+      },
+      projectList: {
+        get () { return this.$store.state.common.projectList }
       }
+    },
+    created () {
+      // alert(11)
+      this.$store.dispatch('common/changeProjectList');
     },
     methods: {
       // 修改密码
@@ -107,7 +127,28 @@
             }
           })
         }).catch(() => {})
+      },
+      selectProject (val) {
+        console.log(val)
+        this.$http({
+            isLoading:false,
+            url: this.$http.adornUrl('nowProject/updateByUuId'),
+            method: 'get',
+            params:  this.$http.adornParams({projectId: val}, false)
+        }).then(({data}) => {
+            if (data.code == 200) {
+            }
+        })
       }
     }
   }
 </script>
+<style scoped>
+.project-box {
+  height: 50px;
+  line-height: 50px;
+  float: right;
+
+}
+
+</style>
