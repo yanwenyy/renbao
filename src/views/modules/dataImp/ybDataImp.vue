@@ -21,7 +21,7 @@
     </el-form>
     <el-table
       :data="dataList"
-      height="80vh"
+      height="60vh"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -464,32 +464,32 @@
       },
       // 获取数据列表
       getDataList () {
-        // this.dataListLoading = true;
-        // // this.dataForm.timeStart=this.value1[0];
-        // // this.dataForm.timeEnd=this.value1[1];
-        // this.$http({
-        //   url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'tableType': 1
-        //     //'pageNum': this.pageIndex,
-        //     //'pageSize': this.pageSize,
-        //     // 'monthTime': this.dataForm.monthTime||'',
-        //     // 'dayTime': this.dataForm.dayTime||'',
-        //     //'timeStart': this.dataForm.timeStart,
-        //     //'timeEnd': this.dataForm.timeEnd,
-        //     //'materialsName':this.dataForm.materialsName
-        //   })
-        // }).then(({data}) => {
-        //   if (data && data.code === 200) {
-        //     this.dataList = data.result;
-        //   } else {
-        //     this.dataList = []
-        //   }
-        //   this.dataListLoading = false
-        // })
-        this.dataList = [{ tableName : "医保病案首页",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"},
-        { tableName : "医保医疗机构信息",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"}]
+        this.dataListLoading = true;
+        // this.dataForm.timeStart=this.value1[0];
+        // this.dataForm.timeEnd=this.value1[1];
+        this.$http({
+          url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'tableType': 1
+            //'pageNum': this.pageIndex,
+            //'pageSize': this.pageSize,
+            // 'monthTime': this.dataForm.monthTime||'',
+            // 'dayTime': this.dataForm.dayTime||'',
+            //'timeStart': this.dataForm.timeStart,
+            //'timeEnd': this.dataForm.timeEnd,
+            //'materialsName':this.dataForm.materialsName
+          })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.dataList = data.result;
+          } else {
+            this.dataList = []
+          }
+          this.dataListLoading = false
+        })
+        //this.dataList = [{ tableName : "医保病案首页",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"},
+        //{ tableName : "医保医疗机构信息",tableSize: 11 ,numRows: 123,lastUpdateTime: "2020-01-02"}]
       },
       // 列表多选
       selectionChangeHandle (val) {

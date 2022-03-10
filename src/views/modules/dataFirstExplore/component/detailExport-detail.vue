@@ -127,6 +127,9 @@
 <script>
 import VueQueryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
 export default {
+  props: {
+    info: String
+  },
   components: {
     VueQueryBuilder
   },
@@ -202,19 +205,19 @@ export default {
           label: "患者姓名"
         }
       ],
-      tableList2:[],
-                tableList:[],
-                tableList3:[],
-                tableList4:[],
-                tableList5:[],
-                tableColumns2:[],
-                tableColumns3:[],
-                tableColumns4:[],
-                tableColumns5:[],
-                tableColumns:[]
+      tableList2: [],
+      tableList: [],
+      tableList3: [],
+      tableList4: [],
+      tableList5: [],
+      tableColumns2: [],
+      tableColumns3: [],
+      tableColumns4: [],
+      tableColumns5: [],
+      tableColumns: []
     };
   },
-  mounted() {
+  created() {
     // this.initList();
   },
   methods: {
