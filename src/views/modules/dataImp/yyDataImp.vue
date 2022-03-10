@@ -72,7 +72,7 @@
       width="70%"
       :close-on-click-modal="false"
       >
-      <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row>
+      <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row> 
       <!-- 文件树 -->
       <el-row :gutter="6" >
         <el-col :span="12">
@@ -367,7 +367,7 @@
         this.fileTreeDialogVisible = true
         this.fileTreeLoading = true
         this.$http({
-          url: this.$http.adornUrl(`ybDataImp/getFileTree/${1}`),
+          url: this.$http.adornUrl(`ybDataImp/getFileTree/${2}`),
           method: 'post'
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -492,7 +492,7 @@
           url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
           method: 'get',
           params: this.$http.adornParams({
-            'tableType': 1,
+            'tableType': 2,
             'tableName': this.dataForm.tableName
           })
         }).then(({data}) => {
