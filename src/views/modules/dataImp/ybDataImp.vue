@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-user">
+  <div class="yb-data-imp">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="表名:">
         <el-input v-model="dataForm.tableName" placeholder="数据表名称" clearable></el-input>
@@ -16,7 +16,10 @@
       </el-form-item> -->
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
-        <el-button type="primary" @click="getFileTree()">导入数据</el-button>
+        <el-button @click="resetSelect()">重置</el-button>
+      </el-form-item>
+      <el-form-item style="float:right">
+        <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -41,7 +44,7 @@
         label="数据量">
       </el-table-column>
       <el-table-column
-        prop="lastUpdateTime"
+        prop="lastUpdate"
         align="center"
         label="最后更新时间">
       </el-table-column>
@@ -56,7 +59,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.tableName)">查看数据</el-button>
+          <el-button type="text" size="small" @click="tableDataView(scope.row.tableName)">查看数据</el-button>
           <el-button type="text" size="small" @click="tableColumnView(scope.row.tableName)">查看字段</el-button>
           <!--<el-button v-if="isAuth('biz:pdbaidudate:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>-->
         </template>
@@ -288,18 +291,30 @@
         <el-button @click="tableColumnViewDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
+    <!-- 查看数据 -->
+    <el-dialog
+      :title="checkTableName"
+      :visible.sync="tableDataViewDialogVisible"
+      width="70%"
+      :close-on-click-modal="false">
+      <data-view :table-name="checkTableName"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import ColumnView from './columnView'
+  import DataView from './dataView'
   export default {
     data () {
       return {
         dataForm: {
           tableName:'',
-          timeStart:'',
-          timeEnd:''
+          //timeStart:'',
+          //timeEnd:''
         },
         lastUpdateTime:'',
         dataList: [],
@@ -313,6 +328,8 @@
         columnTableDialogVisible: false,
         // 查看字段弹窗
         tableColumnViewDialogVisible: false,
+        // 查看数据弹窗
+        tableDataViewDialogVisible: false,
         // 文件选中数据
         fileSelections: [],
         // 文件树
@@ -336,7 +353,7 @@
       }
     },
     components: {
-      ColumnView
+      ColumnView,DataView
     },
     activated () {
       this.getDataList()
@@ -471,14 +488,8 @@
           url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
           method: 'get',
           params: this.$http.adornParams({
-            'tableType': 1
-            //'pageNum': this.pageIndex,
-            //'pageSize': this.pageSize,
-            // 'monthTime': this.dataForm.monthTime||'',
-            // 'dayTime': this.dataForm.dayTime||'',
-            //'timeStart': this.dataForm.timeStart,
-            //'timeEnd': this.dataForm.timeEnd,
-            //'materialsName':this.dataForm.materialsName
+            'tableType': 1,
+            'tableName': this.dataForm.tableName
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -530,9 +541,17 @@
         })
       },
       // 查看字段
-      tableColumnView(tableName) {
+      tableColumnView (tableName) {
         this.checkTableName = tableName
         this.tableColumnViewDialogVisible = true
+      },
+      tableDataView (tableName) {
+        this.checkTableName = tableName
+        this.tableDataViewDialogVisible = true
+      },
+      // 重置查询条件
+      resetSelect() {
+         this.dataForm.tableName = null
       }
     }
   }
