@@ -3,7 +3,7 @@
   <div class="lawsAregulations">
     <el-row :gutter="20">
       <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:500px;overflow-y:auto">
+        <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
           <el-tree
             :data="batchTreeList"
             highlight-current
@@ -26,7 +26,7 @@
         </el-card>
       </el-col>
       <el-col :span="19">
-        <el-card class="box-card">
+        <el-card class="box-card" style="height:800px">
           <div slot="header" class="clearfix">
             <el-row>
               <el-col :span="4">
@@ -102,11 +102,15 @@
                   <div v-if="scope.row.ruleCategory == 2">住院规则</div>
                 </template>
               </el-table-column>
-              <el-table-column
-                prop="actualBeginTime"
-                label="开始时间"
-              ></el-table-column>
+              <el-table-column prop="actualBeginTime" label="开始时间">
+                <template slot-scope="scope">{{
+                  scope.row.actualBeginTime | dateformat
+                }}</template>
+              </el-table-column>
               <el-table-column prop="actualEndTime" label="结束时间">
+                <template slot-scope="scope">{{
+                  scope.row.actualEndTime | dateformat
+                }}</template>
               </el-table-column>
               <el-table-column prop="resultCount" label="结果条数">
               </el-table-column>
