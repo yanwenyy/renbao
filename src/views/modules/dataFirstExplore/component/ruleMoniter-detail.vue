@@ -61,8 +61,8 @@ export default {
         if (data && data.code === 200) {
           var rule = data.result;
           this.dataForm.ruleName = rule.resultTableName;
-          this.dataForm.actualBeginTime = data.result.actualBeginTime;
-          this.dataForm.actualEndTime = data.result.actualEndTime;
+          this.dataForm.actualBeginTime = data.result.actualBeginTime.split('T')[0];
+          this.dataForm.actualEndTime = data.result.actualEndTime.split('T')[0];
           var runStatus = data.result.runStatus;
           if (runStatus == 1) {
             this.dataForm.runStatus = "待执行";

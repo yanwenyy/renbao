@@ -70,7 +70,7 @@
                     >定时运行</el-button
                   >
                   <el-popover placement="right" trigger="click">
-                    <el-table :data="choseRule">
+                    <el-table :data="choseRule" :show-header="false">
                       <el-table-column
                         property="ruleName"
                         label="规则名称"
@@ -116,8 +116,14 @@
               @selection-change="handleSelectionChange"
               v-loading="loading"
               style="width: 100%;margin-top: 20px"
+              :row-key="getRowKeys"
             >
-              <el-table-column type="selection" width="55"> </el-table-column>
+              <el-table-column
+                type="selection"
+                :reserve-selection="true"
+                width="55"
+              >
+              </el-table-column>
               <el-table-column
                 prop="ruleName"
                 label="规则名称"
@@ -473,6 +479,20 @@ export default {
           this.totalPage = 0;
         }
       });
+    },
+    getRowKeys(row) {
+      return row.ruleId;
+    },
+    showSeclectRow() {
+      if (this.multipleSelection.length > 0) {
+        this.multipleSelection.forEach(row => {
+          this.dataList.forEach(item => {
+            if (row.id === item.id) {
+              this.$refs.multipleTable.toggleRowSelection(item, true);
+            }
+          });
+        });
+      }
     }
   }
 };

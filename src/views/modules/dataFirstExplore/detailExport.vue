@@ -32,7 +32,7 @@
               <el-col :span="4">
                 <div class="search-operation">
                   <el-input
-                    v-model="dataForm.resultTableName"
+                    v-model="dataForm.ruleName"
                     size="small"
                     placeholder="规则名称"
                     clearable
@@ -78,10 +78,7 @@
                 <el-button
                   @click="deleteData"
                   type="danger"
-                  :disabled="
-                    this.multipleSelection.length <= 0 ||
-                      this.multipleSelection.length > 1
-                  "
+                  :disabled="this.multipleSelection.length <= 0"
                   >删除</el-button
                 >
               </div>
@@ -96,13 +93,13 @@
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
-                prop="resultTableName"
+                prop="ruleName"
                 label="规则名称"
               ></el-table-column>
               <el-table-column prop="rule.ruleCategory" label="规则类别">
                 <template slot-scope="scope">
-                  <div v-if="scope.row.rule.ruleCategory == 1">门诊规则</div>
-                  <div v-if="scope.row.rule.ruleCategory == 2">门诊规则</div>
+                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
                 </template>
               </el-table-column>
               <el-table-column
@@ -199,7 +196,7 @@ export default {
   data() {
     return {
       dataForm: {
-        resultTableName: "",
+        ruleName: "",
         ruleCategory: ""
       },
       batchTreeList: [
@@ -236,7 +233,8 @@ export default {
       showRunDialog: false,
       rows: [],
       info: "",
-      batchId: ""
+      batchId: "",
+      batchType: 1
     };
   },
   created() {
@@ -251,9 +249,10 @@ export default {
         params: this.$http.adornParams({
           batchId: this.batchId,
           ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
-          resultTableName: this.dataForm.resultTableName,
+          ruleName: this.dataForm.ruleName,
           pageNo: this.pageIndex,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
+          batchType: this.batchType
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -317,7 +316,13 @@ export default {
     },
     //删除
     deleteData() {
-      var uuid = this.multipleSelection[0].resultId;
+      var uuids = "";
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        uuids += this.multipleSelection[i].resultId + ",";
+      }
+      if (uuids.length > 0) {
+        var uuids = uuids.substring(0, uuids.length - 1);
+      }
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -325,8 +330,8 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl(`/ruleResult/delete/${uuid}`),
-            method: "post"
+            url: this.$http.adornUrl(`/ruleResult/deleteByIds/${uuids}`),
+            method: "get"
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -366,14 +371,16 @@ export default {
     },
     //搜索
     getAllSearch() {
+      this.batchId = "";
       this.initData();
     },
     //重置搜索
     reset() {
       this.dataForm = {
-        resultTableName: "",
+        ruleName: "",
         ruleCategory: ""
       };
+      this.batchId = "";
       this.initData();
     },
     //左点右显
