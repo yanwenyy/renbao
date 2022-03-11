@@ -19,6 +19,7 @@
       </select>
 
       <!-- List of operators (e.g. =, !=, >, <) -->
+      <!-- 2022年3月11日 18:10:34 ZhangSiWeiG修改 支持显示值和真实值-->
       <select
         v-if="typeof rule.operators !== 'undefined' && rule.operators.length >= 1"
         v-model="query.operator"
