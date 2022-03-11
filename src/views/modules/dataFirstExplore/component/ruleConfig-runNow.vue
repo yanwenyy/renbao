@@ -129,7 +129,7 @@ export default {
                     cancelButtonText: "取消"
                   }
                 );
-                this.$emit("close");
+                this.$emit("ok");
               } else {
                 this.$message.error("操作失败");
                 this.$emit("close");
