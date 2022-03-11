@@ -75,7 +75,7 @@
       <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row>
       <!-- 文件树 -->
       <el-row :gutter="6" >
-        <el-col :span="12">
+        <el-col :span="12" style="height:45vh; overflow:auto;">
           <el-row>请选择导入文件:</el-row>
           <el-table
             ref="fileTree"
@@ -83,11 +83,9 @@
             v-loading="fileTreeLoading"
             stripe
             fit
-            style="width: 100%;height:45vh; overflow:auto;"
             :data="fileTreeData"
             border
             highlight-current-row
-            max-height="800"
             lazy
             row-key="path"
             @select="selectFiles"
@@ -118,22 +116,20 @@
           </el-table>
         </el-col>
         <!-- 已选择文件 -->
-        <el-col :span="12">
+        <el-col :span="12" style="height:45vh; overflow:auto;">
           <el-row>已选文件:</el-row>
           <el-table
             title="已选文件"
             v-loading="fileTreeLoading"
             stripe
             fit
-            style="width: 100%;height:45vh; overflow:auto;"
             :data="selectedFileData"
             border
             highlight-current-row
-            max-height="800"
           >
             <el-table-column
               label="目录名称"
-              align="center"
+              align="left"
               width="200"
               prop="name"
             />
@@ -364,6 +360,8 @@
     methods: {
       // 获取医保数据文件树
       getFileTree () {
+        this.fileTreeData = []
+        this.selectedFileData = []
         this.fileTreeDialogVisible = true
         this.fileTreeLoading = true
         this.$http({
