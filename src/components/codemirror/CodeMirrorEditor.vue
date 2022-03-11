@@ -512,7 +512,7 @@
 
       }
     },
-    activated(){
+    mounted(){
       this.dragControllerDiv2();
     },
     methods: {
@@ -984,7 +984,7 @@
         const keyCombination =
           event.ctrlKey || event.altKey || event.metaKey;
         if (!keyCombination && keyCode > 64 && keyCode < 123) {
-          this.$refs.myCm.codemirror.showHint({completeSingle: false});
+          this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         }
       },
       // 按下鼠标时事件处理函数
@@ -1087,5 +1087,8 @@
   }
   .inline-block{
     display: inline-block;
+  }
+  .CodeMirror-hints{
+    z-index: 3000 !important;
   }
 </style>

@@ -743,7 +743,7 @@
         }
       },
     },
-    activated(){
+    mounted(){
       this.dragControllerDiv();
     },
     methods: {
@@ -760,6 +760,7 @@
         for (let i = 0; i < resize.length; i++) {
           // 鼠标按下事件
           resize[i].onmousedown = function (e) {
+
             //颜色改变提醒
             resize[i].style.background = '#818181';
             var startX = e.clientX;
