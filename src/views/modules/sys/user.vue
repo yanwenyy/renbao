@@ -24,9 +24,9 @@
         <!--</el-select>-->
       <!--</el-form-item>-->
       <el-form-item  class="searchBtn">
-        <el-button @click="pageIndex=1,getDataList()">查询</el-button>
+        <el-button type="primary" @click="pageIndex=1,getDataList()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="primary" @click="down()">下载模板</el-button>
+        <el-button type="warning" @click="down()">下载模板</el-button>
         <!--<el-upload-->
           <!--class="inline-block"-->
           <!--:headers="{'token':token}"-->
@@ -37,7 +37,7 @@
         <!--&gt;-->
           <!--<el-button type="warning">导入</el-button>-->
         <!--</el-upload>-->
-        <el-button type="primary">导入</el-button>
+        <el-button type="warning">导入</el-button>
         <!--<el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>

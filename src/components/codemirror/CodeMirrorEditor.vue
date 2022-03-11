@@ -126,7 +126,7 @@
           <el-input v-model="dataForm.name" placeholder="模糊查询" clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button @click="getDataList()">查询</el-button>
+          <el-button type="primary" @click="getDataList()">查询</el-button>
           <el-button v-if="" @click="dataForm.name=''">重置</el-button>
         </el-form-item>
       </el-form>
@@ -1073,7 +1073,7 @@
     left:-10px;
     background-size: cover;
     background-position: center;
-    z-index: 9999999999;
+    /*z-index: 9999999999;*/
     font-size: 32px;
     color: white;
   }
