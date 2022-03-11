@@ -367,7 +367,7 @@
         this.fileTreeDialogVisible = true
         this.fileTreeLoading = true
         this.$http({
-          url: this.$http.adornUrl(`ybDataImp/getFileTree/${1}`),
+          url: this.$http.adornUrl(`dataImp/getFileTree/${2}`),
           method: 'post'
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -456,7 +456,7 @@
       // 获取文件中涉及到的表名
       findFileTable () {
         this.$http({
-          url: this.$http.adornUrl('ybDataImp/getFileTable'),
+          url: this.$http.adornUrl(`dataImp/getFileTable/${2}`),
           method: 'post',
           data: this.selectedFileData
         }).then(({data}) => {
@@ -492,7 +492,7 @@
           url: this.$http.adornUrl('/dataInfoBase/selectPageByTableType'),
           method: 'get',
           params: this.$http.adornParams({
-            'tableType': 1,
+            'tableType': 2,
             'tableName': this.dataForm.tableName
           })
         }).then(({data}) => {
@@ -522,7 +522,7 @@
       checkTableColumn () {
         // 校验列信息是否重复
          this.$http({
-          url: this.$http.adornUrl('ybDataImp/checkColumn'),
+          url: this.$http.adornUrl('dataImp/checkColumn'),
           method: 'post',
           data: this.importDataModelList
         }).then(({data}) => {
@@ -538,7 +538,7 @@
       // 导入数据
       impYBData () {
         this.$http({
-          url: this.$http.adornUrl('ybDataImp/impYBData'),
+          url: this.$http.adornUrl(`dataImp/impData/${2}`),
           method: 'post',
           data: this.importDataModelList,
           isLoading: false
