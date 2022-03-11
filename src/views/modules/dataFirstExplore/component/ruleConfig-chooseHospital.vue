@@ -124,9 +124,6 @@ export default {
   },
   created() {
     this.initList();
-    this.$nextTick(() => {
-      this.$refs.multipleTable.toggleAllSelection();
-    });
   },
   methods: {
     //初始化数据列表
@@ -134,15 +131,19 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
         method: "get",
-        params: this.$http.adornParams({
-          pageCount: "1",
-          pageSize: "10000",
-          hospitalName: this.dataForm.hospitalName,
-          hospitalType: this.dataForm.hospitalType
-        },false)
+        params: this.$http.adornParams(
+          {
+            pageCount: "1",
+            pageSize: "10000",
+            hospitalName: this.dataForm.hospitalName,
+            hospitalType: this.dataForm.hospitalType
+          },
+          false
+        )
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableList = data.result.records;
+          this.$refs.multipleTable.toggleAllSelection(this.tableList);
         } else {
           this.tableList = [];
         }

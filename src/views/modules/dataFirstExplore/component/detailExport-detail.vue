@@ -228,7 +228,7 @@ export default {
     initList() {
       this.$http({
         url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
-        method: "post",
+        method: "get",
         params: this.$http.adornParams({
           tableName: "医保住院结算明细",
           resultId: this.info

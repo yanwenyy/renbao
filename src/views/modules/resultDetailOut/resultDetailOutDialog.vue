@@ -85,9 +85,13 @@ export default {
         },
         // 导出
         exportClick (formName) {
+            // window.location.href = this.$http.adornUrl('/ruleResult/exportResult')
+
+
+
             // this.$refs[formName].validate((valid) => {
                 // if (valid) {
-                    this.loading = true
+                    // this.loading = true
                     this.$http({
                         isLoading:false,
                         url: this.$http.adornUrl('/ruleResult/exportResult'),
@@ -96,7 +100,6 @@ export default {
                     }).then(({data}) => {
                         // this.btnLoading = false;
                         if (data.code == 200) {
-                            console.log(data, 'datadatadata')
                             this.loading = false;
                             this.$message({
                                 message: '导出成功',

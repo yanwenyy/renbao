@@ -1,6 +1,12 @@
 <template>
   <div>
-    <el-form :model="dataForm" ref="dataForm" label-width="80px" :rules="rules">
+    <el-form
+      :model="dataForm"
+      ref="dataForm"
+      label-width="80px"
+      :rules="rules"
+      v-loading="loading"
+    >
       <el-form-item label="规则名称" prop="ruleName">
         <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
       </el-form-item>
@@ -75,7 +81,7 @@ export default {
     },
     folderId: {
       type: String
-    },
+    }
   },
   name: "detail",
   data() {
@@ -105,6 +111,7 @@ export default {
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
+      loading: false,
       folderName: [],
       timer: "", //定义一个定时器的变量
       currentTime: new Date() // 获取当前时间
@@ -129,6 +136,7 @@ export default {
   methods: {
     // 获取数据
     init() {
+      this.loading = true;
       this.$http({
         url: this.$http.adornUrl(`/rule/selectByUuid/${this.ruleId}`),
         method: "get",
@@ -145,7 +153,9 @@ export default {
           this.dataForm.createUserName = rule.createUserName;
           this.dataForm.sql = rule.sql;
           this.dataForm.createTime = rule.createTime;
+          this.loading = false;
           // 递归获取对应的规则对象
+          let treeData = this.treeData
           let getTreeData = this.getTreeData(treeData, this.folderId);
           // 回显规则名称
           if (getTreeData.length > 0) {

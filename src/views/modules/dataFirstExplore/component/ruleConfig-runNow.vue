@@ -103,7 +103,7 @@ export default {
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/rule/ruleRun`),
+              url: this.$http.adornUrl(`rule/ruleRun`),
               method: "post",
               data: this.$http.adornData(
                 {
@@ -113,7 +113,8 @@ export default {
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
-                  runtype: 1
+                  runtype: 1,
+                  batchType: 1
                 },
                 false
               )
@@ -146,6 +147,7 @@ export default {
                 {
                   batchName: this.dataForm.batchName,
                   batchRemark: this.dataForm.batchRemark,
+                  batchType: 1,
                   expectedBeginTime: this.dataForm.expectedBeginTime,
                   hospital: this.dataForm.hospitalName,
                   hospitalCode: this.dataForm.hospitalCode,
