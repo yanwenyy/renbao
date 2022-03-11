@@ -1,6 +1,6 @@
 <template>
   <sql-edit
-    ref="sqlEdit"
+    ref="sqlEdits"
     :treeDefaultProps="treeDefaultProps"
     :changeTree="changeTree"
     :getLoadTree="getLoadTree"
@@ -17,6 +17,7 @@
     :deleteSql="deleteSql"
     :saveSql="saveSql"
     :useChinese="true"
+    :exportSql="exportSql"
   ></sql-edit>
 </template>
 
@@ -36,6 +37,7 @@
         sqlListData:[],//sql列表data
         sqlListTotal:0,//sql列表data
         sqlData:'',//sql编译器内容
+        sqlMsg:'',//sql编译器吐给外层的内容
         resultTableTabs: [],//sql执行返回的动态tab
         loadTree: [],//左边树懒加载的数据
         treeData: [],//左边树初始的数据
@@ -43,7 +45,7 @@
         userId:sessionStorage.getItem("userId"),
       }
     },
-    activated(){
+    mounted(){
       this.sqlListData=[];
       this.sqlListTotal=0;
       this.sqlData='';
@@ -58,13 +60,33 @@
       });
       this.ws.connect();
     },
-    beforeDestroy(){
+    beforedestroy(){
       this.ws.close();
     },
     methods: {
+      //导出按钮点击
+      exportSql(data){
+       if(data){
+         this.$http({
+           url: this.$http.adornUrl('/sqlScript/exportExcel'),
+           method: 'post',
+           data: this.$http.adornData({
+             sqlScript:data,
+             dataSize:50000,
+             exportSize:50000,
+           })
+         }).then(({data}) => {
+           if(data.code==200){
+
+           }else{
+             this.$message.error(data.message);
+           }
+         })
+       }
+      },
+      //获取sql运行websocket返回的数据
       getDataList(datas){
         this.key+=1;
-
         if(datas&&datas!='ping'){
           datas=JSON.parse(datas);
           console.log(datas);
@@ -87,6 +109,7 @@
       //实时获取sql内容
       getSqlMsg(data){
         // console.log(data)
+        this.sqlMsg=data;
       },
       //删除sql data传过来的主键id
       deleteSql(data){
@@ -126,6 +149,7 @@
         this.$http({
           url: this.$http.adornUrl('/sqlScript/listDBPTree'),
           method: 'get',
+          isLoading:false,
           params: this.$http.adornParams()
         }).then(({data}) => {
           // console.log(data);

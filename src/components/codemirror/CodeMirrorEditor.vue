@@ -76,7 +76,7 @@
       </div>
       <div id="bottom" class="codemirror-table-div">
         <div class="codemirror-table-btn">
-          <el-button type="primary">全部导出</el-button>
+          <el-button type="primary" @click="exportSqlSelf">全部导出</el-button>
           <div v-if="!useChinese" class="inline-block">
             <i v-if="!fullScreen" class="el-icon-full-screen" @click="setFullScreen(1)"></i>
             <i v-if="fullScreen" class="el-icon-minus" @click="setFullScreen(2)"></i>
@@ -310,6 +310,10 @@
         type: Function,
         default: null,
       },
+      exportSql: {
+        type: Function,
+        default: null,
+      },
       resultTabClick: {
         type: Function,
         default: null,
@@ -512,10 +516,14 @@
 
       }
     },
-    activated(){
+    mounted(){
       this.dragControllerDiv2();
     },
     methods: {
+      //导出事件
+      exportSqlSelf(){
+        this.exportSql(this.editorValue)
+      },
       //sql结果tab切换事件
       tabClick(e){
         var list=this.resultTableTabs[e.index].list;
@@ -984,7 +992,7 @@
         const keyCombination =
           event.ctrlKey || event.altKey || event.metaKey;
         if (!keyCombination && keyCode > 64 && keyCode < 123) {
-          this.$refs.myCm.codemirror.showHint({completeSingle: false});
+          this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         }
       },
       // 按下鼠标时事件处理函数
@@ -1087,5 +1095,8 @@
   }
   .inline-block{
     display: inline-block;
+  }
+  .CodeMirror-hints{
+    z-index: 3000 !important;
   }
 </style>

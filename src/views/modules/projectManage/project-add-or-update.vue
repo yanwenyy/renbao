@@ -6,13 +6,13 @@
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-        <el-form-item label="项目编号">
+        <el-form-item label="项目编号" prop="project.projectCode">
           <el-input v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>
         </el-form-item>
-        <el-form-item label="项目名称">
+        <el-form-item label="项目名称" prop="project.projectName">
           <el-input v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
-        <el-form-item label="项目周期">
+        <el-form-item label="项目周期" prop="project.dataTime">
           <el-date-picker
             v-model="dataForm.project.dataTime"
             type="daterange"
@@ -316,13 +316,13 @@
           xmProjectRoleUsers:[],
         },
         dataRule: {
-          projectCode: [
+          'project.projectCode': [
             { required: true, message: '项目编号不能为空', trigger: 'blur' }
           ],
-          projectName: [
+          'project.projectName': [
             { required: true, message: '项目名称不能为空', trigger: 'blur' }
           ],
-          dataTime: [
+          "project.dataTime": [
             { required: true, message: '项目周期不能为空', trigger: 'blur' }
           ],
           auditedUnit: [
@@ -529,6 +529,9 @@
               this.dataForm.project.projectPeriodBegin=this.dataForm.project.dataTime[0];
               this.dataForm.project.projectPeriodEnd=this.dataForm.project.dataTime[1];
             }
+            this.dataForm.projectCosts.forEach((item,index)=>{
+              item.costSort=index;
+            });
             this.$http({
               url: this.$http.adornUrl(`/xmProject/${!this.dataForm.project.projectId ? 'addProject' : 'updateProject'}`),
               method: 'post',
