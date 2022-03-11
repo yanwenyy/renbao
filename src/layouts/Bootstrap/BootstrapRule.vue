@@ -20,16 +20,16 @@
 
       <!-- List of operators (e.g. =, !=, >, <) -->
       <select
-        v-if="typeof rule.operators !== 'undefined' && rule.operators.length > 1"
+        v-if="typeof rule.operators !== 'undefined' && rule.operators.length >= 1"
         v-model="query.operator"
         class="form-control mr-2"
       >
         <option
           v-for="operator in rule.operators"
-          :key="operator"
-          :value="operator"
+          :key="operator.id"
+          :value="operator.id"
         >
-          {{ operator }}
+          {{ operator.label}}
         </option>
       </select>
 
