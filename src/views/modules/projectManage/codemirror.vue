@@ -17,6 +17,7 @@
     :deleteSql="deleteSql"
     :saveSql="saveSql"
     :useChinese="true"
+    :exportSql="exportSql"
   ></sql-edit>
 </template>
 
@@ -63,6 +64,26 @@
       this.ws.close();
     },
     methods: {
+      //导出按钮点击
+      exportSql(data){
+       if(data){
+         this.$http({
+           url: this.$http.adornUrl('/sqlScript/exportExcel'),
+           method: 'post',
+           data: this.$http.adornData({
+             sqlScript:data,
+             dataSize:50000,
+             exportSize:50000,
+           })
+         }).then(({data}) => {
+           if(data.code==200){
+
+           }else{
+             this.$message.error(data.message);
+           }
+         })
+       }
+      },
       //获取sql运行websocket返回的数据
       getDataList(datas){
         this.key+=1;

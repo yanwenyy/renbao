@@ -134,6 +134,7 @@
           createUserName: '',
           createTime: '',
           ruleSqlValue: '',
+          ruleType: '',
         },
         dataRule: {
           dataTime: [
@@ -160,6 +161,7 @@
       sqlSave(){
         this.sqlVisible=false;
         this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
+        this.dataForm.ruleType='1';
       },
       cleanMsg(){
         this.activeName='1';
@@ -171,6 +173,7 @@
           createUserName: '',
           createTime: '',
           ruleSqlValue: '',
+          ruleType: '',
         };
       },
       init (id) {
@@ -203,6 +206,7 @@
                 this.dataForm.createUserName = datas.createUserName;
                 this.dataForm.createTime = datas.createTime;
                 this.dataForm.ruleSqlValue = datas.ruleSqlValue;
+                this.dataForm.ruleType = datas.ruleType;
                 this.menuListTreeSetCurrentNode()
               }
             })
@@ -238,6 +242,7 @@
                 'createUserName': this.dataForm.createUserName,
                 'createTime': this.dataForm.createTime,
                 'ruleSqlValue': this.dataForm.ruleSqlValue,
+                'ruleType': this.dataForm.ruleType,
               })
             }).then(({data}) => {
               if (data && data.code ===200) {
