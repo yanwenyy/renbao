@@ -19,6 +19,7 @@ export default {
     mainTabs: [],
     mainTabsActiveName: '',
     projectList: [], // 项目列表
+    projectId:'',//项目id
   },
   mutations: {
     updateDocumentClientHeight (state, height) {
@@ -50,19 +51,23 @@ export default {
     },
     updateProjectList (state, data) {
       state.projectList = data
+    },
+    updateProjectId (state, data) {
+      state.projectId = data
     }
   },
   actions: {
-    changeProjectList({commit}) {
+    changeProjectList({commit},userId) {
       httpRequest({
-          isLoading:false,
-          url: httpRequest.adornUrl('/xmProject/projectList'),
-          method: 'get',
+        isLoading:false,
+        url: httpRequest.adornUrl('/xmProject/projectList'),
+        method: 'get',
       }).then(({data}) => {
-          if (data.code == 200) {
-            commit('updateProjectList', data)  
-          }
-      }) 
+        if (data.code == 200) {
+          commit('updateProjectList', data.result)
+        }
+      })
+
     },
   },
 }

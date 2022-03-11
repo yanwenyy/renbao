@@ -52,7 +52,7 @@
               label="成本金额（元/天）"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="人员成本"></el-input>
+                <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="成本金额"></el-input>
               </template>
             </el-table-column>
             <el-table-column
@@ -60,7 +60,7 @@
               label="备注"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.costRemark" placeholder="人员成本"></el-input>
+                <el-input v-model="scope.row.costRemark" placeholder="备注"></el-input>
               </template>
             </el-table-column>
           </el-table>
@@ -286,6 +286,7 @@
         }
       };
       return {
+        userId:sessionStorage.getItem("userId"),//当前用户id
         meberList:[],//小组人员列表
         userList:[],//人员列表
         groupMemberForm:{},//添加小组成员表单
@@ -377,7 +378,7 @@
         return _arr;
       },
       //获取角色和人员和小组列表
-      getRoleList(){
+      getRoleList(projectId){
         this.$http({
           url: this.$http.adornUrl("/role/selectPage"),
           method: "get",
@@ -407,11 +408,12 @@
           }
         });
         this.$http({
-          url: this.$http.adornUrl("/xmProjectGroupTemplate/selectPage"),
+          url: this.$http.adornUrl(projectId?"/xmProjectGroup/selectPage":"/xmProjectGroupTemplate/selectPage"),
           method: "get",
           params: this.$http.adornParams({
             pageNo: 1,
             pageSize: 1000,
+            projectId: projectId,
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
@@ -474,10 +476,10 @@
         this.$forceUpdate();
       },
       init (id) {
-        console.log(id);
+        this.clearMsg();
         this.dataForm.project.projectId = id||0;
         this.visible = true;
-        this.getRoleList();
+        this.getRoleList(id);
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
           if (this.dataForm.project.projectId) {
@@ -488,12 +490,32 @@
             }).then(({data}) => {
               if (data && data.code === 200) {
                 var datas=data.result;
-                this.dataForm.project = datas.project;
-                this.dataForm.project.dataTime[0]=this.dataForm.project.projectPeriodBenig;
-                this.dataForm.project.dataTime[1]=this.dataForm.project.projectPeriodEnd;
+                this.dataForm.project.projectId = datas.project.projectId;
+                this.dataForm.project.projectCode = datas.project.projectCode;
+                this.dataForm.project.projectName = datas.project.projectName;
+                this.dataForm.project.auditedUnit = datas.project.auditedUnit;
+                this.dataForm.project.projectRemark = datas.project.projectRemark;
+                this.dataForm.project.dataTime[0]=datas.project.projectPeriodBegin||'';
+                this.dataForm.project.dataTime[1]=datas.project.projectPeriodEnd||'';
+                this.$set(this.dataForm.project.dataTime,this.dataForm.project.dataTime);
+                console.log(this.dataForm.project.dataTime)
                 this.dataForm.projectCosts = datas.projectCosts;
-                this.dataForm.xmProjectGroupUsers = datas.xmProjectGroupUsers;
-                this.dataForm.xmProjectRoleUsers = datas.xmProjectRoleUsers;
+                this.dataForm.xmProjectRoleUsers.forEach(item=>{
+                  datas.xmProjectRoleUsers.forEach(vtem=>{
+                    if(vtem.roleId==item.roleId){
+                      item.userIds=vtem.userIdss.split(",");
+                      this.getMemberList(item.userIds)
+                    }
+                  })
+                });
+                this.dataForm.xmProjectGroupUsers.forEach(item=>{
+                  datas.xmProjectGroupUsers.forEach(vtem=>{
+                    if(vtem.groupId==item.groupId){
+                      item.leaderIds=vtem.leaderIdss?vtem.leaderIdss.split(","):'';
+                      item.memberIds=vtem.memberIdss?vtem.memberIdss.split(","):[];
+                    }
+                  })
+                });
               }
             })
           }
@@ -504,7 +526,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             if(this.dataForm.project.dataTime!=''&&this.dataForm.project.dataTime!=null){
-              this.dataForm.project.projectPeriodBenig=this.dataForm.project.dataTime[0];
+              this.dataForm.project.projectPeriodBegin=this.dataForm.project.dataTime[0];
               this.dataForm.project.projectPeriodEnd=this.dataForm.project.dataTime[1];
             }
             this.$http({
@@ -518,7 +540,8 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
-                    this.visible = false
+                    this.visible = false;
+                    this.$store.dispatch('common/changeProjectList',this.userId);
                     this.$emit('refreshDataList')
                   }
                 })

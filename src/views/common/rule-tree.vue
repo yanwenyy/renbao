@@ -97,6 +97,26 @@ export default {
         }
 
     },
+    computed: {
+      projectId: {
+        get () {
+          if(this.$store.state.common.projectId){
+            return this.$store.state.common.projectId
+          }else{
+            this.$http({
+              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+              method: "get",
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                return data.result.projectId;
+              }
+            });
+          }
+
+        }
+      },
+    },
     data () {
         return {
             filterText: '',
@@ -123,7 +143,7 @@ export default {
             optionType: 'add',
             editRuleItemNode: {},
             parentId: [],
-            
+
         }
     },
     mounted () {
@@ -140,7 +160,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                params:  this.$http.adornParams({folderSorts: this.folderSorts}, false)
+                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
@@ -189,7 +209,7 @@ export default {
                 folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径  // 所有父节点的id拼接
                 folderSort: this.editRuleItemNode.childNodes.length>0 ? this.editRuleItemNode.childNodes.length+1 : 1, // 顺序 // 子集长度加1
             }
-           
+
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.$http({
@@ -205,9 +225,9 @@ export default {
                         }
                     }).catch(() => {
                         this.btnLoading = false;
-                    })  
+                    })
                 }
-            }); 
+            });
 
         },
         editRuleFolder (formName) {
@@ -236,7 +256,7 @@ export default {
                         }
                     }).catch(() => {
                         this.btnLoading = false;
-                    })  
+                    })
                 }
             });
 
@@ -249,7 +269,7 @@ export default {
             this.editRuleItemNode = node; // 获取点击node
             this.optionType = type; // 编辑或新增
 
-           
+
         },
         remove (node, data) {
             if( data.children ) return this.$message({message: '此规则不可删除',type: 'warning'});
@@ -276,8 +296,8 @@ export default {
                         }
                     }).catch(() => {
                         this.btnLoading = false;
-                    })  
-                    
+                    })
+
             }).catch(() => {})
         },
         nodeClick (data, node) {
@@ -306,8 +326,8 @@ export default {
             this.$refs.ruleTreeRoot.setCheckedKeys([]);
             this.$refs.ruleTreeRoot.setCurrentKey(null);
         }
-        
-        
+
+
 
     },
     watch: {
@@ -321,10 +341,10 @@ export default {
             }
             this.treeForm.folderName = ''
           }
-            
+
         }
     },
-    
+
 }
 </script>
 <style scoped lang="scss">
