@@ -126,8 +126,8 @@
           <el-input v-model="dataForm.name" placeholder="模糊查询" clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button @click="getDataList()">查询</el-button>
-          <el-button v-if="" type="info" @click="dataForm.name=''">重置</el-button>
+          <el-button type="primary" @click="getDataList()">查询</el-button>
+          <el-button v-if="" @click="dataForm.name=''">重置</el-button>
         </el-form-item>
       </el-form>
       <el-table
@@ -512,7 +512,7 @@
 
       }
     },
-    activated(){
+    mounted(){
       this.dragControllerDiv2();
     },
     methods: {
@@ -984,7 +984,7 @@
         const keyCombination =
           event.ctrlKey || event.altKey || event.metaKey;
         if (!keyCombination && keyCode > 64 && keyCode < 123) {
-          this.$refs.myCm.codemirror.showHint({completeSingle: false});
+          this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         }
       },
       // 按下鼠标时事件处理函数
@@ -1073,7 +1073,7 @@
     left:-10px;
     background-size: cover;
     background-position: center;
-    z-index: 9999999999;
+    /*z-index: 9999999999;*/
     font-size: 32px;
     color: white;
   }
@@ -1087,5 +1087,8 @@
   }
   .inline-block{
     display: inline-block;
+  }
+  .CodeMirror-hints{
+    z-index: 3000 !important;
   }
 </style>

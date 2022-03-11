@@ -51,14 +51,14 @@
         <span>当前项目：</span>
         <el-select v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
           <el-option
-            v-for="item in projectList.result"
+            v-for="item in projectList"
             :key="item.projectId"
             :label="item.projectName"
             :value="item.projectId">
           </el-option>
         </el-select>
       </div>
-      
+
     </div>
     <!-- 弹窗, 修改密码 -->
     <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
@@ -73,6 +73,7 @@
       return {
         updatePassowrdVisible: false,
         projectCode: '',
+        userId:sessionStorage.getItem("userId"),//当前用户id
       }
     },
     components: {
@@ -98,8 +99,19 @@
       }
     },
     created () {
-      // alert(11)
-      this.$store.dispatch('common/changeProjectList');
+      // alert(11);
+      this.$store.dispatch('common/changeProjectList',this.userId);
+      this.$http({
+        url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+        method: "get",
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.projectCode=data.result.projectId;
+          this.$store.commit('common/updateProjectId', this.projectCode)
+          // this.$store.dispatch('common/changeProjectId', this.projectCode)
+        }
+      });
     },
     methods: {
       // 修改密码
@@ -129,16 +141,18 @@
         }).catch(() => {})
       },
       selectProject (val) {
-        console.log(val)
-        this.$http({
-            isLoading:false,
-            url: this.$http.adornUrl('nowProject/updateByUuId'),
-            method: 'get',
-            params:  this.$http.adornParams({projectId: val}, false)
-        }).then(({data}) => {
-            if (data.code == 200) {
-            }
-        })
+       if(val){
+         this.$http({
+           isLoading:false,
+           url: this.$http.adornUrl('/nowProject/saveOrUpdateByCreateUserId'),
+           method: 'post',
+           data:  this.$http.adornData({projectId: val,createUserId:this.userId})
+         }).then(({data}) => {
+           if (data.code == 200) {
+           }
+         })
+       }
+
       }
     }
   }

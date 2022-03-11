@@ -60,7 +60,7 @@ export default {
       },
       ruleTypes: {
         "text": {
-          operators: ['等于','不等于','包含以下内容','不包含以下内容','以...结束','不以...结束','为空','不为空','为null','不为null'],
+          operators: ['equals', 'does not equal', 'contains', 'does not contain', 'is empty', 'is not empty', 'begins with', 'ends with'],
           inputType: "text",
           id: "text-field"
         },
@@ -75,7 +75,7 @@ export default {
           id: "custom-field"
         },
         "radio": {
-          operators: [],
+          operators: ['='],
           choices: [],
           inputType: "radio",
           id: "radio-field"
@@ -98,7 +98,13 @@ export default {
           inputType: "select",
           id: "multi-select-field"
         },
-      }
+        "inputselect":{
+          operators: [],
+          choices: [],
+          inputType: "inputselect",
+          id: "inputselect-field"
+         }
+      },sql: ''
     }
   },
 
@@ -140,6 +146,7 @@ export default {
       newQuery => {
         if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
           this.$emit('input', deepClone(newQuery));
+          this.$emit('sql', this.queryToSql(newQuery));
         }
       }, {
       deep: true
@@ -158,6 +165,30 @@ export default {
     if ( typeof this.$options.propsData.value !== "undefined" ) {
       this.query = Object.assign(this.query, this.$options.propsData.value);
     }
+  },//add by wxg.
+  methods:{
+      queryToSql(query) {
+          var sql = [];
+          var that = this;
+          var logicalOperator = query.logicalOperator;
+          var children = query.children;
+          children.forEach((child) => {
+              var type = child.type;
+              if (type === 'query-builder-rule') {
+                  sql.push(child.query.rule);
+                  sql.push(child.query.operator);
+                  sql.push(child.query.value);
+              } else {
+                  sql.push('(');
+                  sql.push(that.queryToSql(child.query))
+                  sql.push(')');
+              }
+              sql.push(logicalOperator);
+          })
+          sql.splice(sql.length - 1, sql.length);
+          return sql.join(' ');
+      }
   }
+      
 }
 </script>

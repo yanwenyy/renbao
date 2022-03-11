@@ -1,6 +1,6 @@
 <template>
     <div class='collection'>
-        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+        <el-form :inline="true" :model="dataForm">
             <el-form-item label="文件名：">
                 <el-input v-model="dataForm.fileName" placeholder="请输入文件名"></el-input>
             </el-form-item>
@@ -8,17 +8,17 @@
                 <el-input v-model="dataForm.filePath" placeholder="请输入文件路径"></el-input>
             </el-form-item>
              <el-form-item label="采集状态：">
-                <el-select v-model="dataForm.collectionStatus" placeholder="已完成" clearable>
+                <el-select v-model="dataForm.collectStatus" placeholder="已完成" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="开始时间：">
                 <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.timeStart" style="width: 100%;"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTime" style="width: 100%;"></el-date-picker>
                 </el-col>
                 <el-col class="line" :span="2">-</el-col>
                 <el-col :span="11">
-                    <el-time-picker placeholder="选择日期" v-model="dataForm.timeEnd" style="width: 100%;"></el-time-picker>
+                    <el-time-picker placeholder="选择日期" v-model="dataForm.endTime" style="width: 100%;"></el-time-picker>
                 </el-col>
             </el-form-item>
             <el-form-item>
@@ -32,28 +32,34 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" style="width: 100%">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="600" style="width: 100%" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
-                    <el-table-column prop="batch" label="批次" align="center"></el-table-column>
+                    <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
-                    <el-table-column label="采集数据文件路径" align="center" prop="filepath"></el-table-column>
-                    <el-table-column label="数据类型" align="center" prop="dataType"></el-table-column>
-                    <el-table-column label="采集人" align="center" prop="Collector"></el-table-column>
-                    <el-table-column label="开始时间" align="center" prop="startDate"></el-table-column>
-                    <el-table-column label="结束时间" align="center" prop="endDate"></el-table-column>
-                    <el-table-column label="状态" align="center" prop="stauts">
+                    <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
+                    <el-table-column label="数据类型" align="center" prop="dataType">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.stauts=='0'">已完成</div>
-                            <div class="tac" v-if="scope.row.stauts=='1'">进行中</div>
-                            <div class="tac" v-if="scope.row.stauts=='2'">失败</div>
+                            <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
+                            <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
+                    <el-table-column label="开始时间" align="center" prop="startTime"></el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="endTime"></el-table-column>
+                    <el-table-column label="状态" align="center" prop="collectStatus">
+                        <template slot-scope="scope">
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="进度" align="center" prop="schedule">
-                        <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template>
+                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
                     </el-table-column>
                     <el-table-column align="center" label="日志">
                         <template slot-scope="scope">
-                            <el-button @click="editClick(scope.row.businessId)" type="text" size="small">查看</el-button>
+                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text" size="small">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -64,30 +70,36 @@
         <el-tab-pane label="医院数据" name="pass">
             <div v-if="activeName == 'pass'">
                 <div class='listDisplay'>
-                    <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
+                    <el-button type="warning" @click="getEditCollection()">查看未导入医院</el-button>
                 </div>
-                <el-table :data="tableDataPass" border stripe style="width: 100%">
+                <el-table :data="tableDataPass" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column label="批次" align="center" prop="batch"> </el-table-column>
+                    <el-table-column label="批次" align="center" prop="collectPlanMonitorBath"> </el-table-column>
                     <el-table-column label="医院名称" align="center" prop="pName"></el-table-column>
-                    <el-table-column label="采集数据文件路径" align="center" prop="floor"> </el-table-column>
-                    <el-table-column label="数据类型" align="center" prop="spaceNum"></el-table-column>
-                    <el-table-column label="采集人" align="center" prop="Collector"> </el-table-column>
-                    <el-table-column label="开始时间" align="center" prop="startDate"></el-table-column>
-                    <el-table-column label="结束时间" align="center" prop="endDate"> </el-table-column>
-                    <el-table-column label="状态" align="center" prop="spaceStatus">
+                    <el-table-column label="采集数据文件路径" align="center" prop="filePath"> </el-table-column>
+                    <el-table-column label="数据类型" align="center" prop="dataType">
+                         <template slot-scope="scope">
+                            <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
+                            <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
+                    <el-table-column label="开始时间" align="center" prop="startTime"></el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="endTime"> </el-table-column>
+                    <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.spaceStatus=='0'">已完成</div>
-                            <div class="tac" v-if="scope.row.spaceStatus=='1'">进行中</div>
-                            <div class="tac" v-if="scope.row.spaceStatus=='2'">失败</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="进度" align="center" prop="schedule">
-                        <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template>
+                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
                     </el-table-column>
                     <el-table-column align="center" label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="edit(scope.row.id)" size="mini">查看进度</el-button>
+                            <el-button @click="edit(scope.row.collectPlanMonitorId)" size="mini">查看进度</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -97,27 +109,28 @@
         <!--医院基本信息-->
         <el-tab-pane label="医院基本信息" name="noPass">
             <div v-if="activeName == 'noPass'">
-                <el-table :data="tableList" border stripe style="width: 100%">
+                <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" @selection-change="handleSelectionChange">
                     <el-table-column type="selection"  header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column label="批次" align="center" prop="pName"> </el-table-column>
+                    <el-table-column label="批次" align="center" prop="collectPlanMonitorBath"> </el-table-column>
                     <el-table-column label="文件名" align="center" prop="fileName"></el-table-column>
-                    <el-table-column label="采集数据文件路径" align="center" prop="floor"> </el-table-column>
-                    <el-table-column label="采集人" align="center" prop="Collector"> </el-table-column>
-                    <el-table-column label="开始时间" align="center" prop="startDate"></el-table-column>
-                    <el-table-column label="结束时间" align="center" prop="endDate"> </el-table-column>
-                    <el-table-column label="状态" align="center" prop="stauts">
+                    <el-table-column label="采集数据文件路径" align="center" prop="filePath"> </el-table-column>
+                    <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
+                    <el-table-column label="开始时间" align="center" prop="startTime"></el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="endTime"> </el-table-column>
+                    <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.stauts=='0'">已完成</div>
-                            <div class="tac" v-if="scope.row.stauts=='1'">进行中</div>
-                            <div class="tac" v-if="scope.row.stauts=='2'">失败</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="进度" align="center" prop="schedule">
-                        <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template>
+                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
                     </el-table-column>
                     <el-table-column align="center"  label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="editClick(scope.row.businessId)" size="mini">查看</el-button>
+                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" size="mini">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -136,7 +149,7 @@
                 ></el-pagination>
          <!-- 查看弹框-->
         <el-dialog title='查看日志' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="editShowVisible">
-            <Edit v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :businessId="businessId" ></Edit>
+            <Edit v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId" ></Edit>
         </el-dialog>
         <!-- 查看未导入医院弹框-->
         <el-dialog title='查看未导入医院' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="notImportVisible">
@@ -169,9 +182,9 @@ export default {
             dataForm:{
                 fileName:'',
                 filePath:'',
-                collectionStatus:'',
-                timeEnd:'',
-                timeStart:''
+                collectStatus:'',
+                startTime:'',
+                endTime:''
             },
             options:[{
                 value:'1',
@@ -182,6 +195,9 @@ export default {
             },{
                 value:'3',
                 label:'失败'
+            },{
+                value:'4',
+                label:'待采集'
             }],
             activeName:'audit',
             tableList:[],//医保数据 医院基本信息
@@ -195,13 +211,18 @@ export default {
                 pageIndex:1,
                 total:0,
             },
-            businessId:''
+            collectPlanMonitorId:'',
+            dataSelectTable:[] //选中数据
         }
     },
     mounted(){
         this.getInitList()
     },
     methods:{
+        //多选
+        handleSelectionChange(val){
+            this.dataSelectTable = val
+        },
         //tab事件
         handleClick(tab,event){
             this.activeName = tab.name;
@@ -211,9 +232,14 @@ export default {
         },
         //初始化数据
         getInitList(){
+            this.tableList = []
             this.$http({
                 url:this.$http.adornUrl('/collectPlanMonitor/selectPageList'),
                 method: 'get',
+                params: this.$http.adornParams({
+                    pageSize:this.apComServerData.pageSize,
+                    pageNo:this.apComServerData.pageIndex
+                })
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableList = data.result.records
@@ -236,7 +262,7 @@ export default {
         //查看
         editClick(id){
             this.editShowVisible = true
-            this.businessId = id
+            this.collectPlanMonitorId = id
         },
         //医院查看进度
         edit(){
@@ -244,7 +270,7 @@ export default {
         },
 
         //医院查看未导入数据
-        getStopCollection(){
+        getEditCollection(){
             this.notImportVisible = true
         },
         //关闭弹框
@@ -262,12 +288,12 @@ export default {
         handleSizeChange(val){
             this.apComServerData.pageSize = val;
             this.apComServerData.pageIndex = 1
-            this.getDataList()
+            this.getInitList()
         },
         //当前页
         handleCurrentChange(val){
             this.apComServerData.pageIndex = val;
-            this.getDataList()
+            this.getInitList()
         },
         //重置
         resetForm(formName){
@@ -279,6 +305,29 @@ export default {
                 timeStart:''
             }
             this.$refs[formName].resetFields()
+        },
+        getSearch(){
+            this.getInitList()
+            // this.$http({
+            //     url:this.$http.adornUrl('/collectPlanMonitor/selectPageList'),
+            //     method: 'get',
+            //     params :this.$http.adornParams({
+            //         fileName:this.dataForm.fileName,
+            //         filePath:this.dataForm.filePath,
+            //         collectStatus:this.dataForm.collectStatus,
+            //         startTime:this.dataForm.startTime,
+            //         endTime:this.dataForm.endTime
+            //     })
+            // }).then(({data}) =>{
+            //     if(data && data.code === 200){
+            //         this.tableList = data.result.records
+            //         this.apComServerData.total = data.result.total
+            //     }else{
+            //         this.tableList = []
+            //         this.apComServerData.total = 0
+            //     }
+            //     this.dataListLoading = false;
+            // })
         }
     }
 }

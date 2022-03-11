@@ -61,7 +61,7 @@
           <!--</el-form-item>-->
           <el-form-item>
             <el-button type="primary" @click="pageIndex=1,getDataList()">查询</el-button>
-            <el-button>重置</el-button>
+            <el-button @click="reset()">重置</el-button>
           </el-form-item>
         </el-form>
         <div class="search-btn">
@@ -176,6 +176,7 @@ import ruleTree from '../../common/rule-tree.vue'
         dataForm: {
           ruleName: '',
           createUserName: '',
+          folderId:'',//规则分类主键
         },
         token:'',
         imgUrlfront:'',
@@ -230,6 +231,17 @@ import ruleTree from '../../common/rule-tree.vue'
       this.getDataList();
     },
     methods: {
+      //重置点击
+      reset(){
+        this.dataForm={
+          ruleName: '',
+          createUserName: '',
+          folderId:'',//规则分类主键
+        };
+        this.pageIndex=1;
+        this.pageSize=10;
+        this.getDataList();
+      },
       append(data,type) {
         // console.log(data)
        this.treeTitle=type=='add'?'填写分类信息':'编辑分类信息';
@@ -260,6 +272,7 @@ import ruleTree from '../../common/rule-tree.vue'
             'pageSize': this.pageSize,
             'ruleName': this.dataForm.ruleName,
             'createUserName': this.dataForm.createUserName,
+            'folderId': this.dataForm.folderId,
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -358,7 +371,9 @@ import ruleTree from '../../common/rule-tree.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
-        console.log(data, 'datadatadata')
+        // console.log(data, 'datadatadata');
+        this.dataForm.folderId=data.folderId;
+        this.getDataList();
       }
     }
   }
