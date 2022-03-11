@@ -4,7 +4,7 @@
 
 <script>
 /* eslint-disable vue/require-default-prop */
-import deepClone from '../../utilities.js';
+import deepClone from '../../utilities';
 import QueryBuilderChildren from './QueryBuilderChildren.vue';
 
 export default {
