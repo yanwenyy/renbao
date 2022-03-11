@@ -109,12 +109,13 @@ export default {
                 {
                   batchName: this.dataForm.batchName,
                   batchRemark: this.dataForm.batchRemark,
+                  batchType: 1,
+                  expectedBeginTime: "",
                   hospital: this.dataForm.hospitalName,
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
-                  runtype: 1,
-                  batchType: 1
+                  runType: 1
                 },
                 false
               )
@@ -153,7 +154,7 @@ export default {
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
-                  runtype: 2
+                  runType: 2
                 },
                 false
               )
