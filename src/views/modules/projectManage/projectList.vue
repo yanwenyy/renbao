@@ -10,6 +10,7 @@
       </el-form-item>
       <el-form-item label="项目时间:">
         <el-date-picker
+          :picker-options="pickerOptionsStart"
           v-model="dataForm.createTimeBegin"
           type="date"
           value-format="yyyy-MM-dd"
@@ -17,6 +18,7 @@
         </el-date-picker>
         <span>--</span>
         <el-date-picker
+          :picker-options="pickerOptionsEnd"
           v-model="dataForm.createTimeEnd"
           type="date"
           value-format="yyyy-MM-dd"
@@ -118,6 +120,28 @@
   export default {
     data () {
       return {
+        // 开始日期 :picker-options 中引用
+        pickerOptionsStart: {
+          disabledDate: time => {
+            // 获取结束日期的 v-model 值并赋值给新定义的对象
+            let endDateVal = this.dataForm.createTimeEnd;
+            if (endDateVal) {
+              // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+              return time.getTime() > new Date(endDateVal).getTime();
+            }
+          }
+        },
+        // 结束日期 :picker-options 中引用
+        pickerOptionsEnd: {
+          disabledDate: time => {
+            // 获取开始日期的 v-model 值并赋值给新定义的对象
+            let beginDateVal = this.dataForm.createTimeBegin;
+            if (beginDateVal) {
+              // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+              return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
+            }
+          }
+        },
         dataForm: {
           projectCode: '',
           projectName: '',

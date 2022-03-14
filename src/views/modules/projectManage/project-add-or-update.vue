@@ -201,7 +201,7 @@
           </el-table>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea"
+          <el-input maxlength="2000" type="textarea"
                     :rows="4" v-model="dataForm.project.projectRemark" placeholder="备注"></el-input>
         </el-form-item>
       </el-form>
