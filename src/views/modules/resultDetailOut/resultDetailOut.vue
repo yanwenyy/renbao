@@ -24,16 +24,16 @@
                    
                     <el-form-item>
                         <el-button type="primary" @click="onQuery">查询</el-button>
-                        <el-button type="info" @click="onReset">重置</el-button>
+                        <el-button @click="onReset">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
           
             <div class="table-box">
-                <el-button-group class="option-box">
-                    <el-button size="small" type="primary" @click="deleteFn">删除</el-button>
+                <div class="option-box">
+                    <el-button size="small" type="danger" @click="deleteFn">删除</el-button>
                     <el-button size="small" type="primary" @click="resultDetailsExportClick">结果明细导出</el-button>
-                </el-button-group>
+                </div>
                 <el-table
                     v-loading="tableLoading"
                     ref="multipleTable"
@@ -138,9 +138,12 @@ export default {
             this.getTableData()
         },
         onReset () {
-            this.searchForm={ruleCategory: '',ruleName: ''};
+            this.searchForm.ruleCategory = '';
+            this.searchForm.ruleName = '';
+            this.Pager.pageIndex = 1;
             this.$refs.treesa.setCheckedKeys([]);
             this.$refs.treesa.setCurrentKey(null);
+            this.batchItem = {}
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;
@@ -222,7 +225,7 @@ export default {
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
             var deleteList = []
             this.multipleTable.forEach( item =>{
-                deleteList.push( item.ruleId )
+                deleteList.push( item.resultId )
             })
             this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
                 confirmButtonText: '确定',

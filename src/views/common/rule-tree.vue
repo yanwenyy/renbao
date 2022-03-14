@@ -147,10 +147,11 @@ export default {
         }
     },
     mounted () {
+        this.getRuleFolder();
 
     },
     activated () {
-        this.getRuleFolder();
+        
     },
     methods: {
         // 获取规则树
@@ -164,6 +165,7 @@ export default {
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
+                console.log(data, '获取规则树')
                 if (data.code == 200) {
                     this.treeData = data.result;
                 }
