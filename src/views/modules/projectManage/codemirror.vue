@@ -45,7 +45,7 @@
         userId:sessionStorage.getItem("userId"),
       }
     },
-    mounted(){
+    activated(){
       this.sqlListData=[];
       this.sqlListTotal=0;
       this.sqlData='';
@@ -54,6 +54,8 @@
       this.treeData=[];
       this.getSjbData();
       this.getSqlList();
+    },
+    mounted(){
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -82,6 +84,8 @@
              this.$message.error(data.message);
            }
          })
+       }else{
+         this.$message.error("sql语句不能为空")
        }
       },
       //获取sql运行websocket返回的数据

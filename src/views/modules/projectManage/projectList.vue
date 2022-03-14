@@ -60,7 +60,7 @@
         align="center"
         label="项目周期">
         <template slot-scope="scope">
-          {{scope.row.projectPeriodBegin }}-{{scope.row.projectPeriodEnd}}
+          {{scope.row.projectPeriodBegin }}至{{scope.row.projectPeriodEnd}}
         </template>
       </el-table-column>
       <el-table-column
