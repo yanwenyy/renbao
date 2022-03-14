@@ -74,7 +74,7 @@
       <div id="resize" title="收缩栏"  v-if="!fullScreen">
 
       </div>
-      <div id="bottom" class="codemirror-table-div">
+      <div id="bottom" class="codemirror-table-div" :class="fullScreen?'fullScreenClass':''">
         <div class="codemirror-table-btn">
           <el-button type="primary" @click="exportSqlSelf">全部导出</el-button>
           <div v-if="!useChinese" class="inline-block">
@@ -1098,5 +1098,15 @@
   }
   .CodeMirror-hints{
     z-index: 3000 !important;
+  }
+  .fullScreenClass{
+    width: 100%!important;
+    height: 100vh!important;
+    position: fixed;
+    top:0;
+    left: 0;
+    border: 1px solid #999;
+    padding: 10px;
+    box-shadow:5px 2px 6px #ddd;
   }
 </style>
