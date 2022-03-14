@@ -156,7 +156,7 @@
       </div>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
   </div>
 </template>
 
@@ -166,6 +166,7 @@ import ruleTree from '../../common/rule-tree.vue'
   export default {
     data () {
       return {
+        ruleData:{},//组件规则数数据
         form:{
           name:'',
         },
@@ -229,6 +230,13 @@ import ruleTree from '../../common/rule-tree.vue'
     },
     activated () {
       this.getDataList();
+      this.$http({
+        url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
+        method: 'get',
+        params: this.$http.adornParams({folderSorts: ''})
+      }).then(({data}) => {
+        this.ruleData = data.result;
+      })
     },
     methods: {
       //重置点击

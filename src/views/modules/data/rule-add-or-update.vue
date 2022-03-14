@@ -29,7 +29,7 @@
                 v-model="treeVisible">
                 <el-tree
                   class="rule-tree"
-                  :data="menuList"
+                  :data="ruleData"
                   :props="menuListTreeProps"
                   node-key="folderId"
                   ref="menuListTree"
@@ -102,6 +102,12 @@
   export default {
     components: {
       sqlElement
+    },
+    props:{
+      ruleData: {
+        type: Array,
+        default: null,
+      },
     },
     data () {
       var validateInteger = (rule, value, callback) => {
@@ -235,41 +241,32 @@
         this.dataForm.id = id || 0;
         this.visible = true;
         this.getUserInfo();
-        this.$http({
-          url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
-          method: 'get',
-          params: this.$http.adornParams({folderSorts: ''})
-        }).then(({data}) => {
-          this.menuList = data.result;
-        }).then(() => {
-          this.visible = true
-          this.$nextTick(() => {
-            this.$refs['dataForm'].resetFields();
-            this.$refs['dataForm'].clearValidate()
-          })
-        }).then(() => {
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 200) {
-                var datas = data.result;
-                this.dataForm.ruleName = datas.ruleName;
-                this.dataForm.ruleCategory = datas.ruleCategory;
-                this.dataForm.folderId = datas.folderId;
-                this.dataForm.createUserName = datas.createUserName;
-                this.dataForm.createTime = datas.createTime;
-                this.dataForm.ruleSqlValue = datas.ruleSqlValue;
-                this.sqlEditMsg = datas.ruleSqlValue;
-                console.log(this.sqlEditMsg,33333)
-                this.dataForm.ruleType = datas.ruleType;
-                this.menuListTreeSetCurrentNode();
-              }
-            })
-          }
+        this.visible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields();
+          this.$refs['dataForm'].clearValidate()
         })
+        if (this.dataForm.id) {
+          this.$http({
+            url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 200) {
+              var datas = data.result;
+              this.dataForm.ruleName = datas.ruleName;
+              this.dataForm.ruleCategory = datas.ruleCategory;
+              this.dataForm.folderId = datas.folderId;
+              this.dataForm.createUserName = datas.createUserName;
+              this.dataForm.createTime = datas.createTime;
+              this.dataForm.ruleSqlValue = datas.ruleSqlValue;
+              this.sqlEditMsg = datas.ruleSqlValue;
+              console.log(this.sqlEditMsg,33333)
+              this.dataForm.ruleType = datas.ruleType;
+              this.menuListTreeSetCurrentNode();
+            }
+          })
+        }
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
