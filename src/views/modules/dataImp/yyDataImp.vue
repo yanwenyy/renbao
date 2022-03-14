@@ -343,7 +343,9 @@
         // 查看表数据，表结构选中的表
         checkTableName: '',
         // 导入数据集合
-        importDataModelList: []
+        importDataModelList: [],
+        // 医院名
+        hospitalName: ''
       }
     },
     components: {
@@ -457,7 +459,7 @@
       // 导入数据
       impYYData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${1}`),
+          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName}`),
           method: 'post',
           data: this.importDataModelList,
           isLoading: false
@@ -495,6 +497,7 @@
       fileClick(row){
         if (row.ifDir) {
           this.selectedFileData = []
+          this.hospitalName = row.name
           row.children.forEach(item => {
             // 去除选中的文件夹
             if (!item.ifDir) {
