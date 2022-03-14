@@ -201,7 +201,9 @@
                   <el-select
                     v-model="scope.row[getMapKey(scope.row)]"
                     value-key="columnInfoId"
-                    placeholder="请选择匹配字段">
+                    placeholder="请选择匹配字段"
+                    clearable
+                    >
                     <el-option
                       v-for="itemdbm in item.dbColumns[selectTableNames[index]]"
                       :key="itemdbm.columnInfoId"

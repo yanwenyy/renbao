@@ -75,7 +75,7 @@ export default {
                 folderId: '',
                 createUserName: '',
                 createTime: '',
-                folderName: '',
+                folderName: [],
                 folderPath: '',
                 ruleId: '',
                 username: ''
@@ -87,9 +87,9 @@ export default {
                 ruleCategory: [
                     { required: true, message: '请选择规则类别'},
                 ],
-                // folderName: [
-                //     { required: true, message: '请选择规则类别'},
-                // ],
+                folderName: [
+                    { required: true, message: '请选择规则分类', trigger: 'blur'},
+                ],
                 username: [
                     { required: true, message: '请输入创建人'},
                 ],
@@ -112,30 +112,29 @@ export default {
             this.reset();
             this.checkedData = d;
             this.type = type; // 新建、编辑
-            
             let that = this;
             this.$nextTick(() => {
-                let getTreeCheckedData = []
-                this.$refs.ruleTree.getRuleFolder((treeData) => {
-                    // console.log(treeData, 'treeDatatreeDatatreeData')
-                     that.treeData = treeData
+                if (this.type == 'edit') {
                     if (this.checkedData.length>0) {
-                        let getTreeData = this.getTreeData(this.treeData, this.checkedData[0].folderId); // 递归获取对应的规则对象
-                        getTreeCheckedData = getTreeData
                         this.ruleOperationForm.ruleName = this.checkedData[0].ruleName;
                         this.ruleOperationForm.ruleCategory = this.checkedData[0].ruleCategory == '住院规则'?2 : this.checkedData[0].ruleCategory == '门诊规则' ? 1 : '' ;
                         this.ruleOperationForm.ruleId = this.checkedData[0].ruleId;
                         this.ruleOperationForm.folderId = this.checkedData[0].folderId;
-                        // 回显规则名称
-                        if (getTreeData.length>0) {
-                            this.ruleOperationForm.folderName = [getTreeData[0].folderName];
-                            this.ruleOperationForm.folderPath = this.getParentByData(this.treeData,getTreeData[0].folderId )
-                            // 设置复选框的勾选状态
-                            this.setPerCheckedNodes(getTreeData)
-                        }
                     }
-                   
-                })
+                    this.$refs.ruleTree.getRuleFolder((treeData) => {
+                        that.treeData = treeData
+                        if (this.checkedData.length>0) {
+                            let getTreeData = this.getTreeData(this.treeData, this.checkedData[0].folderId); // 递归获取对应的规则对象
+                            // 规则分类回显
+                            if (getTreeData.length>0) {
+                                // 设置复选框的勾选状态
+                                this.setPerCheckedNodes(getTreeData)
+                            }
+                        }
+                    })
+                } else {
+                    this.reset()
+                } 
             })
             this.dialogVisible = true;
             this.ruleOperationForm.createTime = getDate(); // 回显创建时间
@@ -143,6 +142,8 @@ export default {
             this.ruleOperationForm.username = this.username; // 回显创建人
         },
         setPerCheckedNodes (getTreeData) {
+            this.ruleOperationForm.folderName = [getTreeData[0].folderName];
+            this.ruleOperationForm.folderPath = this.getParentByData(this.treeData,getTreeData[0].folderId )
             this.$nextTick(() => {
                 this.$refs.ruleTree.setCheckedByData(getTreeData[0]);
             })
@@ -213,19 +214,25 @@ export default {
                 return temp.join('/');
         },
         handleNodeChange (data, node , treeData) {
-            console.log(this.$refs.ruleTree.setCheckedByData, '打印纸')
-            this.ruleCheckedData = data
-            this.$refs.ruleTree.setCheckedByData(data);
-            this.ruleOperationForm.folderName = [data.folderName];
-            this.ruleOperationForm.folderId =  data.folderId;
-            this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
+            // this.ruleCheckedData = data
+            // this.$refs.ruleTree.setCheckedByData(data);
+            // this.ruleOperationForm.folderName = [data.folderName];
+            // this.ruleOperationForm.folderId =  data.folderId;
+            // this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
         },
         handleCheckChange(data, checked, treeData) {
-            // this.bitchCheckData = data; 
-            this.ruleCheckedData = data
-            this.ruleOperationForm.folderName = [this.ruleCheckedData.folderName];
-            this.ruleOperationForm.folderId =  this.ruleCheckedData.folderId;
-            this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
+            if (checked) {
+                this.ruleCheckedData = data
+                this.ruleOperationForm.folderName = [this.ruleCheckedData.folderName];
+                this.ruleOperationForm.folderId =  this.ruleCheckedData.folderId;
+                this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
+            } else {
+                this.ruleCheckedData = {}
+                this.ruleOperationForm.folderName = [];
+                this.ruleOperationForm.folderId =  '';
+                this.ruleOperationForm.folderPath =  ''
+            }
+           
         },
         handleClose () {
             this.resetForm();
@@ -280,22 +287,22 @@ export default {
             this.resetForm();
             this.reset();
             this.dialogVisible = false;
-           
         },
         resetForm(formName) {
-            this.$refs['ruleOperationForm'].resetFields();
+            if (this.$refs['ruleOperationForm']) {
+                this.$refs['ruleOperationForm'].resetFields();
+            } 
         },
         reset () {
-            this.ruleOperationForm = {
-                ruleName: '',
-                ruleCategory: '',
-                folderId: '',
-                createUserName: '',
-                createTime: '',
-                folderName: '',
-                folderPath: '',
-                ruleId: ''
-            };
+            this.ruleOperationForm.ruleName = '';
+            this.ruleOperationForm.ruleCategory = '';
+            this.ruleOperationForm.folderId = '';
+            this.ruleOperationForm.folderName = [];
+            this.ruleOperationForm.folderPath = '';
+            this.ruleOperationForm.ruleId = '';
+            this.$nextTick(() => {
+               this.$refs.ruleTree && this.$refs.ruleTree.clearCheckedKeys();
+            })
         },
     },
     computed: {
@@ -303,11 +310,15 @@ export default {
             get () { return this.$store.state.user.name }
         },
      },
-    
     components: {
         ruleTree   
     },
     watch : {
+        'dialogVisible'(nval, oval) {
+            if (nval ) {   
+               this.resetForm();
+            }
+        },
     }
 }
 </script>

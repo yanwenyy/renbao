@@ -234,8 +234,9 @@ export default {
                 }).then(() => {
                 this.$http({
                     isLoading:false,
-                    url: this.$http.adornUrl(`ruleResult/deleteByIds/${deleteList.join(',')}`),
+                    url: this.$http.adornUrl('ruleResult/deleteByIds'),
                     method: 'DELETE',
+                    data:  this.$http.adornData({ids: deleteList}, false)
                 }).then(({data}) => {
                     if (data && data.code === 200) {
                     this.$message({message: '删除成功',type: 'success',})

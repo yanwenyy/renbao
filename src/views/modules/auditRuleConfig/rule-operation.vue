@@ -130,8 +130,6 @@ export default {
         },
         onSubmit (formName) {
             this.ruleOperationForm.batchType= 2
-            console.log(this.ruleOperationForm, 'ruleOperationForm')
-            debugger
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true

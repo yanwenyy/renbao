@@ -321,7 +321,7 @@ export default {
             if(this.isRelation) {
                 this.$emit("checkChange", data, checked, this.treeData);
                 if (checked) {
-                    this.$refs.ruleTreeRoot.setCheckedNodes([data]);
+                    this.$refs.ruleTreeRoot.setCheckedNodes([data]);                  
                 } else {
                     this.$refs.ruleTreeRoot.setCheckedNodes([]);
                 }
@@ -336,8 +336,6 @@ export default {
             this.$refs.ruleTreeRoot.setCheckedKeys([]);
             this.$refs.ruleTreeRoot.setCurrentKey(null);
         }
-
-
 
     },
     watch: {

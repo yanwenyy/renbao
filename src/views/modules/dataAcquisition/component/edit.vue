@@ -1,19 +1,16 @@
 <template>
     <div class='Edit'>
         <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" style="width: 100%">
-            <el-table-column label="校验规则" align="center" prop="stepName"></el-table-column>
-            <el-table-column label="校验状态" align="center" prop="stepStatus">
+            <el-table-column label="步骤规则" align="center" prop="stepName"></el-table-column>
+            <el-table-column label="步骤状态" align="center" prop="stepStatus">
                 <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.stepStatus=='1'">成功</div>
-                    <div class="tac" v-if="scope.row.stepStatus=='2'">执行中</div>
+                    <div class="tac" v-if="scope.row.stepStatus=='0'">待采集</div>
+                    <div class="tac" v-if="scope.row.stepStatus=='1'">进行中</div>
+                    <div class="tac" v-if="scope.row.stepStatus=='2'">已完成</div>
                     <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                 </template>
             </el-table-column>
-            <el-table-column label="校验结果" align="center" prop="stepResult">
-                <!-- <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.stepResult=='1'">成功</div>
-                    <div class="tac" v-if="scope.row.stepResult=='2'">失败</div>
-                </template> -->
+            <el-table-column label="步骤结果" align="center" prop="stepResult">
             </el-table-column>
         </el-table>
         <div class="itemBtn">
