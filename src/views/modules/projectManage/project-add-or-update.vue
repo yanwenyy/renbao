@@ -22,7 +22,7 @@
             end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="被审核单位">
+        <el-form-item label="被审核单位"  prop="project.auditedUnit">
           <el-input v-model="dataForm.project.auditedUnit" placeholder="被审核单位"></el-input>
         </el-form-item>
         <el-form-item label="项目成本">
@@ -325,7 +325,7 @@
           "project.dataTime": [
             { required: true, message: '项目周期不能为空', trigger: 'blur' }
           ],
-          auditedUnit: [
+          "project.auditedUnit": [
             { required: true, message: '被审核单位不能为空', trigger: 'blur' }
           ],
           dataAmount: [

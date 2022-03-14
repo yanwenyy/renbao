@@ -8,7 +8,7 @@
       :visible.sync="visible">
       <el-tabs type="border-card" class="self-tabs" v-model="activeName">
         <el-tab-pane name="1" label="基本信息">
-          <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
+          <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
                    label-width="80px">
             <el-form-item label="规则名称">
               <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
@@ -41,10 +41,11 @@
                         placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
             </el-form-item>
             <el-form-item label="创建人">
-              <el-input v-model="dataForm.createUserName" placeholder="创建人"></el-input>
+              <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
             </el-form-item>
             <el-form-item label="创建时间">
               <el-date-picker
+                readonly
                 v-model="dataForm.createTime"
                 type="date"
                 value-format="yyyy-MM-dd"
@@ -153,6 +154,36 @@
       }
     },
     methods: {
+      //获取当前日期，格式YYYY-MM-DD
+      getNowFormatDay() {
+        var nowDate=new Date();
+        var char = "-";
+        if(nowDate == null){
+          nowDate = new Date();
+        }
+        var day = nowDate.getDate();
+        var month = nowDate.getMonth() + 1;//注意月份需要+1
+        var year = nowDate.getFullYear();
+        //补全0，并拼接
+        return year + char + this.completeDate(month) + char +this.completeDate(day);
+      },
+      //补全0
+       completeDate(value) {
+          return value < 10 ? "0"+value:value;
+        },
+      //获取当前登录人信息
+      getUserInfo () {
+        this.dataForm.createTime=this.getNowFormatDay();
+        this.$http({
+          url: this.$http.adornUrl('/sys/currentUser'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.dataForm.createUserName = data.result.userName;
+          }
+        })
+      },
       openSql(){
         this.sqlVisible=true;
         console.log(this.$refs.sqler)
@@ -180,6 +211,7 @@
         this.cleanMsg();
         this.dataForm.id = id || 0;
         this.visible = true;
+        this.getUserInfo();
         this.$http({
           url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
           method: 'get',
@@ -288,6 +320,12 @@
   }
   .sqlDialog-btn{
     text-align: right;
+  }
+  .infoForm .el-input,.infoForm .el-select{
+    width: 30%;
+  }
+  .infoForm .el-select >>>.el-input{
+    width: 100%!important;
   }
 </style>
 
