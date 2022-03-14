@@ -44,7 +44,10 @@
               label="成本事项"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
+                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.projectItem'" :rules='dataRule.moneyValid'>
+                  <!--@input="scope.row.contractAmount=getMoney(scope.row.contractAmount)"-->
+                  <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
+                </el-form-item>
               </template>
             </el-table-column>
             <el-table-column
@@ -52,7 +55,11 @@
               label="成本金额（元/天）"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="成本金额"></el-input>
+                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.costMoney'" :rules='dataRule.moneyValid'>
+                  <!--@input="scope.row.contractAmount=getMoney(scope.row.contractAmount)"-->
+                  <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="成本金额"></el-input>
+                </el-form-item>
+
               </template>
             </el-table-column>
             <el-table-column
@@ -334,7 +341,7 @@
           effectiveData: [
             { required: true, validator: validateInteger,trigger: 'blur' }
           ],
-          todayConsumeMoney: [
+          moneyValid: [
             { required: true, validator: validateMoney, trigger: 'blur' }
           ],
         }
@@ -581,6 +588,12 @@
   }
   .input-hasBtn{
     width: 70%;
+  }
+  .tabelForm >>>.el-form-item__error{
+    top: 22%;
+    right: 0;
+    text-align: right;
+    padding-right: 15%;
   }
 </style>
 

@@ -24,8 +24,8 @@
               <span v-if="useChinese" title="保存">保存</span>
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="saveSqlSelf('save')">保存</el-dropdown-item>
-              <el-dropdown-item @click.native="saveSqlSelf('saveAs')">另存为</el-dropdown-item>
+              <el-dropdown-item @click.native="draftSql='',saveSqlSelf('save')">保存</el-dropdown-item>
+              <el-dropdown-item @click.native="sqlSaveForm.draftName='',saveSqlSelf('saveAs')">另存为</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown style="margin-left: 10px" trigger="click"  placement="bottom-start">
@@ -116,6 +116,8 @@
       </div>
     </div>
     <el-dialog
+      :append-to-body='true'
+      custom-class="self-dialog"
       width="70%"
       title="sql草稿列表"
       :close-on-click-modal="false"
@@ -184,7 +186,7 @@
         <!--<el-button type="primary" @click="sub()">使用sql</el-button>-->
       </span>
     </el-dialog>
-    <el-dialog title="草稿sql" :visible.sync="LookSql">
+    <el-dialog :append-to-body='true' custom-class="self-dialog" title="草稿sql" :visible.sync="LookSql">
       <el-form>
         <el-form-item>
             <el-input
@@ -196,7 +198,7 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog title="保存草稿" :visible.sync="saveSqlVisible">
+    <el-dialog :append-to-body='true' custom-class="self-dialog" title="保存草稿" :visible.sync="saveSqlVisible">
       <el-form :model="sqlSaveForm" ref="sqlSaveRef">
         <el-form-item label="草稿名称" prop="draftName"
                       :rules="{
@@ -1108,5 +1110,8 @@
     border: 1px solid #999;
     padding: 10px;
     box-shadow:5px 2px 6px #ddd;
+  }
+  >>>.self-dialog{
+    z-index: 9999999999!important;
   }
 </style>

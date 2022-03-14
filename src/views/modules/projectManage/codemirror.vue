@@ -134,6 +134,7 @@
         this.$http({
           url: this.$http.adornUrl('/draft/selectDraftPage'),
           method: 'get',
+          isLoading:false,
           params: this.$http.adornParams({
             draftName:options?options.draftName:'',
             pageNo:options?options.pageNo:1,

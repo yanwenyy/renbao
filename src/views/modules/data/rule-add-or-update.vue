@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      class="self-dialog"
+      custom-class="rule-dialog"
       width="80%"
       :title="!dataForm.id ? '新增' : '修改'"
       :close-on-click-modal="false"
@@ -10,29 +10,30 @@
         <el-tab-pane name="1" label="基本信息">
           <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
                    label-width="80px">
-            <el-form-item label="规则名称">
+            <el-form-item label="规则名称" prop="ruleName">
               <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
             </el-form-item>
-            <el-form-item label="规则类别">
+            <el-form-item label="规则类别" prop="ruleCategory">
               <el-select v-model="dataForm.ruleCategory">
                 <el-option label="请选择" value=""></el-option>
                 <el-option label="门诊规则" :value="1"></el-option>
                 <el-option label="住院规则" :value="2"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="规则分类">
+            <el-form-item label="规则分类"  prop="folderId">
               <el-popover
                 ref="menuListPopover"
                 placement="bottom-start"
                 trigger="click"
                 v-model="treeVisible">
                 <el-tree
+                  class="rule-tree"
                   :data="menuList"
                   :props="menuListTreeProps"
                   node-key="folderId"
                   ref="menuListTree"
                   @current-change="menuListTreeCurrentChangeHandle"
-                  :default-expand-all="true"
+                  :default-expand-all="false"
                   :highlight-current="true"
                   :expand-on-click-node="false">
                 </el-tree>
@@ -75,13 +76,15 @@
       </span>
     </el-dialog>
     <el-dialog
-      width="90%"
+      custom-class="sql-dialog"
+      width="100%"
       title="sql编译器"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible.sync="sqlVisible">
       <div class="sqlDialog-btn">
         <el-button @click="sqlVisible = false">取消</el-button>
-        <el-button type="primary" @click="sqlSave">确定</el-button>
+        <el-button type="primary" @click="sqlSave">选中sql语句</el-button>
       </div>
       <sql-element ref="sqler"></sql-element>
     </el-dialog>
@@ -138,8 +141,17 @@
           ruleType: '',
         },
         dataRule: {
+          ruleName: [
+            { required: true, message: '规则名称不能为空', trigger: 'blur' }
+          ],
+          ruleCategory: [
+            { required: true, message: '规则类别不能为空', trigger: 'blur' }
+          ],
+          folderId: [
+            { required: true, message: '规则名称不能为空', trigger: 'change' }
+          ],
           dataTime: [
-            { required: true, message: '数据时间不能为空', trigger: 'blur' }
+            { required: true, message: '规则分类不能为空', trigger: 'blur' }
           ],
           dataAmount: [
             { required: true,validator: validateInteger, trigger: 'blur' }
@@ -215,7 +227,7 @@
         this.$http({
           url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
           method: 'get',
-          params: this.$http.adornParams()
+          params: this.$http.adornParams({folderSorts: ''})
         }).then(({data}) => {
           this.menuList = data.result;
         }).then(() => {
@@ -250,7 +262,7 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.folderId = data.folderParentId
+        this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.treeVisible=false;
       },
@@ -315,17 +327,37 @@
     margin-top: 10px;
   }
   .self-tabs{
-    min-height:60vh;
+    min-height:55vh;
     height: auto;
   }
   .sqlDialog-btn{
     text-align: right;
+    width: 100%;
+    position: absolute;
+    top:20px;
+    left: 0;
+    padding-right: 2%;
+    box-sizing: border-box;
   }
   .infoForm .el-input,.infoForm .el-select{
     width: 30%;
   }
   .infoForm .el-select >>>.el-input{
     width: 100%!important;
+  }
+  >>>.rule-dialog{
+    margin-top: 7.5vh!important;
+  }
+  >>>.sql-dialog{
+    margin-top: 0!important;
+    height: 100%;
+  }
+  >>>.sql-dialog .el-dialog__body{
+    padding-top: 0!important;
+  }
+  .rule-tree{
+    height: 40vh;
+    overflow: auto;
   }
 </style>
 
