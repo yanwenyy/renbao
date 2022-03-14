@@ -48,14 +48,19 @@
                     <el-table-column label="结束时间" align="center" prop="endTime"></el-table-column>
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">已完成</div>
                             <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="进度" align="center" prop="schedule">
-                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
+                    <el-table-column label="进度" align="center" prop="collectStatus">
+                        <template slot-scope="scope">
+                            <el-progress v-if="scope.row.collectStatus=='0'" :percentage="0"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='1'" :percentage="50"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='2'" :percentage="100"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress>
+                        </template>
                     </el-table-column>
                     <el-table-column align="center" label="日志">
                         <template slot-scope="scope">
@@ -88,18 +93,23 @@
                     <el-table-column label="结束时间" align="center" prop="endTime"> </el-table-column>
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">已完成</div>
                             <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="进度" align="center" prop="schedule">
-                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
+                    <el-table-column label="进度" align="center" prop="collectStatus">
+                        <template slot-scope="scope">
+                            <el-progress v-if="scope.row.collectStatus=='0'" :percentage="0"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='1'" :percentage="50"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='2'" :percentage="100"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress>
+                        </template>
                     </el-table-column>
                     <el-table-column align="center" label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="edit(scope.row.collectPlanMonitorId)" size="mini">查看进度</el-button>
+                            <el-button @click="edit(scope.row.collectPlanMonitorId)" type="text">查看进度</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -119,18 +129,23 @@
                     <el-table-column label="结束时间" align="center" prop="endTime"> </el-table-column>
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.collectStatus=='1'">已完成</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='2'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='1'">进行中</div>
+                            <div class="tac" v-if="scope.row.collectStatus=='2'">已完成</div>
                             <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
-                            <div class="tac" v-if="scope.row.collectStatus=='4'">待采集</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="进度" align="center" prop="schedule">
-                        <!-- <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template> -->
+                    <el-table-column label="进度" align="center" prop="collectStatus">
+                        <template slot-scope="scope">
+                            <el-progress v-if="scope.row.collectStatus=='0'" :percentage="0"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='1'" :percentage="50"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='2'" :percentage="100"></el-progress>
+                            <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress>
+                        </template>
                     </el-table-column>
                     <el-table-column align="center"  label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" size="mini">查看</el-button>
+                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -238,12 +253,18 @@ export default {
                 method: 'get',
                 params: this.$http.adornParams({
                     pageSize:this.apComServerData.pageSize,
-                    pageNo:this.apComServerData.pageIndex
+                    pageNo:this.apComServerData.pageIndex,
+                    fileName:this.dataForm.fileName || '',
+                    filePath:this.dataForm.filePath || '',
+                    // collectStatus:this.dataForm.collectStatus || '',
+                    // startTime:this.dataForm.startTime || '',
+                    // endTime:this.dataForm.endTime || ''
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableList = data.result.records
                     this.apComServerData.total = data.result.total
+                      
                 }else{
                     this.tableList = []
                     this.apComServerData.total = 0

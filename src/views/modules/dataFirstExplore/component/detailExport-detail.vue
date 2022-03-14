@@ -24,85 +24,12 @@
       </transition>
       <el-table
         :data="tableList"
-        v-if="selectNum == 1"
         border
         style="100%"
         :header-cell-style="{ textAlign: 'center' }"
         class="demo-ruleForm"
       >
         <template v-for="(item, index) in tableColumns">
-          <el-table-column
-            :prop="item"
-            :label="item"
-            :key="index"
-            width
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-      </el-table>
-      <el-table
-        :data="tableList2"
-        v-if="selectNum == 2"
-        border
-        style="100%"
-        :header-cell-style="{ textAlign: 'center' }"
-        class="demo-ruleForm"
-      >
-        <template v-for="(item, index) in tableColumns2">
-          <el-table-column
-            :prop="item"
-            :label="item"
-            :key="index"
-            width
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-      </el-table>
-      <el-table
-        :data="tableList3"
-        v-if="selectNum == 3"
-        border
-        style="100%"
-        :header-cell-style="{ textAlign: 'center' }"
-        class="demo-ruleForm"
-      >
-        <template v-for="(item, index) in tableColumns3">
-          <el-table-column
-            :prop="item"
-            :label="item"
-            :key="index"
-            width
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-      </el-table>
-      <el-table
-        :data="tableList4"
-        v-if="selectNum == 4"
-        border
-        style="100%"
-        :header-cell-style="{ textAlign: 'center' }"
-        class="demo-ruleForm"
-      >
-        <template v-for="(item, index) in tableColumns4">
-          <el-table-column
-            :prop="item"
-            :label="item"
-            :key="index"
-            width
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-      </el-table>
-      <el-table
-        :data="tableList5"
-        v-if="selectNum == 5"
-        border
-        style="100%"
-        :header-cell-style="{ textAlign: 'center' }"
-        class="demo-ruleForm"
-      >
-        <template v-for="(item, index) in tableColumns5">
           <el-table-column
             :prop="item"
             :label="item"
@@ -120,8 +47,8 @@
         :total="apComServerData.total"
       ></el-pagination>
     </div>
-    <el-button type="primary" @click="ok">确定</el-button>
-    <el-button @click="close">取消</el-button>
+    <!-- <el-button type="primary" @click="ok">确定</el-button> -->
+    <el-button @click="close">关闭</el-button>
   </div>
 </template>
 <script>
@@ -234,13 +161,14 @@ export default {
           resultId: this.info
         })
       }).then(({ data }) => {
-        /* if (data && data.code === 200) {
-          this.tableList = data.result;
-          this.apComServerData.total;
+        if (data && data.code === 200) {
+          this.tableColumns = data.result.columns;
+          this.tableList = data.result.result
+          // this.apComServerData.total;
         } else {
-          this.dataList = [];
+          this.tyqab = [];
           this.apComServerData.total = 0;
-        } */
+        }
       });
     },
     //重置
