@@ -28,7 +28,7 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="onQuery">查询</el-button>
-                        <el-button type="info" @click="onReset">重置</el-button>
+                        <el-button @click="onReset">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -231,9 +231,12 @@ export default {
         },
         // 列表重置
         onReset () {
-            this.searchForm= {type: '',runningState: ''};
+            this.searchForm.type = '';
+            this.searchForm.runningState = '';
+            this.Pager.pageIndex = 1;
             this.$refs.treesa.setCheckedKeys([]);
             this.$refs.treesa.setCurrentKey(null);
+            this.batchItem = {}
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;

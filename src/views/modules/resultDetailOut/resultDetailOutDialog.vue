@@ -21,7 +21,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="exportClick('exportForm')" :loading="loading">导出</el-button>
+                        <el-button type="warning" @click="exportClick('exportForm')" :loading="loading">导出</el-button>
                     </el-form-item>
                 </el-form>
             </div>
