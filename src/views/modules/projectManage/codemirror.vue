@@ -59,6 +59,14 @@
       this.getSqlList();
     },
     mounted(){
+      this.sqlListData=[];
+      this.sqlListTotal=0;
+      this.sqlData='';
+      this.resultTableTabs=[];
+      this.loadTree=[];
+      this.treeData=[];
+      this.getSjbData();
+      this.getSqlList();
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -75,11 +83,12 @@
          this.$http({
            url: this.$http.adornUrl('/sqlScript/exportExcel'),
            method: 'post',
+           responseType: 'blob',
            data: this.$http.adornData({
              sqlScript:data,
              dataSize:50000,
              exportSize:50000,
-           })
+           }),
          }).then(({data}) => {
            if(data.code==200){
 
@@ -137,7 +146,6 @@
         this.$http({
           url: this.$http.adornUrl('/draft/selectDraftPage'),
           method: 'get',
-          isLoading:false,
           params: this.$http.adornParams({
             draftName:options?options.draftName:'',
             pageNo:options?options.pageNo:1,

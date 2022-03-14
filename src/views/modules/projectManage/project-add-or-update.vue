@@ -102,6 +102,7 @@
             >
               <template slot-scope="scope">
                 <el-select
+                            class="userList"
                             multiple
                             v-model="scope.row.userIds"
                             placeholder="请选择"
@@ -159,7 +160,7 @@
               align="center"
             >
               <template slot-scope="scope">
-                <el-select multiple v-model="scope.row.leaderIds" placeholder="请选择">
+                <el-select class="userList" multiple v-model="scope.row.leaderIds" placeholder="请选择">
                   <el-option
                     v-for="(item,index) in meberList"
                     :key="index"
@@ -176,7 +177,7 @@
               align="center"
             >
               <template slot-scope="scope">
-                <el-select multiple v-model="scope.row.memberIds" placeholder="请选择">
+                <el-select class="userList" multiple v-model="scope.row.memberIds" placeholder="请选择">
                   <el-option
                     v-for="(item,index) in meberList"
                     :key="index"
@@ -594,6 +595,13 @@
     right: 0;
     text-align: right;
     padding-right: 15%;
+  }
+  .userList{
+   width: 80%;
+  }
+  .userList >>>.el-input{
+    width: 100%;
+    box-sizing: border-box;
   }
 </style>
 

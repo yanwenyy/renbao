@@ -6,10 +6,11 @@
       :title="!dataForm.id ? '新增' : '修改'"
       :close-on-click-modal="false"
       :visible.sync="visible">
-      <el-tabs type="border-card" class="self-tabs" v-model="activeName">
+      <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
+               label-width="80px">
+        <el-tabs type="border-card" class="self-tabs" v-model="activeName">
         <el-tab-pane name="1" label="基本信息">
-          <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-                   label-width="80px">
+
             <el-form-item label="规则名称" prop="ruleName">
               <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
             </el-form-item>
@@ -54,22 +55,26 @@
               </el-date-picker>
             </el-form-item>
 
-          </el-form>
+
 
         </el-tab-pane>
         <el-tab-pane name="2" label="sql编写">
           <el-button type="primary" @click="openSql()">sql编译器</el-button>
           <el-button type="primary">图形化工具</el-button>
-          <el-input
-            class="sql-text"
-            type="textarea"
-            :rows="4"
-            readonly
-            placeholder="sql编译器"
-            v-model="dataForm.ruleSqlValue">
-          </el-input>
+          <el-form-item prop="ruleSqlValue" class="no-label">
+            <el-input
+              class="sql-text"
+              type="textarea"
+              :rows="4"
+              readonly
+              placeholder="sql编译器"
+              v-model="dataForm.ruleSqlValue">
+            </el-input>
+          </el-form-item>
+
         </el-tab-pane>
       </el-tabs>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="visible = false">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -84,7 +89,7 @@
       :visible.sync="sqlVisible">
       <div class="sqlDialog-btn">
         <el-button @click="sqlVisible = false">取消</el-button>
-        <el-button type="primary" @click="sqlSave">选中sql语句</el-button>
+        <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
       <sql-element ref="sqler"></sql-element>
     </el-dialog>
@@ -145,13 +150,16 @@
             { required: true, message: '规则名称不能为空', trigger: 'blur' }
           ],
           ruleCategory: [
-            { required: true, message: '规则类别不能为空', trigger: 'blur' }
+            { required: true, message: '规则类别不能为空', trigger: ['blur',"change"] }
           ],
           folderId: [
-            { required: true, message: '规则名称不能为空', trigger: 'change' }
+            { required: true, message: '规则名称不能为空', trigger: ['blur',"change"] }
           ],
           dataTime: [
             { required: true, message: '规则分类不能为空', trigger: 'blur' }
+          ],
+          ruleSqlValue: [
+            { required: true, message: 'sql编译器内容不能为空', trigger:['blur',"change"] }
           ],
           dataAmount: [
             { required: true,validator: validateInteger, trigger: 'blur' }
@@ -218,6 +226,10 @@
           ruleSqlValue: '',
           ruleType: '',
         };
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+
       },
       init (id) {
         this.cleanMsg();
@@ -234,6 +246,7 @@
           this.visible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].resetFields()
+
           })
         }).then(() => {
           if (this.dataForm.id) {
@@ -303,6 +316,8 @@
                 this.$message.error(data.msg)
               }
             })
+          }else{
+            this.$message.error("请完善信息!")
           }
         })
       },
@@ -358,6 +373,9 @@
   .rule-tree{
     height: 40vh;
     overflow: auto;
+  }
+  .no-label >>>.el-form-item__content{
+    margin-left: 0!important;
   }
 </style>
 
