@@ -124,4 +124,9 @@
     }
   }
 </script>
+<style scoped>
+  .site-tabs__tools{
+    z-index: 999999999;
+  }
+</style>
 

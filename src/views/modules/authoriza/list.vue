@@ -43,9 +43,6 @@
             :props="defaultProps">
           </el-tree>
         </div>
-
-
-
       </div>
     </div>
 </template>
@@ -292,7 +289,7 @@
     width: 100%;
     position: fixed;
     right: 5%;
-    z-index: 9999;
+    z-index: 999;
   }
   .user-list{
     padding: 0;
