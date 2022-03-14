@@ -729,7 +729,7 @@
         this.$refs.tree.filter(val);
       },
       treedata: function (newValue, oldValue) {
-       console.log(newValue, oldValue)
+       // console.log(newValue, oldValue)
       },
       loadTree:{
         deep: true,

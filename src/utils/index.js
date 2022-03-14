@@ -101,7 +101,7 @@ PxSocket.prototype = {
     var _this = this;
     try {
       if ('WebSocket' in window) {
-        // console.log(_this.options.url)
+        console.log(_this.options.url)
         _this.ws = new WebSocket(_this.options.url);
         // console.log( _this.ws)
         // console.log(http_url.Socket_url+options.id)
@@ -129,7 +129,7 @@ PxSocket.prototype = {
       };
       _this.ws.onclose = function () {
         // _this.reconnect(_this.ws);
-        console.log(_this.options.name +" closed websockettttttt!")
+        console.log("closed websockettttttt!")
       }
     } catch (e){
       _this.reconnect(_this.ws);
