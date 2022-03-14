@@ -31,12 +31,12 @@
                     <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
                     <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
                     <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" :formatter="dateFormat" label="生效日期"></el-table-column>
+                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
                     <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
                     <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
                     <el-table-column prop="用量" header-align="center" align="center" label="用量"></el-table-column>
                     <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" :formatter="dateEndFormat" label="终止日期"></el-table-column>
+                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                     <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
@@ -58,11 +58,11 @@
                     <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
                     <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
                     <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" :formatter="dateFormat" label="生效日期"></el-table-column>
+                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
                     <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
                     <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
                     <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" :formatter="dateEndFormat" label="终止日期"></el-table-column>
+                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
                 </el-table>
@@ -83,9 +83,9 @@
                     <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
                     <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
                     <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" :formatter="dateFormat" label="生效日期"></el-table-column>
+                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
                     <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" :formatter="dateEndFormat" label="终止日期"></el-table-column>
+                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
                 </el-table>
@@ -105,6 +105,12 @@
                 layout="total, sizes, prev, pager, next, jumper">
                 </el-pagination>
             <el-dialog title="导入数据" :visible.sync="addUploadVisible">
+                <div style="padding-bottom:10px;">
+                    <span>导入类型</span>
+                    <el-select v-model="importType" placeholder="请选择" style="margin-left:10px;">
+                         <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </div>
                 <el-upload
                     class="upload-demo"
                     action=""
@@ -151,6 +157,7 @@ export default {
             output:null,
             show:false,
             isShow:false,
+            importType: '',
             options: [
                 {
                     value: '0',
@@ -173,6 +180,13 @@ export default {
                 //     label: '服务价格目录'
                 // }
                 ],
+            selectOption:[{
+                    value: '0',
+                    label: '全量'
+                },{
+                    value: '1',
+                    label: '增量'
+                }],
             tableList:[],
             tableList0:[],
             fileList:[],
@@ -187,29 +201,6 @@ export default {
         this.token = this.$cookie.get("token");
     },
     methods:{
-        //时间转换
-        dateFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.生效日期) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-        //时间转换
-        dateEndFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.终止日期) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-
         // 获取数据列表
         getDataList(val){
             this.dataLoading = true;
@@ -251,6 +242,7 @@ export default {
                 data:formData,
                 params :this.$http.adornParams({
                     catalogType:this.dataForm.dataType,
+                    importType:this.importType
                 })
                 }).then(({data})=>{
                     if(data && data.code === 200){
