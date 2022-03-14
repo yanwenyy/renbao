@@ -193,7 +193,6 @@
               @ok="succeed"
               :ruleId="ruleId"
               :folderId="folderId"
-              :treeData1="treeData1"
               v-if="showAddOrEditDialog"
             ></AddOrEdit>
           </el-dialog>
@@ -233,13 +232,18 @@ export default {
   },
   data() {
     return {
+      //条件查询数据定义
       dataForm: {
         ruleName: "",
         ruleCategory: ""
       },
+      //树id
       folderId: "",
+      //树path
       folderPath: "",
+      //规则树
       ruleTree: "",
+      //运行id
       runIds: "",
       //当前页
       pageIndex: 1,
@@ -249,38 +253,49 @@ export default {
       totalPage: 0,
       //当前所选规则
       choseRule: [],
+      //树数据
       dataTree: [],
+      //规则类别
       ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
+      //树默认属性
       defaultProps: {
         children: "children",
         label: "name"
       },
+      //表格数据定义
       tableData: [],
+      //多选数据定义
       multipleSelection: [],
+      //loading加载
       listLoadingTry: false,
+      //loading
       loading: false,
+      //树loading
       treeLoading: false,
-      formLoading: false,
       //查看规则详细弹窗是否显示
       showDetailDialog: false,
       //新增、修改弹窗是否显示
       showAddOrEditDialog: false,
       //立即运行、定时运行弹窗是否显示
       showRunDialog: false,
+      //行数据定义
       rows: [],
+      //运行弹窗区分字段 true:定时运行 false:立即运行
       info: "",
-      ruleId: "",
-      treeData1: []
+      //规则id
+      ruleId: ""
     };
   },
   created() {
     this.initData();
   },
   methods: {
+    //获取列表数据
     initData() {
+      this.loading = true;
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
@@ -300,10 +315,12 @@ export default {
           this.tableData = data.result.records;
           this.totalPage = data.result.total;
           this.dataForm.total = data.result.total;
+          this.loading = false;
         } else {
           this.dataForm.total = 0;
           this.tableData = [];
           this.totalPage = 0;
+          this.loading = false;
         }
       });
     },
@@ -316,14 +333,12 @@ export default {
       this.showAddOrEditDialog = true;
       this.ruleId = "";
       this.folderId = "";
-      this.treeData1 = this.treeData;
     },
     //修改弹框
     editData() {
       this.showAddOrEditDialog = true;
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
-      this.treeData1 = this.treeData;
     },
     // 关闭编辑弹窗
     closeDetail() {
@@ -361,6 +376,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.initData();
+                  this.clearTableChecked();
                 }
               });
             } else {
@@ -389,6 +405,7 @@ export default {
         createTime: ""
       };
       this.initData();
+      this.clearTableChecked();
     },
     //立即运行
     runNow() {
@@ -420,16 +437,21 @@ export default {
     closeRun() {
       this.showRunDialog = false;
     },
+    //运行成功后关闭页面并刷新
     succeedRun() {
-      this.showRunDialog = false;
+      this.closeRun();
+      this.initData();
+      this.clearTableChecked();
     },
     //关闭新增、修改弹窗
     closeAddOrEdit() {
       this.showAddOrEditDialog = false;
     },
+    //新增、修改成功后关闭页面并刷新
     succeed() {
       this.closeAddOrEdit();
       this.initData();
+      this.clearTableChecked();
     },
     // 每页数
     sizeChangeHandle(val) {
@@ -480,19 +502,14 @@ export default {
         }
       });
     },
+    //获取每行数据id
     getRowKeys(row) {
       return row.ruleId;
     },
-    showSeclectRow() {
-      if (this.multipleSelection.length > 0) {
-        this.multipleSelection.forEach(row => {
-          this.dataList.forEach(item => {
-            if (row.id === item.id) {
-              this.$refs.multipleTable.toggleRowSelection(item, true);
-            }
-          });
-        });
-      }
+    //清除已选
+    clearTableChecked() {
+      this.$refs.tableData.clearSelection(this.multipleTable);
+      this.multipleSelection = [];
     }
   }
 };

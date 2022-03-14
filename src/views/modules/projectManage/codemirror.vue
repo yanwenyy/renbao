@@ -17,6 +17,7 @@
     :deleteSql="deleteSql"
     :saveSql="saveSql"
     :useChinese="true"
+    :exportSql="exportSql"
   ></sql-edit>
 </template>
 
@@ -44,7 +45,7 @@
         userId:sessionStorage.getItem("userId"),
       }
     },
-    mounted(){
+    activated(){
       this.sqlListData=[];
       this.sqlListTotal=0;
       this.sqlData='';
@@ -53,6 +54,8 @@
       this.treeData=[];
       this.getSjbData();
       this.getSqlList();
+    },
+    mounted(){
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -63,6 +66,28 @@
       this.ws.close();
     },
     methods: {
+      //导出按钮点击
+      exportSql(data){
+       if(data){
+         this.$http({
+           url: this.$http.adornUrl('/sqlScript/exportExcel'),
+           method: 'post',
+           data: this.$http.adornData({
+             sqlScript:data,
+             dataSize:50000,
+             exportSize:50000,
+           })
+         }).then(({data}) => {
+           if(data.code==200){
+
+           }else{
+             this.$message.error(data.message);
+           }
+         })
+       }else{
+         this.$message.error("sql语句不能为空")
+       }
+      },
       //获取sql运行websocket返回的数据
       getDataList(datas){
         this.key+=1;

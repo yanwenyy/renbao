@@ -76,7 +76,7 @@
       </div>
       <div id="bottom" class="codemirror-table-div">
         <div class="codemirror-table-btn">
-          <el-button type="primary">全部导出</el-button>
+          <el-button type="primary" @click="exportSqlSelf">全部导出</el-button>
           <div v-if="!useChinese" class="inline-block">
             <i v-if="!fullScreen" class="el-icon-full-screen" @click="setFullScreen(1)"></i>
             <i v-if="fullScreen" class="el-icon-minus" @click="setFullScreen(2)"></i>
@@ -310,6 +310,10 @@
         type: Function,
         default: null,
       },
+      exportSql: {
+        type: Function,
+        default: null,
+      },
       resultTabClick: {
         type: Function,
         default: null,
@@ -516,6 +520,10 @@
       this.dragControllerDiv2();
     },
     methods: {
+      //导出事件
+      exportSqlSelf(){
+        this.exportSql(this.editorValue)
+      },
       //sql结果tab切换事件
       tabClick(e){
         var list=this.resultTableTabs[e.index].list;

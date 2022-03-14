@@ -163,24 +163,26 @@
             v-if="detailExportDialog"
           >
             <el-form
-              :model="dataForm"
-              ref="dataForm"
+              :model="dataForm1"
+              ref="dataForm1"
               label-width="80px"
               :rules="rules"
             >
-              <el-form-item prop="folderId">
+              <el-form-item prop="hospital">
                 <el-select
-                  v-model="dataForm.folderId"
+                  v-model="dataForm1.hospital"
                   filterable
                   clearable
                   placeholder="请选择医院"
                 >
                   <el-option
-                    v-for="(item, index) in folderId"
-                    :key="index"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
+                    v-for="item in hospital"
+                    :key="item['医院编码']"
+                    :label="item['医院名称']"
+                    :value="item['医院编码']"
+                  >
+                    ></el-option
+                  >
                 </el-select>
               </el-form-item>
             </el-form>
@@ -202,6 +204,12 @@ export default {
       dataForm: {
         ruleName: "",
         ruleCategory: ""
+      },
+      dataForm1: {
+        hospital: ""
+      },
+      rules: {
+        hospital: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       batchTreeList: [
         {
@@ -238,15 +246,19 @@ export default {
       rows: [],
       info: "",
       batchId: "",
-      batchType: 1
+      batchType: 1,
+      hospital: []
     };
   },
   created() {
     this.initData();
     this.initTree();
+    this.initHospital();
   },
   methods: {
+    //初始化列表数据
     initData() {
+      this.loading = true;
       this.$http({
         url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
@@ -263,13 +275,16 @@ export default {
           this.tableData = data.result.records;
           this.totalPage = data.result.total;
           this.dataForm.total = data.result.total;
+          this.loading = false;
         } else {
           this.dataForm.total = 0;
           this.tableData = [];
           this.totalPage = 0;
+          this.loading = false;
         }
       });
     },
+    //初始化批次树数据
     initTree() {
       this.treeLoading = true;
       this.$http({
@@ -292,6 +307,26 @@ export default {
         .catch(() => {
           this.treeLoading = false;
         });
+    },
+    ////选择医院下拉列表数据
+    initHospital() {
+      this.$http({
+        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+        method: "get",
+        params: this.$http.adornParams(
+          {
+            pageCount: "1",
+            pageSize: "10000",
+          },
+          false
+        )
+      })
+        .then(({ data }) => {
+          if (data.code == 200) {
+            this.hospital = data.result.records;
+          }
+        })
+        .catch(() => {});
     },
     //结果明细导出弹窗
     detailExport() {
@@ -391,6 +426,36 @@ export default {
     nodeClick(node, data) {
       this.batchId = data.batchId;
       this.initData();
+    },
+
+    //结果明细导出
+    exportExcel() {
+      this.$http({
+        url: this.$http.adornUrl("ruleResult/exportResult"),
+        method: "get",
+        responseType: "blob", //解决乱码问题
+        params: this.$http.adornParams({
+          hospitalName: this.dataForm.hospitalName,
+          hospitalType: this.dataForm.hospitalType,
+          moneyEnd: this.dataForm.moneyEnd,
+          moneyStart: this.dataForm.moneyStart
+        })
+      }).then(({ data }) => {
+        const blob = new Blob([data]);
+        let fileName = "excel.xls";
+        if ("download" in document.createElement("a")) {
+          const elink = document.createElement("a");
+          elink.download = fileName;
+          elink.style.display = "none";
+          elink.href = URL.createObjectURL(blob); // 创建下载的链接
+          document.body.appendChild(elink);
+          elink.click(); // 点击下载
+          URL.revokeObjectURL(elink.href); // 释放掉blob对象
+          document.body.removeChild(elink); // 下载完成移除元素
+        } else {
+          navigator.msSaveBlob(blob, fileName);
+        }
+      });
     }
   }
 };

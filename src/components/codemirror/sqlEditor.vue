@@ -103,6 +103,7 @@
         :formatContent="formatContent"
         :autoFormatJson="autoFormatJson"
         :jsonIndentation="jsonIndentation"
+        :exportSql="exportSql"
         @setFS="getFullScreen"
       ></code-mirror-editor>
 
@@ -118,6 +119,10 @@
     },
     props:{
       formatContent: {
+        type: Function,
+        default: null,
+      },
+      exportSql: {
         type: Function,
         default: null,
       },
