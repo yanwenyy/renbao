@@ -7,10 +7,10 @@
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="项目编号" prop="project.projectCode">
-          <el-input v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>
+          <el-input @blur="verification(dataForm.project.projectCode,'项目编号不能重复','projectCode')" v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>
         </el-form-item>
         <el-form-item label="项目名称" prop="project.projectName">
-          <el-input v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
+          <el-input @blur="verification(dataForm.project.projectName,'项目名称不能重复','projectName')" v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
         <el-form-item label="项目周期" prop="project.dataTime">
           <el-date-picker
@@ -349,6 +349,29 @@
       }
     },
     methods: {
+      //验证唯一性
+      verification(val,msg,name){
+        if(val){
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectRepeat"),
+            method: "get",
+            isLoading:false,
+            params: this.$http.adornParams({
+              projectCode: this.dataForm.project.projectCode,
+              projectName:  this.dataForm.project.projectName,
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              if(data.result===false){
+                this.$message.error(msg);
+                this.$forceUpdate();
+                this.dataForm.project[name]='';
+                this.$set(this.dataForm,this.dataForm)
+              }
+            }
+          });
+        }
+      },
       //获取小组成员列表
       getMemberList(id){
         if(id){

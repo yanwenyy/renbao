@@ -30,7 +30,7 @@
                 <el-button size="mini" type="warning" @click="exportData">导出数据</el-button>
                 <el-button size="mini" type="warning" @click="importData">导入数据</el-button>
             </div>
-            <el-table :data="tableList" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading'>
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="医院名称" header-align="center" align="center" label="医院名称"></el-table-column>
                 <el-table-column prop="医院编码" header-align="center" align="center" label="医院编码"></el-table-column>
@@ -73,6 +73,7 @@ export default {
                 moneyEnd:'',
                 moneyStart:''
             }, 
+            tableLoading:false,
             //loading
             dataListLoading: false,
             importVisible:false,
@@ -104,7 +105,7 @@ export default {
     methods:{
         //初始化数据列表
         getInitList(){
-            this.dataListLoading = true;
+            this.tableLoading = true;
             this.$http({
                 url:this.$http.adornUrl('/hospitalBasicInfo/getPageList'),
                 method: 'get',
@@ -125,7 +126,7 @@ export default {
                     this.tableList = []
                     this.apComServerData.total = 0
                 }
-                this.dataListLoading = false;
+                this.tableLoading = false;
             })
         },
         handleChange(file,fileList){

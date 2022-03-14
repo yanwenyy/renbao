@@ -8,10 +8,10 @@
         <el-input v-model="dataForm.userLoginName" placeholder="用户账号"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword" :class="{ 'is-required': !dataForm.id }">
-        <el-input v-model="dataForm.userPassword" type="password" placeholder="密码"></el-input>
+        <el-input class="no-autofill-pwd" v-model="dataForm.userPassword" type="text" placeholder="密码"></el-input>
       </el-form-item>
-      <el-form-item label="确认密码" prop="comfirmPassword" :class="{ 'is-required': !dataForm.id }">
-        <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
+      <el-form-item label="确认密码" prop="comfirmPassword" class="no-autofill-pwd" :class="{ 'is-required': !dataForm.id }">
+        <el-input class="no-autofill-pwd" v-model="dataForm.comfirmPassword" type="text" placeholder="确认密码"></el-input>
       </el-form-item>
       <el-form-item label="用户姓名" prop="userName">
         <el-input v-model="dataForm.userName" placeholder="用户姓名"></el-input>
@@ -122,6 +122,29 @@
       }
     },
     methods: {
+      //验证唯一性
+      verification(val,msg,name){
+        if(val){
+          this.$http({
+            url: this.$http.adornUrl("/user/add"),
+            method: "post",
+            isLoading:false,
+            params: this.$http.adornParams({
+              userLoginName: this.dataForm.userLoginName,
+              userNumber:  this.dataForm.userNumber,
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              if(data.result===false){
+                this.$message.error(msg);
+                this.$forceUpdate();
+                this.dataForm.project[name]='';
+                this.$set(this.dataForm,this.dataForm)
+              }
+            }
+          });
+        }
+      },
       init (id) {
         this.visible = true;
         this.dataForm.id=id;
@@ -175,7 +198,7 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }
@@ -184,3 +207,8 @@
     }
   }
 </script>
+<style scoped>
+  >>>.no-autofill-pwd .el-input__inner{
+    -webkit-text-security:disc!important;
+  }
+</style>

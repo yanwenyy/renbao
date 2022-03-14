@@ -2,36 +2,53 @@
 <template>
     <div>
          <div class='listDisplay'>
-             <el-button type="primary" @click="getStopCollection()">查看未导入医院</el-button>
+             <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
         </div>
-        <el-table :data="tableData" border stripe style="width: 100%">
+        <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" @selection-change="handleSelectionChange">
             <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-            <el-table-column label="批次" align="center" prop="batch"> </el-table-column>
+            <el-table-column label="批次" align="center" prop="collectPlanMonitorBath"> </el-table-column>
             <el-table-column label="医院名称" align="center" prop="pName"></el-table-column>
-            <el-table-column label="采集数据文件路径" align="center" prop="floor"> </el-table-column>
-            <el-table-column label="数据类型" align="center" prop="spaceNum"></el-table-column>
-            <el-table-column label="采集人" align="center" prop="Collector"> </el-table-column>
-            <el-table-column label="开始时间" align="center" prop="startDate"></el-table-column>
-            <el-table-column label="结束时间" align="center" prop="endDate"> </el-table-column>
-            <el-table-column label="状态" align="center" prop="spaceStatus">
-                <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.spaceStatus=='0'">已完成</div>
-                    <div class="tac" v-if="scope.row.spaceStatus=='1'">进行中</div>
-                    <div class="tac" v-if="scope.row.spaceStatus=='2'">失败</div>
+            <el-table-column label="采集数据文件路径" align="center" prop="filePath"> </el-table-column>
+            <el-table-column label="数据类型" align="center" prop="dataType">
+                    <template slot-scope="scope">
+                    <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
+                    <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
                 </template>
             </el-table-column>
-            <el-table-column label="进度" align="center" prop="schedule">
-                <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template>
+            <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
+            <el-table-column label="开始时间" align="center" :formatter="dateFormat"  prop="startTime"></el-table-column>
+            <el-table-column label="结束时间" align="center" :formatter="dateEndFormat" prop="endTime"> </el-table-column>
+            <el-table-column label="状态" align="center" prop="collectStatus">
+                <template slot-scope="scope">
+                    <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
+                    <div class="tac" v-if="scope.row.collectStatus=='1'">进行中</div>
+                    <div class="tac" v-if="scope.row.collectStatus=='2'">已完成</div>
+                    <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="进度" align="center" prop="collectStatus">
+                <template slot-scope="scope">
+                    <el-progress v-if="scope.row.collectStatus=='0'" :percentage="0"></el-progress>
+                    <el-progress v-if="scope.row.collectStatus=='1'" :percentage="50"></el-progress>
+                    <el-progress v-if="scope.row.collectStatus=='2'" :percentage="100"></el-progress>
+                    <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress>
+                </template>
             </el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="edit(scope.row.id)" size="mini">查看进度</el-button>
+                    <el-button @click="edit(scope.row.collectPlanMonitorId)" type="text">查看进度</el-button>
                 </template>
             </el-table-column>
         </el-table>
-        <div class='pager'>
-            <el-pagination small layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total"></el-pagination>
-        </div>
+        <el-pagination 
+            :page-size="apComServerData.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="apComServerData.total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="apComServerData.pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            ></el-pagination>
         <!-- 查看未导入医院弹框-->
         <el-dialog title='查看未导入医院' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="notImportVisible">
             <NotImport v-if="notImportVisible" @close="closeImportDrawer" @ok="ImportSucceed"></NotImport>
@@ -53,52 +70,54 @@ export default {
     },
     data(){
         return{
-            tableData:[{
-                'batch':'20220217',
-                'pName':'妇幼保健院',
-                'floor':'全部文件/医院数据/幼妇保健院',
-                'spaceNum':'医院数据',
-                'Collector':'小明',
-                'endDate':'2022-2-17 13:45',
-                'startDate':'',
-                'spaceStatus':'1',
-                'schedule':'10'
-            },{
-                'batch':'20220216',
-                'pName':'商洛市中医院',
-                'floor':'全部文件/医保数据/商洛市中医院',
-                'spaceNum':'医院数据',
-                'Collector':'小红',
-                'endDate':'2022-2-17 13:45',
-                'startDate':'',
-                'spaceStatus':'0',
-                'schedule':'30'
-            },{
-                'batch':'20220215',
-                'pName':'商洛市中心医院',
-                'floor':'全部文件/医保数据/商洛市中心医院',
-                'spaceNum':'医院数据',
-                'Collector':'小莉',
-                'startDate':'2022-2-17 13:45',
-                'endDatestartDate':'2022-2-15 14:58',
-                'spaceStatus':'2',
-                'schedule':'14'
-            }],
+            tableData:[],
             apComServerData:{
                 current: 1,
                 pageSize: 10,
-                pageNum:1,
+                pageIndex:1,
                 total:0,
             },
             notImportVisible:false,
-            showViewVisible:false
+            showViewVisible:false,
+            multipleSelection:''
         }
     },
+    mounted(){
+        this.getInitList()
+    },
     methods:{
-        getList(){},
+        getInitList(){},
         //查看进度
         edit(){
             this.showViewVisible = true
+            //  this.collectPlanMonitorId = id
+        },
+        //多选
+        handleSelectionChange(val){
+            this.multipleSelection = val
+            this.$emit('satDataHospital',this.multipleSelection); // 回显医院名称
+        },
+         //开始时间转换
+        dateFormat(row, column, cellValue, index){
+            let date = new Date(parseInt(row.startTime) * 1000);
+            let Y = date.getFullYear() + '-';
+            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
+            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
+            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
+            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
+            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+            return Y + M + D + h + m + s;
+        },
+        //结束时间转换
+        dateEndFormat(row, column, cellValue, index){
+            let date = new Date(parseInt(row.endTime) * 1000);
+            let Y = date.getFullYear() + '-';
+            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
+            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
+            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
+            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
+            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+            return Y + M + D + h + m + s;
         },
         //进度条
         format(percentage) {
@@ -114,12 +133,24 @@ export default {
         closeImportDrawer(){
             this.notImportVisible = false
         },
+        //关闭弹框
         viewSucceed(){
             this.closeViewDrawer()
         },
         closeViewDrawer(){
             this.showViewVisible = false
-        }
+        },
+          // 页数
+        handleSizeChange(val){
+            this.apComServerData.pageSize = val;
+            this.apComServerData.pageIndex = 1
+            this.getInitList()
+        },
+        //当前页
+        handleCurrentChange(val){
+            this.apComServerData.pageIndex = val;
+            this.getInitList()
+        },
     }
 }
 </script>
