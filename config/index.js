@@ -13,15 +13,17 @@ module.exports = {
     assetsPublicPath: '/',
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
-      '/proxyApi': {
-        // target: 'http://59.110.54.1:8080/jinding-back/',
-        target: 'http://10.10.113.229:1070/jeecg-boot/',
+      '/dataanalysis': {
+        target: 'http://10.10.23.64:1070/dataanalysis/',
+        // target: 'http://10.10.113.229:1070/dataanalysis/',
+        // target: 'http://10.10.113.44:1077/dataanalysis/',
         changeOrigin: true,
         pathRewrite: {
-          '^/proxyApi': '/'
+          '^/dataanalysis': '/'
         }
       }
     },
+
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
