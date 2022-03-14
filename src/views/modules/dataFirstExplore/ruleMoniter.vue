@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="auditRuleMonitoring-left">
+    <div class="auditRuleMonitoring-left" style="height:800px">
       <el-tree
         :data="batchTreeList"
         highlight-current

@@ -155,38 +155,41 @@
           <!--结果明细导出弹窗 -->
           <el-dialog
             :visible.sync="detailExportDialog"
-            title="查看结果明细"
+            title="结果明细导出"
             :close-on-click-modal="false"
             :modal-append-to-body="false"
-            width="20%"
+            width="30%"
             :close-on-press-escape="false"
             v-if="detailExportDialog"
           >
             <el-form
               :model="dataForm1"
               ref="dataForm1"
-              label-width="80px"
+              label-width="120px"
               :rules="rules"
             >
-              <el-form-item prop="hospital">
+              <el-form-item prop="hospital" label="请选择医院：">
                 <el-select
                   v-model="dataForm1.hospital"
                   filterable
                   clearable
                   placeholder="请选择医院"
+                  multiple
                 >
                   <el-option
-                    v-for="item in hospital"
+                    v-for="item in hospitals"
                     :key="item['医院编码']"
                     :label="item['医院名称']"
-                    :value="item['医院编码']"
+                    :value="item['医院名称']"
                   >
-                    ></el-option
-                  >
+                  </el-option>
                 </el-select>
+                <el-button type="primary" @click="exportExcel()"
+                  >导出</el-button
+                >
               </el-form-item>
             </el-form>
-            <el-button type="primary" @click="exportExcel()">导出</el-button>
+            <el-button @click="closeExport">取消</el-button>
           </el-dialog>
         </el-card>
       </el-col>
@@ -247,7 +250,7 @@ export default {
       info: "",
       batchId: "",
       batchType: 1,
-      hospital: []
+      hospitals: []
     };
   },
   created() {
@@ -308,7 +311,7 @@ export default {
           this.treeLoading = false;
         });
     },
-    ////选择医院下拉列表数据
+    //选择医院下拉列表数据
     initHospital() {
       this.$http({
         url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
@@ -316,20 +319,21 @@ export default {
         params: this.$http.adornParams(
           {
             pageCount: "1",
-            pageSize: "10000",
+            pageSize: "10000"
           },
           false
         )
       })
         .then(({ data }) => {
           if (data.code == 200) {
-            this.hospital = data.result.records;
+            this.hospitals = data.result.records;
           }
         })
         .catch(() => {});
     },
     //结果明细导出弹窗
     detailExport() {
+      this.dataForm1.hospital = [];
       this.detailExportDialog = true;
     },
     // 关闭详细弹窗
@@ -430,19 +434,23 @@ export default {
 
     //结果明细导出
     exportExcel() {
+      var arr = this.dataForm1.hospital;
+      var hospitalNames = "";
+      for (var i = 0; i < arr.length; i++) {
+        hospitalNames += arr[i] + ",";
+      }
+      if (hospitalNames.length > 0) {
+        hospitalNames = hospitalNames.substring(0, hospitalNames.length - 1);
+      }
+      console.log(hospitalNames);
       this.$http({
         url: this.$http.adornUrl("ruleResult/exportResult"),
-        method: "get",
+        method: "post",
         responseType: "blob", //解决乱码问题
-        params: this.$http.adornParams({
-          hospitalName: this.dataForm.hospitalName,
-          hospitalType: this.dataForm.hospitalType,
-          moneyEnd: this.dataForm.moneyEnd,
-          moneyStart: this.dataForm.moneyStart
-        })
+        data: this.$http.adornData({ hospitalName: hospitalNames }, false)
       }).then(({ data }) => {
         const blob = new Blob([data]);
-        let fileName = "excel.xls";
+        let fileName = "结果明细.xls";
         if ("download" in document.createElement("a")) {
           const elink = document.createElement("a");
           elink.download = fileName;
@@ -456,6 +464,10 @@ export default {
           navigator.msSaveBlob(blob, fileName);
         }
       });
+    },
+    //关闭结果明细导出弹窗
+    closeExport() {
+      this.detailExportDialog = false;
     }
   }
 };
