@@ -759,9 +759,9 @@
       //拖拽改变宽度
       dragControllerDiv: function () {
         var resize = document.getElementsByClassName('resize');
-        var left = document.getElementsByClassName('left');
-        var mid = document.getElementsByClassName('mid');
-        var box = document.getElementsByClassName('box');
+        var left = document.getElementsByClassName('code-mirror-tree');
+        var mid = document.getElementsByClassName('code-mirror-div');
+        var box = document.getElementsByClassName('box-mirror');
         for (let i = 0; i < resize.length; i++) {
           // 鼠标按下事件
           resize[i].onmousedown = function (e) {
@@ -780,7 +780,6 @@
               if (moveLen > maxT - 10) moveLen = maxT - 10; //右边区域最小宽度为150px
 
               resize[i].style.left = moveLen; // 设置左侧区域的宽度
-
               for (let j = 0; j < left.length; j++) {
                 left[j].style.width = moveLen + 'px';
                 mid[j].style.width = (box[i].clientWidth - moveLen - 10) + 'px';
@@ -1000,7 +999,9 @@
     text-align: center;
     /*height: 200px;*/
   }
-
+  .mune-tree{
+    width:100%;
+  }
   .tree-left>div{
     vertical-align: middle;
     /*height: 50%;*/

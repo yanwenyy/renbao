@@ -1,24 +1,27 @@
 <template>
-  <sql-edit
-    ref="sqlEdits"
-    :treeDefaultProps="treeDefaultProps"
-    :changeTree="changeTree"
-    :getLoadTree="getLoadTree"
-    :treedata="treeData"
-    :loadTree="loadTree"
-    :getwsData="getwsData"
-    :resultTableTabs="resultTableTabs"
-    :sqlData="sqlData"
-    :sqlListTotal="sqlListTotal"
-    :sqlListData="sqlListData"
-    :formatContent="formatContent"
-    :getSqlList="getSqlList"
-    :getSqlMsg="getSqlMsg"
-    :deleteSql="deleteSql"
-    :saveSql="saveSql"
-    :useChinese="true"
-    :exportSql="exportSql"
-  ></sql-edit>
+  <div style="width:100%">
+    <sql-edit
+      ref="sqlEdits"
+      :treeDefaultProps="treeDefaultProps"
+      :changeTree="changeTree"
+      :getLoadTree="getLoadTree"
+      :treedata="treeData"
+      :loadTree="loadTree"
+      :getwsData="getwsData"
+      :resultTableTabs="resultTableTabs"
+      :sqlData="sqlData"
+      :sqlListTotal="sqlListTotal"
+      :sqlListData="sqlListData"
+      :formatContent="formatContent"
+      :getSqlList="getSqlList"
+      :getSqlMsg="getSqlMsg"
+      :deleteSql="deleteSql"
+      :saveSql="saveSql"
+      :useChinese="true"
+      :exportSql="exportSql"
+    ></sql-edit>
+  </div>
+
 </template>
 
 <script>
