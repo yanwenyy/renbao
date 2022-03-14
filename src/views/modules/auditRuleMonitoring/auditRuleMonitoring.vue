@@ -283,6 +283,9 @@ export default {
             color: #0000FF;
             width: 100%;
         }
+        /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+            background-color: #e3edfa;
+        }
     }
     .auditRuleMonitoring-right {
         flex: 1;

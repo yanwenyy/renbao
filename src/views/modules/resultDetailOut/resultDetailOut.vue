@@ -218,6 +218,7 @@ export default {
 
         },
         resultDetailsExportClick () {
+            if( !this.batchItem.batchId ) return this.$message({message: '请选择批次名称',type: 'warning'});
             this.$refs.resultDetailOutDialog.showDialog(this.batchItem)
         },
        
@@ -296,6 +297,10 @@ export default {
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;
             color: #0000FF;
+        }
+        /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+            background-color: #e3edfa;
+
         }
     }
     .resultDetailsExport-right {
