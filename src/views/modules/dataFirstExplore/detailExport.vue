@@ -120,7 +120,7 @@
                 <template slot-scope="scope">
                   <el-button
                     type="text"
-                    @click="detailHandle(scope.row.resultId)"
+                    @click="detailHandle(scope.row)"
                     >查看明细</el-button
                   >
                 </template>
@@ -149,6 +149,7 @@
               @close="closeDetail"
               @ok="editSucceed"
               :info="info"
+              :resultTableName="resultTableName"
               v-if="showDetailDialog"
             ></detail>
           </el-dialog>
@@ -180,7 +181,7 @@
                     v-for="item in hospitals"
                     :key="item['医院编码']"
                     :label="item['医院名称']"
-                    :value="item['医院名称']"
+                    :value="item['医院编码']"
                   >
                   </el-option>
                 </el-select>
@@ -209,6 +210,7 @@ export default {
         ruleCategory: ""
       },
       dataForm1: {
+        batchId: "",
         hospital: ""
       },
       rules: {
@@ -333,8 +335,12 @@ export default {
     },
     //结果明细导出弹窗
     detailExport() {
-      this.dataForm1.hospital = [];
-      this.detailExportDialog = true;
+      if (this.batchId == "" || this.batchId == null) {
+        this.$message.error("请先选择批次");
+      } else {
+        this.dataForm1.hospital = [];
+        this.detailExportDialog = true;
+      }
     },
     // 关闭详细弹窗
     closeDetail() {
@@ -393,8 +399,9 @@ export default {
         .catch(() => {});
     },
     //查看结果明细
-    detailHandle(id) {
-      this.info = id;
+    detailHandle(data) {
+      this.info = data.resultId;
+      this.resultTableName = data.resultTableName
       this.showDetailDialog = true;
     },
     //重置表单
@@ -431,23 +438,27 @@ export default {
       this.batchId = data.batchId;
       this.initData();
     },
-
     //结果明细导出
     exportExcel() {
-      var arr = this.dataForm1.hospital;
-      var hospitalNames = "";
-      for (var i = 0; i < arr.length; i++) {
-        hospitalNames += arr[i] + ",";
+      this.dataForm1.batchId = this.batchId;
+      /* var arr = [];
+      var hospitalCodes = [];
+      var hospitalNames = [];
+      for (var i = 0; i < this.dataForm1.hospital.length; i++) {
+        arr.push(this.dataForm1.hospital[i].split("|"));
       }
-      if (hospitalNames.length > 0) {
-        hospitalNames = hospitalNames.substring(0, hospitalNames.length - 1);
-      }
-      console.log(hospitalNames);
+      for (var j = 0; j < arr.length; j++) {
+        hospitalCodes.push(arr[j][0]);
+        hospitalNames.push(arr[j][1]);
+      } */
+      // console.log(hospitalCodes);
+      // console.log(hospitalNames);
+      console.log(this.dataForm1);
       this.$http({
         url: this.$http.adornUrl("ruleResult/exportResult"),
         method: "post",
         responseType: "blob", //解决乱码问题
-        data: this.$http.adornData({ hospitalName: hospitalNames }, false)
+        data: this.$http.adornData(this.dataForm1, false)
       }).then(({ data }) => {
         const blob = new Blob([data]);
         let fileName = "结果明细.xls";

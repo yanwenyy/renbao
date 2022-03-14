@@ -180,7 +180,7 @@
             ></detail>
           </el-dialog>
           <!--新增/修改页面 -->
-          <el-dialog
+          <!-- <el-dialog
             :visible.sync="showAddOrEditDialog"
             title="sql编辑器"
             :close-on-click-modal="false"
@@ -195,7 +195,7 @@
               :folderId="folderId"
               v-if="showAddOrEditDialog"
             ></AddOrEdit>
-          </el-dialog>
+          </el-dialog> -->
           <!--规则运行页面 -->
           <el-dialog
             :visible.sync="showRunDialog"
@@ -213,6 +213,27 @@
               v-if="showRunDialog"
             ></runNow>
           </el-dialog>
+          <!-- 弹窗, 新增 / 修改 -->
+          <el-dialog :title="treeTitle" :visible.sync="treeVisible">
+            <el-form :model="form">
+              <el-form-item label="分类名称">
+                <el-input v-model="form.name" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="treeVisible = false">取 消</el-button>
+              <el-button type="primary" @click="treeVisible = false"
+                >确 定</el-button
+              >
+            </div>
+          </el-dialog>
+          <!-- 弹窗, 新增 / 修改 -->
+          <add-or-update
+            v-if="addOrUpdateVisible"
+            ref="addOrUpdate"
+            @refreshDataList="getDataList"
+            :ruleData="ruleData"
+          ></add-or-update>
         </el-card>
       </el-col>
     </el-row>
@@ -223,12 +244,14 @@ import detail from "./component/ruleConfig-detail.vue";
 import AddOrEdit from "./component/ruleConfig-addOredit.vue";
 import runNow from "./component/ruleConfig-runNow.vue";
 import ruleTree from "../../common/rule-tree.vue";
+import addOrUpdate from "@/views/modules/data/rule-add-or-update.vue";
 export default {
   components: {
     detail,
     AddOrEdit,
     runNow,
-    ruleTree
+    ruleTree,
+    addOrUpdate
   },
   data() {
     return {
@@ -237,6 +260,12 @@ export default {
         ruleName: "",
         ruleCategory: ""
       },
+      ruleData: [],
+      treeVisible: false,
+      treeTitle: "",
+      form: { name: "" },
+      getDataList: [],
+      ruleData: [],
       //树id
       folderId: "",
       //树path
@@ -286,7 +315,8 @@ export default {
       //运行弹窗区分字段 true:定时运行 false:立即运行
       info: "",
       //规则id
-      ruleId: ""
+      ruleId: "",
+      addOrUpdateVisible: false
     };
   },
   created() {
@@ -330,15 +360,23 @@ export default {
     },
     //新增弹框
     addData() {
-      this.showAddOrEditDialog = true;
+      this.addOrUpdateVisible = true;
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init("");
+      });
       this.ruleId = "";
       this.folderId = "";
+      this.ruleData = this.$refs.ruleTree.treeData;
     },
     //修改弹框
     editData() {
-      this.showAddOrEditDialog = true;
+      this.addOrUpdateVisible = true;
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init(this.multipleSelection[0].ruleId);
+      });
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
+      this.ruleData = this.$refs.ruleTree.treeData;
     },
     // 关闭编辑弹窗
     closeDetail() {
@@ -445,7 +483,7 @@ export default {
     },
     //关闭新增、修改弹窗
     closeAddOrEdit() {
-      this.showAddOrEditDialog = false;
+      this.addOrUpdateVisible = false;
     },
     //新增、修改成功后关闭页面并刷新
     succeed() {
@@ -468,8 +506,6 @@ export default {
     filterNode() {},
     //查看已选规则
     seeChoseRule() {
-      var chose = [];
-      // chose.
       this.choseRule = this.multipleSelection;
     },
     //拿到选择树的id

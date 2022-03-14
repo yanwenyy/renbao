@@ -1,7 +1,7 @@
 <template>
   <div class="threeData" style="height:600px">
     <!-- 列表 -->
-    <div class="listDisplay">
+    <div class="listDisplay" style="height:500px;overflow-y:auto;">
       <div class="f_right">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="warning" @click="reportList">导出</el-button>
@@ -55,7 +55,8 @@
 import VueQueryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
 export default {
   props: {
-    info: String
+    info: String,
+    resultTableName: String
   },
   components: {
     VueQueryBuilder
@@ -135,6 +136,7 @@ export default {
           label: "患者姓名"
         }
       ],
+      resultTableName:'',
       tableList2: [],
       tableList: [],
       tableList3: [],
@@ -157,13 +159,13 @@ export default {
         url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
         method: "get",
         params: this.$http.adornParams({
-          tableName: "医保住院结算明细",
+          tableName: this.resultTableName,
           resultId: this.info
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableColumns = data.result.columns;
-          this.tableList = data.result.result
+          this.tableList = data.result.result;
           // this.apComServerData.total;
         } else {
           this.tyqab = [];

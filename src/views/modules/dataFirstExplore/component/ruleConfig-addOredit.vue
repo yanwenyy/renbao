@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-form
+    
+    <!-- <el-form
       :model="dataForm"
       ref="dataForm"
       label-width="80px"
@@ -26,7 +27,7 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择分类" prop="folderId">
+      <el-form-item label="规则分类" prop="folderId">
         <el-select
           v-model="dataForm.folderName"
           placeholder="请选择"
@@ -55,11 +56,8 @@
           v-model="dataForm.createUserName"
           placeholder="创建人"
         ></el-input>
-      </el-form-item>
-      <!-- <el-form-item label="sql语句" prop="sql">
-        <el-input v-model="dataForm.sql" placeholder="备注"></el-input>
       </el-form-item> -->
-      <el-form-item label="创建时间" prop="createTime">
+    <!-- <el-form-item label="创建时间" prop="createTime">
         <el-input
           disabled
           v-model="dataForm.createTime"
@@ -68,7 +66,7 @@
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="submit('dataForm')">保存</el-button>
-    <el-button @click="close">关闭</el-button>
+    <el-button @click="close">关闭</el-button> -->
   </div>
 </template>
 <script>
@@ -155,7 +153,7 @@ export default {
           this.dataForm.createTime = rule.createTime;
           this.loading = false;
           // 递归获取对应的规则对象
-          let treeData = this.treeData
+          let treeData = this.treeData;
           let getTreeData = this.getTreeData(treeData, this.folderId);
           // 回显规则名称
           if (getTreeData.length > 0) {
@@ -215,7 +213,8 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
-        method: "get"
+        method: "get",
+        params: this.$http.adornParams({ folderSorts: "1,2" }, false)
       })
         .then(({ data }) => {
           this.treeLoading = false;
