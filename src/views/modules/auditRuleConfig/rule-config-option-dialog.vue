@@ -24,9 +24,10 @@
                     <el-form-item label="规则分类：" prop="folderName">
                         <el-select v-model="ruleOperationForm.folderName" placeholder="请选择" multiple collapse-tags>
                             <el-option :value="ruleOperationForm.folderName" style="height: auto">
-                                <el-tree :data="treeData" default-expand-all show-checkbox check-strictly 
+                                <!-- <el-tree :data="treeData" default-expand-all show-checkbox check-strictly 
                                     ref="treeSelect" highlight-current :props="layoutTreeProps" node-key="folderId"
-                                    @check-change="handleCheckChange" @node-click="handleNodeChange"></el-tree>
+                                    @check-change="handleCheckChange" @node-click="handleNodeChange"></el-tree> -->
+                                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="handleNodeChange" @checkChange="handleCheckChange" folderSorts="3"></rule-tree>
                             </el-option>
                         </el-select>
                     </el-form-item>
@@ -57,6 +58,7 @@
 </template>
 <script>
 import {getDate} from '@/utils'
+import ruleTree from '../../common/rule-tree.vue'
 export default {
     props: [
         'getData'
@@ -98,13 +100,7 @@ export default {
             },
             type: '',
             checkedData: [],
-            treeData: [],
-            layoutTreeProps: {
-                label(data, node) {
-                    const config = data.__config__ || data
-                    return  config.label || config.folderName
-                },
-            },
+            ruleCheckedData: {}
         }
     },
     mounted () {
@@ -204,36 +200,43 @@ export default {
                 temp.remove(folderId);
                 return temp.join('/');
         },
-        handleNodeChange (data, node , selt) {
-            this.$refs.treeSelect.setCheckedNodes([data]);
+        handleNodeChange (data, node , treeData) {
+            this.ruleCheckedData = data
+            this.$refs.ruleTree.setCheckedNodes(data);
             this.ruleOperationForm.folderName = [data.folderName];
             this.ruleOperationForm.folderId =  data.folderId;
-            this.ruleOperationForm.folderPath =  this.getParentByNode(node);
+            // this.ruleOperationForm.folderPath =  this.getParentByNode(node, treeData);
+            this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
         },
-        handleCheckChange(data, checked, node) {
+        handleCheckChange(data, checked, treeData) {
+            // this.bitchCheckData = data; 
+            this.ruleCheckedData = data
+            this.ruleOperationForm.folderName = [this.ruleCheckedData.folderName];
+            this.ruleOperationForm.folderId =  this.ruleCheckedData.folderId;
+            this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
 
-            let res = this.$refs.treeSelect.getCheckedNodes(false, true); //true，1. 是否只是叶子节点 2.选择的时候不包含父节点）
-            if (checked) {
-                this.$refs.treeSelect.setCheckedNodes([data]);
-            }
-            let arrLabel = [];
-            res.forEach(item => {
-                if (arrLabel.length === 0) {
-                    arrLabel.push(item);
-                } else {
-                    arrLabel.length === 0;
-                }
-            });
+            // let res = this.$refs.treeSelect.getCheckedNodes(false, true); //true，1. 是否只是叶子节点 2.选择的时候不包含父节点）
+            // if (checked) {
+            //     this.$refs.treeSelect.setCheckedNodes([data]);
+            // }
+            // let arrLabel = [];
+            // res.forEach(item => {
+            //     if (arrLabel.length === 0) {
+            //         arrLabel.push(item);
+            //     } else {
+            //         arrLabel.length === 0;
+            //     }
+            // });
             
-            if (arrLabel.length>0) {
-                this.ruleOperationForm.folderName = [arrLabel[0].folderName];
-                this.ruleOperationForm.folderId =  arrLabel[0].folderId;
-                this.ruleOperationForm.folderPath =  this.getParentByData(this.treeData,data.folderId )
-            } else {
-                this.ruleOperationForm.folderName = [];
-                this.ruleOperationForm.folderId =  '';
-                this.ruleOperationForm.folderPath =  ''
-            }
+            // if (arrLabel.length>0) {
+            //     this.ruleOperationForm.folderName = [arrLabel[0].folderName];
+            //     this.ruleOperationForm.folderId =  arrLabel[0].folderId;
+            //     this.ruleOperationForm.folderPath =  this.getParentByData(this.treeData,data.folderId )
+            // } else {
+            //     this.ruleOperationForm.folderName = [];
+            //     this.ruleOperationForm.folderId =  '';
+            //     this.ruleOperationForm.folderPath =  ''
+            // }
         },
         handleClose () {
             this.resetForm();
@@ -318,8 +321,7 @@ export default {
      },
     
     components: {
-        
-        
+        ruleTree   
     },
     watch : {
     }
