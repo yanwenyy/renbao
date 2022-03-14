@@ -153,7 +153,7 @@
             { required: true, message: '规则类别不能为空', trigger: ['blur',"change"] }
           ],
           folderId: [
-            { required: true, message: '规则名称不能为空', trigger: ['blur',"change"] }
+            { required: true, message: '规则分类不能为空', trigger: 'change' }
           ],
           dataTime: [
             { required: true, message: '规则分类不能为空', trigger: 'blur' }
@@ -221,6 +221,7 @@
           ruleName: '',
           ruleCategory: '',
           folderId: '',
+          parentName: '',
           createUserName: '',
           createTime: '',
           ruleSqlValue: '',
@@ -228,11 +229,9 @@
         };
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
-        })
-
+        });
       },
       init (id) {
-        this.cleanMsg();
         this.dataForm.id = id || 0;
         this.visible = true;
         this.getUserInfo();
@@ -245,8 +244,8 @@
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
-            this.$refs['dataForm'].resetFields()
-
+            this.$refs['dataForm'].resetFields();
+            this.$refs['dataForm'].clearValidate()
           })
         }).then(() => {
           if (this.dataForm.id) {
@@ -264,17 +263,15 @@
                 this.dataForm.createTime = datas.createTime;
                 this.dataForm.ruleSqlValue = datas.ruleSqlValue;
                 this.dataForm.ruleType = datas.ruleType;
-                this.menuListTreeSetCurrentNode()
+                this.menuListTreeSetCurrentNode();
               }
             })
-          } else {
-            // 新增
-            this.menuListTreeSetCurrentNode()
           }
         })
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
+        console.log(data.folderId)
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.treeVisible=false;
@@ -308,8 +305,9 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
+                    this.visible = false;
+                    this.cleanMsg();
+                    this.$emit('refreshDataList');
                   }
                 })
               } else {
