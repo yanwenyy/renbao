@@ -23,10 +23,13 @@
             @node-click="nodeClick"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
-                <span v-if="isShowEdit" :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " :title="node.label">
+                <span v-if="!isShowEdit" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
+                <span v-if="isShowEdit" >
+                    <span :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " :title="node.label"></span>
                     <span  > {{node.label}}</span>
+
                 </span>
+               
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
                         type="text"
@@ -380,9 +383,12 @@ export default {
     .folder-icon {
         // backgroundImage:'url(' + data.icon + ')';
         // background: url(../images/folder.png);
-        // background: url(../../);
+        background: url(../../assets/img/folder.png);
         background-size: 100% 100%;
         background-repeat: no-repeat;
+        display: inline-block;
+        width: 13px;
+        height: 16px;
     }
     .cut-width {
         max-width: 100px;
