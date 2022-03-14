@@ -272,11 +272,12 @@ export default {
     .auditRuleMonitoring-left {
         width: 300px;
         // min-height: 100vh;
-        min-height: calc(100vh - 165px);
+        // min-height: calc(100vh - 165px);
         // margin-right: 20px;
         border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
+        height: 75vh;
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;
             color: #0000FF;
@@ -286,6 +287,8 @@ export default {
     .auditRuleMonitoring-right {
         flex: 1;
         border: none;
+        height: 75vh;
+        overflow: auto;
         // padding-left: 20px;
         // 
         .search-box {

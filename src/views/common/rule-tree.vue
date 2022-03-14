@@ -399,6 +399,10 @@ export default {
         //     display: inline-block;
         // }
     }
+    /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        background-color: #e3edfa;
+
+    }
 
 }
 

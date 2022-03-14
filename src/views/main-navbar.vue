@@ -142,7 +142,6 @@
       },
       selectProject (val) {
        if(val){
-         console.log(val, 'valvalvalvalval')
          this.$store.commit('common/updateProjectId', val)
          this.$http({
            isLoading:false,

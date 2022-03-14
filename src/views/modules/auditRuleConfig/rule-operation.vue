@@ -35,7 +35,7 @@
                     >
                         <el-input class="size"  v-model="ruleOperationForm.batchName" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item 
+                    <el-form-item
                         label="备注"
                         prop="batchRemark"
                     >

@@ -31,11 +31,11 @@
                     <!-- 默认全选 -->
                     <el-table
                         v-loading="tableLoading"
-                        overflow-y:auto
                         ref="hospitalSelectionTable"
                         :data="tableData"
+                        max-height="350"
                         tooltip-effect="dark"
-                        style="width: 100%"
+                        style="width: 100%; height: 100%; overflow-y: auto"
                         @selection-change="handleSelectionChange">
                          <el-table-column type="selection" width="55"></el-table-column>
                         <el-table-column
@@ -158,9 +158,6 @@ export default {
     }
     /deep/ .el-dialog__footer {
         text-align: center;
-    }
-    /deep/ .el-dialog__body {
-
     }
     .rule-tree-box {
         display: flex;

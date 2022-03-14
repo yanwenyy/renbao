@@ -47,10 +47,7 @@
                        <el-button type="primary" @click="onSubmit('ruleOperationForm')" :loading="loading" size="small">确 定</el-button>
                         <el-button @click="cancel" size="small">取 消</el-button>
                     </el-form-item>
-                   
-                   
                 </el-form>
-                
             </div>
         </el-drawer>
        
@@ -134,6 +131,7 @@ export default {
                     })
                 } else {
                     this.reset()
+
                 } 
             })
             this.dialogVisible = true;
