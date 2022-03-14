@@ -47,7 +47,7 @@
       getDataList () {
         this.dataListLoading = true;
         this.$http({
-          url: this.$http.adornUrl(`/ybDataImp/getColumnInfosByTN/${this.tableName}`),
+          url: this.$http.adornUrl(`/dataImp/getColumnInfosByTN/${this.tableName}`),
           method: 'get'
         }).then(({data}) => {
           if (data && data.code === 200) {

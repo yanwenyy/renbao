@@ -195,7 +195,6 @@
                 <template slot-scope="scope">
                   <el-select
                     v-model="scope.row[getMapKey(scope.row)]"
-                    clearable
                     value-key="columnInfoId"
                     placeholder="请选择匹配字段">
                     <el-option
