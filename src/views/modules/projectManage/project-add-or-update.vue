@@ -22,7 +22,7 @@
             end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="被审核单位">
+        <el-form-item label="被审核单位"  prop="project.auditedUnit">
           <el-input v-model="dataForm.project.auditedUnit" placeholder="被审核单位"></el-input>
         </el-form-item>
         <el-form-item label="项目成本">
@@ -44,7 +44,10 @@
               label="成本事项"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
+                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.projectItem'" :rules='dataRule.moneyValid'>
+                  <!--@input="scope.row.contractAmount=getMoney(scope.row.contractAmount)"-->
+                  <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
+                </el-form-item>
               </template>
             </el-table-column>
             <el-table-column
@@ -52,7 +55,11 @@
               label="成本金额（元/天）"
             >
               <template slot-scope="scope">
-                <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="成本金额"></el-input>
+                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.costMoney'" :rules='dataRule.moneyValid'>
+                  <!--@input="scope.row.contractAmount=getMoney(scope.row.contractAmount)"-->
+                  <el-input v-model="scope.row.costMoney	"  @input="formatValue(scope.row.costMoney	,scope.$index,dataForm.projectCosts,'costMoney')" placeholder="成本金额"></el-input>
+                </el-form-item>
+
               </template>
             </el-table-column>
             <el-table-column
@@ -95,6 +102,7 @@
             >
               <template slot-scope="scope">
                 <el-select
+                            class="userList"
                             multiple
                             v-model="scope.row.userIds"
                             placeholder="请选择"
@@ -152,7 +160,7 @@
               align="center"
             >
               <template slot-scope="scope">
-                <el-select multiple v-model="scope.row.leaderIds" placeholder="请选择">
+                <el-select class="userList" multiple v-model="scope.row.leaderIds" placeholder="请选择">
                   <el-option
                     v-for="(item,index) in meberList"
                     :key="index"
@@ -169,7 +177,7 @@
               align="center"
             >
               <template slot-scope="scope">
-                <el-select multiple v-model="scope.row.memberIds" placeholder="请选择">
+                <el-select class="userList" multiple v-model="scope.row.memberIds" placeholder="请选择">
                   <el-option
                     v-for="(item,index) in meberList"
                     :key="index"
@@ -325,7 +333,7 @@
           "project.dataTime": [
             { required: true, message: '项目周期不能为空', trigger: 'blur' }
           ],
-          auditedUnit: [
+          "project.auditedUnit": [
             { required: true, message: '被审核单位不能为空', trigger: 'blur' }
           ],
           dataAmount: [
@@ -334,7 +342,7 @@
           effectiveData: [
             { required: true, validator: validateInteger,trigger: 'blur' }
           ],
-          todayConsumeMoney: [
+          moneyValid: [
             { required: true, validator: validateMoney, trigger: 'blur' }
           ],
         }
@@ -581,6 +589,19 @@
   }
   .input-hasBtn{
     width: 70%;
+  }
+  .tabelForm >>>.el-form-item__error{
+    top: 22%;
+    right: 0;
+    text-align: right;
+    padding-right: 15%;
+  }
+  .userList{
+   width: 80%;
+  }
+  .userList >>>.el-input{
+    width: 100%;
+    box-sizing: border-box;
   }
 </style>
 

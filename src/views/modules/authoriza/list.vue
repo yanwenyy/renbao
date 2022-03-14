@@ -179,23 +179,25 @@
           // this.dataRight=this.datafake;
           this.userId=data;
           this.userIdList=[];
+          this.selTree=[];
           this.$http({
-            url: this.$http.adornUrl('/menu/getMenuList'),
+            url: this.$http.adornUrl('/menu/getUserMenuList'),
             method: 'get',
             params: this.$http.adornParams({userId:id})
           }).then(({data}) => {
-            this.dataRight = treeDataTranslate(data.result, 'menuId','menuParentId');
+            var datas=data.result;
+            datas.forEach(item=>{
+              this.selTree.push(item.menuId);
+            });
             this.$http({
-              url: this.$http.adornUrl('/menu/getUserMenuList'),
+              url: this.$http.adornUrl('/menu/getMenuList'),
               method: 'get',
               params: this.$http.adornParams({userId:id})
             }).then(({data}) => {
-              var datas=data.result;
-              datas.forEach(item=>{
-                this.selTree.push(item.menuId);
-              })
+              this.dataRight = treeDataTranslate(data.result, 'menuId','menuParentId');
+
             })
-          })
+          });
         },
         filterNode(value, data) {
           if (!value) return true;

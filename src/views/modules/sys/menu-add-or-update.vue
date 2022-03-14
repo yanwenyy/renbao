@@ -19,6 +19,7 @@
           trigger="click"
           v-model="treeVisible">
           <el-tree
+            class="mune-tree"
             :data="menuList"
             :props="menuListTreeProps"
             node-key="menuId"
@@ -263,5 +264,9 @@
       color: #e6a23c;
       cursor: pointer;
     }
+  }
+  .mune-tree{
+    height: 50vh;
+    overflow: auto;
   }
 </style>

@@ -1,24 +1,27 @@
 <template>
-  <sql-edit
-    ref="sqlEdits"
-    :treeDefaultProps="treeDefaultProps"
-    :changeTree="changeTree"
-    :getLoadTree="getLoadTree"
-    :treedata="treeData"
-    :loadTree="loadTree"
-    :getwsData="getwsData"
-    :resultTableTabs="resultTableTabs"
-    :sqlData="sqlData"
-    :sqlListTotal="sqlListTotal"
-    :sqlListData="sqlListData"
-    :formatContent="formatContent"
-    :getSqlList="getSqlList"
-    :getSqlMsg="getSqlMsg"
-    :deleteSql="deleteSql"
-    :saveSql="saveSql"
-    :useChinese="true"
-    :exportSql="exportSql"
-  ></sql-edit>
+  <div style="width:100%">
+    <sql-edit
+      ref="sqlEdits"
+      :treeDefaultProps="treeDefaultProps"
+      :changeTree="changeTree"
+      :getLoadTree="getLoadTree"
+      :treedata="treeData"
+      :loadTree="loadTree"
+      :getwsData="getwsData"
+      :resultTableTabs="resultTableTabs"
+      :sqlData="sqlData"
+      :sqlListTotal="sqlListTotal"
+      :sqlListData="sqlListData"
+      :formatContent="formatContent"
+      :getSqlList="getSqlList"
+      :getSqlMsg="getSqlMsg"
+      :deleteSql="deleteSql"
+      :saveSql="saveSql"
+      :useChinese="true"
+      :exportSql="exportSql"
+    ></sql-edit>
+  </div>
+
 </template>
 
 <script>
@@ -56,6 +59,14 @@
       this.getSqlList();
     },
     mounted(){
+      this.sqlListData=[];
+      this.sqlListTotal=0;
+      this.sqlData='';
+      this.resultTableTabs=[];
+      this.loadTree=[];
+      this.treeData=[];
+      this.getSjbData();
+      this.getSqlList();
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -72,11 +83,12 @@
          this.$http({
            url: this.$http.adornUrl('/sqlScript/exportExcel'),
            method: 'post',
+           responseType: 'blob',
            data: this.$http.adornData({
              sqlScript:data,
              dataSize:50000,
              exportSize:50000,
-           })
+           }),
          }).then(({data}) => {
            if(data.code==200){
 

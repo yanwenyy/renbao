@@ -21,7 +21,7 @@
                     @check-change="handleCheckChange"
                     >
                 </el-tree> -->
-                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange"></rule-tree>
+                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="3"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
