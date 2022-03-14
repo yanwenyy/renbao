@@ -165,7 +165,6 @@ export default {
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
-                console.log(data, '获取规则树')
                 if (data.code == 200) {
                     this.treeData = data.result;
                 }
@@ -305,15 +304,15 @@ export default {
         nodeClick (data, node) {
             // 调用父组件的获取规则树id的方法
             if (this.isParent) {
-                this.$parent[this.parentGetTreeData](data,node);
+                this.$parent[this.parentGetTreeData](data,node, this.treeData);
             } else {
-                this.$emit("getTreeId", data,node );
+                this.$emit("getTreeId", data,node, this.treeData);
             }
         },
-        callCheckChange (data, checked, indeterminate) {
+        callCheckChange (data, checked) {
             // alert(1111)
             if(this.isRelation) {
-                this.$emit("checkChange", data, checked, indeterminate);
+                this.$emit("checkChange", data, checked, this.treeData);
                 if (checked) {
                     this.$refs.ruleTreeRoot.setCheckedNodes([data]);
                 }
@@ -344,7 +343,15 @@ export default {
             this.treeForm.folderName = ''
           }
 
+        },
+        projectId (nval, oval) {
+            console.log(nval, '新的项目id')
+            if (nval) {
+                this.getRuleFolder()
+            }
+
         }
+
     },
 
 }
