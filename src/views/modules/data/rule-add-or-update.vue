@@ -151,6 +151,7 @@
           createTime: '',
           ruleSqlValue: '',
           ruleType: '',
+          folderPath: ''
         },
         dataRule: {
           ruleName: [
@@ -232,6 +233,7 @@
           createTime: '',
           ruleSqlValue: '',
           ruleType: '',
+          folderPath: ''
         };
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
@@ -257,12 +259,14 @@
               this.dataForm.ruleName = datas.ruleName;
               this.dataForm.ruleCategory = datas.ruleCategory;
               this.dataForm.folderId = datas.folderId;
+              this.dataForm.folderPath = datas.folderPath;
               this.dataForm.createUserName = datas.createUserName;
               this.dataForm.createTime = datas.createTime;
               this.dataForm.ruleSqlValue = datas.ruleSqlValue;
               this.sqlEditMsg = datas.ruleSqlValue;
               console.log(this.sqlEditMsg,33333)
               this.dataForm.ruleType = datas.ruleType;
+
               this.menuListTreeSetCurrentNode();
             }
           })
@@ -273,7 +277,19 @@
         console.log(data.folderId)
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
+        this.dataForm.folderPath = this.getParentByNode(node)
         this.treeVisible=false;
+      },
+      getParentByNode (node) {
+          const checkedNodes = [];
+          const traverse = function(node) {
+              if (node.parent.data.folderId) {
+                  checkedNodes.push(node.parent.data.folderId);
+                  traverse(node.parent);
+              }
+          };
+          traverse(node)
+          return checkedNodes.join('/');
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
@@ -296,6 +312,7 @@
                 'createTime': this.dataForm.createTime,
                 'ruleSqlValue': this.dataForm.ruleSqlValue,
                 'ruleType': this.dataForm.ruleType,
+                'folderPath': this.dataForm.folderPath,
               })
             }).then(({data}) => {
               if (data && data.code ===200) {

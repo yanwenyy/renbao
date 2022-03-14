@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData" folderSorts="3" ></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData" :folderSorts="folderSorts" ></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box"> 
@@ -24,9 +24,9 @@
             </div>
             <div class="rule-table">
                 <div class="rule-table-btn">
-                    <el-button size="small" type="primary" icon="el-icon-s-unfold" @click="addFun">新增</el-button>
-                    <el-button size="small" type="primary" icon="el-icon-edit-outline" @click="editorFun">编辑</el-button>
-                    <el-button size="small" type="danger" icon="el-icon-delete" @click="deleteFn">删除</el-button>
+                    <el-button size="small" type="primary"  @click="addFun">新增</el-button>
+                    <el-button size="small" type="primary"  @click="editorFun">编辑</el-button>
+                    <el-button size="small" type="danger"  @click="deleteFn">删除</el-button>
                 </div>
                 <div class="table-box">
                     <el-table
@@ -83,6 +83,7 @@
         <submit-personality-rule ref="submitPersonalityRule"></submit-personality-rule>
         <rule-operation ref="ruleOperation"></rule-operation>
         <rule-config-option-dialog ref="ruleConfigDialog"></rule-config-option-dialog>
+        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSelectPage" :ruleData="treeData" ></add-or-update>
     </div>
 </template>
 <script>
@@ -90,6 +91,7 @@ import submitPersonalityRule from './submit-personality-rule.vue'// 提交至地
 import ruleOperation from './rule-operation.vue' // 规则运行弹框
 import ruleTree from '../../common/rule-tree.vue'
 import ruleConfigOptionDialog from './rule-config-option-dialog.vue'
+import AddOrUpdate from '../../modules/data/rule-add-or-update.vue'
 export default {
     data () {
         return {
@@ -118,11 +120,14 @@ export default {
             getRowKeys(row) {
                 return row.ruleId;
             },
-            treeData: []
+            treeData: [],
+            addOrUpdateVisible: false,
+            folderSorts: 3
         }
     },
     activated () {
-        this.getSelectPage()
+        this.getSelectPage();
+        this.getRuleFolder();
     },
     created () {
        
@@ -153,6 +158,23 @@ export default {
             })
 
         },
+        // 获取规则树
+        getRuleFolder () {
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
+                method: 'get',
+                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
+                // params:  this.$http.adornParams({}, false)
+            }).then(({data}) => {
+               
+                if (data.code == 200) {
+                    this.treeData = data.result;
+                }
+            }).catch(() => {
+                
+            })
+        },
         getTreeData (data) {
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
@@ -175,11 +197,20 @@ export default {
             
         },
         addFun () {
-            this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
+            // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
+            this.addOrUpdateVisible = true
+            this.$nextTick(() => {
+                this.$refs.addOrUpdate.init()
+            })
         },
         editorFun () {
             if( this.multipleTable.length != 1 ) return this.$message({message: '请选择一条数据进行编辑',type: 'warning'});
-            this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
+            // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
+            this.addOrUpdateVisible = true
+            this.$nextTick(() => {
+            this.$refs.addOrUpdate.init(this.multipleTable[0].ruleId)
+            })
+
         },
         deleteFn () {
             if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
@@ -243,11 +274,41 @@ export default {
             this.$refs.ruleOperation.showDialog(this.multipleTable,'timing', [], {});
         }
     },
+    computed: {
+      projectId: {
+        get () {
+          if(this.$store.state.common.projectId){
+            return this.$store.state.common.projectId
+          }else{
+            this.$http({
+              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+              method: "get",
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                return data.result.projectId;
+              }
+            });
+          }
+
+        }
+      },
+    },
     components: {
         submitPersonalityRule,
         ruleOperation,
         ruleTree,
-        ruleConfigOptionDialog
+        ruleConfigOptionDialog,
+        AddOrUpdate
+    },
+    watch: {
+        projectId (nval, oval) {
+            if (nval) {
+                this.getRuleFolder()
+            }
+
+        }
+
     }
 }
 
@@ -261,8 +322,9 @@ export default {
     .auditRuleConfig-left {
         width: 300px;
         // min-height: 100vh;
-        min-height: calc(100vh - 165px);
+        // min-height: calc(100vh - 165px);
         // margin-right: 20px;
+        height: 75vh;
         border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
@@ -271,6 +333,8 @@ export default {
     .auditRuleConfig-right {
         flex: 1;
         border: none;
+        height: 75vh;
+        overflow: auto;
         // 
         .search-box {
             display: flex;

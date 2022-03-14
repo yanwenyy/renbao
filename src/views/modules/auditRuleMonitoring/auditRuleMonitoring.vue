@@ -231,8 +231,8 @@ export default {
         },
         // 列表重置
         onReset () {
-            this.searchForm.type = '';
-            this.searchForm.runningState = '';
+            this.searchForm.ruleCategory = '';
+            this.searchForm.runStatus = '';
             this.Pager.pageIndex = 1;
             this.$refs.treesa.setCheckedKeys([]);
             this.$refs.treesa.setCurrentKey(null);
@@ -304,6 +304,7 @@ export default {
             // padding-left: 20px;
             .result-view-text {
                 color: #0CBDE5;
+                cursor: pointer;
             }
         }
       

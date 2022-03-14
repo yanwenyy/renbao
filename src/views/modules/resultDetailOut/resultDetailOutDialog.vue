@@ -155,10 +155,10 @@ export default {
         text-align: center;
     }
     .result-detail-out {
-        /deep/ .el-select__tags,.el-select {
-            width: 300px !important;
-            max-width: unset !important;
-        }
+        // /deep/ .el-select__tags,.el-select {
+        //     width: 300px !important;
+        //     max-width: unset !important;
+        // }
 
     }
    

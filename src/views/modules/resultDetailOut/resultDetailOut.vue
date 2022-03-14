@@ -287,8 +287,9 @@ export default {
     .resultDetailsExport-left {
         width: 300px;
         // min-height: 100vh;
-        min-height: calc(100vh - 165px);
+        // min-height: calc(100vh - 165px);
         // margin-right: 20px;
+        height: 75vh;
         border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
@@ -300,6 +301,8 @@ export default {
     .resultDetailsExport-right {
         flex: 1;
         border: none;
+        height: 75vh;
+        overflow: auto;
         // padding-left: 20px;
         // 
         .search-box {
