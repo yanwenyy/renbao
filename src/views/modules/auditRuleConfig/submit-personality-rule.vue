@@ -9,18 +9,6 @@
             :before-close="handleClose">
             <div class="rule-tree-box">
                 <span>选择规则：</span>
-                <!-- <el-tree
-                    ref="ruleTree"
-                    check-strictly
-                    :default-expand-all="true"
-                    :data="projectRulesTreeList"
-                    show-checkbox
-                    :check-on-click-node="true"
-                    :expand-on-click-node="false"
-                    node-key="label"
-                    @check-change="handleCheckChange"
-                    >
-                </el-tree> -->
                 <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="3"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -41,68 +29,95 @@ export default {
             loading: false,
             dialogVisible: false,
             uniqueValue: '', //最后拿到的唯一选择的moduldCode值,相当于id
-            bitchCheckData: {}
+            bitchCheckData: {},
+            multipleTable: [],
+            folderData: {}
         }
     },
     methods: {
         //默认打开页面
-        showDialog(type, d) {
-            this.dialogVisible = true
+        showDialog(multipleTable, d) {
+            this.dialogVisible = true;
+            this.multipleTable = multipleTable
         },
-        handleCheckChange (data, checked, indeterminate) {
+        handleCheckChange (data, checked, treeData) {
            this.bitchCheckData = data; 
+        this.folderData.folderName = data.folderName;
+        this.folderData.folderId =  data.folderId;
+        this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
         },
-        getTreeCheckData (data) {
+        getTreeCheckData (data,node , treeData) {
             this.bitchCheckData = data;
             this.$refs.ruleTree.setCheckedByData(data);
+            this.folderData.folderName = data.folderName;
+            this.folderData.folderId =  data.folderId;
+            this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
+        },
+        getParentByData (ruleTreeData1,folderId) {
+                var temp = []
+                var forFn = function (ruleTreeData, folderId) {
+                    for (var i = 0; i < ruleTreeData.length; i++) {
+                    var item = ruleTreeData[i]
+                    if (item.folderId === folderId) {
+                        temp.push(item.folderId)
+                        forFn(ruleTreeData1, item.folderParentId)
+                        break
+                    } else {
+                        if (item.children) {
+                        forFn(item.children, folderId)
+                        }
+                    }
+                    }
+                }
+                forFn(ruleTreeData1, folderId)
+                temp.remove(folderId);
+                return temp.join('/');
         },
        
         handleClose () {
             this.dialogVisible = false
         },
         onSubmit (formName) {
-            // console.log(this.bitchCheckData, 'bitchCheckDatabitchCheckDatabitchCheckData')
-            //  ruleUrl = '/rule/updateByUuId'
-
-            // this.$refs[formName].validate((valid) => {
-            //     if (valid) {
-            //         this.loading = true
-            //         this.$http({
-            //             isLoading:false,
-            //             url: this.$http.adornUrl(ruleUrl),
-            //             method: 'post',
-            //             data:  this.$http.adornData(this.ruleOperationForm, false)
-            //         }).then(({data}) => {
-            //             // this.btnLoading = false;
-            //             if (data.code == 200) {
-            //                 this.loading = false
-            //                 this.$message({
-            //                     message: this.type == 'add' ?'添加成功' : '编辑成功',
-            //                     type: 'success',
-            //                     duration: 1500,
-            //                 })
-            //                 this.dialogVisible = false;
-            //                 this.$parent.getSelectPage();
-            //                 this.$parent.setTableChecked()
-            //             } else {
-            //                 this.loading = false
-            //                 this.$message({
-            //                     message: this.type == 'add' ?'添加失败' : '编辑失败',
-            //                     type: 'error',
-            //                     duration: 1500,
-            //                 })
-            //                  this.dialogVisible = false;
-
-            //             }
-            //         }).catch(() => {
-            //             this.loading = false
-            //         })  
-
-
-
-            //     }
-            // })   
-
+            let submitPersonalityRuleData = {
+                ruleId: this.multipleTable[0].ruleId,
+                ruleName: this.multipleTable[0].ruleName,
+                ruleCategory:this.multipleTable[0].ruleCategory == '住院规则'?2 : this.multipleTable[0].ruleCategory == '门诊规则' ? 1 : '',
+                folderId: this.folderData.folderId,
+                folderName: this.folderData.folderName,
+                createUserName: this.multipleTable[0].createUserName,
+                createTime: this.multipleTable[0].createTime
+            }
+            this.loading = true
+            this.$http({
+                isLoading:false,
+                url: this.$http.adornUrl('/rule/add'),
+                method: 'post',
+                data:  this.$http.adornData(submitPersonalityRuleData, false)
+            }).then(({data}) => {
+                // this.btnLoading = false;
+                if (data.code == 200) {
+                    this.loading = false
+                    this.$message({
+                        message: '提交成功',
+                        type: 'success',
+                        duration: 1500,
+                    })
+                    this.dialogVisible = false;
+                    this.$parent.getSelectPage();
+                    this.$parent.setTableChecked()
+                } else {
+                    this.loading = false
+                    this.$message({
+                        message: '提交失败',
+                        type: 'error',
+                        duration: 1500,
+                    })
+                    this.dialogVisible = false;
+                }
+            }).catch(() => {
+                this.loading = false
+            })  
+           
 
             
         },
