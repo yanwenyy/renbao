@@ -41,17 +41,24 @@ export default {
             this.multipleTable = multipleTable
         },
         handleCheckChange (data, checked, treeData) {
-           this.bitchCheckData = data; 
-        this.folderData.folderName = data.folderName;
-        this.folderData.folderId =  data.folderId;
-        this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
+            if (checked) {
+                this.bitchCheckData = data; 
+                this.folderData.folderName = data.folderName;
+                this.folderData.folderId =  data.folderId;
+                this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
+            } else {
+                this.bitchCheckData = {}; 
+                this.folderData.folderName = [];
+                this.folderData.folderId =  '';
+                this.folderData.folderPath =  ''
+            }
         },
         getTreeCheckData (data,node , treeData) {
-            this.bitchCheckData = data;
-            this.$refs.ruleTree.setCheckedByData(data);
-            this.folderData.folderName = data.folderName;
-            this.folderData.folderId =  data.folderId;
-            this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
+            // this.bitchCheckData = data;
+            // this.$refs.ruleTree.setCheckedByData(data);
+            // this.folderData.folderName = data.folderName;
+            // this.folderData.folderId =  data.folderId;
+            // this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
         },
         getParentByData (ruleTreeData1,folderId) {
                 var temp = []
@@ -87,6 +94,7 @@ export default {
                 createUserName: this.multipleTable[0].createUserName,
                 createTime: this.multipleTable[0].createTime
             }
+            if( !this.folderData.folderId ) return this.$message({message: '请选择规则分类',type: 'warning'});
             this.loading = true
             this.$http({
                 isLoading:false,
@@ -125,10 +133,22 @@ export default {
             this.dialogVisible = false;
            
         },
-       
+        reset () {
+            this.folderData = {}
+            this.$nextTick(() => {
+               this.$refs.ruleTree && this.$refs.ruleTree.clearCheckedKeys();
+            })
+        },
     },
     components: {
         ruleTree,
+    },
+    watch : {
+        'dialogVisible'(nval, oval) {
+            if (nval ) {   
+               this.reset()
+            }
+        },
     }
 }
 </script>

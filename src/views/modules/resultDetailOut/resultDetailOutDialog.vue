@@ -11,14 +11,12 @@
             <div class="result-detail-out">
                 <el-form ref="exportForm" :model="exportForm" :rules="exportFormRules"   :inline="true">
                     <el-form-item prop="hospital" label="选择医院：">
-                        <el-select v-model="exportForm.hospital" multiple placeholder="请选择医院" clearable>
-                            <el-option
-                                v-for="item in hospitalTableData"
-                                :key="item['医院编码']"
-                                :label="item['医院名称']"
-                                :value="item['医院编码']">
-                            </el-option>
-                        </el-select>
+                        <el-cascader
+                            v-model="exportForm.hospital"
+                            :options="hospitalTableData"
+                            :props="{ value: '医院编码',label: '医院名称',  multiple: true, emitPath:false,checkStrictly:false}"
+                            clearable>
+                        </el-cascader>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="warning" @click="exportClick('exportForm')" :loading="loading">导出</el-button>
@@ -52,7 +50,13 @@ export default {
                     { required: true, message: '请选择医院'},
                 ],
             },
-            batchItem: {}
+            batchItem: {},
+            searchHospitalForm: {
+                hospitalName: '',
+                hospitalType: '',
+                pageCount: 1,
+                pageSize: 10000
+            },
         }
     },
     methods: {
@@ -85,6 +89,7 @@ export default {
         },
         // 导出
         exportClick (formName) {
+            console.log(this.exportForm, 'exportFormexportFormexportForm')
             // window.location.href = this.$http.adornUrl('/ruleResult/exportResult')
 
 

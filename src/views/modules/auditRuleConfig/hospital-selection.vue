@@ -31,6 +31,7 @@
                     <!-- 默认全选 -->
                     <el-table
                         v-loading="tableLoading"
+                        overflow-y:auto
                         ref="hospitalSelectionTable"
                         :data="tableData"
                         tooltip-effect="dark"
@@ -157,6 +158,9 @@ export default {
     }
     /deep/ .el-dialog__footer {
         text-align: center;
+    }
+    /deep/ .el-dialog__body {
+
     }
     .rule-tree-box {
         display: flex;
