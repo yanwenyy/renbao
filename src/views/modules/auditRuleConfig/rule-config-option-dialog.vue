@@ -100,7 +100,8 @@ export default {
             },
             type: '',
             checkedData: [],
-            ruleCheckedData: {}
+            ruleCheckedData: {},
+            treeData: [],
         }
     },
     mounted () {
@@ -111,29 +112,40 @@ export default {
             this.reset();
             this.checkedData = d;
             this.type = type; // 新建、编辑
-            this.getRuleFolder((treeData) => {
-                if (this.checkedData.length>0) {
-                    let getTreeData = this.getTreeData(treeData, this.checkedData[0].folderId); // 递归获取对应的规则对象
-                    this.ruleOperationForm.ruleName = this.checkedData[0].ruleName;
-                    this.ruleOperationForm.ruleCategory = this.checkedData[0].ruleCategory == '住院规则'?2 : this.checkedData[0].ruleCategory == '门诊规则' ? 1 : '' ;
-                    this.ruleOperationForm.ruleId = this.checkedData[0].ruleId;
-                    this.ruleOperationForm.folderId = this.checkedData[0].folderId;
-                    // 回显规则名称
-                    if (getTreeData.length>0) {
-                        this.ruleOperationForm.folderName = [getTreeData[0].folderName];
-                        this.ruleOperationForm.folderPath = this.getParentByData(treeData,getTreeData[0].folderId )
-                        this.$nextTick(() => {
-                            this.$refs.treeSelect.setCheckedNodes(getTreeData);
-                        })
+            
+            let that = this;
+            this.$nextTick(() => {
+                let getTreeCheckedData = []
+                this.$refs.ruleTree.getRuleFolder((treeData) => {
+                    // console.log(treeData, 'treeDatatreeDatatreeData')
+                     that.treeData = treeData
+                    if (this.checkedData.length>0) {
+                        let getTreeData = this.getTreeData(this.treeData, this.checkedData[0].folderId); // 递归获取对应的规则对象
+                        getTreeCheckedData = getTreeData
+                        this.ruleOperationForm.ruleName = this.checkedData[0].ruleName;
+                        this.ruleOperationForm.ruleCategory = this.checkedData[0].ruleCategory == '住院规则'?2 : this.checkedData[0].ruleCategory == '门诊规则' ? 1 : '' ;
+                        this.ruleOperationForm.ruleId = this.checkedData[0].ruleId;
+                        this.ruleOperationForm.folderId = this.checkedData[0].folderId;
+                        // 回显规则名称
+                        if (getTreeData.length>0) {
+                            this.ruleOperationForm.folderName = [getTreeData[0].folderName];
+                            this.ruleOperationForm.folderPath = this.getParentByData(this.treeData,getTreeData[0].folderId )
+                            // 设置复选框的勾选状态
+                            this.setPerCheckedNodes(getTreeData)
+                        }
                     }
-                }
-
-            });// 获取规则树
+                   
+                })
+            })
             this.dialogVisible = true;
             this.ruleOperationForm.createTime = getDate(); // 回显创建时间
             this.ruleOperationForm.createUserName = this.username; // 回显创建人
             this.ruleOperationForm.username = this.username; // 回显创建人
-
+        },
+        setPerCheckedNodes (getTreeData) {
+            this.$nextTick(() => {
+                this.$refs.ruleTree.setCheckedByData(getTreeData[0]);
+            })
         },
         // 获取规则树
         getRuleFolder (callBack) {
@@ -201,11 +213,11 @@ export default {
                 return temp.join('/');
         },
         handleNodeChange (data, node , treeData) {
+            console.log(this.$refs.ruleTree.setCheckedByData, '打印纸')
             this.ruleCheckedData = data
-            this.$refs.ruleTree.setCheckedNodes(data);
+            this.$refs.ruleTree.setCheckedByData(data);
             this.ruleOperationForm.folderName = [data.folderName];
             this.ruleOperationForm.folderId =  data.folderId;
-            // this.ruleOperationForm.folderPath =  this.getParentByNode(node, treeData);
             this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
         },
         handleCheckChange(data, checked, treeData) {
@@ -214,34 +226,10 @@ export default {
             this.ruleOperationForm.folderName = [this.ruleCheckedData.folderName];
             this.ruleOperationForm.folderId =  this.ruleCheckedData.folderId;
             this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
-
-            // let res = this.$refs.treeSelect.getCheckedNodes(false, true); //true，1. 是否只是叶子节点 2.选择的时候不包含父节点）
-            // if (checked) {
-            //     this.$refs.treeSelect.setCheckedNodes([data]);
-            // }
-            // let arrLabel = [];
-            // res.forEach(item => {
-            //     if (arrLabel.length === 0) {
-            //         arrLabel.push(item);
-            //     } else {
-            //         arrLabel.length === 0;
-            //     }
-            // });
-            
-            // if (arrLabel.length>0) {
-            //     this.ruleOperationForm.folderName = [arrLabel[0].folderName];
-            //     this.ruleOperationForm.folderId =  arrLabel[0].folderId;
-            //     this.ruleOperationForm.folderPath =  this.getParentByData(this.treeData,data.folderId )
-            // } else {
-            //     this.ruleOperationForm.folderName = [];
-            //     this.ruleOperationForm.folderId =  '';
-            //     this.ruleOperationForm.folderPath =  ''
-            // }
         },
         handleClose () {
             this.resetForm();
             this.reset();
-            // this.$refs.treeSelect.setCheckedKeys([])
             this.dialogVisible = false
 
         },
@@ -284,10 +272,7 @@ export default {
                         }
                     }).catch(() => {
                         this.loading = false
-                    })  
-
-
-
+                    })
                 }
             })   
         },
@@ -317,7 +302,6 @@ export default {
         username: {
             get () { return this.$store.state.user.name }
         },
-      
      },
     
     components: {

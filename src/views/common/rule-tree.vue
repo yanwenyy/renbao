@@ -24,6 +24,9 @@
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
+                <span v-if="isShowEdit" :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " :title="node.label">
+                    <span  > {{node.label}}</span>
+                </span>
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
                         type="text"
@@ -79,7 +82,6 @@ export default {
         parentGetTreeData: { // 父组件的获取规则树id的方法名
             type: String,
             default: 'getTreeId'
-
         },
         parentCheckChange : {
             type: Function,
@@ -155,7 +157,7 @@ export default {
     },
     methods: {
         // 获取规则树
-        getRuleFolder () {
+        getRuleFolder (callBack) {
             this.treeLoading = true;
             this.$http({
                 isLoading:false,
@@ -167,6 +169,11 @@ export default {
                 this.treeLoading = false
                 if (data.code == 200) {
                     this.treeData = data.result;
+                    if (callBack) {
+                        callBack(this.treeData)
+                    }
+                    
+                    this.$emit("getTreeData", this.treeData);
                 }
             }).catch(() => {
                 this.treeLoading = false
@@ -186,8 +193,6 @@ export default {
                 // 编辑提交
                 this.editRuleFolder(formName)
             }
-
-
         },
         getParent (node) {
             const checkedNodes = [];
@@ -310,20 +315,21 @@ export default {
             }
         },
         callCheckChange (data, checked) {
-            // alert(1111)
             if(this.isRelation) {
                 this.$emit("checkChange", data, checked, this.treeData);
                 if (checked) {
                     this.$refs.ruleTreeRoot.setCheckedNodes([data]);
+                } else {
+                    this.$refs.ruleTreeRoot.setCheckedNodes([]);
                 }
             }
         },
+        // 父组件通过data 设置复选框为勾选状态
         setCheckedByData (data) {
             this.$refs.ruleTreeRoot.setCheckedNodes([data]);
         },
         // 清楚选中的规则列表
         clearCheckedKeys () {
-            // alert(1)
             this.$refs.ruleTreeRoot.setCheckedKeys([]);
             this.$refs.ruleTreeRoot.setCurrentKey(null);
         }
@@ -345,7 +351,6 @@ export default {
 
         },
         projectId (nval, oval) {
-            console.log(nval, '新的项目id')
             if (nval) {
                 this.getRuleFolder()
             }
@@ -371,6 +376,13 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
         -o-text-overflow:ellipsis
+    }
+    .folder-icon {
+        // backgroundImage:'url(' + data.icon + ')';
+        // background: url(../images/folder.png);
+        // background: url(../../);
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
     }
     .cut-width {
         max-width: 100px;
