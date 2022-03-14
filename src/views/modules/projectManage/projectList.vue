@@ -10,14 +10,14 @@
       </el-form-item>
       <el-form-item label="项目时间:">
         <el-date-picker
-          v-model="dataForm.projectPeriodBenig"
+          v-model="dataForm.createTimeBegin"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择日期">
         </el-date-picker>
         <span>--</span>
         <el-date-picker
-          v-model="dataForm.projectPeriodEnd"
+          v-model="dataForm.createTimeEnd"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择日期">
@@ -26,6 +26,7 @@
       <el-form-item>
         <el-button type="primary" @click="pageIndex=1,getDataList()">查询</el-button>
         <el-button v-if="" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button @click="reset()">重置</el-button>
         <!--<el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
@@ -120,8 +121,8 @@
         dataForm: {
           projectCode: '',
           projectName: '',
-          projectPeriodBenig: '',
-          projectPeriodEnd: '',
+          createTimeBegin: '',
+          createTimeEnd: '',
         },
         dataList: [],
         pageIndex: 1,
@@ -141,6 +142,16 @@
       this.getDataList();
     },
     methods: {
+      //重置
+      reset(){
+        this.dataForm={
+          projectCode: '',
+          projectName: '',
+          createTimeBegin: '',
+          createTimeEnd: '',
+        };
+        this.getDataList();
+      },
       // 获取数据列表
       getDataList () {
         console.log(this.value1)
@@ -153,8 +164,8 @@
             'pageSize': this.pageSize,
             'projectCode': this.dataForm.projectCode||null,
             'projectName': this.dataForm.projectName||null,
-            'projectPeriodBenig': this.dataForm.projectPeriodBenig||null,
-            'projectPeriodEnd': this.dataForm.projectPeriodEnd||null
+            'createTimeBegin': this.dataForm.createTimeBegin||null,
+            'createTimeEnd': this.dataForm.createTimeEnd||null
           })
         }).then(({data}) => {
           if (data && data.code === 200) {

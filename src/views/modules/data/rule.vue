@@ -38,7 +38,7 @@
               </span>
             </span>
           </el-tree> -->
-          <ruleTree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="true" :isShowEdit="true" parentGetTreeData="getTreeData"></ruleTree>
+          <ruleTree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="false" :isShowEdit="true" parentGetTreeData="getTreeData"></ruleTree>
         </div>
       </div>
       <div class="right">

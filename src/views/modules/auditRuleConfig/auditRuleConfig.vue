@@ -17,17 +17,17 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="queryClick">查询</el-button>
-                        <el-button type="info" @click="onReset">重置</el-button>
+                        <el-button @click="onReset">重置</el-button>
                     </el-form-item>
                 </el-form>
                 <el-button type="primary" class="search-right-btn" @click="submitgxhgz">提交至地区个性化规则</el-button>
             </div>
             <div class="rule-table">
-                <el-button-group>
+                <div class="rule-table-btn">
                     <el-button size="small" type="primary" icon="el-icon-s-unfold" @click="addFun">新增</el-button>
                     <el-button size="small" type="primary" icon="el-icon-edit-outline" @click="editorFun">编辑</el-button>
-                    <el-button size="small" type="primary" icon="el-icon-delete" @click="deleteFn">删除</el-button>
-                </el-button-group>
+                    <el-button size="small" type="danger" icon="el-icon-delete" @click="deleteFn">删除</el-button>
+                </div>
                 <div class="table-box">
                     <el-table
                         v-loading="tableLoading"
@@ -165,9 +165,14 @@ export default {
 
         },
         onReset () {
-            this.searchForm= { ruleName: '',ruleType: ''}
+            this.searchForm.ruleName = '';
+            this.searchForm.ruleType = '';
+            this.Pager.pageIndex =1;
             // 调用规则树的重置方法
             this.$refs.ruleTree.clearCheckedKeys();
+            this.searchForm.folderPath = '';
+            this.searchForm.folderId = '';
+            
         },
         addFun () {
             this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');

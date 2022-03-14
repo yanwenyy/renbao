@@ -21,7 +21,7 @@
                             <el-option label="住院审核规则" :value=2></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="规则：" prop="folderName">
+                    <el-form-item label="规则分类：" prop="folderName">
                         <el-select v-model="ruleOperationForm.folderName" placeholder="请选择" multiple collapse-tags>
                             <el-option :value="ruleOperationForm.folderName" style="height: auto">
                                 <el-tree :data="treeData" default-expand-all show-checkbox check-strictly 

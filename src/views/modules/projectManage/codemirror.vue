@@ -62,7 +62,7 @@
       });
       this.ws.connect();
     },
-    beforedestroy(){
+    beforeDestory(){
       this.ws.close();
     },
     methods: {
