@@ -376,6 +376,10 @@
       },
       // 获取文件中涉及到的表名
       findFileTable () {
+        if (this.selectedFileData.length == 0) {
+          this.$message.error("请选择要采集的文件")
+          return
+        }
         this.$http({
           url: this.$http.adornUrl(`dataImp/getFileTable/${1}`),
           method: 'post',
