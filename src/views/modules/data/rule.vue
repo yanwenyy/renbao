@@ -176,7 +176,7 @@ import ruleTree from '../../common/rule-tree.vue'
         dataForm: {
           ruleName: '',
           createUserName: '',
-          folderId:'',//规则分类主键
+          folderPath:'',//规则分类主键
         },
         token:'',
         imgUrlfront:'',
@@ -236,7 +236,7 @@ import ruleTree from '../../common/rule-tree.vue'
         this.dataForm={
           ruleName: '',
           createUserName: '',
-          folderId:'',//规则分类主键
+          folderPath:'',//规则分类主键
         };
         this.pageIndex=1;
         this.pageSize=10;
@@ -272,7 +272,7 @@ import ruleTree from '../../common/rule-tree.vue'
             'pageSize': this.pageSize,
             'ruleName': this.dataForm.ruleName,
             'createUserName': this.dataForm.createUserName,
-            'folderId': this.dataForm.folderId,
+            'folderPath': this.dataForm.folderPath,
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -371,8 +371,8 @@ import ruleTree from '../../common/rule-tree.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
-        // console.log(data, 'datadatadata');
-        this.dataForm.folderId=data.folderId;
+        console.log(data, 'datadatadata');
+        this.dataForm.folderPath=data.folderPath;
         this.getDataList();
       }
     }

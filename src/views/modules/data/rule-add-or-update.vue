@@ -91,7 +91,7 @@
         <el-button @click="sqlVisible = false">取消</el-button>
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
-      <sql-element ref="sqler"></sql-element>
+      <sql-element ref="sqler" :sqlEditMsg="sqlEditMsg"></sql-element>
     </el-dialog>
   </div>
 </template>
@@ -123,6 +123,7 @@
         }
       };
       return {
+        sqlEditMsg:'',//回显时候的sql语句
         activeName:'1',//tab页切换时的状态值
         sqlVisible:false,//sql编译器显示状态
         treeVisible:false,//规则分类显示名称
@@ -206,7 +207,6 @@
       },
       openSql(){
         this.sqlVisible=true;
-        console.log(this.$refs.sqler)
       },
       //sql编译器点击保存
       sqlSave(){
@@ -262,6 +262,8 @@
                 this.dataForm.createUserName = datas.createUserName;
                 this.dataForm.createTime = datas.createTime;
                 this.dataForm.ruleSqlValue = datas.ruleSqlValue;
+                this.sqlEditMsg = datas.ruleSqlValue;
+                console.log(this.sqlEditMsg,33333)
                 this.dataForm.ruleType = datas.ruleType;
                 this.menuListTreeSetCurrentNode();
               }

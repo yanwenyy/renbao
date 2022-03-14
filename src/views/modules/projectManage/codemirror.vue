@@ -31,6 +31,12 @@
     components: {
       sqlEdit
     },
+    props:{
+      sqlEditMsg: {
+        type: String,
+        default: null,
+      },
+    },
     data() {
       return {
         ws:{},//websoket对象
@@ -48,6 +54,16 @@
         userId:sessionStorage.getItem("userId"),
       }
     },
+    watch: {
+      sqlEditMsg(val) {
+        console.log(val,6666)
+        if(val!=''){
+          if(val!=''){
+            this.sqlData=val;
+          }
+        }
+      }
+    },
     activated(){
       this.sqlListData=[];
       this.sqlListTotal=0;
@@ -58,6 +74,7 @@
       this.getSjbData();
       this.getSqlList();
     },
+
     mounted(){
       this.sqlListData=[];
       this.sqlListTotal=0;
