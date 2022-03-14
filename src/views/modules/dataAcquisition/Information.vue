@@ -8,8 +8,23 @@
             </el-form-item>
         </el-form>
         <!-- 列表 -->
-        <div class="listDisplay">
+        <div class="listDisplay"  v-if="selectNum == 0">
             <div class='f_right'>                    
+                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
+                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+            </div>
+            <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            </el-table>
+            <!-- 病种目录 -->
+            <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            </el-table> -->
+            <!-- 服务价格目录 -->
+            <!-- <el-table :data="tableList" v-if="selectNum == 5" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            </el-table>  -->
+            <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
+        </div>
+        <div class="listDisplay"  v-if="selectNum == 1">
+             <div class='f_right'>                    
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                  <!-- <el-button size="mini" type="primary" @click="searchList">ceshi </el-button> -->
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
@@ -17,12 +32,10 @@
             <div class='ax_default'>
                 <div @click="handleChange">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
                 <transition name="sub-comments">
-                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns' :data='data'></myquerybuilder>
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
-            <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                </el-table>
-            <el-table :data="tableList" v-if="selectNum == 1" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -47,8 +60,21 @@
                 <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
                 <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
             </el-table>
+            <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
+        </div>
+        <div class="listDisplay"  v-if="selectNum == 2">
+            <div class='f_right'>                    
+                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
+                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+            </div>
+            <div class='ax_default'>
+                <div @click="handleChanges">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
+                <transition name="sub-comments">
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns2' :data='data'></myquerybuilder>
+                </transition>
+            </div>
              <!-- 医保诊疗项目 -->
-            <el-table :data="tableList" v-if="selectNum == 2" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -72,8 +98,22 @@
                 <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                 <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
             </el-table>
+            <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
+        </div>
+        <div class="listDisplay"  v-if="selectNum == 3">
+            <div class='f_right'>                    
+                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
+                 <!-- <el-button size="mini" type="primary" @click="searchList">ceshi </el-button> -->
+                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+            </div>
+            <div class='ax_default'>
+                <div @click="handleChange3">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
+                <transition name="sub-comments">
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns3' :data='data'></myquerybuilder>
+                </transition>
+            </div>
             <!-- 医保耗材目录 -->
-            <el-table :data="tableList" v-if="selectNum == 3" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
@@ -95,12 +135,6 @@
                 <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                 <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
             </el-table>
-            <!-- 病种目录 -->
-            <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-            </el-table> -->
-            <!-- 服务价格目录 -->
-            <!-- <el-table :data="tableList" v-if="selectNum == 5" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-            </el-table>  -->
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
     </div>
@@ -154,7 +188,7 @@ export default {
             ],  
             fileName: "",
             data:[],
-            columns:{
+            columns1:{
                 "columnList": [
                     {"columnName":"医保药品编码","columnType": "VARCHAR"},
                     {"columnName":"医保药品名称","columnType": "VARCHAR"},
@@ -175,9 +209,55 @@ export default {
                     {"columnName":"住院自付比例","columnType": "VARCHAR"},
                     {"columnName":"工伤自付比例","columnType": "VARCHAR"},
                     {"columnName":"生育自付比例","columnType": "VARCHAR"},
-                    {"columnName":"生效日期","columnType": "INT"},
-                    {"columnName":"终止日期","columnType": "INT"},
+                    {"columnName":"生效日期","columnType": "VARCHAR"},
+                    {"columnName":"终止日期","columnType": "VARCHAR"},
                     {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
+                    ]},
+            columns2:{
+                "columnList": [
+                    {"columnName":"一级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"二级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"三级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"住院自付比例","columnType": "VARCHAR"},
+                    {"columnName":"医保目录除外内容","columnType": "VARCHAR"},
+                    {"columnName":"医保项目内涵","columnType": "VARCHAR"},      
+                    {"columnName":"医保药品名称","columnType": "VARCHAR"},
+                    {"columnName":"医保药品编码","columnType": "VARCHAR"},
+                    {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
+                    {"columnName":"备注","columnType": "VARCHAR"},
+                    {"columnName":"工伤自付比例","columnType": "VARCHAR"},
+                    {"columnName":"支付单位","columnType": "VARCHAR"},
+                    {"columnName":"支付类别","columnType": "VARCHAR"},
+                    {"columnName":"最高限价","columnType": "VARCHAR"},
+                    {"columnName":"生效日期","columnType": "VARCHAR"},
+                    {"columnName":"生育自付比例","columnType": "VARCHAR"},
+                    {"columnName":"用法","columnType": "VARCHAR"},
+                    {"columnName":"离休价格","columnType": "VARCHAR"},
+                    {"columnName":"终止日期","columnType": "VARCHAR"},
+                    {"columnName":"规格","columnType": "VARCHAR"},
+                    {"columnName":"门诊自付比例","columnType": "VARCHAR"},
+                    ]},
+            columns3:{
+                "columnList": [
+                    {"columnName":"一级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"二级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"三级医院最高价格","columnType": "VARCHAR"},
+                    {"columnName":"住院自付比例","columnType": "VARCHAR"},
+                    {"columnName":"医保目录除外内容","columnType": "VARCHAR"},
+                    {"columnName":"医保项目内涵","columnType": "VARCHAR"},      
+                    {"columnName":"医保药品名称","columnType": "VARCHAR"},
+                    {"columnName":"医保药品编码","columnType": "VARCHAR"},
+                    {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
+                    {"columnName":"备注","columnType": "VARCHAR"},
+                    {"columnName":"工伤自付比例","columnType": "VARCHAR"},
+                    {"columnName":"支付单位","columnType": "VARCHAR"},
+                    {"columnName":"支付类别","columnType": "VARCHAR"},
+                    {"columnName":"最高限价","columnType": "VARCHAR"},
+                    {"columnName":"生效日期","columnType": "VARCHAR"},
+                    {"columnName":"生育自付比例","columnType": "VARCHAR"},
+                    {"columnName":"终止日期","columnType": "VARCHAR"},
+                    {"columnName":"规格","columnType": "VARCHAR"},
+                    {"columnName":"门诊自付比例","columnType": "VARCHAR"},
                     ]},
             rules:  [
                 {
@@ -274,7 +354,6 @@ export default {
         searchList(){
             var getSql = this.$refs.myquerybuilder.getSelectSql()
             this.sqlData = getSql.sql
-            // console.log(getSql.sql)
            // this.$refs.myquerybuilder.ceshi()
             // return;
             this.dataListLoading = true;
@@ -326,9 +405,25 @@ export default {
         },
         //复杂查询展开事件
         handleChange(){
-            this.show = !this.show
-            this.columns = this.columns 
-            this.data = this.output
+            if(this.selectNum = 1){
+                this.show = !this.show
+                this.columns = this.columns1
+                this.data = this.output
+            }
+        },
+        handleChanges(){
+            if(this.selectNum = 2){ 
+                this.show = !this.show
+                this.columns = this.columns2
+                this.data = this.output
+            }
+        },
+        handleChange3(){
+            if(this.selectNum = 3){ 
+                this.show = !this.show
+                this.columns = this.columns3
+                this.data = this.output
+            }
         },
         // 页数
         handleSizeChange(val){
@@ -350,10 +445,10 @@ export default {
     padding:5px;
 }
 .mask{
-    width: 84.2%;
+    width: 90%;
     padding-top: 15px;
     position: fixed;
-    z-index: 998;
+    z-index: 2;
     overflow: hidden;
 }
 .sub-comments-leave-active,.sub-comments-enter-active {
@@ -364,5 +459,8 @@ export default {
 }
 .sub-comments-leave,.sub-comments-enter-active {
     height:500px;
+}
+.demo-ruleForm{
+    z-index: 1;
 }
 </style>

@@ -10,7 +10,7 @@
         <!-- 列表 -->
         <div class="listDisplay">
             <div class='f_right'>             
-                <el-button size="mini" type="warning" v-show="isShow" @click="ImportLists">导出模板</el-button>       
+                <el-button size="mini" type="warning" v-show="isShow" @click="ImportLists">下载模板</el-button>       
                 <el-button size="mini" type="warning"  @click="ImportList">导入数据</el-button>
             </div>
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
@@ -189,7 +189,6 @@ export default {
     methods:{
         // 获取数据列表
         getDataList(val){
-            
             // this.dataLoading = true;
             this.$http({
                 url: this.$http.adornUrl("/threeCatalog/getThreeCatalogDataList"),
@@ -255,6 +254,8 @@ export default {
                     catalogType:this.dataForm.dataType,
                 })
             }).then(({data})=>{
+                debugger
+                console.log(data)
                 const blob =  new Blob([data]);
                 let fileName = this.fileName + '.xls';
                 if("download" in document.createElement("a")){
