@@ -2,8 +2,8 @@
   <div class="box-mirror box"  ref="box">
     <div class="code-mirror-tree left" v-if="!fullScreen">
       <div class="tree-left">
-        <div class="tree-left-one" @click="changeTree('1')">数据表</div>
-        <div class="tree-left-two" @click="changeTree('2')">函数表</div>
+        <div class="tree-left-one" :class="treeType==='1'?'tree-left-active':''" @click="changeTree('1')">数据表</div>
+        <div class="tree-left-two" :class="treeType==='2'?'tree-left-active':''" @click="changeTree('2')">函数表</div>
       </div>
       <div class="tree-right">
         <div class="custom-tree-container">
@@ -1036,12 +1036,16 @@
     /*height: 50%;*/
     display: inline-block;
     padding:30px 0;
+    color:#939DA6;
     text-align: center;
     background: #F0F0F2;
     border-top-left-radius:5px;
     border-top-right-radius:20px;
     border-bottom-left-radius:5px;
     border-bottom-right-radius:20px;
+  }
+  .tree-left>.tree-left-active{
+    color: #000;
   }
   .tree-left-one{
    margin-bottom: 10px;
