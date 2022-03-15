@@ -12,15 +12,34 @@
         <el-form-item label="项目名称" prop="project.projectName">
           <el-input @blur="verification(dataForm.project.projectName,'项目名称不能重复','projectName')" v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
-        <el-form-item label="项目周期" prop="project.dataTime">
-          <el-date-picker
-            v-model="dataForm.project.dataTime"
-            type="daterange"
-            value-format="yyyy-MM-dd"
-            range-separator="-"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
-          </el-date-picker>
+        <el-form-item label="项目周期">
+          <!--<el-date-picker-->
+            <!--v-model="dataForm.project.dataTime"-->
+            <!--type="daterange"-->
+            <!--value-format="yyyy-MM-dd"-->
+            <!--range-separator="-"-->
+            <!--start-placeholder="开始日期"-->
+            <!--end-placeholder="结束日期">-->
+          <!--</el-date-picker>-->
+          <el-form-item class="time-two" prop="project.projectPeriodBegin">
+            <el-date-picker
+              :picker-options="pickerOptionsStart"
+              v-model="dataForm.project.projectPeriodBegin"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <span>--</span>
+          <el-form-item class="time-two time-two-nolabel" prop="project.projectPeriodEnd">
+            <el-date-picker
+              :picker-options="pickerOptionsEnd"
+              v-model="dataForm.project.projectPeriodEnd"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
         </el-form-item>
         <el-form-item label="被审核单位"  prop="project.auditedUnit">
           <el-input v-model="dataForm.project.auditedUnit" placeholder="被审核单位"></el-input>
@@ -44,7 +63,9 @@
               label="成本事项"
             >
               <template slot-scope="scope">
-                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.projectItem'" :rules='dataRule.moneyValid'>
+                <el-form-item class="tabelForm" :prop="'projectCosts.' + scope.$index + '.projectItem'" :rules="{
+      required: true, message: '成本事项不能为空', trigger: 'blur'
+    }">
                   <!--@input="scope.row.contractAmount=getMoney(scope.row.contractAmount)"-->
                   <el-input v-model="scope.row.projectItem" placeholder="成本事项"></el-input>
                 </el-form-item>
@@ -294,6 +315,28 @@
         }
       };
       return {
+        // 开始日期 :picker-options 中引用
+        pickerOptionsStart: {
+          disabledDate: time => {
+            // 获取结束日期的 v-model 值并赋值给新定义的对象
+            let endDateVal = this.dataForm.project.projectPeriodEnd;
+            if (endDateVal) {
+              // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+              return time.getTime() > new Date(endDateVal).getTime();
+            }
+          }
+        },
+        // 结束日期 :picker-options 中引用
+        pickerOptionsEnd: {
+          disabledDate: time => {
+            // 获取开始日期的 v-model 值并赋值给新定义的对象
+            let beginDateVal = this.dataForm.project.projectPeriodBegin;
+            if (beginDateVal) {
+              // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+              return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
+            }
+          }
+        },
         userId:sessionStorage.getItem("userId"),//当前用户id
         meberList:[],//小组人员列表
         userList:[],//人员列表
@@ -318,6 +361,8 @@
             dataTime: [],
             auditedUnit: '',
             projectRemark: '',
+            projectPeriodBegin: '',
+            projectPeriodEnd: '',
           },
           projectCosts:[],
           xmProjectGroupUsers:[],
@@ -332,6 +377,12 @@
           ],
           "project.dataTime": [
             { required: true, message: '项目周期不能为空', trigger: 'blur' }
+          ],
+          "project.projectPeriodBegin": [
+            { required: true, message: '项目周期开始时间不能为空', trigger: 'change' }
+          ],
+          "project.projectPeriodEnd": [
+            { required: true, message: '项目周期结束时间不能为空', trigger: 'change' }
           ],
           "project.auditedUnit": [
             { required: true, message: '被审核单位不能为空', trigger: 'blur' }
@@ -464,6 +515,8 @@
             dataTime: [],
             auditedUnit: '',
             projectRemark: '',
+            projectPeriodBegin: '',
+            projectPeriodEnd: '',
           },
           projectCosts:[],
           xmProjectGroupUsers:[],
@@ -526,10 +579,12 @@
                 this.dataForm.project.projectName = datas.project.projectName;
                 this.dataForm.project.auditedUnit = datas.project.auditedUnit;
                 this.dataForm.project.projectRemark = datas.project.projectRemark;
-                this.dataForm.project.dataTime[0]=datas.project.projectPeriodBegin||'';
-                this.dataForm.project.dataTime[1]=datas.project.projectPeriodEnd||'';
-                this.$set(this.dataForm.project.dataTime,this.dataForm.project.dataTime);
-                console.log(this.dataForm.project.dataTime)
+                this.dataForm.project.projectPeriodBegin = datas.project.projectPeriodBegin;
+                this.dataForm.project.projectPeriodEnd = datas.project.projectPeriodEnd;
+                // this.dataForm.project.dataTime[0]=datas.project.projectPeriodBegin||'';
+                // this.dataForm.project.dataTime[1]=datas.project.projectPeriodEnd||'';
+                // this.$set(this.dataForm.project.dataTime,this.dataForm.project.dataTime);
+                // console.log(this.dataForm.project.dataTime)
                 this.dataForm.projectCosts = datas.projectCosts;
                 this.dataForm.xmProjectRoleUsers.forEach(item=>{
                   datas.xmProjectRoleUsers.forEach(vtem=>{
@@ -556,10 +611,10 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            if(this.dataForm.project.dataTime!=''&&this.dataForm.project.dataTime!=null){
-              this.dataForm.project.projectPeriodBegin=this.dataForm.project.dataTime[0];
-              this.dataForm.project.projectPeriodEnd=this.dataForm.project.dataTime[1];
-            }
+            // if(this.dataForm.project.dataTime!=''&&this.dataForm.project.dataTime!=null){
+            //   this.dataForm.project.projectPeriodBegin=this.dataForm.project.dataTime[0];
+            //   this.dataForm.project.projectPeriodEnd=this.dataForm.project.dataTime[1];
+            // }
             this.dataForm.projectCosts.forEach((item,index)=>{
               item.costSort=index;
             });
@@ -615,9 +670,11 @@
   }
   .tabelForm >>>.el-form-item__error{
     top: 22%;
-    right: 0;
+    left: 40%;
     text-align: right;
     padding-right: 15%;
+    display: inline-block;
+    width: auto;
   }
   .userList{
    width: 80%;
@@ -625,6 +682,16 @@
   .userList >>>.el-input{
     width: 100%;
     box-sizing: border-box;
+  }
+  .time-two{
+    width: 44%!important;
+    display: inline-block;
+  }
+  .time-two .el-input{
+    width: 100%!important;
+  }
+  .time-two-nolabel{
+    margin-left: 0!important;
   }
 </style>
 

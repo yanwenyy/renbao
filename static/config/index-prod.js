@@ -6,6 +6,7 @@
 
   // api接口请求地址
   window.SITE_CONFIG['baseUrl'] = 'http://10.10.23.21:1070/dataanalysis/';
+  window.SITE_CONFIG['wsUrl'] = 'ws://10.10.23.21:1070/dataanalysis/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名
