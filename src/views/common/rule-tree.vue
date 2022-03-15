@@ -209,7 +209,7 @@ export default {
             };
             traverse(node)
             if (type == 'add') {
-                checkedNodes.push(node.data.folderId)
+                checkedNodes.unshift(node.data.folderId)
             }
             return checkedNodes;
         },

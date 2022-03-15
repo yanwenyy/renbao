@@ -78,7 +78,7 @@ export default {
         data1: ""
       },
       apComServerData: {
-        total: ""
+        total: 0
       },
       //loading
       listLoading: false,
@@ -172,10 +172,6 @@ export default {
     },
     //初始化数据列表
     initList() {
-        console.log({
-          tableName: this.viewDetailsData.resultTableName,
-          resultId: this.viewDetailsData.resultId
-        }, '查询参数')
       this.$http({
         url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
         method: 'get',
@@ -185,7 +181,6 @@ export default {
         }, false)
       }).then(({ data }) => {
         if (data && data.code === 200) {
-            console.log(data, 'datadatadata')
           this.tableColumns = data.result.columns;
           this.tableList = data.result.result;
           // this.apComServerData.total;

@@ -11,13 +11,8 @@
             <div class="result-detail-out">
                 <el-form ref="exportForm" :model="exportForm" :rules="exportFormRules"   :inline="true">
                     <el-form-item prop="hospital" label="选择医院：">
-                        <!-- <el-cascader
-                            v-model="exportForm.hospital"
-                            :options="hospitalTableData"
-                            :props="{ value: '医院编码',label: '医院名称',  multiple: true, emitPath:false,checkStrictly:false}"
-                            clearable>
-                        </el-cascader> -->
                         <el-select v-model="exportForm.hospId" placeholder="请选择" multiple @change="(val)=>checkChange(val)">
+                            <el-checkbox  v-model="checked" @change="selectAll" style="padding-left: 20px;">全选</el-checkbox>
                             <el-option
                                 v-for="item in hospitalTableData"
                                 :key="item['医院编码']"
@@ -48,6 +43,7 @@ export default {
     data() {
         return {
             loading: false,
+            checked: false, // 全选状态
             dialogVisible: false,
             exportForm: {
                 hospId: [],
@@ -89,6 +85,10 @@ export default {
                 });
             }
         },
+        // 全选
+        selectAll () {
+
+        },
         // 获取医院列表
         getHospital () {
             this.$http({
@@ -100,7 +100,6 @@ export default {
                 // this.tableLoading = false
                 if (data.code == 200) {
                     this.hospitalTableData = data.result.records;
-                    console.log(this.hospitalTableData, '医院列表')
                 }
             }).catch(() => {
                 // this.tableLoading = false
