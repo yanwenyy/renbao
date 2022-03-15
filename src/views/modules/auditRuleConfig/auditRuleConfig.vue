@@ -179,8 +179,8 @@ export default {
             // 规则列表有子节点时folderId为空
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
-            this.searchForm.folderPath = data.folderPath;
-            this.searchForm.folderId = data.folderId;
+            this.searchForm.folderPath = data.folderPath && data.folderPath || '';
+            this.searchForm.folderId = data.folderId && data.folderId || '';
             if (data.children) {
                 this.searchForm.folderId = '';
             }

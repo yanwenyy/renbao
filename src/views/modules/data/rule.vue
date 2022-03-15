@@ -382,8 +382,8 @@ import ruleTree from '../../common/rule-tree.vue'
       },
       getTreeData (data) {
         // 规则列表有子节点时folderId为空
-        this.dataForm.folderPath=data.folderPath;
-        this.dataForm.folderId = data.folderId;
+        this.dataForm.folderPath=data.folderPath && data.folderPath || '';
+        this.dataForm.folderId = data.folderId && data.folderId || '';
         if (data.children) {
           this.dataForm.folderId = '';
         }
