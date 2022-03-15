@@ -11,11 +11,12 @@
             placeholder="输入关键字进行过滤"
             v-model="filterText">
           </el-input>
-          <div  v-show="treeType==='1'">
+          <div class="custom-tree-container"  v-show="treeType==='1'">
             <el-tree
+              class="sql-tree-self"
               :data="treedata"
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree1"
               :load="loadNode"
               lazy
               node-key="id"
@@ -31,14 +32,23 @@
               draggable
               :allow-drop="returnFalse"
               :allow-drag="allowDrag">
+               <span class="custom-tree-node" slot-scope="{ node, data }">
+                    <span>
+                         <img v-if="node.data.dataType=='1'" class="tree-icon" src="./icons/view.png" alt="">
+                         <img v-if="node.data.dataType=='2'" class="tree-icon" src="./icons/table_1.png" alt="">
+                         <img v-if="node.data.dataType=='3'" class="tree-icon" src="./icons/column.png" alt="">
+                        {{ node.label }}
+                    </span>
+                </span>
             </el-tree>
           </div>
-          <div  v-show="treeType==='2'">
+          <div class="custom-tree-container"  v-show="treeType==='2'">
             <el-tree
+              class="sql-tree-self"
               :props="FundefaultProps"
               :data="funData"
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree2"
               node-key="id"
               :default-expand-all="false"
               @node-drag-start="handleDragStart"
@@ -50,6 +60,13 @@
               draggable
               :allow-drop="returnFalse"
               :allow-drag="allowDrag">
+               <span class="custom-tree-node" slot-scope="{ node, data }">
+                    <span>
+                         <img v-if="node.data.type=='funFolder'" class="tree-icon" src="./icons/function.png" alt="">
+                         <img v-if="node.data.type=='funNode'" class="tree-icon" src="./icons/param.png" alt="">
+                        {{ node.label }}
+                    </span>
+                </span>
             </el-tree>
           </div>
 
@@ -57,7 +74,7 @@
 
       </div>
     </div>
-    <div v-if="!fullScreen" class="resize" title="收缩侧边栏">
+    <div v-if="!fullScreen" class="resize tree-resize" title="收缩侧边栏">
       <div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>
     </div>
     <div class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
@@ -635,7 +652,11 @@
         defaultProps: {
           children: 'children',
           label: this.treeDefaultProps.label?this.treeDefaultProps.label:'label',
-          isLeaf:'isLeaf'
+          isLeaf:(data,node) => {
+            if (node.level >2) {// 根据需要进行条件判断添加is-leaf类名
+              return true
+            }
+          }
         },
         visible:true,
         cmTheme: "default", // codeMirror主题
@@ -726,7 +747,12 @@
     },
     watch: {
       filterText(val) {
-        this.$refs.tree.filter(val);
+        if(this.treeType==='1'){
+          this.$refs.tree1.filter(val);
+        }else if(this.treeType==='2'){
+          this.$refs.tree2.filter(val);
+        }
+
       },
       treedata: function (newValue, oldValue) {
        // console.log(newValue, oldValue)
@@ -758,7 +784,7 @@
       },
       //拖拽改变宽度
       dragControllerDiv: function () {
-        var resize = document.getElementsByClassName('resize');
+        var resize = document.getElementsByClassName('tree-resize');
         var left = document.getElementsByClassName('code-mirror-tree');
         var mid = document.getElementsByClassName('code-mirror-div');
         var box = document.getElementsByClassName('box-mirror');
@@ -832,7 +858,8 @@
         return false;
       },
       allowDrag(draggingNode) {
-        return draggingNode.data.level>2||draggingNode.data.type=='funNode';
+        // return draggingNode.data.level>2||draggingNode.data.type=='funNode';
+        return Number(draggingNode.data.dataType)>1||draggingNode.data.type=='funNode';
       },
       handleDragStart(node, ev) {
         console.log('drag start', node);
@@ -1078,5 +1105,23 @@
   }
   .mid-100{
     width: 100%!important;
+  }
+  .tree-icon{
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+  }
+  .is-leaf.el-tree-node_expand-icon  {
+    display:none;
+  }
+  .sql-tree-self{
+    height:80vh;
+    overflow: auto;
+  }
+  .custom-tree-container{
+    overflow-y: hidden;
+    overflow-x: auto;
+    width:100%;
   }
 </style>

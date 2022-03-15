@@ -3,23 +3,32 @@
     <div id="box">
       <div id="top" class="codemirror-div" v-if="!fullScreen">
         <div class="btn-group">
-          <el-button type="text"
+          <el-button  v-if="!useChinese" type="text"
                      @click="formatContentSelf">
-            <i v-if="!useChinese" class="el-icon-paperclip" title="格式化"></i>
-            <span v-if="useChinese" title="格式化">格式化</span>
+            <i class="el-icon-paperclip" title="格式化"></i>
           </el-button>
-          <el-button type="text"
+          <el-button  v-if="useChinese" type="primary"
+                     @click="formatContentSelf">
+            格式化
+          </el-button>
+          <el-button v-if="!useChinese" type="text"
                      :disabled="implementDisabled"
                      @click="implement">
-            <i  v-if="!useChinese" class="el-icon-video-play" title="运行"></i>
-            <span v-if="useChinese" title="运行">运行</span>
+            <i  class="el-icon-video-play" title="运行"></i>
           </el-button>
-          <el-button type="text" @click="openPython">
-            <i v-if="!useChinese" class="el-icon-folder-opened" title="打开sql"></i>
-            <span v-if="useChinese" title="打开sql">打开sql</span>
+          <el-button v-if="useChinese" type="primary"
+                     :disabled="implementDisabled"
+                     @click="implement">
+            运行
+          </el-button>
+          <el-button v-if="!useChinese" type="text" @click="openPython">
+            <i class="el-icon-folder-opened" title="打开sql"></i>
+          </el-button>
+          <el-button v-if="useChinese" type="primary" @click="openPython">
+            打开sql
           </el-button>
           <el-dropdown style="margin-left: 10px" trigger="click" placement="bottom-start">
-            <el-button type="text">
+            <el-button :type="useChinese?'primary':'text'">
               <i v-if="!useChinese" class="el-icon-document-add" title="保存"></i>
               <span v-if="useChinese" title="保存">保存</span>
             </el-button>
@@ -29,7 +38,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown style="margin-left: 10px" trigger="click"  placement="bottom-start">
-            <el-button type="text">
+            <el-button  :type="useChinese?'primary':'text'">
               <i v-if="!useChinese" class="el-icon-suitcase-1" title="工具箱"></i>
               <span v-if="useChinese" title="工具箱">工具箱</span>
             </el-button>
@@ -397,9 +406,9 @@
           },
           lint: true,
           gutters: [
-            "CodeMirror-lint-markers",
+            // "CodeMirror-lint-markers",
             "CodeMirror-linenumbers",
-            "CodeMirror-foldgutter"
+            // "CodeMirror-foldgutter"
           ],
           foldGutter: true,
           autoCloseBrackets: true,
