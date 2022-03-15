@@ -27,6 +27,7 @@
       height="60vh"
       border
       v-loading="dataListLoading"
+      element-loading-text="努力加载中..."
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
       <el-table-column
@@ -421,7 +422,8 @@
           params: this.$http.adornParams({
             'tableType': 1,
             'tableName': this.dataForm.tableName
-          })
+          }),
+          isLoading: false
         }).then(({data}) => {
           if (data && data.code === 200) {
             this.dataList = data.result;

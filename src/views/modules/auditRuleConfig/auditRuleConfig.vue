@@ -9,10 +9,10 @@
                     <el-form-item label="审核规则名称：">
                         <el-input v-model="searchForm.ruleName" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="审核规则类型：">
+                    <el-form-item label="审核规则类别：">
                         <el-select v-model="searchForm.ruleCategory"  placeholder="请选择" clearable>
-                            <el-option label="门诊审核规则" value="1"></el-option>
-                            <el-option label="住院审核规则" value="2"></el-option>
+                            <el-option label="门诊规则" value="1"></el-option>
+                            <el-option label="住院规则" value="2"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -127,11 +127,10 @@ export default {
     },
     activated () {
         this.getSelectPage();
-        this.getRuleFolder();
+        // this.getRuleFolder();
     },
     created () {
-       
-
+        this.getRuleFolder();
     },
     methods: {
         getSelectPage () {
@@ -170,6 +169,7 @@ export default {
                
                 if (data.code == 200) {
                     this.treeData = data.result;
+                    console.log(this.treeData, '规则树')
                 }
             }).catch(() => {
                 
@@ -188,16 +188,15 @@ export default {
         },
         queryClick () {
             this.getSelectPage();
-
         },
         onReset () {
             this.searchForm.ruleName = '';
-            this.searchForm.ruleType = '';
+            this.searchForm.ruleCategory = '';
             this.Pager.pageIndex =1;
             // 调用规则树的重置方法
-            this.$refs.ruleTree.clearCheckedKeys();
-            this.searchForm.folderPath = '';
-            this.searchForm.folderId = '';
+            // this.$refs.ruleTree.clearCheckedKeys();
+            // this.searchForm.folderPath = '';
+            // this.searchForm.folderId = '';
             
         },
         addFun () {
