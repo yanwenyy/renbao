@@ -285,22 +285,10 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        let folderPath = this.getParentByNode(node);
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
-        this.dataForm.folderPath =  folderPath.length>0 && folderPath.join('\\') || ''
+        this.dataForm.folderPath =  data.folderPath
         this.treeVisible=false;
-      },
-      getParentByNode (node) {
-          const checkedNodes = [];
-          const traverse = function(node) {
-              if (node.parent.data.folderId) {
-                  checkedNodes.push(node.parent.data.folderId);
-                  traverse(node.parent);
-              }
-          };
-          traverse(node)
-          return checkedNodes;
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {

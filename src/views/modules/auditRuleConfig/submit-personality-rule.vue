@@ -45,7 +45,7 @@ export default {
                 this.bitchCheckData = data; 
                 this.folderData.folderName = data.folderName;
                 this.folderData.folderId =  data.folderId;
-                this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
+                this.folderData.folderPath =  data.folderPath;
             } else {
                 this.bitchCheckData = {}; 
                 this.folderData.folderName = [];
@@ -60,41 +60,19 @@ export default {
             // this.folderData.folderId =  data.folderId;
             // this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
         },
-        // 根据规则Data获取父节点id
-        getParentByData (ruleTreeData1,folderId) {
-                var temp = []
-                var forFn = function (ruleTreeData, folderId) {
-                    for (var i = 0; i < ruleTreeData.length; i++) {
-                    var item = ruleTreeData[i]
-                    if (item.folderId === folderId) {
-                        temp.push(item.folderId)
-                        forFn(ruleTreeData1, item.folderParentId)
-                        break
-                    } else {
-                        if (item.children) {
-                        forFn(item.children, folderId)
-                        }
-                    }
-                    }
-                }
-                forFn(ruleTreeData1, folderId)
-                temp.remove(folderId);
-                return temp;
-        },
        
         handleClose () {
             this.dialogVisible = false
         },
         onSubmit (formName) {
             if( !this.folderData.folderId ) return this.$message({message: '请选择规则分类',type: 'warning'});
-            let folderPath =  this.folderData.folderPath;
             let submitPersonalityRuleData = {
                 ruleId: this.multipleTable[0].ruleId,
                 ruleName: this.multipleTable[0].ruleName,
                 ruleCategory:this.multipleTable[0].ruleCategory == '住院规则'?2 : this.multipleTable[0].ruleCategory == '门诊规则' ? 1 : '',
                 folderId: this.folderData.folderId,
                 folderName: this.folderData.folderName,
-                folderPath: folderPath.length>0 && folderPath.join('\\') || '',
+                folderPath: this.folderData.folderPath,
                 createUserName: this.multipleTable[0].createUserName,
                 createTime: this.multipleTable[0].createTime
             }

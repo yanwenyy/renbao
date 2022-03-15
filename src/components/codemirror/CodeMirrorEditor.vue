@@ -550,9 +550,10 @@
           //颜色改变提醒
           resize.style.background = '#818181';
           var startY = e.clientY;
-          resize.top = resize.offsetTop;
+          resize.top = resize.offsetTop-60;
           // 鼠标拖动事件
           document.onmousemove = function (e) {
+
             var endY = e.clientY;
             var moveLen = resize.top + (endY - startY); // （endY - startY）=移动的距离。resize.top+移动的距离=左边区域最后的高度
             var maxT = _box.clientHeight - resize.offsetHeight; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
@@ -561,6 +562,7 @@
             if (moveLen > maxT - 150) moveLen = maxT - 150; //下边区域最小高度为150px
 
             resize.style.top = moveLen; // 设置上册区域的高度
+
             _top[0].style.height = moveLen + 'px';
             _bottom.style.height = (_box.clientHeight - moveLen - 10) + 'px';
 
@@ -1084,7 +1086,7 @@
   }
   #resize{
     float: left;
-    cursor: row-resize;
+    cursor: n-resize;
     width: calc(100% + 10px);
     height: 3px;
     background-color:#c0c5d4;

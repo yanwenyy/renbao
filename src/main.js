@@ -11,6 +11,9 @@ import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/a
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import moment from 'moment'
+// 引入bus
+import { bus } from '@/utils/bus.js'
+Vue.prototype.$bus = bus;
 
 // 引入jshint用于实现js自动补全提示
 

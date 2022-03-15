@@ -141,7 +141,7 @@ export default {
         },
         setPerCheckedNodes (getTreeData) {
             this.ruleOperationForm.folderName = [getTreeData[0].folderName];
-            this.ruleOperationForm.folderPath = this.getParentByData(this.treeData,getTreeData[0].folderId )
+            this.ruleOperationForm.folderPath = getTreeData[0].folderPath
             this.$nextTick(() => {
                 this.$refs.ruleTree.setCheckedByData(getTreeData[0]);
             })
@@ -223,7 +223,7 @@ export default {
                 this.ruleCheckedData = data
                 this.ruleOperationForm.folderName = [this.ruleCheckedData.folderName];
                 this.ruleOperationForm.folderId =  this.ruleCheckedData.folderId;
-                this.ruleOperationForm.folderPath =  this.getParentByData(treeData,this.ruleCheckedData.folderId )
+                this.ruleOperationForm.folderPath =  this.ruleCheckedData.folderPath
             } else {
                 this.ruleCheckedData = {}
                 this.ruleOperationForm.folderName = [];
