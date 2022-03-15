@@ -164,6 +164,7 @@
             v-if="detailExportDialog"
           >
             <el-form
+              style="height:200px;overflow-y:auto"
               :model="dataForm1"
               ref="dataForm1"
               label-width="120px"
@@ -185,11 +186,14 @@
                   >
                   </el-option>
                 </el-select>
-                <el-button type="primary" @click="exportExcel()"
-                  >导出</el-button
+                <el-checkbox
+                  v-model="checked"
+                  @change="selectAll"
+                  >全选</el-checkbox
                 >
               </el-form-item>
             </el-form>
+            <el-button type="primary" @click="exportExcel()">导出</el-button>
             <el-button @click="closeExport">取消</el-button>
           </el-dialog>
         </el-card>
@@ -222,6 +226,8 @@ export default {
           children: []
         }
       ],
+      //全选状态
+      checked: false,
       treeLoading: false,
       layoutTreeProps: {
         label(data, node) {
@@ -339,9 +345,10 @@ export default {
     //结果明细导出弹窗
     detailExport() {
       if (this.batchId == "" || this.batchId == null) {
-        this.$message.error("请先选择批次");
+        this.$message.warning("请先选择批次");
       } else {
         this.dataForm1.hospital = [];
+        this.checked = false
         this.detailExportDialog = true;
       }
     },
@@ -486,6 +493,17 @@ export default {
     //关闭结果明细导出弹窗
     closeExport() {
       this.detailExportDialog = false;
+    },
+    //医院全选
+    selectAll() {
+      this.dataForm1.hospital = [];
+      if (this.checked) {
+        this.hospitals.map(item => {
+          this.dataForm1.hospital.push(item);
+        });
+      } else {
+        this.dataForm1.hospital = [];
+      }
     }
   }
 };

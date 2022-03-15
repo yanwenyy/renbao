@@ -362,7 +362,7 @@ export default {
     addData() {
       this.addOrUpdateVisible = true;
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init("");
+        this.$refs.addOrUpdate.init();
       });
       this.ruleId = "";
       this.folderId = "";
