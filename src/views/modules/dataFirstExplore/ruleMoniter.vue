@@ -3,29 +3,29 @@
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
-          <!-- <div class="auditRuleMonitoring-left" style="height:800px"> -->
-          <el-tree
-            :data="batchTreeList"
-            highlight-current
-            :default-expand-all="true"
-            v-loading="treeLoading"
-            node-key="id"
-            ref="treesa"
-            :props="layoutTreeProps"
-          >
-            <span
-              class="custom-tree-node"
-              slot-scope="{ node, data }"
-              @click="nodeClick(node, data)"
+          <div class="auditRuleMonitoring-left" style="height:800px">
+            <el-tree
+              :data="batchTreeList"
+              highlight-current
+              :default-expand-all="true"
+              v-loading="treeLoading"
+              node-key="id"
+              ref="treesa"
+              :props="layoutTreeProps"
             >
-              <span>
-                {{ node.label }}
+              <span
+                class="custom-tree-node"
+                slot-scope="{ node, data }"
+                @click="nodeClick(node, data)"
+              >
+                <span>
+                  {{ node.label }}
+                </span>
               </span>
-            </span>
-          </el-tree>
+            </el-tree>
+          </div>
         </el-card>
       </el-col>
-      <!-- </div> -->
       <el-col :span="19">
         <!-- <div class="auditRuleMonitoring-right"> -->
         <el-card class="box-card" style="height:800px">
@@ -61,7 +61,7 @@
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="onQuery">查询</el-button>
-                <el-button type="info" @click="onReset">重置</el-button>
+                <el-button @click="onReset">重置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -289,12 +289,15 @@ export default {
     },
     currentChangeHandle(val) {
       this.Pager.pageIndex = val;
+      this.getTableData();
     },
     handleSelectionChange(val) {
       this.multipleTable = val;
+      this.getTableData();
     },
     sizeChangeHandle(val) {
       this.Pager.pageSize = val;
+      this.getTableData();
     },
     // 日志查看
     resultViewClick(data) {
@@ -311,7 +314,7 @@ export default {
 <style scoped lang="scss">
 .box {
   width: 100%;
-  display: flex;
+  // display: flex;
   min-width: 800px;
   // overflow-x: auto;
   .auditRuleMonitoring-left {
@@ -319,7 +322,7 @@ export default {
     // min-height: 100vh;
     min-height: calc(100vh - 165px);
     // margin-right: 20px;
-    border: 1px solid #ddd;
+    // border: 1px solid #ddd;
     overflow: auto;
     min-width: 300px;
     /deep/ .el-tree-node__children .custom-tree-node {
