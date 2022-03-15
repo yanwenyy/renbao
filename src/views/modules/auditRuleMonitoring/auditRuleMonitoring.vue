@@ -240,9 +240,9 @@ export default {
             this.searchForm.ruleCategory = '';
             this.searchForm.runStatus = '';
             this.Pager.pageIndex = 1;
-            this.$refs.treesa.setCheckedKeys([]);
-            this.$refs.treesa.setCurrentKey(null);
-            this.batchItem = {}
+            // this.$refs.treesa.setCheckedKeys([]);
+            // this.$refs.treesa.setCurrentKey(null);
+            // this.batchItem = {}
         },
         currentChangeHandle (val) {
             this.Pager.pageIndex = val;

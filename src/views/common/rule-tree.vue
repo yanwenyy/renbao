@@ -174,7 +174,6 @@ export default {
                 this.treeLoading = false
                 if (data.code == 200) {
                     this.treeData = data.result;
-                    console.log(this.treeData, 'treeDatatreeDatatreeData')
                     if (callBack) {
                         callBack(this.treeData)
                     }
@@ -283,8 +282,6 @@ export default {
             this.editRuleItem = data; // 获取本条数据
             this.editRuleItemNode = node; // 获取点击node
             this.optionType = type; // 编辑或新增
-
-
         },
         remove (node, data) {
             if( data.children ) return this.$message({message: '此规则不可删除',type: 'warning'});

@@ -223,18 +223,26 @@
       },
       cleanMsg(){
         this.activeName='1';
-        this.dataForm={
-          id: 0,
-          ruleName: '',
-          ruleCategory: '',
-          folderId: '',
-          parentName: '',
-          createUserName: '',
-          createTime: '',
-          ruleSqlValue: '',
-          ruleType: '',
-          folderPath: ''
-        };
+        this.dataForm.id = 0;
+        this.dataForm.ruleName = '';
+        this.dataForm.ruleCategory = '';
+        this.dataForm.folderId = '';
+        this.dataForm.parentName = '';
+        this.dataForm.ruleSqlValue = '';
+        this.dataForm.ruleType = '';
+        this.dataForm.folderPath = '';
+        // this.dataForm={
+        //   id: 0,
+        //   ruleName: '',
+        //   ruleCategory: '',
+        //   folderId: '',
+        //   parentName: '',
+        //   createUserName: '',
+        //   // createTime: '',
+        //   ruleSqlValue: '',
+        //   ruleType: '',
+        //   folderPath: ''
+        // };
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         });
@@ -246,7 +254,10 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
-          this.$refs['dataForm'].clearValidate()
+          this.$refs['dataForm'].clearValidate();
+          // 初始化规则树
+          this.$refs.menuListTree.setCheckedKeys([]);
+          this.$refs.menuListTree.setCurrentKey(null);
         })
         if (this.dataForm.id) {
           this.$http({
@@ -342,6 +353,13 @@
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       }
+    },
+    watch : {
+      'visible'(nval, oval) {
+          if (nval ) {   
+            this.cleanMsg();
+          }
+      },
     }
   }
 </script>
