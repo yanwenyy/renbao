@@ -11,13 +11,8 @@
             <div class="result-detail-out">
                 <el-form ref="exportForm" :model="exportForm" :rules="exportFormRules"   :inline="true">
                     <el-form-item prop="hospital" label="选择医院：">
-                        <!-- <el-cascader
-                            v-model="exportForm.hospital"
-                            :options="hospitalTableData"
-                            :props="{ value: '医院编码',label: '医院名称',  multiple: true, emitPath:false,checkStrictly:false}"
-                            clearable>
-                        </el-cascader> -->
                         <el-select v-model="exportForm.hospId" placeholder="请选择" multiple @change="(val)=>checkChange(val)">
+                            <el-checkbox  v-model="checked" @change="selectAll" style="padding-left: 20px;">全选</el-checkbox>
                             <el-option
                                 v-for="item in hospitalTableData"
                                 :key="item['医院编码']"
@@ -48,6 +43,7 @@ export default {
     data() {
         return {
             loading: false,
+            checked: false, // 全选状态
             dialogVisible: false,
             exportForm: {
                 hospId: [],
@@ -81,12 +77,29 @@ export default {
         },
         checkChange (val) {
             this.exportForm.hospName = [];
+            // 判断是否为全选状态
+            if (val.length == this.hospitalTableData.length) {
+                this.checked = true
+            } else {
+                this.checked = false
+            }
             for(let i=0;i<=val.length-1;i++){
                 this.hospitalTableData.find((item)=>{ //这里的options就是数据源
                     if(item['医院编码'] == val[i]){
                         this.exportForm.hospName.push(item['医院名称'])
                     }
                 });
+            }
+        },
+        // 全选
+        selectAll () {
+            this.exportForm.hospId = [];
+            if (this.checked) {
+                this.hospitalTableData.map(i => {
+                    this.exportForm.hospId.push(i['医院编码'])
+                })
+            } else {
+                this.exportForm.hospId = [];
             }
         },
         // 获取医院列表
@@ -97,10 +110,8 @@ export default {
                 method: 'get',
                 params:  this.$http.adornParams(this.searchHospitalForm, false)
             }).then(({data}) => {
-                // this.tableLoading = false
                 if (data.code == 200) {
                     this.hospitalTableData = data.result.records;
-                    console.log(this.hospitalTableData, '医院列表')
                 }
             }).catch(() => {
                 // this.tableLoading = false
@@ -128,6 +139,7 @@ export default {
                             })
                             this.dialogVisible = false
                         } else {
+                            this.loading = false;
                             this.$message({
                                 message: data.message,
                                 type: 'error',
@@ -136,21 +148,28 @@ export default {
                         }
                     }).catch(() => {
                         this.loading = false
-                    })  
+                    })
+                    this.reSet();
                 }
             })
         },
         handleClose () {
             this.dialogVisible = false
-        },
-        onSubmit (formName) {
-            console.log(this.ruleOperationForm, '表单数据')
-            
-            
+            this.reSet();
         },
         cancel () {
             this.dialogVisible = false;
+            this.reSet();
            
+        },
+        reSet () {
+            this.exportForm = {
+                hospId: [],
+                hospName: [],
+                batchId: ''
+            };
+            this.checked = false
+
         }
     },
     components: {

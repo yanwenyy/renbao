@@ -348,7 +348,9 @@
         // 导入数据集合
         importDataModelList: [],
         // 医院名
-        hospitalName: ''
+        hospitalName: '',
+        // 医院采集路径
+        hospitalPath: ''
       }
     },
     components: {
@@ -467,9 +469,14 @@
       // 导入数据
       impYYData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName}`),
+          url: this.$http.adornUrl(`dataImp/impData/${1}`),
           method: 'post',
-          data: this.importDataModelList,
+          //data: this.importDataModelList,
+          data: this.$http.adornData({
+            'importDataModels': this.importDataModelList,
+            'hospitalName': this.hospitalName,
+            'hospitalPath': this.hospitalPath
+          }),
           isLoading: false
         }).then(({data}) => {
           //if (data && data.code === 200) {
@@ -506,6 +513,7 @@
         if (row.ifDir) {
           this.selectedFileData = []
           this.hospitalName = row.name
+          this.hospitalPath = row.path
           row.children.forEach(item => {
             // 去除选中的文件夹
             if (!item.ifDir) {
