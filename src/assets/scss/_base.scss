@@ -291,14 +291,14 @@ img {
         .el-submenu{
           padding: 0!important;
         }
-        .el-submenu >.el-submenu__title{
-          padding: 0!important;
+        .el-submenu >.el-submenu__title, .el-submenu~ .padding-40{
+          padding-left: 20px!important;
         }
         .el-submenu.is-opened > .el-submenu__title{
           background-color:$sidebar--background-color-dark ;
           color:$--theme-red!important;
           border-left: 4px solid $--theme-red;
-          padding: 0!important;
+          padding-left: 20px!important;
           border-radius: 0!important;
           box-sizing: border-box;
         }

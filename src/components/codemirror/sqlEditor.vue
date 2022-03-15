@@ -794,7 +794,7 @@
             //颜色改变提醒
             resize[i].style.background = '#818181';
             var startX = e.clientX;
-            resize[i].left = resize[i].offsetLeft;
+            resize[i].left = resize[i].offsetLeft-30;
             // 鼠标拖动事件
             document.onmousemove = function (e) {
               var endX = e.clientX;
