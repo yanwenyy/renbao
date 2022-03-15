@@ -221,7 +221,7 @@ export default {
                 folderName: this.treeForm.folderName, // 规则树名称
                 folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
                 folderParentId: this.editRuleItem.folderId, // 父节点id
-                folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径  // 所有父节点的id拼接
+                folderPath: folderPath.length>0 && folderPath.join('\\') || '', // 路径  // 所有父节点的id拼接
                 folderSort: this.editRuleItemNode.childNodes.length>0 ? this.editRuleItemNode.childNodes.length+1 : 1, // 顺序 // 子集长度加1
             }
 
@@ -253,7 +253,7 @@ export default {
                 folderName: this.treeForm.folderName, // 规则树名称
                 folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
                 folderParentId: this.editRuleItem.folderParentId, // 父节点id
-                folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径 // 父节点id集合
+                folderPath: folderPath.length>0 && folderPath.join('\\') || '', // 路径 // 父节点id集合
                 folderSort: this.editRuleItem.folderSort, // 顺序
             }
             this.$refs[formName].validate((valid) => {
