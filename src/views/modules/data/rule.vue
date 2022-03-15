@@ -69,7 +69,7 @@
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="getDataList()">导入</el-button>
           <el-button type="warning" @click="getDataList()">全部导出</el-button>
-          <el-button type="warning" @click="getDataList()">导出</el-button>
+          <el-button type="warning" @click="ruleExport">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
@@ -292,6 +292,14 @@ import ruleTree from '../../common/rule-tree.vue'
           }
           this.dataListLoading = false
         })
+      },
+      // 批量导出
+      ruleExport () {
+        if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+        console.log(this.dataListSelections, '所选列表')
+        
+
+
       },
       // 每页数
       sizeChangeHandle (val) {

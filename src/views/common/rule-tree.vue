@@ -216,6 +216,7 @@ export default {
         addRuleFolder (formName) {
             this.btnLoading = true;
             let folderPath =  this.getParent(this.editRuleItemNode, 'add');
+            folderPath = folderPath.reverse()
             let addRuleFolderdata = {
                 folderName: this.treeForm.folderName, // 规则树名称
                 folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
@@ -246,7 +247,7 @@ export default {
         },
         editRuleFolder (formName) {
             this.btnLoading = true;
-            let folderPath =  this.getParent(this.editRuleItemNode, 'edit');
+            // let folderPath =  this.getParent(this.editRuleItemNode, 'edit');
             let editRuleFolderdata = {
                 folderId: this.editRuleItem.folderId,
                 folderName: this.treeForm.folderName, // 规则树名称
