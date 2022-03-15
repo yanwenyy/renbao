@@ -260,7 +260,7 @@ export default {
                     isLoading:false,
                     url: this.$http.adornUrl('ruleResult/deleteByIds'),
                     method: 'DELETE',
-                    data:  this.$http.adornData({ids: deleteList}, false)
+                    data: this.$http.adornData( deleteList, false)
                 }).then(({data}) => {
                     if (data && data.code === 200) {
                     this.$message({message: '删除成功',type: 'success',})

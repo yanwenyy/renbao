@@ -178,6 +178,7 @@ import ruleTree from '../../common/rule-tree.vue'
           ruleName: '',
           createUserName: '',
           folderPath:'',//规则分类主键
+          folderId: '',
         },
         token:'',
         imgUrlfront:'',
@@ -281,6 +282,7 @@ import ruleTree from '../../common/rule-tree.vue'
             'ruleName': this.dataForm.ruleName,
             'createUserName': this.dataForm.createUserName,
             'folderPath': this.dataForm.folderPath,
+            'folderId': this.dataForm.folderId,
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -379,8 +381,12 @@ import ruleTree from '../../common/rule-tree.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
-        console.log(data, 'datadatadata');
+        // 规则列表有子节点时folderId为空
         this.dataForm.folderPath=data.folderPath;
+        this.dataForm.folderId = data.folderId;
+        if (data.children) {
+          this.dataForm.folderId = '';
+        }
         this.getDataList();
       }
     }
