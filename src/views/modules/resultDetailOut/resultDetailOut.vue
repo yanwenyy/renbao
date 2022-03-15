@@ -54,9 +54,7 @@
                         <template slot-scope="scope">
                             <div v-if="items.type=='option'">
                                 <div class="operation-box">
-                                    <!-- <span @click="publish(scope.row)">发表</span> -->
-                                    <span class="result-view-text" @click="resultViewClick(scope.row)" v-if="scope.row.q5 == 1">查看明细</span>
-                                    <span v-else>运行成功</span>
+                                    <span class="result-view-text" @click="resultViewClick(scope.row)" >查看明细</span>
                                 </div>
                             </div>
                             <div v-else>
@@ -81,11 +79,29 @@
             </el-pagination>
         </div>
        <result-detail-out-dialog ref="resultDetailOutDialog"></result-detail-out-dialog>
-        
+        <!--查看详细弹窗 -->
+        <el-dialog
+            :visible.sync="showDetailDialog"
+            title="查看结果明细"
+            :close-on-click-modal="false"
+            :modal-append-to-body="false"
+            width="90%"
+            :close-on-press-escape="false"
+        >
+            <detail
+                @close="closeDetail"
+                @ok="editSucceed"
+                :info="info"
+                :resultTableName="resultTableName"
+                v-if="showDetailDialog"
+            ></detail>
+        </el-dialog>
     </div>
 </template>
 <script>
 import resultDetailOutDialog from './resultDetailOutDialog.vue'
+// import detail from "./component/detailExport-detail.vue";
+import detail from "../dataFirstExplore/component/detailExport-detail.vue";
 export default {
     data () {
         return {
@@ -122,12 +138,14 @@ export default {
                     return  config.label || config.batchName
                 },
             },
-            batchItem: {}
+            batchItem: {},
+            info: {},
+            showDetailDialog: false
         }
     },
     activated () {
         this.getbatchList();
-        this.getTableData()
+        // this.getTableData()
     },
     methods: {
         nodeClick (node,data) {
@@ -214,8 +232,10 @@ export default {
         // 列表查看
         resultViewClick (data) {
             // this.$refs.resultView.showDialog(data)
-            console.log('查看明细')
-
+            this.info = data.resultId;
+            // this.resultTableName = data.resultTableName
+            // console.log(data.resultTableName, 'data.resultTableNamedata.resultTableName')
+            this.showDetailDialog = true;
         },
         resultDetailsExportClick () {
             if( !this.batchItem.batchId ) return this.$message({message: '请选择批次名称',type: 'warning'});
@@ -271,9 +291,18 @@ export default {
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
         },
+        // 关闭详细弹窗
+        closeDetail() {
+            this.showDetailDialog = false;
+        },
+        // 关闭弹窗确认
+        editSucceed() {
+            this.closeDetail();
+        },
     },
     components: {
-        resultDetailOutDialog
+        resultDetailOutDialog,
+        detail
     }
    
 }
@@ -294,6 +323,7 @@ export default {
         border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
+        min-height: 75vh;
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;
             color: #0000FF;
