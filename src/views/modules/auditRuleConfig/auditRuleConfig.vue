@@ -329,6 +329,10 @@ export default {
         overflow: auto;
         min-width: 300px;
         padding: 10px 0 0 10px;
+        /deep/ .el-tree {
+            min-height: 70vh;
+        }
+
     }
     .auditRuleConfig-right {
         flex: 1;

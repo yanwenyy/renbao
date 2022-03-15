@@ -25,11 +25,9 @@
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span v-if="!isShowEdit" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
                 <span v-if="isShowEdit" >
-                    <span :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " :title="node.label"></span>
-                    <span  > {{node.label}}</span>
-
+                    <span :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " ></span>
+                    <span :title="node.label"> {{node.label}}</span>
                 </span>
-               
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
                         type="text"
