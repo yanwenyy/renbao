@@ -1,28 +1,30 @@
 <!--结果明细导出-->
 <template>
-  <div class="lawsAregulations">
+  <div class="box">
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
-          <el-tree
-            :data="batchTreeList"
-            highlight-current
-            :default-expand-all="true"
-            v-loading="treeLoading"
-            node-key="id"
-            ref="treesa"
-            :props="layoutTreeProps"
-          >
-            <span
-              class="custom-tree-node"
-              slot-scope="{ node, data }"
-              @click="nodeClick(node, data)"
+          <div class="auditRuleMonitoring-left" style="height:800px">
+            <el-tree
+              :data="batchTreeList"
+              highlight-current
+              :default-expand-all="true"
+              v-loading="treeLoading"
+              node-key="id"
+              ref="treesa"
+              :props="layoutTreeProps"
             >
-              <span>
-                {{ node.label }}
+              <span
+                class="custom-tree-node"
+                slot-scope="{ node, data }"
+                @click="nodeClick(node, data)"
+              >
+                <span>
+                  {{ node.label }}
+                </span>
               </span>
-            </span>
-          </el-tree>
+            </el-tree>
+          </div>
         </el-card>
       </el-col>
       <el-col :span="19">
@@ -118,9 +120,7 @@
               </el-table-column>
               <el-table-column prop="moblie" label="操作">
                 <template slot-scope="scope">
-                  <el-button
-                    type="text"
-                    @click="detailHandle(scope.row)"
+                  <el-button type="text" @click="detailHandle(scope.row)"
                     >查看明细</el-button
                   >
                 </template>
@@ -132,7 +132,7 @@
                 layout="total, sizes, prev, pager, next, jumper"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :total="dataForm.total"
+                :total="totalPage"
               ></el-pagination>
             </div>
           </div>
@@ -252,7 +252,10 @@ export default {
       info: "",
       batchId: "",
       batchType: 1,
-      hospitals: []
+      hospitals: [],
+      pageSize: 10,
+      pageIndex: 1,
+      totalPage: 0
     };
   },
   created() {
@@ -365,12 +368,16 @@ export default {
     },
     //删除
     deleteData() {
-      var uuids = "";
+      /* var uuids = "";
       for (var i = 0; i < this.multipleSelection.length; i++) {
         uuids += this.multipleSelection[i].resultId + ",";
       }
       if (uuids.length > 0) {
         var uuids = uuids.substring(0, uuids.length - 1);
+      } */
+      var uuids = [];
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        uuids.push(this.multipleSelection[i].resultId);
       }
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
@@ -379,8 +386,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl(`/ruleResult/deleteByIds/${uuids}`),
-            method: "get"
+            url: this.$http.adornUrl("/ruleResult/deleteByIds"),
+            method: "delete",
+            data: this.$http.adornData(uuids, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -401,7 +409,7 @@ export default {
     //查看结果明细
     detailHandle(data) {
       this.info = data.resultId;
-      this.resultTableName = data.resultTableName
+      this.resultTableName = data.resultTableName;
       this.showDetailDialog = true;
     },
     //重置表单
@@ -483,3 +491,46 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+.box {
+  width: 100%;
+  // display: flex;
+  min-width: 800px;
+  // overflow-x: auto;
+  .auditRuleMonitoring-left {
+    width: 300px;
+    // min-height: 100vh;
+    min-height: calc(100vh - 165px);
+    // margin-right: 20px;
+    // border: 1px solid #ddd;
+    overflow: auto;
+    min-width: 300px;
+    /deep/ .el-tree-node__children .custom-tree-node {
+      text-decoration: underline;
+      color: #0000ff;
+      width: 100%;
+    }
+  }
+  .auditRuleMonitoring-right {
+    flex: 1;
+    border: none;
+    // padding-left: 20px;
+    //
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      // padding-right: 109px;
+    }
+    .table-box {
+      margin-top: 10px;
+      // padding-left: 20px;
+      .result-view-text {
+        color: #0cbde5;
+      }
+    }
+  }
+}
+</style>

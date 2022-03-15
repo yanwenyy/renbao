@@ -274,10 +274,10 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        console.log(data.folderId)
+        let folderPath = this.getParentByNode(node);
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
-        this.dataForm.folderPath = this.getParentByNode(node)
+        this.dataForm.folderPath =  folderPath.length>0 && folderPath.join('\\') || ''
         this.treeVisible=false;
       },
       getParentByNode (node) {
@@ -289,7 +289,7 @@
               }
           };
           traverse(node)
-          return checkedNodes.join('/');
+          return checkedNodes;
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {

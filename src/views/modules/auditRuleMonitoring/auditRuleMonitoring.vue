@@ -194,6 +194,12 @@ export default {
                     this.Pager.pageSize = data.result.size;
                     this.Pager.pageIndex = data.result.current;
                     this.Pager.total = data.result.total;  
+                } else {
+                    this.tableData = [];
+                    this.Pager.pageIndex =1;
+                    this.Pager.total = 0; 
+                    this.$message.warning(data.message)
+                    this.tableLoading = false
                 }
             }).catch(() => {
                 this.tableLoading = false
@@ -278,6 +284,9 @@ export default {
         overflow: auto;
         min-width: 300px;
         height: 75vh;
+        /deep/ .el-tree {
+            min-height: 70vh;
+        }
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;
             color: #0000FF;

@@ -176,10 +176,14 @@ export default {
             })
         },
         getTreeData (data) {
+            // 规则列表有子节点时folderId为空
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
-            this.searchForm.folderPath = data.folderPath;
-            this.searchForm.folderId = data.folderId;
+            this.searchForm.folderPath = data.folderPath && data.folderPath || '';
+            this.searchForm.folderId = data.folderId && data.folderId || '';
+            if (data.children) {
+                this.searchForm.folderId = '';
+            }
             this.getSelectPage();
         },
         queryClick () {
@@ -329,6 +333,10 @@ export default {
         overflow: auto;
         min-width: 300px;
         padding: 10px 0 0 10px;
+        /deep/ .el-tree {
+            min-height: 70vh;
+        }
+
     }
     .auditRuleConfig-right {
         flex: 1;
