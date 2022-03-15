@@ -544,9 +544,14 @@
       // 导入数据
       impYBData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${2}/${'医保'}`),
+          url: this.$http.adornUrl(`dataImp/impData/${2}`),
           method: 'post',
-          data: this.importDataModelList,
+          // data: this.importDataModelList,
+          data: this.$http.adornData({
+            'importDataModels': this.importDataModelList,
+            'hospitalName': "",
+            'hospitalPath': ""
+          }),
           isLoading: false
         }).then(({data}) => {
           //if (data && data.code === 200) {
