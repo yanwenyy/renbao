@@ -23,8 +23,8 @@
             @node-click="nodeClick"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span v-if="!isShowEdit" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
-                <span v-if="isShowEdit" >
+                <span v-if="!isShowIcon" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
+                <span v-if="isShowIcon" >
                     <span :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " ></span>
                     <span :title="node.label"> {{node.label}}</span>
                 </span>
@@ -97,6 +97,10 @@ export default {
         },
         folderSorts: { // 规则树查询参数
             default: ''
+        },
+        isShowIcon: {
+            type: Boolean, // 是否显示文件夹
+            default: true
         }
 
     },
@@ -170,6 +174,7 @@ export default {
                 this.treeLoading = false
                 if (data.code == 200) {
                     this.treeData = data.result;
+                    console.log(this.treeData, 'treeDatatreeDatatreeData')
                     if (callBack) {
                         callBack(this.treeData)
                     }
@@ -195,7 +200,7 @@ export default {
                 this.editRuleFolder(formName)
             }
         },
-        getParent (node) {
+        getParent (node, type) {
             const checkedNodes = [];
             const traverse = function(node) {
                 if (node.parent.data.folderId) {
@@ -204,14 +209,17 @@ export default {
                 }
             };
             traverse(node)
+            if (type == 'add') {
+                checkedNodes.push(node.data.folderId)
+            }
             return checkedNodes;
         },
         addRuleFolder (formName) {
             this.btnLoading = true;
-            let folderPath =  this.getParent(this.editRuleItemNode);
+            let folderPath =  this.getParent(this.editRuleItemNode, 'add');
             let addRuleFolderdata = {
                 folderName: this.treeForm.folderName, // 规则树名称
-                folderLevel: this.editRuleItem.folderLevel, // 级别
+                folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
                 folderParentId: this.editRuleItem.folderId, // 父节点id
                 folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径  // 所有父节点的id拼接
                 folderSort: this.editRuleItemNode.childNodes.length>0 ? this.editRuleItemNode.childNodes.length+1 : 1, // 顺序 // 子集长度加1
@@ -239,11 +247,11 @@ export default {
         },
         editRuleFolder (formName) {
             this.btnLoading = true;
-            let folderPath =  this.getParent(this.editRuleItemNode);
+            let folderPath =  this.getParent(this.editRuleItemNode, 'edit');
             let editRuleFolderdata = {
                 folderId: this.editRuleItem.folderId,
                 folderName: this.treeForm.folderName, // 规则树名称
-                folderLevel: this.editRuleItem.folderLevel, // 级别
+                folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
                 folderParentId: this.editRuleItem.folderParentId, // 父节点id
                 folderPath: folderPath.length>0 && folderPath.join('/') || '', // 路径 // 父节点id集合
                 folderSort: this.editRuleItem.folderSort, // 顺序

@@ -80,28 +80,14 @@ export default {
             // this.exportForm.batchId = '6998b4b9-f2ef-4b7f-b945-3f353e773655'
         },
         checkChange (val) {
-            console.log(val, 'valvalvalval')
-            let checkedHospData = []
-            // this.hospitalTableData.map(i => {
-            //     if (val.indexOf(i['医院编码'] != -1)) {
-            //         checkedHospData.push(i);
-
-            //     }
-            // })
-            // console.log(checkedHospData, 'checkedHospDatacheckedHospData')
-
             this.exportForm.hospName = [];
             for(let i=0;i<=val.length-1;i++){
                 this.hospitalTableData.find((item)=>{ //这里的options就是数据源
                     if(item['医院编码'] == val[i]){
                         this.exportForm.hospName.push(item['医院名称'])
-                        // this.departmentIds.push(item.id) //这里的value我改成了id
-                        // this.departmentNames.push(item.roleName) //这里的label我改成了roleName
                     }
                 });
             }
-
-
         },
         // 获取医院列表
         getHospital () {
@@ -122,8 +108,6 @@ export default {
         },
         // 导出
         exportClick (formName) {
-            console.log(this.exportForm, 'exportFormexportFormexportForm')
-            
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true
@@ -137,14 +121,14 @@ export default {
                         if (data.code == 200) {
                             this.loading = false;
                             this.$message({
-                                message: '导出成功',
+                                message: data.message,
                                 type: 'success',
                                 duration: 1500,
                             })
                             this.dialogVisible = false
                         } else {
                             this.$message({
-                                message: '导出失败',
+                                message: data.message,
                                 type: 'error',
                                 duration: 1500,
                             })

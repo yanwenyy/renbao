@@ -195,6 +195,9 @@ export default {
                     this.Pager.pageIndex = data.result.current;
                     this.Pager.total = data.result.total;  
                 } else {
+                    this.tableData = [];
+                    this.Pager.pageIndex =1;
+                    this.Pager.total = 0; 
                     this.$message.warning(data.message)
                     this.tableLoading = false
                 }

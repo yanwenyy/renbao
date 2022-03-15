@@ -80,7 +80,7 @@
         </div>
        <result-detail-out-dialog ref="resultDetailOutDialog"></result-detail-out-dialog>
         <!--查看详细弹窗 -->
-        <el-dialog
+        <!-- <el-dialog
             :visible.sync="showDetailDialog"
             title="查看结果明细"
             :close-on-click-modal="false"
@@ -95,13 +95,13 @@
                 :resultTableName="resultTableName"
                 v-if="showDetailDialog"
             ></detail>
-        </el-dialog>
+        </el-dialog> -->
+        <view-details ref="viewDetails"></view-details>
     </div>
 </template>
 <script>
 import resultDetailOutDialog from './resultDetailOutDialog.vue'
-// import detail from "./component/detailExport-detail.vue";
-import detail from "../dataFirstExplore/component/detailExport-detail.vue";
+import viewDetails from './viewDetails.vue'
 export default {
     data () {
         return {
@@ -139,8 +139,6 @@ export default {
                 },
             },
             batchItem: {},
-            info: {},
-            showDetailDialog: false
         }
     },
     activated () {
@@ -225,6 +223,9 @@ export default {
                     this.Pager.pageIndex = data.result.current;
                     this.Pager.total = data.result.total;  
                 } else {
+                    this.tableData = [];
+                    this.Pager.pageIndex =1;
+                    this.Pager.total = 0; 
                     this.$message.warning(data.message)
                     this.tableLoading = false
                 }
@@ -235,13 +236,14 @@ export default {
         // 列表查看
         resultViewClick (data) {
             // this.$refs.resultView.showDialog(data)
-            this.info = data.resultId;
+            // this.info = data.resultId;
             // this.resultTableName = data.resultTableName
             // console.log(data.resultTableName, 'data.resultTableNamedata.resultTableName')
-            this.showDetailDialog = true;
+            // this.showDetailDialog = true;
+            this.$refs.viewDetails.showDialog(data);
         },
         resultDetailsExportClick () {
-            if( !this.batchItem.batchId ) return this.$message({message: '请选择批次名称',type: 'warning'});
+            if( !this.batchItem.batchId ) return this.$message({message: '请选择对应的批次',type: 'warning'});
             this.$refs.resultDetailOutDialog.showDialog(this.batchItem)
         },
        
@@ -305,7 +307,7 @@ export default {
     },
     components: {
         resultDetailOutDialog,
-        detail
+        viewDetails
     }
    
 }
