@@ -229,15 +229,24 @@ import ruleTree from '../../common/rule-tree.vue'
     },
     activated () {
       this.getDataList();
-      this.$http({
-        url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
-        method: 'get',
-        params: this.$http.adornParams({folderSorts: ''})
-      }).then(({data}) => {
-        this.ruleData = data.result;
-      })
+      this.getRuleFolder();
+    },
+    mounted () {
+      this.$bus.$on('updateRuleData', () => {
+        this.getRuleFolder()
+      });
     },
     methods: {
+      // 获取规则树
+      getRuleFolder () {
+        this.$http({
+          url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
+          method: 'get',
+          params: this.$http.adornParams({folderSorts: ''})
+        }).then(({data}) => {
+          this.ruleData = data.result;
+        })
+      },
       //重置点击
       reset(){
         this.dataForm={
@@ -297,6 +306,28 @@ import ruleTree from '../../common/rule-tree.vue'
       ruleExport () {
         if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
         console.log(this.dataListSelections, '所选列表')
+        var exportList = []
+        this.dataListSelections.forEach( item =>{
+            exportList.push( item.ruleId )
+        })
+        this.$http({
+            isLoading:false,
+            url: this.$http.adornUrl('/rule/ruleExport'),
+            method: 'post',
+            data: this.$http.adornData(exportList, false)
+        }).then(({data}) => {
+            if (data && data.code === 200) {
+              console.log(data, 'datadatadatadata')
+              this.$message({message: '导出成功',type: 'success'});
+              this.getDataList();
+            } else {
+              // this.$message.error(data.msg)
+            }
+        })
+
+
+
+
         
 
 

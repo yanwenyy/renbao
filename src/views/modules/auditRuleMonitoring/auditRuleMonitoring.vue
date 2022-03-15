@@ -233,6 +233,7 @@ export default {
             // } else {
             //     this.$message({message: '请选择批次列表',type: 'warning'})
             // } 
+            this.Pager.pageIndex = 1;
             this.getTableData()
         },
         // 列表重置

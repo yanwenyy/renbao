@@ -186,6 +186,7 @@ export default {
             this.getSelectPage();
         },
         queryClick () {
+            this.Pager.pageIndex = 1;
             this.getSelectPage();
         },
         onReset () {

@@ -151,6 +151,7 @@ export default {
             this.getTableData()
         },
         onQuery () {
+            this.Pager.pageIndex = 1;
             this.getTableData()
         },
         onReset () {

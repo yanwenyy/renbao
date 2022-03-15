@@ -237,6 +237,7 @@ export default {
                         if (data.code == 200) {
                             this.treeVisible = false;
                             this.getRuleFolder()
+                            this.$bus.$emit('updateRuleData');
                         }
                     }).catch(() => {
                         this.btnLoading = false;
@@ -268,6 +269,7 @@ export default {
                         if (data.code == 200) {
                             this.treeVisible = false;
                             this.getRuleFolder()
+                            this.$bus.$emit('updateRuleData');
                         }
                     }).catch(() => {
                         this.btnLoading = false;
@@ -303,6 +305,7 @@ export default {
                                 type: 'success',
                             })
                             this.getRuleFolder()
+                            this.$bus.$emit('updateRuleData');
                         } else {
                             this.$message.error(data.msg)
 
