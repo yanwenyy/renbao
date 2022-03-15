@@ -13,15 +13,23 @@ module.exports = {
     assetsPublicPath: '/',
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
-      '/dataanalysis': {
-        target: 'http://10.10.23.64:1070/dataanalysis/',
+      '/proxyApi': {
+        target: 'http://10.10.104.46:1070/dataanalysis/',
         // target: 'http://10.10.113.229:1070/dataanalysis/',
         // target: 'http://10.10.113.44:1077/dataanalysis/',
         changeOrigin: true,
         pathRewrite: {
           '^/dataanalysis': '/'
         }
-      }
+      },
+      '/wsApi': {
+        target: 'ws://10.10.113.229:1070/dataanalysis/',
+        ws:true,//开启ws, 如果是http代理此处可以不用设置
+        changeOrigin: true,
+        pathRewrite: {
+          '^/wsApi': '/'
+        }
+      },
     },
 
 

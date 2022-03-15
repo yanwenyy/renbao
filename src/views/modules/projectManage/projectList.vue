@@ -45,6 +45,13 @@
         <!--width="50">-->
       <!--</el-table-column>-->
       <el-table-column
+        type="index"
+        header-align="center"
+        align="center"
+        label="序号"
+        width="50">
+      </el-table-column>
+      <el-table-column
         prop="projectCode"
         header-align="center"
         align="center"
