@@ -469,14 +469,9 @@
       // 导入数据
       impYYData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${1}`),
+          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName}`),
           method: 'post',
-          //data: this.importDataModelList,
-          data: this.$http.adornData({
-            'importDataModels': this.importDataModelList,
-            'hospitalName': this.hospitalName,
-            'hospitalPath': this.hospitalPath
-          }),
+          data: this.importDataModelList,
           isLoading: false
         }).then(({data}) => {
           //if (data && data.code === 200) {
