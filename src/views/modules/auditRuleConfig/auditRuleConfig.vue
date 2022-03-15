@@ -169,7 +169,6 @@ export default {
                
                 if (data.code == 200) {
                     this.treeData = data.result;
-                    console.log(this.treeData, '规则树')
                 }
             }).catch(() => {
                 
