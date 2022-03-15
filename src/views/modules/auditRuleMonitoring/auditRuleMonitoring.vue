@@ -134,7 +134,7 @@ export default {
     },
     activated() {
         this.getbatchList();
-        this.getTableData();
+        // this.getTableData();
     },
     methods: {
         dealRunStatus (type) {
@@ -217,8 +217,8 @@ export default {
         },
 
         nodeClick (node,data) {
-            this.getTableData()
             this.batchItem = data;
+            this.getTableData()
         },
         // 列表查询
         onQuery () {
