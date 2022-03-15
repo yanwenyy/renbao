@@ -32,7 +32,7 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="600" style="width: 100%" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="600" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
@@ -44,8 +44,15 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
-                    <el-table-column label="开始时间" align="center" :formatter="dateFormat" prop="startTime"></el-table-column>
-                    <el-table-column label="结束时间" align="center" :formatter="dateEndFormat" prop="endTime"></el-table-column>
+                    <el-table-column label="开始时间" align="center" prop="startTime">
+                        <template slot-scope="scope">
+                        {{scope.row.startTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="endTime"></el-table-column>
+                     <!-- <template slot-scope="scope">
+                        {{scope.row.endTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}
+                        </template> -->
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
                             <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
@@ -145,10 +152,10 @@ export default {
             },
             collectPlanMonitorId:'',
             dataSelectTable:[], //选中数据
-
+            dataLoading:false
         }
     },
-    mounted(){
+    activated(){
         this.getInitList()
     },
     methods:{
@@ -156,28 +163,6 @@ export default {
             this.dataSelectTable = data
         },
         satDataHospital(data){ this.dataSelectTable = data},
-        //开始时间转换
-        dateFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.startTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-        //结束时间转换
-        dateEndFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.endTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
         //多选
         handleSelectionChange(val){
             this.dataSelectTable = val
@@ -186,10 +171,11 @@ export default {
         //tab事件
         handleClick(tab,event){
             this.activeName = tab.name;
+            this.getInitList()
         },
         //初始化数据
         getInitList(){
-            this.tableList = []
+            this.dataLoading = true
             this.$http({
                 url:this.$http.adornUrl('/collectPlanMonitor/selectPageList'),
                 method: 'get',
@@ -205,17 +191,14 @@ export default {
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableList = data.result.records
-                    this.apComServerData.total = data.result.total
-                      
+                    this.apComServerData.total = data.result.total                   
                 }else{
                     this.tableList = []
                     this.apComServerData.total = 0
                 }
-                this.dataListLoading = false;
+                this.dataLoading = false;
             })
         },
-
-
      
         //停止采集
         getStopCollection(){
@@ -234,6 +217,7 @@ export default {
             this.editShowVisible = true
             this.collectPlanMonitorId = id
         },
+
 
         //进度条
         format(percentage) {
