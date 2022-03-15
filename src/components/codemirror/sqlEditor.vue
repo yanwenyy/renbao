@@ -47,7 +47,7 @@
               class="sql-tree-self"
               :props="FundefaultProps"
               :data="funData"
-              :filter-node-method="filterNode"
+              :filter-node-method="filterNode2"
               ref="tree2"
               node-key="id"
               :default-expand-all="false"
@@ -752,7 +752,6 @@
         }else if(this.treeType==='2'){
           this.$refs.tree2.filter(val);
         }
-
       },
       treedata: function (newValue, oldValue) {
        // console.log(newValue, oldValue)
@@ -851,7 +850,11 @@
       },
       filterNode(value, data) {
         if (!value) return true;
-        return data.label.indexOf(value) !== -1;
+        return data.title.indexOf(value) !== -1;
+      },
+      filterNode2(value, data) {
+        if (!value) return true;
+        return data.name.indexOf(value) !== -1;
       },
       // 树内不可拖拽
       returnFalse() {
@@ -1019,10 +1022,9 @@
   }
   .tree-left{
     margin-top: 50px;
-    width: 29px;
+    width: 25px;
     white-space: pre-wrap;
     cursor: pointer;
-    border: 1px solid #000;
     text-align: center;
     /*height: 200px;*/
   }
@@ -1035,9 +1037,14 @@
     display: inline-block;
     padding:30px 0;
     text-align: center;
+    background: #F0F0F2;
+    border-top-left-radius:5px;
+    border-top-right-radius:20px;
+    border-bottom-left-radius:5px;
+    border-bottom-right-radius:20px;
   }
   .tree-left-one{
-    border-bottom: 1px solid #000;
+   margin-bottom: 10px;
     /*padding-top: 2%;*/
   }
   .tree-right{
