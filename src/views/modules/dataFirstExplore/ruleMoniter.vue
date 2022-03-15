@@ -28,13 +28,21 @@
       </el-col>
       <el-col :span="19">
         <!-- <div class="auditRuleMonitoring-right"> -->
-        <el-card class="box-card" style="height:800px">
+        <el-card class="box-card" style="height:800px;overflow-y:auto">
           <div class="search-box">
             <el-form ref="searchForm" :model="searchForm" :inline="true">
-              <el-form-item label="规则类型：">
+              <el-form-item>
+                <el-input
+                  v-model="searchForm.ruleName"
+                  size="small"
+                  placeholder="规则名称"
+                  clearable
+                ></el-input>
+              </el-form-item>
+              <el-form-item>
                 <el-select
                   v-model="searchForm.ruleCategory"
-                  placeholder="请选择"
+                  placeholder="规则类型"
                   clearable
                 >
                   <el-option
@@ -45,10 +53,10 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="运行状态：">
+              <el-form-item>
                 <el-select
                   v-model="searchForm.runStatus"
-                  placeholder="请选择"
+                  placeholder="运行状态"
                   clearable
                 >
                   <el-option
@@ -152,6 +160,7 @@
             <detail
               @close="closeDetail"
               :id="id"
+              :name="name"
               v-if="showDetailDialog"
             ></detail>
           </el-dialog>
@@ -179,6 +188,7 @@ export default {
       ],
       id: "",
       searchForm: {
+        ruleName: "",
         ruleCategory: "",
         runStatus: ""
       },
@@ -223,6 +233,7 @@ export default {
         params: this.$http.adornParams(
           {
             batchId: this.batchId,
+            ruleName: this.searchForm.ruleName,
             runStatus: this.searchForm.runStatus, // 运行状态
             ruleCategory: this.searchForm.ruleCategory,
             pageNo: this.Pager.pageIndex,
@@ -275,7 +286,7 @@ export default {
     },
     // 列表查询
     onQuery() {
-      this.batchId = "";
+      // this.batchId = this.batchId;
       this.getTableData();
     },
     // 列表重置
@@ -284,7 +295,6 @@ export default {
         ruleCategory: "",
         runStatus: ""
       };
-      this.batchId = "";
       this.getTableData();
     },
     currentChangeHandle(val) {
@@ -303,6 +313,7 @@ export default {
     resultViewClick(data) {
       this.showDetailDialog = true;
       this.id = data.resultId;
+      this.name = data.ruleName
     },
     //关闭日志弹窗
     closeDetail() {

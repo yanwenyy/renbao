@@ -43,7 +43,6 @@
                     :prop="item"
                     :label="item"
                     :key="index"
-                    width
                     show-overflow-tooltip
                 ></el-table-column>
                 </template>
@@ -51,10 +50,14 @@
             </div>
             <div>
             <el-pagination
-                small
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="apComServerData.total"
-            ></el-pagination>
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="Pager.pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="Pager.pageSize"
+                :total="Pager.total"
+                layout="total, sizes, prev, pager, next, jumper">
+            </el-pagination>
             </div>
             <!-- <el-button type="primary" @click="ok">确定</el-button> -->
             <el-button @click="close">关闭</el-button>
@@ -70,81 +73,74 @@ export default {
   },
   data() {
     return {
-    showDetailDialog: false,
-      dataForm: {
-        basicName: "",
-        basicType: "",
-        data2: "",
-        data1: ""
-      },
-      apComServerData: {
-        total: ""
-      },
-      //loading
-      listLoading: false,
-      importVisible: false,
-      show: false,
-      output: null,
-      //table表格数据
-      tableList: [],
-      tableColumns: [],
-      options: [
-        {
-          value: "0",
-          label: "三级甲等"
+        showDetailDialog: false,
+        Pager: {
+            pageSize: 10,
+            pageIndex: 1,
+            total: 0
         },
-        {
-          value: "1",
-          label: "三级乙等"
-        },
-        {
-          value: "2",
-          label: "三级丙等"
-        }
-      ],
-      rules: [
-        {
-          type: "text",
-          id: "医疗机构编码",
-          label: "医疗机构编码 "
-        },
-        {
-          type: "text",
-          id: "医疗机构名称",
-          label: "医疗机构名称"
-        },
-        {
-          type: "text",
-          id: "结算单据号",
-          label: "结算单据号"
-        },
-        {
-          type: "text",
-          id: " 住院号",
-          label: " 住院号"
-        },
-        {
-          type: "text",
-          id: " 结算类别",
-          label: " 结算类别"
-        },
-        {
-          type: "text",
-          id: "结算日期",
-          label: "结算日期"
-        },
-        {
-          type: "text",
-          id: "入院科室名称",
-          label: "入院科室名称"
-        },
-        {
-          type: "text",
-          id: "患者姓名",
-          label: "患者姓名"
-        }
-      ],
-      viewDetailsData: []
+        show: false,
+        output: null,
+        //table表格数据
+        tableList: [],
+        tableColumns: [],
+        options: [
+            {
+            value: "0",
+            label: "三级甲等"
+            },
+            {
+            value: "1",
+            label: "三级乙等"
+            },
+            {
+            value: "2",
+            label: "三级丙等"
+            }
+        ],
+        rules: [
+            {
+            type: "text",
+            id: "医疗机构编码",
+            label: "医疗机构编码 "
+            },
+            {
+            type: "text",
+            id: "医疗机构名称",
+            label: "医疗机构名称"
+            },
+            {
+            type: "text",
+            id: "结算单据号",
+            label: "结算单据号"
+            },
+            {
+            type: "text",
+            id: " 住院号",
+            label: " 住院号"
+            },
+            {
+            type: "text",
+            id: " 结算类别",
+            label: " 结算类别"
+            },
+            {
+            type: "text",
+            id: "结算日期",
+            label: "结算日期"
+            },
+            {
+            type: "text",
+            id: "入院科室名称",
+            label: "入院科室名称"
+            },
+            {
+            type: "text",
+            id: "患者姓名",
+            label: "患者姓名"
+            }
+        ],
+        viewDetailsData: []
     };
   },
   created() {
@@ -172,10 +168,6 @@ export default {
     },
     //初始化数据列表
     initList() {
-        console.log({
-          tableName: this.viewDetailsData.resultTableName,
-          resultId: this.viewDetailsData.resultId
-        }, '查询参数')
       this.$http({
         url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
         method: 'get',
@@ -185,45 +177,26 @@ export default {
         }, false)
       }).then(({ data }) => {
         if (data && data.code === 200) {
-            console.log(data, 'datadatadata')
           this.tableColumns = data.result.columns;
           this.tableList = data.result.result;
           // this.apComServerData.total;
         } else {
-          this.tyqab = [];
-          this.apComServerData.total = 0;
+         
         }
       });
-    },
-    //重置
-    resetForm() {},
-    //查询
-    getDataList() {},
-    //确定
-    ok() {
-      this.$emit("ok");
-    },
-    //取消
-    close() {
-      this.$emit("close");
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
-    },
-    //多选
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
     },
     //查询条件事件
     handleChange() {
       this.show = !this.show;
-    }
+    },
+    sizeChangeHandle (val) {
+        this.Pager.pageSize = val
+        // this.getTableData()
+    },
+    currentChangeHandle (val) {
+        this.Pager.pageIndex = val;
+        // this.getTableData()
+    },
   }
 };
 </script>

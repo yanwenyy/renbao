@@ -209,7 +209,7 @@ export default {
             };
             traverse(node)
             if (type == 'add') {
-                checkedNodes.push(node.data.folderId)
+                checkedNodes.unshift(node.data.folderId)
             }
             return checkedNodes;
         },
@@ -250,10 +250,10 @@ export default {
             let editRuleFolderdata = {
                 folderId: this.editRuleItem.folderId,
                 folderName: this.treeForm.folderName, // 规则树名称
-                folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
-                folderParentId: this.editRuleItem.folderParentId, // 父节点id
-                folderPath: folderPath.length>0 && folderPath.join('\\') || '', // 路径 // 父节点id集合
-                folderSort: this.editRuleItem.folderSort, // 顺序
+                // folderLevel: this.editRuleItem.folderLevel && this.editRuleItem.folderLevel || '', // 级别
+                // folderParentId: this.editRuleItem.folderParentId, // 父节点id
+                // folderPath: folderPath.length>0 && folderPath.join('\\') || '', // 路径 // 父节点id集合
+                // folderSort: this.editRuleItem.folderSort, // 顺序
             }
             this.$refs[formName].validate((valid) => {
                 if (valid) {
