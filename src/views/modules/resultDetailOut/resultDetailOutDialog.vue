@@ -121,7 +121,8 @@ export default {
                         if (data.code == 200) {
                             this.loading = false;
                             this.$message({
-                                message: data.message,
+                                // message: data.message,
+                                message: '导出成功',
                                 type: 'success',
                                 duration: 1500,
                             })
