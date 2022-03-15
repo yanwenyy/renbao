@@ -403,7 +403,7 @@ img {
   vertical-align: middle;
   margin-right: 5px;
 }
-.el-button--primary,.el-button--warning,.el-button--primary:hover,.el-button--warning:hover{
+.el-button--primary,.el-button--warning,.el-button--primary:hover,.el-button--warning:hover,.el-button--primary:focus,.el-button--warning:focus{
   background: $--theme-red;
   border: $--theme-red;
 }
