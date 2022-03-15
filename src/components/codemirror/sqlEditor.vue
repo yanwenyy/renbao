@@ -793,14 +793,16 @@
 
             //颜色改变提醒
             resize[i].style.background = '#818181';
+            resize[i].style.cursor = 'w-resize';
             var startX = e.clientX;
-            resize[i].left = resize[i].offsetLeft-30;
+            resize[i].left = resize[i].offsetLeft-33;
+
             // 鼠标拖动事件
             document.onmousemove = function (e) {
               var endX = e.clientX;
               var moveLen = resize[i].left + (endX - startX); // （endx-startx）=移动的距离。resize[i].left+移动的距离=左边区域最后的宽度
               var maxT = box[i].clientWidth - resize[i].offsetWidth; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
-
+              console.log(resize[i].left,endX,startX,moveLen);
               if (moveLen < 10) moveLen = 10; // 左边区域的最小宽度为32px
               if (moveLen > maxT - 10) moveLen = maxT - 10; //右边区域最小宽度为150px
 
@@ -1083,7 +1085,7 @@
   }
   /*拖拽区div样式*/
   .resize {
-    cursor: col-resize;
+    cursor: w-resize;
     float: left;
     position: relative;
     top: 0;

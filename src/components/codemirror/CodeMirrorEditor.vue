@@ -562,7 +562,7 @@
             if (moveLen > maxT - 150) moveLen = maxT - 150; //下边区域最小高度为150px
 
             resize.style.top = moveLen; // 设置上册区域的高度
-            console.log(resize.top,endY,startY,moveLen);
+
             _top[0].style.height = moveLen + 'px';
             _bottom.style.height = (_box.clientHeight - moveLen - 10) + 'px';
 
@@ -1086,7 +1086,7 @@
   }
   #resize{
     float: left;
-    cursor: row-resize;
+    cursor: n-resize;
     width: calc(100% + 10px);
     height: 3px;
     background-color:#c0c5d4;
