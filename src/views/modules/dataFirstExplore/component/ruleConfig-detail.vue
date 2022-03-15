@@ -4,51 +4,57 @@
       <el-form-item label="规则名称" prop="ruleName">
         <el-input
           v-model="dataForm.ruleName"
-          disabled
+          readonly
           placeholder="规则名称"
         ></el-input>
       </el-form-item>
       <el-form-item label="规则类别" prop="ruleCategory">
-        <el-select
-          v-model="dataForm.ruleCategory"
-          filterable
-          clearable
-          placeholder="规则类别"
-          size="small"
-          disabled
-        >
-          <el-option
-            v-for="(item, index) in ruleCategory"
-            :key="index"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="创建人" prop="createUserName">
         <el-input
-          disabled
-          v-model="dataForm.createUserName"
-          placeholder="创建人"
+          readonly
+          v-model="dataForm.ruleCategory"
+          placeholder="规则类别"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="规则分类" prop="folderId">
+        <el-tree
+          v-show="false"
+          class="rule-tree"
+          :data="ruleData"
+          :props="menuListTreeProps"
+          node-key="folderId"
+          ref="menuListTree"
+          @current-change="menuListTreeCurrentChangeHandle"
+          :default-expand-all="false"
+          :highlight-current="true"
+          :expand-on-click-node="false"
+        >
+        </el-tree>
+        <el-input
+          v-popover:menuListPopover
+          v-model="dataForm.parentName"
+          :readonly="true"
+          placeholder="点击选择上级菜单"
+          class="menu-list__input"
         ></el-input>
       </el-form-item>
       <el-form-item label="sql编辑" prop="ruleSqlValue">
-        <!-- <el-button
-          type="text"
-          @click="sqlEditor"
-          style="position: absolute;left: -60px;"
-          >sql编辑</el-button
-        > -->
         <el-input
           type="textarea"
-          disabled
+          readonly
           :autosize="{ minRows: 10, maxRows: 10 }"
           v-model="dataForm.ruleSqlValue"
         ></el-input>
       </el-form-item>
+      <el-form-item label="创建人" prop="createUserName">
+        <el-input
+          readonly
+          v-model="dataForm.createUserName"
+          placeholder="创建人"
+        ></el-input>
+      </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-input
-          disabled
+          readonly
           v-model="dataForm.createTime"
           placeholder="创建时间"
         ></el-input>
@@ -80,7 +86,9 @@
 </template>
 <script>
 export default {
-  props: { ruleId: { type: String } },
+  props: {
+    ruleId: { type: String }
+  },
   name: "detail",
   data() {
     return {
@@ -89,8 +97,17 @@ export default {
         ruleCategory: "",
         createUserName: "",
         ruleSqlValue: "",
-        createTime: ""
+        createTime: "",
+        parentName: "",
+        folderId: "",
+        folderPath: ""
       },
+      ruleData: [],
+      menuListTreeProps: {
+        label: "folderName",
+        children: "children"
+      },
+      treeVisible: false,
       submitForm: {
         sql: ""
       },
@@ -103,6 +120,7 @@ export default {
   },
   created() {
     this.init();
+    this.initTree();
   },
   methods: {
     // 获取数据
@@ -122,12 +140,29 @@ export default {
         if (data && data.code === 200) {
           var rule = data.result;
           this.dataForm.ruleName = rule.ruleName;
-          this.dataForm.ruleCategory = rule.ruleCategory;
+          // this.dataForm.ruleCategory = rule.ruleCategory;
+          if (rule.ruleCategory == 1) {
+            this.dataForm.ruleCategory = "门诊规则";
+          } else {
+            this.dataForm.ruleCategory = "住院规则";
+          }
           this.dataForm.createUserName = rule.createUserName;
           this.dataForm.ruleSqlValue = rule.ruleSqlValue;
           this.dataForm.createTime = rule.createTime;
+          this.dataForm.folderId = rule.folderId;
+          this.dataForm.folderPath = rule.folderPath;
           this.loading = false;
+          this.menuListTreeSetCurrentNode();
         }
+      });
+    },
+    initTree() {
+      this.$http({
+        url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+        method: "get",
+        params: this.$http.adornParams({ folderSorts: "1,2" })
+      }).then(({ data }) => {
+        this.ruleData = data.result;
       });
     },
     //关闭弹窗
@@ -142,6 +177,31 @@ export default {
     submitSql() {
       this.showSqlEditorDialog = false;
       this.dataForm.ruleSqlValue = this.submitForm.sql;
+    },
+    // 规则树选中
+    menuListTreeCurrentChangeHandle(data, node) {
+      /*   console.log(data.folderId);
+      this.dataForm.folderId = data.folderId;
+      this.dataForm.parentName = data.folderName;
+      this.dataForm.folderPath = this.getParentByNode(node);
+      this.treeVisible = false; */
+    },
+    /* getParentByNode(node) {
+      const checkedNodes = [];
+      const traverse = function(node) {
+        if (node.parent.data.folderId) {
+          checkedNodes.push(node.parent.data.folderId);
+          traverse(node.parent);
+        }
+      };
+      traverse(node);
+      return checkedNodes.join("/");
+    }, */
+    // 规则树设置当前选中节点
+    menuListTreeSetCurrentNode() {
+      this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
+      this.dataForm.parentName = (this.$refs.menuListTree.getCurrentNode() ||
+        {})["folderName"];
     }
   }
 };

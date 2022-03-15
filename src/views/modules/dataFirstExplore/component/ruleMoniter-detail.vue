@@ -2,25 +2,36 @@
   <div>
     <el-form :model="dataForm" ref="dataForm" label-width="80px">
       <el-form-item label="规则名称" prop="ruleName">
-        <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
+        <el-input
+          readonly
+          v-model="dataForm.ruleName"
+          placeholder="规则名称"
+        ></el-input>
       </el-form-item>
       <el-form-item label="开始时间" prop="actualBeginTime">
         <el-input
+          readonly
           v-model="dataForm.actualBeginTime"
           placeholder="开始时间"
         ></el-input>
       </el-form-item>
       <el-form-item label="结束时间" prop="actualEndTime">
         <el-input
+          readonly
           v-model="dataForm.actualEndTime"
           placeholder="结束时间"
         ></el-input>
       </el-form-item>
       <el-form-item label="状态" prop="runStatus">
-        <el-input v-model="dataForm.runStatus" placeholder="状态"></el-input>
+        <el-input
+          readonly
+          v-model="dataForm.runStatus"
+          placeholder="状态"
+        ></el-input>
       </el-form-item>
       <el-form-item label="错误描述" prop="resultMessage">
         <el-input
+          readonly
           type="textarea"
           v-model="dataForm.resultMessage"
           placeholder="错误描述"
@@ -34,7 +45,8 @@
 export default {
   name: "detail",
   props: {
-    id: String
+    id: String,
+    name:String
   },
   data() {
     return {
@@ -59,10 +71,11 @@ export default {
         method: "get"
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          var rule = data.result;
-          this.dataForm.ruleName = rule.resultTableName;
-          this.dataForm.actualBeginTime = data.result.actualBeginTime.split('T')[0];
-          this.dataForm.actualEndTime = data.result.actualEndTime.split('T')[0];
+          this.dataForm.ruleName = this.name;
+          this.dataForm.actualBeginTime = data.result.actualBeginTime.split(
+            "T"
+          )[0];
+          this.dataForm.actualEndTime = data.result.actualEndTime.split("T")[0];
           var runStatus = data.result.runStatus;
           if (runStatus == 1) {
             this.dataForm.runStatus = "待执行";

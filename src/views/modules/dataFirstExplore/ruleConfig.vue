@@ -14,7 +14,7 @@
           ></rule-tree>
         </el-card>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="19" style="height:800px;overflow-y:auto">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <el-row>
@@ -334,9 +334,9 @@ export default {
             pageNo: this.pageIndex,
             pageSize: this.pageSize,
             ruleName: this.dataForm.ruleName,
-            ruleCategory: this.dataForm.ruleCategory
-            // folderId: this.folderId,
-            // folderPath: this.folderPath
+            ruleCategory: this.dataForm.ruleCategory,
+            folderId: this.folderId,
+            folderPath: this.folderPath
           },
           false
         )
@@ -431,7 +431,7 @@ export default {
     },
     //搜索
     getAllSearch() {
-      this.folderId = 1;
+      // this.folderId = 1;
       this.initData();
     },
     //重置搜索
@@ -512,31 +512,7 @@ export default {
     getTreeId(data) {
       this.folderId = data.folderId;
       this.folderPath = data.folderPath;
-      this.$http({
-        url: this.$http.adornUrl("/rule/selectPage"),
-        method: "get",
-        params: this.$http.adornParams(
-          {
-            pageNo: this.pageIndex,
-            pageSize: this.pageSize,
-            ruleName: this.dataForm.ruleName,
-            ruleCategory: this.dataForm.ruleCategory,
-            folderId: this.folderId,
-            folderPath: this.folderPath
-          },
-          false
-        )
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.tableData = data.result.records;
-          this.totalPage = data.result.total;
-          this.dataForm.total = data.result.total;
-        } else {
-          this.dataForm.total = 0;
-          this.tableData = [];
-          this.totalPage = 0;
-        }
-      });
+      this.initData();
     },
     //获取每行数据id
     getRowKeys(row) {
