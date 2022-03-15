@@ -185,9 +185,8 @@
           isLoading:false,
           params: this.$http.adornParams()
         }).then(({data}) => {
-          // console.log(data);
+          // 注意层级 dataType是必须要的,1:一级,2:表,3:列
           var datas=data.result;
-          // datas=treeDataTranslate(datas, 'id','parentId');
           this.treeData=datas?[datas]:[];
         })
       },

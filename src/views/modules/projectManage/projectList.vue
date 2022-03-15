@@ -34,7 +34,6 @@
     </el-form>
     <el-table
       :data="dataList"
-      border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
@@ -95,7 +94,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

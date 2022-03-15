@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="box">
-      <div class="left">
+      <div class="left list-left-tree">
         <div class="custom-tree-container">
           <!-- <el-input
             placeholder="输入关键字进行过滤"
@@ -74,7 +74,6 @@
         </div>
         <el-table
           :data="dataList"
-          border
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
           style="width: 100%;">
@@ -117,7 +116,6 @@
             </template>
           </el-table-column>
           <el-table-column
-            fixed="right"
             header-align="center"
             align="center"
             width="150"
@@ -418,7 +416,7 @@ import ruleTree from '../../common/rule-tree.vue'
   }
   .box>div{
     height: 74vh;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
     padding: 1%;
     overflow: auto;
   }
