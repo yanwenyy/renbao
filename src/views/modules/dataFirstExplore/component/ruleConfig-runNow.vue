@@ -89,7 +89,7 @@ export default {
       },
       //   form校验
       rules: {
-        // hospitalName: [{ required: true, message: "请选择", trigger: "blur" }],
+        hospitalName: [{ required: true, message: "请选择", trigger: "blur" }],
         batchName: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       showHospitalDialog: false

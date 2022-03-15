@@ -28,7 +28,7 @@
         </el-card>
       </el-col>
       <el-col :span="19">
-        <el-card class="box-card" style="height:800px">
+        <el-card class="box-card" style="height:800px;overflow-y:auto">
           <div slot="header" class="clearfix">
             <el-row>
               <el-col :span="4">
@@ -427,9 +427,9 @@ export default {
       this.dataForm.pageNum = val;
       this.initData();
     },
-    //搜索
+    //查询
     getAllSearch() {
-      this.batchId = "";
+      // this.batchId = "";
       this.initData();
     },
     //重置搜索
@@ -438,7 +438,6 @@ export default {
         ruleName: "",
         ruleCategory: ""
       };
-      this.batchId = "";
       this.initData();
     },
     //左点右显
