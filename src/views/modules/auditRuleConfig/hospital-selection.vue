@@ -33,7 +33,7 @@
                         v-loading="tableLoading"
                         ref="hospitalSelectionTable"
                         :data="tableData"
-                        max-height="350"
+                      
                         tooltip-effect="dark"
                         style="width: 100%; height: 100%; overflow-y: auto"
                         @selection-change="handleSelectionChange">
