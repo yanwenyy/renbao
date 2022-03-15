@@ -32,13 +32,13 @@
           placeholder="创建人"
         ></el-input>
       </el-form-item>
-      <el-form-item prop="ruleSqlValue">
-        <el-button
+      <el-form-item label="sql编辑" prop="ruleSqlValue">
+        <!-- <el-button
           type="text"
           @click="sqlEditor"
           style="position: absolute;left: -60px;"
           >sql编辑</el-button
-        >
+        > -->
         <el-input
           type="textarea"
           disabled
@@ -136,7 +136,7 @@ export default {
     },
     //sql编辑弹窗
     sqlEditor() {
-      this.showSqlEditorDialog = true;
+      // this.showSqlEditorDialog = true;
     },
     //sql编辑弹窗确认
     submitSql() {
