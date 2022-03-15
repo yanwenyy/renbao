@@ -287,7 +287,7 @@
       menuListTreeCurrentChangeHandle (data, node) {
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
-        this.dataForm.folderPath =  data.folderName
+        this.dataForm.folderPath =  data.folderPath
         this.treeVisible=false;
       },
       // 规则树设置当前选中节点
