@@ -9,7 +9,6 @@
     <el-table
       :data="dataList"
       row-key="menuId"
-      border
       style="width: 100%; ">
       <el-table-column
         prop="menuName"
@@ -57,7 +56,6 @@
         label="菜单URL">
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

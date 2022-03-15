@@ -48,7 +48,6 @@
         </el-menu-item>
       </el-menu>
       <div class="project-box">
-        <span>当前项目：</span>
         <el-select v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
           <el-option
             v-for="item in projectList"
@@ -163,7 +162,15 @@
   height: 50px;
   line-height: 50px;
   float: right;
+  width:40%
+}
+.project-box .el-select{
+  width: 100%;
 
 }
+  .project-box >>>.el-input input{
+    border:none;
+    text-align: right;
+  }
 
 </style>
