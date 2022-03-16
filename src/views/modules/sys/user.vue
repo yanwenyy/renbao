@@ -225,8 +225,32 @@ export default {
     },
     //下载模板
     down() {
-      var url = "/user/exportTemplate";
-      window.open(this.$http.adornUrl(url));
+      // var url = "/user/exportTemplate";
+      // window.open(this.$http.adornUrl(url));
+      this.$http({
+        method: "get",
+        url: this.$http.adornUrl("/user/exportTemplate"),
+        // data: this.query.data,
+        responseType: "blob"
+      })
+        .then(res => {
+          // console.log(decodeURI(res.headers['filename']));
+          const link = document.createElement("a");
+          let blob = new Blob([res.data], { type: "application/vnd.ms-excel" });
+          link.style.display = "none";
+          link.href = URL.createObjectURL(blob);
+          link.setAttribute("download", decodeURI(res.headers["filename"]));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        })
+        .catch(error => {
+          this.$Notice.error({
+            title: "错误",
+            desc: "系统数据错误"
+          });
+          console.log(error);
+        });
     },
     // 获取数据列表
     getDataList() {

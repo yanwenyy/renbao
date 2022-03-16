@@ -91,7 +91,7 @@
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
-                <el-button @click="addData" type="primary">新增</el-button>
+               <!--  <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
                     this.multipleSelection.length <= 0 ||
@@ -100,7 +100,7 @@
                   @click="editData"
                   type="primary"
                   >修改</el-button
-                >
+                > -->
                 <el-button
                   @click="deleteData"
                   :disabled="this.multipleSelection.length <= 0"
@@ -179,24 +179,6 @@
               v-if="showDetailDialog"
             ></detail>
           </el-dialog>
-          <!--新增/修改页面 -->
-          <!-- <el-dialog
-            :visible.sync="showAddOrEditDialog"
-            title="sql编辑器"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <AddOrEdit
-              @close="closeAddOrEdit"
-              @ok="succeed"
-              :ruleId="ruleId"
-              :folderId="folderId"
-              v-if="showAddOrEditDialog"
-            ></AddOrEdit>
-          </el-dialog> -->
-          <!--规则运行页面 -->
           <el-dialog
             :visible.sync="showRunDialog"
             title="规则运行"
@@ -306,8 +288,6 @@ export default {
       treeLoading: false,
       //查看规则详细弹窗是否显示
       showDetailDialog: false,
-      //新增、修改弹窗是否显示
-      showAddOrEditDialog: false,
       //立即运行、定时运行弹窗是否显示
       showRunDialog: false,
       //行数据定义
