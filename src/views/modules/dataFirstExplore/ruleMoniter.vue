@@ -97,22 +97,22 @@
               </el-table-column>
               <el-table-column prop="expectedBeginTime" label="预计开始时间">
                 <template slot-scope="scope">{{
-                  scope.row.expectedBeginTime | dateformat
+                  scope.row.expectedBeginTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="actualBeginTime" label="实际开始时间">
                 <template slot-scope="scope">{{
-                  scope.row.actualBeginTime | dateformat
+                  scope.row.actualBeginTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="expectedEndTime" label="预计结束时间">
                 <template slot-scope="scope">{{
-                  scope.row.expectedEndTime | dateformat
+                  scope.row.expectedEndTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="actualEndTime" label="实际结束时间">
                 <template slot-scope="scope">{{
-                  scope.row.actualEndTime | dateformat
+                  scope.row.actualEndTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="runStatus" label="运行状态">
@@ -302,7 +302,7 @@ export default {
     },
     // 列表查询
     onQuery() {
-      // this.batchId = this.batchId;
+      this.Pager.pageIndex = 1;
       this.getTableData();
     },
     // 列表重置
@@ -311,6 +311,7 @@ export default {
         ruleCategory: "",
         runStatus: ""
       };
+      this.Pager.pageIndex = 1;
       this.getTableData();
     },
     //分页
