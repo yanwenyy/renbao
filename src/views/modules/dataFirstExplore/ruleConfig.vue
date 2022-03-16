@@ -1,6 +1,6 @@
 <!--初探规则配置-->
 <template>
-  <div>
+  <div :style="conheight">
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
@@ -137,7 +137,11 @@
                   @click="timeRun"
                   >定时运行</el-button
                 >
-                <el-popover placement="top" trigger="click" v-if="this.multipleSelection.length>0">
+                <el-popover
+                  placement="top"
+                  trigger="click"
+                  v-if="this.multipleSelection.length > 0"
+                >
                   <p v-for="(i, k) in multipleSelection" :key="k">
                     {{ i.ruleName }}
                   </p>
@@ -294,10 +298,17 @@ export default {
       //规则id
       ruleId: "",
       //新增、修改弹窗是否显示
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      conheight: {
+        height: ""
+      }
     };
   },
   created() {
+    //高度自适应
+    window.addEventListener("resize", this.getHeight);
+    this.getHeight();
+    //获取列表
     this.initData();
   },
   methods: {
@@ -307,6 +318,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
+        isLoading:false,
         params: this.$http.adornParams(
           {
             pageNo: this.pageIndex,
@@ -493,6 +505,10 @@ export default {
     clearTableChecked() {
       this.$refs.tableData.clearSelection(this.multipleTable);
       this.multipleSelection = [];
+    },
+    //高度自适应
+    getHeight() {
+      this.conheight.height = window.innerHeight - 170 + "px";
     }
   }
 };
