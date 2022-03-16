@@ -34,7 +34,7 @@
               :allow-drag="allowDrag">
                <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span>
-                         <img v-if="node.data.dataType=='1'" class="tree-icon" src="./icons/view.png" alt="">
+                         <img v-if="node.data.dataType=='1'" class="tree-icon" src="./icons/files.png" alt="">
                          <img v-if="node.data.dataType=='2'" class="tree-icon" src="./icons/table_1.png" alt="">
                          <img v-if="node.data.dataType=='3'" class="tree-icon" src="./icons/column.png" alt="">
                         {{ node.label }}
@@ -62,8 +62,8 @@
               :allow-drag="allowDrag">
                <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span>
-                         <img v-if="node.data.type=='funFolder'" class="tree-icon" src="./icons/function.png" alt="">
-                         <img v-if="node.data.type=='funNode'" class="tree-icon" src="./icons/param.png" alt="">
+                         <img v-if="node.data.type=='funFolder'" class="tree-icon" src="./icons/files.png" alt="">
+                         <img v-if="node.data.type=='funNode'" class="tree-icon" src="./icons/function.png" alt="">
                         {{ node.label }}
                     </span>
                 </span>
@@ -122,6 +122,8 @@
         :jsonIndentation="jsonIndentation"
         :exportSql="exportSql"
         @setFS="getFullScreen"
+        :treeDataToHint="treeDataToHint"
+        :hintShowName="defaultProps.label"
       ></code-mirror-editor>
 
     </div>
@@ -202,6 +204,7 @@
     },
     data() {
       return {
+        treeDataToHint:[],//tree数据给sql编译器提示
         resultTableTabsList:[],//拖拽条显示高度判断
         funData:[
           {
@@ -795,14 +798,14 @@
             resize[i].style.background = '#818181';
             resize[i].style.cursor = 'w-resize';
             var startX = e.clientX;
-            resize[i].left = resize[i].offsetLeft-33;
+            resize[i].left = resize[i].offsetLeft-35;
 
             // 鼠标拖动事件
             document.onmousemove = function (e) {
               var endX = e.clientX;
               var moveLen = resize[i].left + (endX - startX); // （endx-startx）=移动的距离。resize[i].left+移动的距离=左边区域最后的宽度
               var maxT = box[i].clientWidth - resize[i].offsetWidth; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
-              console.log(resize[i].left,endX,startX,moveLen);
+              // console.log(resize[i].left,endX,startX,moveLen);
               if (moveLen < 10) moveLen = 10; // 左边区域的最小宽度为32px
               if (moveLen > maxT - 10) moveLen = maxT - 10; //右边区域最小宽度为150px
 
@@ -831,6 +834,12 @@
       },
       loadNode(node, resolve) {
         if (node.level === 0) {
+          console.log(77777);
+          this.treedata.forEach(item=>{
+            if(item.children){
+              this.treeDataToHint=this.treeDataToHint.concat(item.children);
+            }
+          });
           return resolve(this.treedata);
         }
         // if (node.level > 1) return resolve([]);
@@ -839,9 +848,22 @@
         }else{
           setTimeout(() => {
             resolve(this.loadTree);
+            this.treeDataToHint.forEach(item=>{
+              if(item.id==node.data.id){
+                item.childrens=[];
+                if(node.childNodes){
+                  node.childNodes.forEach(vtem=>{
+                    item.childrens.push(vtem.data);
+                  })
+                }
+              }
+            })
           }, 500);
         }
 
+      },
+      treeToHint(list){
+        list.for
       },
       handleNodeClick(data,obj,node){
         this.getLoadTree(data,obj,node)
@@ -879,9 +901,13 @@
         console.log('tree drag over: ', dropNode.label);
       },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        // console.log(draggingNode, dropNode, dropType, ev);
+        console.log(draggingNode, dropNode, dropType, ev);
 
         if (draggingNode.childNodes.length == 0 ) {
+          this.treeLable = this.treeDefaultProps.label?draggingNode.data[this.treeDefaultProps.label]:draggingNode.data.label;
+        }
+        //除了第一层都可以拖拽  dataType是层级分类
+        if (draggingNode.data.dataType>1) {
           this.treeLable = this.treeDefaultProps.label?draggingNode.data[this.treeDefaultProps.label]:draggingNode.data.label;
         }
         if (

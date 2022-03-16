@@ -143,7 +143,6 @@
       </el-form>
       <el-table
         :data="sqlListData"
-        border
         v-loading="dataListLoading"
         @selection-change="selectionChangeHandle"
         style="width: 100%;">
@@ -169,7 +168,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          fixed="right"
+
           header-align="center"
           align="center"
           label="操作">
@@ -275,12 +274,17 @@
   import "codemirror/addon/display/autorefresh.js";
   import "codemirror/addon/selection/mark-selection.js";
   import "codemirror/addon/search/match-highlighter.js";
+
   export default {
     components: {
       codemirror
     },
     // props: ["cmTheme", "cmMode", "autoFormatJson", "jsonIndentation",'treeLable','tableData'],
     props: {
+      hintShowName: {
+        type: String,
+        default: null,
+      },
       cmMode: {
         type: String,
         default: null,
@@ -306,6 +310,10 @@
         default: null,
       },
       sqlListData: {
+        type: Array,
+        default: null,
+      },
+      treeDataToHint: {
         type: Array,
         default: null,
       },
@@ -348,6 +356,7 @@
     },
     data() {
       return {
+        hintTable:{},//自定义提示的table
         resultTableTabsValue: '2',//动态标签显示项
         sqlSaveType:'',
         sqlSaveForm:{
@@ -377,6 +386,10 @@
         implementDisabled:false,
         editorValue: "",
         cmOptions: {
+          hintOptions: { // 自定义提示选项
+            tables: {},
+            tablesTitle:{},
+          },
           theme:'solarized light',
           mode:'text/x-mysql',
           lineWrapping: true,
@@ -432,6 +445,30 @@
       };
     },
     watch: {
+      treeDataToHint: {
+        immediate: true,
+        deep: true,
+        handler(val) {
+          if(val!=''){
+            if(val!=''){
+              console.log(val,9999999)
+              val=this.setHintList(val);
+              console.log(val,88888)
+              val.forEach(item=>{
+                this.hintTable[item.name]=[];
+                this.$refs.myCm.codemirror.options.hintOptions.tables[item.name]=[];
+                this.$refs.myCm.codemirror.options.hintOptions.tablesTitle[item.name]=[];
+              });
+              // console.log(this.$refs.myCm.codemirror.options.hintOptions.tables)
+              // console.log( this.hintTable)
+              // this.$refs.myCm.codemirror.setOption('hintOptions', { // 自定义提示选项
+              //   completeSingle: false, // 当匹配只有一项的时候是否自动补全
+              //   tables: this.hintTable
+              // });
+            }
+          }
+        }
+      },
       treeLable: {
         // 实时监控数据变化
         immediate: true,
@@ -531,6 +568,20 @@
       this.dragControllerDiv2();
     },
     methods: {
+      setHintList(list){
+        list.forEach(item=>{
+          item.name=item[this.hintShowName];
+          if(item.childrens){
+            var _list=[];
+            item.childrens.forEach(vtem=>{
+              _list.push(vtem[this.hintShowName]);
+            });
+            item.hintChildList=_list;
+            this.setHintList(item.childrens)
+          }
+        });
+        return list;
+      },
       //导出事件
       exportSqlSelf(){
         this.exportSql(this.editorValue)
@@ -549,8 +600,9 @@
         resize.onmousedown = function (e) {
           //颜色改变提醒
           resize.style.background = '#818181';
+          resize.style.cursor = 'n-resize';
           var startY = e.clientY;
-          resize.top = resize.offsetTop-60;
+          resize.top = resize.offsetTop-70;
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
@@ -1004,6 +1056,7 @@
         const keyCode = event.keyCode || event.which || event.charCode;
         const keyCombination =
           event.ctrlKey || event.altKey || event.metaKey;
+
         if (!keyCombination && keyCode > 64 && keyCode < 123) {
           this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         }
@@ -1015,8 +1068,38 @@
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
+        this.completeIfInTag(cm);
+        // if(this.editorValue!=''){
+        //   this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
+        // }
         this.resetLint();
       },
+
+      completeIfInTag(cm){
+        var that=this;
+        return this.completeAfter(cm, function () {          //智能提示
+          var tok = cm.getTokenAt(cm.getCursor());
+          if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
+          console.log(that.$refs.myCm.codemirror)
+          // var inner = that.$refs.myCm.codemirror.innerMode(cm.getMode(), tok.state).state;
+          // console.log(inner.tagName)
+          // return inner.tagName;
+        });
+      },
+      completeAfter(cm, pred){
+        var cur = cm.getCursor();
+        if (!pred || pred()) {
+          setTimeout(function () {
+            if (!cm.state.completionActive)
+              cm.showHint({
+                completeSingle: false
+              });
+          }, 100);
+        }
+        return this.$refs.myCm.codemirror.Pass;
+      },
+
+
       // 格式化字符串为json格式字符串
       formatStrInJson(strValue) {
         return JSON.stringify(
@@ -1052,9 +1135,13 @@
   .CodeMirror-selectedtext {
     color: white !important;
   }
-  .cm-matchhighlight {
-    background-color: #ae00ae;
+  .codeMirror-blue{
+    background: blue !important;
   }
+  /*紫色高亮*/
+  /*.cm-matchhighlight {*/
+    /*background-color: #ae00ae;*/
+  /*}*/
   .btn-group .el-button--text i{
     font-size: 18px;
   }
