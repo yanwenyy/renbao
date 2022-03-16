@@ -126,7 +126,14 @@ export default {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true
-                    this.$http.post(this.$http.adornUrl('/ruleResult/exportResult'), this.exportForm, { responseType: "blob", headers: { 'Content-Type': 'application/json; application/octet-stream'} } ).then((response) => {
+                    this.$http({
+                        method: "post",
+                        isLoading:false,
+                        responseType: 'blob',
+                        url: this.$http.adornUrl('/ruleResult/exportResult'),
+                        headers: { 'Content-Type': 'application/json; application/octet-stream'},
+                        data: this.$http.adornData(this.exportForm, false) 
+                    }).then((response) => {
                         exportZip(response, '结果明细')
                         this.loading = false;
                         this.$message({
@@ -136,7 +143,7 @@ export default {
                             duration: 1500,
                         })
                         this.dialogVisible = false
-                     })
+                    });
                     this.reSet();
                 }
             })

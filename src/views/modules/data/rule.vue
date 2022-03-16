@@ -68,8 +68,8 @@
           <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="ruleImport">导入</el-button>
-          <el-button type="warning" @click="ruleExport('all')">全部导出</el-button>
-          <el-button type="warning" @click="ruleExport">导出</el-button>
+          <el-button type="warning" @click="ruleExport('all')" :loading="ruleExportAllLoading">全部导出</el-button>
+          <el-button type="warning" @click="ruleExport" :loading="ruleExportLoading">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
@@ -217,6 +217,9 @@ import ImportFile from './Import-file.vue'
             value: '国六',
             label: '国六'
           }],
+        ruleExportLoading: false,
+        ruleExportAllLoading: false,
+        ruleCheckData: {}
       }
     },
     watch: {
@@ -283,6 +286,7 @@ import ImportFile from './Import-file.vue'
       getDataList () {
         this.dataListLoading = true
         this.$http({
+          isLoading: false,
           url: this.$http.adornUrl('/rule/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
@@ -305,35 +309,35 @@ import ImportFile from './Import-file.vue'
         })
       },
       // 批量导出
-      ruleExport (all) {
+      ruleExport (isAll) {
         var exportList = []
         // 判断是否为全部导出，全部导出的话exportList为空列表
-        if (all) {
+        if (isAll) {
           if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
           this.dataListSelections.forEach( item =>{
               exportList.push( item.ruleId )
           })
+          this.ruleExportLoading = true
         }
+        if (!isAll) {
+          this.ruleExportAllLoading = true;
+        }
+       
         this.$http({
             isLoading:false,
             url: this.$http.adornUrl('/rule/ruleExport'),
             method: 'post',
             data: this.$http.adornData(exportList, false)
         }).then(({data}) => {
+            this.ruleExportLoading = false
+            this.ruleExportAllLoading = false;
             if (data && data.code === 200) {
-
               this.$message({message: '导出成功',type: 'success'});
               this.getDataList();
             } else {
-              // this.$message.error(data.msg)
+              this.$message({message: data.message,type: 'error'});
             }
         })
-
-
-
-
-        
-
 
       },
       // 导入
@@ -359,7 +363,7 @@ import ImportFile from './Import-file.vue'
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(id, this.ruleCheckData)
         })
       },
       //图片预览
@@ -426,6 +430,8 @@ import ImportFile from './Import-file.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
+        let checkedData = JSON.parse(JSON.stringify(data))
+        this.ruleCheckData = checkedData
         // 规则列表有子节点时folderId为空
         this.dataForm.folderPath=data.folderPath && data.folderPath || '';
         this.dataForm.folderId = data.folderId && data.folderId || '';

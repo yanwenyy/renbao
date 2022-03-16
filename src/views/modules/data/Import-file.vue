@@ -104,15 +104,13 @@ export default {
                 data: fd 
             }).then((res) => {
                 this.loading = false
-                if (res.code == 200) {
-
+                if (res.data.code == 200) {
+                    this.$message.success('导入成功');
+                    this.$parent.getDataList();
+                    this.dialogVisible = false
                 } else {
-                    this.$message({
-                        message: "系统出错了，请联系管理员！",
-                        type: "error",
-                    });
+                    this.$message.error(res.data.message);
                 }
-                
             });
         },
         cancel () {

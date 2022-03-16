@@ -155,10 +155,9 @@ export default {
     },
     mounted () {
         this.getRuleFolder();
-
     },
     activated () {
-        
+        this.getRuleFolder();
     },
     methods: {
         // 获取规则树

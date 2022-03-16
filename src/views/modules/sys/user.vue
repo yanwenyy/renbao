@@ -51,7 +51,7 @@
         <el-button type="warning" @click="down()">下载模板</el-button>
         <el-upload
           class="inline-block"
-          :headers="{token: token }"
+          :headers="{ token: token }"
           :action="this.$http.adornUrl('/user/dataImport')"
           :on-success="handleChange"
           :on-error="handleChange"
@@ -198,7 +198,7 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false,
       fileList: [],
-      token:this.$cookie.get("token")
+      token: this.$cookie.get("token")
     };
   },
   components: {
@@ -221,15 +221,13 @@ export default {
           }
         });
       } else {
-        this.$message.error(response.message);  
+        this.$message.error(response.message);
       }
     },
     //下载模板
     down() {
-      // var url = "/user/exportTemplate";
-      // window.open(this.$http.adornUrl(url));
-      this.$http({
-        method: "post",
+       this.$http({
+        method: "get",
         url: this.$http.adornUrl("/user/exportTemplate"),
         // data: this.query.data,
         responseType: "blob"
@@ -357,7 +355,7 @@ export default {
 .searchBtn {
   float: right;
 }
-  .inline-block{
-    display: inline-block;
-  }
+.inline-block {
+  display: inline-block;
+}
 </style>
