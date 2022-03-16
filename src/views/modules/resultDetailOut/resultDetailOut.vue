@@ -3,7 +3,7 @@
         <div class="resultDetailsExport-left">
             <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
                     <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
-                        <span>
+                        <span :title="node.label">
                             {{node.label}}
                         </span>
                     </span>
@@ -333,8 +333,15 @@ export default {
             min-height: 70vh;
         }
         /deep/ .el-tree-node__children .custom-tree-node{
+            padding: 0 5px;
             text-decoration: underline;
             color: #0000FF;
+            width: 100%;
+            display: inline-block;
+            overflow:hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            -o-text-overflow:ellipsis;
         }
         /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
             background-color: #e3edfa;

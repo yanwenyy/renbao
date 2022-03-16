@@ -13,6 +13,7 @@
                     <el-form-item 
                         label="导入文件"
                         prop="ruleFile"
+                        class="upload-box"
                     >
                         <el-upload
                             ref="ruleFileUpload"
@@ -65,24 +66,12 @@ export default {
         //默认打开页面
         showDialog( ) {
             this.dialogVisible = true  
-        },
-       
-        reset () {
-            this.ruleOperationForm = {
-                expectedBeginTime: '',
-                hospital: '',
-                batchName: '',
-                batchRemark: '',
-                hospitalCode: '',
-                hospitalName: '',
-                ruleId: ''
-            };
+            this.resetForm();
         },
       
         handleClose () {
             this.dialogVisible = false
             this.resetForm();
-            this.reset();
         },
         onSubmit (formName) {
             // this.uploadData()
@@ -96,22 +85,25 @@ export default {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.$refs.ruleFileUpload.submit();
-                    
                 }
             })
 
         },
+        // 上传文件
         uploadData (params) {
             let fd = new FormData();
+            this.loading = true;
             fd.append("ruleFile", params.file); //传文件
             this.$http({
                 method: "post",
+                isLoading:false,
                 url: this.$http.adornUrl('rule/ruleImport'),
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
                 data: fd 
             }).then((res) => {
+                this.loading = false
                 if (res.code == 200) {
 
                 } else {
@@ -120,58 +112,25 @@ export default {
                         type: "error",
                     });
                 }
+                
             });
-
-            // this.ruleOperationForm.batchType= 2
-            // this.$refs[formName].validate((valid) => {
-            //     if (valid) {
-            //         this.loading = true
-            //         this.$http({
-            //             isLoading:false,
-            //             url: this.$http.adornUrl('/rule/ruleRun'),
-            //             method: 'post',
-            //             data:  this.$http.adornData(this.ruleOperationForm, false)
-            //         }).then(({data}) => {
-            //             // this.btnLoading = false;
-            //             if (data.code == 200) {
-            //                 this.loading = false
-            //                 this.$alert('请在审核执行监控中查看运行详情', '执行成功',{
-            //                     confirmButtonText: '关闭',
-            //                     callback: action => {
-            //                         this.dialogVisible = false;
-            //                         this.$parent.setTableChecked()
-            //                     }
-            //                 });
-            //             } else {
-            //                 this.$message({
-            //                     message: '执行失败',
-            //                     type: 'error',
-            //                     duration: 1500,
-            //                 })
-            //                 this.loading = false
-            //             }
-            //         }).catch(() => {
-            //             this.loading = false
-            //         })  
-            //     }
-            // }) 
         },
         cancel () {
             this.dialogVisible = false;
             this.resetForm();
-            this.reset();  
         },
         resetForm(formName) {
             if (this.$refs['ruleExportForm']) {
                 this.$refs['ruleExportForm'].resetFields();
             }
+            this.fileList = []
             
         },
         //文件上传成功时的钩子
         onSuccess(response, file, fileList) {
-            console.log(response);
-            console.log(file);
-            console.log(fileList);
+            // console.log(response);
+            // console.log(file);
+            // console.log(fileList);
             if (response.code == 200) {
                 alert("文件上传成功！");
                 this.fileUploadStatus = "success";
@@ -182,12 +141,11 @@ export default {
  
         //文件列表移除文件时的钩子
         handleRemove(file, fileList) {
-            console.log(file, fileList);
+            // console.log(file, fileList);
             this.fileList = []
         },
         //文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
         onChange(file) {
-            console.log(file);
             this.fileList.push(file);
         },
     },
@@ -210,6 +168,13 @@ export default {
     }
     /deep/ .el-dialog__footer {
         text-align: center;
+    }
+    .upload-box {
+        max-width: 400px;
+    }
+    /deep/ .el-upload-list__item {
+        margin-top: 0;
+
     }
    
 }
