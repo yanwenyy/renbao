@@ -4,20 +4,23 @@
          <div class='listDisplay'>
              <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
         </div>
-        <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" v-loading="dataListLoading" @selection-change="handleSelectionChange">
             <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-            <el-table-column label="批次" align="center" prop="collectPlanMonitorBath"> </el-table-column>
-            <el-table-column label="医院名称" align="center" prop="pName"></el-table-column>
-            <el-table-column label="采集数据文件路径" align="center" prop="filePath"> </el-table-column>
-            <el-table-column label="数据类型" align="center" prop="dataType">
+            <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
+            <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
+            <el-table-column label="采集表名称" align="center" prop="fileName"></el-table-column>
+            <el-table-column label="采集数据文件路径" align="center" prop="collectPath"> </el-table-column>
+            <el-table-column label="数据类型" align="center">
                     <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
-                    <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                    <div class="tac">医院数据</div>
+                    <!-- <div class="tac" v-if="scope.row.dataType=='2'">医保</div> -->
                 </template>
             </el-table-column>
             <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
-            <el-table-column label="开始时间" align="center" :formatter="dateFormat"  prop="startTime"></el-table-column>
-            <el-table-column label="结束时间" align="center" :formatter="dateEndFormat" prop="endTime"> </el-table-column>
+            <el-table-column label="开始时间" align="center" prop="startTimeString">
+            </el-table-column>
+            <el-table-column label="结束时间" align="center"  prop="endTimeString">
+            </el-table-column>
             <el-table-column label="状态" align="center" prop="collectStatus">
                 <template slot-scope="scope">
                     <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
@@ -50,7 +53,7 @@
             :page-sizes="[10, 20, 50, 100]"
             ></el-pagination>
         <!-- 查看未导入医院弹框-->
-        <el-dialog title='查看未导入医院' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="notImportVisible">
+        <el-dialog title='查看未导入医院' :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="notImportVisible">
             <NotImport v-if="notImportVisible" @close="closeImportDrawer" @ok="ImportSucceed"></NotImport>
         </el-dialog>
         <!-- 查看进度弹框-->
@@ -79,14 +82,48 @@ export default {
             },
             notImportVisible:false,
             showViewVisible:false,
-            multipleSelection:''
+            multipleSelection:'',
+            dataListLoading:false,
+            dataForm:{
+                fileName:'',
+                filePath:'',
+                collectStatus:'',
+                startTime:'',
+                endTime:''
+            },
         }
     },
     mounted(){
         this.getInitList()
     },
     methods:{
-        getInitList(){},
+        getInitList(){
+            this.dataListLoading = true;
+            this.$http({
+                url:this.$http.adornUrl('/hospitalCollectPlan/selectPageList'),
+                method: 'get',
+                params: this.$http.adornParams({
+                    pageSize:this.apComServerData.pageSize,
+                    pageNo:this.apComServerData.pageIndex,
+                    // fileName:this.dataForm.fileName || '',
+                    // filePath:this.dataForm.filePath || '',
+                    collectStatus:this.dataForm.collectStatus || '',
+                    startTimeBegin:this.dataForm.startTime || '',
+                    // endTime:this.dataForm.endTime || ''
+                    
+                })
+            }).then(({data}) =>{
+                if(data && data.code === 200){
+                    this.tableData = data.result.records
+                    this.apComServerData.total = data.result.total
+                      
+                }else{
+                    this.tableData = []
+                    this.apComServerData.total = 0
+                }
+                this.dataListLoading = false;
+            })
+        },
         //查看进度
         edit(){
             this.showViewVisible = true
@@ -97,28 +134,7 @@ export default {
             this.multipleSelection = val
             this.$emit('satDataHospital',this.multipleSelection); // 回显医院名称
         },
-         //开始时间转换
-        dateFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.startTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-        //结束时间转换
-        dateEndFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.endTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
+      
         //进度条
         format(percentage) {
            return percentage === 100 ? '满' : `${percentage}%`;
@@ -127,6 +143,7 @@ export default {
         getStopCollection(){
             this.notImportVisible = true
         },
+        //关闭弹框
         ImportSucceed(){
             this.closeImportDrawer()
         },
