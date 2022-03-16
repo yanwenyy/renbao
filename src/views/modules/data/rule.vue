@@ -67,7 +67,7 @@
         <div class="search-btn">
           <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
-          <el-button type="warning" @click="getDataList()">导入</el-button>
+          <el-button type="warning" @click="ruleImport">导入</el-button>
           <el-button type="warning" @click="getDataList()">全部导出</el-button>
           <el-button type="warning" @click="ruleExport">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
@@ -155,12 +155,14 @@
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
+    <Import-file ref="ImportFile"></Import-file>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './rule-add-or-update'
+import AddOrUpdate from './rule-add-or-update'
 import ruleTree from '../../common/rule-tree.vue'
+import ImportFile from './Import-file.vue'
   export default {
     data () {
       return {
@@ -224,8 +226,8 @@ import ruleTree from '../../common/rule-tree.vue'
     },
     components: {
       ruleTree,
-
-      AddOrUpdate
+      AddOrUpdate,
+      ImportFile
     },
     activated () {
       this.getDataList();
@@ -331,6 +333,10 @@ import ruleTree from '../../common/rule-tree.vue'
         
 
 
+      },
+      // 导入
+      ruleImport () {
+        this.$refs.ImportFile.showDialog()
       },
       // 每页数
       sizeChangeHandle (val) {
