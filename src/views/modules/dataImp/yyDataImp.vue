@@ -57,7 +57,6 @@
       <el-table-column
         header-align="center"
         align="center"
-        width="150"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="tableDataView(scope.row.tableName)">查看数据</el-button>
@@ -145,6 +144,65 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="fileTreeDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="checkFileTable">下一步</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog 
+      title="数据表匹配" 
+      :visible.sync="checkFileTableDialogVisible" 
+      width="60%" 
+      :close-on-click-modal="false">
+      <el-table
+        border
+        style="width: 100%;height:45vh; overflow:auto;"
+        :data="this.selectedFileData">
+        <!-- fileTableInfos  -->
+        <el-table-column
+          align="center"
+          label="文件名">
+          <template slot-scope="scope">
+            {{ scope.row.name}}
+          </template>
+        </el-table-column>
+        <el-table-column
+          align="center"
+          label="目标表">
+            <template slot-scope="scope">
+              <!-- scope.row[getMapKey(scope.row)] -->
+              <el-select
+                v-model="fileTableInfos[scope.row.path]"
+                v-if="checkType(scope.row.fileType)"
+                multiple
+                value-key="tableInfoId"
+                placeholder="请选择匹配表"
+                clearable
+                >
+                <el-option
+                  v-for="itemdbm in tableInfos"
+                  :key="itemdbm.tableInfoId"
+                  :label="itemdbm.tableNameCn"
+                  :value="itemdbm">
+                </el-option>
+              </el-select>
+              <el-select
+                v-model="fileTableInfos[scope.row.path][0]"
+                v-if="!checkType(scope.row.fileType)"
+                value-key="tableInfoId"
+                placeholder="请选择匹配表"
+                clearable
+                >
+                <el-option
+                  v-for="itemdbm in tableInfos"
+                  :key="itemdbm.tableInfoId"
+                  :label="itemdbm.tableNameCn"
+                  :value="itemdbm">
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="checkFileTableDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="findFileTable">下一步</el-button>
       </span>
     </el-dialog>
@@ -326,7 +384,11 @@
         // 查看字段弹窗
         tableColumnViewDialogVisible: false,
         // 查看数据弹窗
-        tableDataViewDialogVisible: false,
+        tableDataViewDialogVisible: false, 
+        // 匹配表弹窗
+        checkFileTableDialogVisible: false,
+        // 医保表信息
+        tableInfos: [],
         // 文件选中数据
         fileSelections: [],
         // 文件树
@@ -350,7 +412,11 @@
         // 医院名
         hospitalName: '',
         // 医院采集路径
-        hospitalPath: ''
+        hospitalPath: '',
+        // 导入数据集合
+        importDataModelList: [],
+        // 文件表对应关系
+        fileTableInfos: {}
       }
     },
     components: {
@@ -379,6 +445,34 @@
         })
         this.fileTreeLoading = false
       },
+      // 检查文件和匹配的表信息
+      checkFileTable () {
+        this.$http({
+          url: this.$http.adornUrl(`dataImp/checkFileTable`),
+          method: 'post',
+          data: this.selectedFileData
+        }).then(({data}) => {
+             if (data && data.code === 200) {
+               this.fileTableInfos = data.result
+               this.findFileTable()
+             } else if (data && data.code == 500 && data.result) {
+               this.fileTableInfos = data.result
+              this.$http({
+                url: this.$http.adornUrl(`dataImp/getTableInfos/${2}`),
+                method: 'get'
+              }).then(({data}) => {
+                  if (data && data.code == 200) {
+                    if(data.result != null) {
+                      this.tableInfos = data.result
+                    }
+                  }
+              })
+               this.checkFileTableDialogVisible = true
+             } else {
+               this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+             }
+         })
+      },
       // 获取文件中涉及到的表名
       findFileTable () {
         if (this.selectedFileData.length == 0) {
@@ -388,7 +482,7 @@
         this.$http({
           url: this.$http.adornUrl(`dataImp/getFileTable/${1}`),
           method: 'post',
-          data: this.selectedFileData
+          data: this.fileTableInfos
         }).then(({data}) => {
           if (data && data.code === 200) {
             // 获取表和列的信息
@@ -502,6 +596,16 @@
       // 重置查询条件
       resetSelect() {
          this.dataForm.tableName = null
+      },
+      // 文件类型是否为dmp或者bak
+      checkType(fileType) {
+         switch (fileType.toUpperCase()) {
+            case 'BAK':
+            case 'DMP':
+              return true
+              break
+          }
+          return false
       },
       // 点击文件树
       fileClick(row){

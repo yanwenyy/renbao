@@ -69,10 +69,10 @@
           </div>
           <div class="content">
             <div class="tableTitle">
-              <span
+              <!-- <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
-              >
+              > -->
               <div style="float:right;margin-bottom:10px">
                 <el-button @click="detailExport" type="warning"
                   >结果明细导出</el-button
@@ -106,12 +106,12 @@
               </el-table-column>
               <el-table-column prop="actualBeginTime" label="开始时间">
                 <template slot-scope="scope">{{
-                  scope.row.actualBeginTime | dateformat
+                  scope.row.actualBeginTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="actualEndTime" label="结束时间">
                 <template slot-scope="scope">{{
-                  scope.row.actualEndTime | dateformat
+                  scope.row.actualEndTime
                 }}</template>
               </el-table-column>
               <el-table-column prop="resultCount" label="结果条数">
@@ -128,12 +128,15 @@
             </el-table>
             <div class="pager">
               <el-pagination
-                small
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="Pager.pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="Pager.pageSize"
+                :total="Pager.total"
                 layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :total="totalPage"
-              ></el-pagination>
+              >
+              </el-pagination>
             </div>
           </div>
           <!--查看详细弹窗 -->
@@ -172,11 +175,12 @@
             >
               <el-form-item prop="hospital" label="请选择医院：">
                 <el-select
-                  v-model="dataForm1.hospital"
+                  v-model="dataForm1.hospId"
                   filterable
                   clearable
                   placeholder="请选择医院"
                   multiple
+                  @change="val => checkChange(val)"
                 >
                   <el-option
                     v-for="item in hospitals"
@@ -186,14 +190,14 @@
                   >
                   </el-option>
                 </el-select>
-                <el-checkbox
-                  v-model="checked"
-                  @change="selectAll"
+                <el-checkbox v-model="checked" @change="selectAll"
                   >全选</el-checkbox
                 >
               </el-form-item>
             </el-form>
-            <el-button type="primary" @click="exportExcel()">导出</el-button>
+            <el-button type="primary" @click="exportExcel('dataForm1')"
+              >导出</el-button
+            >
             <el-button @click="closeExport">取消</el-button>
           </el-dialog>
         </el-card>
@@ -203,25 +207,29 @@
 </template>
 <script>
 import detail from "./component/detailExport-detail.vue";
+import { exportZip } from "@/utils";
 export default {
   components: {
-    detail
+    detail,
+    exportZip
   },
   data() {
     return {
       //条件查询
       dataForm: {
         ruleName: "",
-        ruleCategory: ""
+        ruleCategory: "",
+        total: ""
       },
       //医院数据
       dataForm1: {
         batchId: "",
-        hospital: ""
+        hospId: [],
+        hospName: []
       },
       //必填校验
       rules: {
-        hospital: [{ required: true, message: "请选择", trigger: "blur" }]
+        dataForm1: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       batchTreeList: [
         {
@@ -263,9 +271,11 @@ export default {
       batchId: "",
       batchType: 1,
       hospitals: [],
-      pageSize: 10,
-      pageIndex: 1,
-      totalPage: 0
+      Pager: {
+        pageSize: 10,
+        pageIndex: 1,
+        total: 0
+      }
     };
   },
   created() {
@@ -284,20 +294,20 @@ export default {
           batchId: this.batchId,
           ruleCategory: this.dataForm.ruleCategory, //规则类别;1:门诊规则,2:住院规则
           ruleName: this.dataForm.ruleName,
-          pageNo: this.pageIndex,
-          pageSize: this.pageSize,
+          pageNo: this.Pager.pageIndex,
+          pageSize: this.Pager.pageSize,
           batchType: this.batchType
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.tableData = data.result.records;
-          this.totalPage = data.result.total;
+          this.Pager.total = data.result.total;
           this.dataForm.total = data.result.total;
           this.loading = false;
         } else {
-          this.dataForm.total = 0;
           this.tableData = [];
-          this.totalPage = 0;
+          this.Pager.total = 0;
+          this.dataForm.total = 0;
           this.loading = false;
         }
       });
@@ -351,8 +361,9 @@ export default {
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
       } else {
-        this.dataForm1.hospital = [];
-        this.checked = false
+        this.dataForm1.hospId = [];
+        this.dataForm1.hospName = [];
+        this.checked = false;
         this.detailExportDialog = true;
       }
     },
@@ -429,18 +440,18 @@ export default {
       this.$refs[formName].resetFields();
     },
     //分页
-    handleSizeChange(val) {
-      this.dataForm.pageSize = val;
+    sizeChangeHandle(val) {
+      this.Pager.pageSize = val;
       this.initData();
     },
     //分页
-    handleCurrentChange(val) {
-      this.dataForm.pageNum = val;
+    currentChangeHandle(val) {
+      this.Pager.pageIndex = val;
       this.initData();
     },
     //查询
     getAllSearch() {
-      // this.batchId = "";
+      this.Pager.pageIndex = 1;
       this.initData();
     },
     //重置搜索
@@ -449,6 +460,7 @@ export default {
         ruleName: "",
         ruleCategory: ""
       };
+      this.Pager.pageIndex = 1;
       this.initData();
     },
     //左点右显
@@ -457,39 +469,34 @@ export default {
       this.initData();
     },
     //结果明细导出
-    exportExcel() {
+    exportExcel(formName) {
       this.dataForm1.batchId = this.batchId;
-      /* var arr = [];
-      var hospitalCodes = [];
-      var hospitalNames = [];
-      for (var i = 0; i < this.dataForm1.hospital.length; i++) {
-        arr.push(this.dataForm1.hospital[i].split("|"));
-      }
-      for (var j = 0; j < arr.length; j++) {
-        hospitalCodes.push(arr[j][0]);
-        hospitalNames.push(arr[j][1]);
-      } */
-      // console.log(hospitalCodes);
-      // console.log(hospitalNames);
-      this.$http({
-        url: this.$http.adornUrl("ruleResult/exportResult"),
-        method: "post",
-        responseType: "blob", //解决乱码问题
-        data: this.$http.adornData(this.dataForm1, false)
-      }).then(({ data }) => {
-        const blob = new Blob([data]);
-        let fileName = "结果明细.xls";
-        if ("download" in document.createElement("a")) {
-          const elink = document.createElement("a");
-          elink.download = fileName;
-          elink.style.display = "none";
-          elink.href = URL.createObjectURL(blob); // 创建下载的链接
-          document.body.appendChild(elink);
-          elink.click(); // 点击下载
-          URL.revokeObjectURL(elink.href); // 释放掉blob对象
-          document.body.removeChild(elink); // 下载完成移除元素
-        } else {
-          navigator.msSaveBlob(blob, fileName);
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.loading = true;
+          this.$http
+            .post(
+              this.$http.adornUrl("/ruleResult/exportResult"),
+              this.dataForm1,
+              {
+                responseType: "blob",
+                headers: {
+                  "Content-Type": "application/json; application/octet-stream"
+                }
+              }
+            )
+            .then(response => {
+              exportZip(response, "结果明细");
+              this.loading = false;
+              this.$message({
+                // message: data.message,
+                message: "导出成功",
+                type: "success",
+                duration: 1500
+              });
+              this.detailExportDialog = false;
+            });
+          this.reSet();
         }
       });
     },
@@ -497,16 +504,54 @@ export default {
     closeExport() {
       this.detailExportDialog = false;
     },
+    //选择数据
+    checkChange(val) {
+      this.exportForm.hospName = [];
+      // 判断是否为全选状态
+      if (val.length == this.hospitalTableData.length) {
+        this.checked = true;
+      } else {
+        this.checked = false;
+      }
+      for (let i = 0; i <= val.length - 1; i++) {
+        this.hospitalTableData.find(item => {
+          //这里的options就是数据源
+          if (item["医院编码"] == val[i]) {
+            this.exportForm.hospName.push(item["医院名称"]);
+          }
+        });
+      }
+    },
     //医院全选
     selectAll() {
-      this.dataForm1.hospital = [];
+      /* this.dataForm1.hospital = [];
       if (this.checked) {
         this.hospitals.map(item => {
           this.dataForm1.hospital.push(item);
         });
       } else {
         this.dataForm1.hospital = [];
+      } */
+      this.exportForm.hospId = [];
+      this.exportForm.hospName = [];
+      if (this.checked) {
+        this.hospitalTableData.map(i => {
+          this.exportForm.hospId.push(i["医院编码"]);
+          this.exportForm.hospName.push(i["医院名称"]);
+        });
+      } else {
+        this.exportForm.hospId = [];
+        this.exportForm.hospName = [];
       }
+    },
+    //重置已选
+    reSet() {
+      this.dataForm1 = {
+        hospId: [],
+        hospName: [],
+        batchId: ""
+      };
+      this.checked = false;
     }
   }
 };

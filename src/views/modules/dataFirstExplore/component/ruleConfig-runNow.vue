@@ -13,10 +13,9 @@
       >
         <el-date-picker
           v-model="dataForm.expectedBeginTime"
-          type="date"
+          type="datetime"
           placeholder="选择日期时间"
-          format="yyyy/MM/dd"
-          value-format="yyyy-MM-dd"
+          
         >
         </el-date-picker>
       </el-form-item>
