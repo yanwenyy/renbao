@@ -69,10 +69,10 @@
           </div>
           <div class="content">
             <div class="tableTitle">
-              <span
+              <!-- <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
-              >
+              > -->
               <div style="float:right;margin-bottom:10px">
                 <el-button @click="detailExport" type="warning"
                   >结果明细导出</el-button

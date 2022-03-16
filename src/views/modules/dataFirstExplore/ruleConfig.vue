@@ -52,44 +52,14 @@
                 >
                 <el-button @click="reset()">重置</el-button>
               </el-col>
-              <el-col :span="11">
-                <el-button-group style="float:right">
-                  <el-button
-                    >当前选择规则数量：{{
-                      this.multipleSelection.length
-                    }}</el-button
-                  >
-                  <el-button
-                    :disabled="this.multipleSelection.length <= 0"
-                    @click="runNow"
-                    >立即运行</el-button
-                  >
-                  <el-button
-                    :disabled="this.multipleSelection.length <= 0"
-                    @click="timeRun"
-                    >定时运行</el-button
-                  >
-                  <el-popover placement="right" trigger="click">
-                    <el-table :data="choseRule" :show-header="false">
-                      <el-table-column
-                        property="ruleName"
-                        label="规则名称"
-                      ></el-table-column>
-                    </el-table>
-                    <el-button slot="reference" @click="seeChoseRule"
-                      >当前所选规则</el-button
-                    >
-                  </el-popover>
-                </el-button-group>
-              </el-col>
             </el-row>
           </div>
           <div class="content">
             <div class="tableTitle">
-              <!-- <span
+              <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
-              > -->
+              >
               <div style="float:right;margin-bottom:10px">
                 <!-- <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
@@ -150,6 +120,35 @@
                 </template>
               </el-table-column>
             </el-table>
+            <div style="float:left;margin-top:10px">
+              <el-button-group>
+                <el-button
+                  >当前选择规则数量：{{
+                    this.multipleSelection.length
+                  }}</el-button
+                >
+                <el-button
+                  :disabled="this.multipleSelection.length <= 0"
+                  @click="runNow"
+                  >立即运行</el-button
+                >
+                <el-button
+                  :disabled="this.multipleSelection.length <= 0"
+                  @click="timeRun"
+                  >定时运行</el-button
+                >
+                <el-popover placement="right" trigger="click">
+                  <el-table :data="choseRule" :show-header="false" style="width:300px">
+                    <el-table-column
+                      prop="ruleName"
+                    ></el-table-column>
+                  </el-table>
+                  <el-button slot="reference" @click="seeChoseRule"
+                    >当前所选规则</el-button
+                  >
+                </el-popover>
+              </el-button-group>
+            </div>
             <div class="pager">
               <el-pagination
                 @size-change="sizeChangeHandle"
@@ -230,7 +229,7 @@ import addOrUpdate from "@/views/modules/data/rule-add-or-update.vue";
 export default {
   components: {
     detail,
-    // AddOrEdit, 
+    // AddOrEdit,
     runNow,
     ruleTree,
     addOrUpdate
@@ -480,7 +479,7 @@ export default {
       this.choseRule = this.multipleSelection;
     },
     //拿到选择树的id
-    getTreeId(data) { 
+    getTreeId(data) {
       // 规则列表有子节点时folderId为空
       this.folderPath = (data.folderPath && data.folderPath) || "";
       this.folderId = (data.folderId && data.folderId) || "";
