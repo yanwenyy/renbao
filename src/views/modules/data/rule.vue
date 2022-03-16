@@ -65,7 +65,7 @@
           </el-form-item>
         </el-form>
         <div class="search-btn">
-          <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+          <el-button type="primary" @click="addOrUpdateHandle('')">新增</el-button>
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="ruleImport">导入</el-button>
           <el-button type="warning" @click="ruleExport('all')" :loading="ruleExportAllLoading">全部导出</el-button>
@@ -242,6 +242,18 @@ import ImportFile from './Import-file.vue'
       });
     },
     methods: {
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          if (id) {
+            this.$refs.addOrUpdate.init(id,this.ruleCheckData)
+          } else {
+            this.$refs.addOrUpdate.init('',this.ruleCheckData)
+          }
+          
+        })
+      },
       // 获取规则树
       getRuleFolder () {
         this.$http({
@@ -359,13 +371,6 @@ import ImportFile from './Import-file.vue'
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
-      // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id, this.ruleCheckData)
-        })
-      },
       //图片预览
       preImg(src){
         this.ImgPreVisible = true;
@@ -431,7 +436,7 @@ import ImportFile from './Import-file.vue'
       },
       getTreeData (data) {
         let checkedData = JSON.parse(JSON.stringify(data))
-        this.ruleCheckData = checkedData
+        this.ruleCheckData = data
         // 规则列表有子节点时folderId为空
         this.dataForm.folderPath=data.folderPath && data.folderPath || '';
         this.dataForm.folderId = data.folderId && data.folderId || '';

@@ -101,6 +101,9 @@ export default {
         isShowIcon: {
             type: Boolean, // 是否显示文件夹
             default: true
+        },
+        folderType: { // 规则树查询参数
+            default: ''
         }
 
     },
@@ -167,7 +170,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
+                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId, folderType: this.folderType}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
@@ -399,7 +402,8 @@ export default {
     .custom-tree-node {
         width: 100%;
         display: flex;
-        display: inline-block;
+        // display: inline-block;
+        align-items: center;
     }
     .tree-label {
         max-width: 180px;
