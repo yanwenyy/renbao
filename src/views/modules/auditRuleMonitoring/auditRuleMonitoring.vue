@@ -3,7 +3,7 @@
         <div class="auditRuleMonitoring-left">
             <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
                     <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
-                        <span>
+                        <span :title="node.label">
                             {{node.label}}
                         </span>
                     </span>
@@ -54,11 +54,9 @@
                         <template slot-scope="scope">
                             <div v-if="items.type=='option'">
                                 <div class="operation-box">
-                                    <!-- <span @click="publish(scope.row)">发表</span> -->
                                     <span class="result-view-text" @click="resultViewClick(scope.row)" v-if="scope.row.option == 3">结果查看</span>
-                                    <span v-else-if="scope.row.option == 2"></span>
+                                    <span v-else-if="scope.row.option == 2 || scope.row.option == 1"></span>
                                     <span v-else-if="scope.row.option == 4">运行成功</span>
-                                    <span v-else-if="scope.row.option == 1">待执行</span>
                                 </div>
                             </div>
                             <div v-else>
@@ -292,6 +290,12 @@ export default {
             text-decoration: underline;
             color: #0000FF;
             width: 100%;
+            padding: 0 5px;
+            display: inline-block;
+            overflow:hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            -o-text-overflow:ellipsis;
         }
         /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
             background-color: #e3edfa;

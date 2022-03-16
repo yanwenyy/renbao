@@ -94,12 +94,15 @@ export default {
         // 全选
         selectAll () {
             this.exportForm.hospId = [];
+            this.exportForm.hospName = [];
             if (this.checked) {
                 this.hospitalTableData.map(i => {
                     this.exportForm.hospId.push(i['医院编码'])
+                    this.exportForm.hospName.push(i['医院名称'])
                 })
             } else {
                 this.exportForm.hospId = [];
+                this.exportForm.hospName = [];
             }
         },
         // 获取医院列表
@@ -119,6 +122,7 @@ export default {
         },
         // 导出
         exportClick (formName) {
+            console.log(this.exportForm, 'exportForm')
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true

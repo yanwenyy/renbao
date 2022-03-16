@@ -144,10 +144,12 @@ export default {
   },
   data() {
     return {
+      //条件查询
       dataForm: {
         basicName: "",
         basicType: ""
       },
+      //新增、修改弹窗是否显示
       showAddOrEditDialog: false,
       //loading
       listLoading: false,
@@ -157,10 +159,13 @@ export default {
       multipleSelection: [],
       //table表格数据
       tableList: [],
+      //动态表格列
       tableColumns: [],
+      //新增、弹窗传参
       info: "",
+      //状态
       status: [
-        {
+       /*  {
           value: "0",
           label: "三级甲等"
         },
@@ -171,7 +176,7 @@ export default {
         {
           value: "2",
           label: "三级丙等"
-        }
+        } */
       ]
     };
   },

@@ -23,10 +23,10 @@
             @node-click="nodeClick"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span v-if="!isShowIcon" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' " :title="node.label">{{ node.label }}</span>
-                <span v-if="isShowIcon" >
-                    <span :class="isShowEdit ? 'cut-width custom-tree-label folder-icon' : 'custom-tree-label folder-icon' " ></span>
-                    <span :title="node.label"> {{node.label}}</span>
+                <span v-if="!isShowIcon" :class="isShowEdit ? 'cut-width custom-tree-label tree-label' : 'custom-tree-label tree-label' " :title="node.label">{{ node.label }}</span>
+                <span v-if="isShowIcon" class="tree-label">
+                    <span class="folder-icon" :title="node.label"></span>
+                    <span :title="node.label" :class="isShowEdit ? 'cut-width custom-tree-label' : 'custom-tree-label' "> {{node.label}}</span>
                 </span>
                 <span class="tree-btn" v-if="isShowEdit">
                     <el-button
@@ -55,7 +55,7 @@
         <el-dialog :title="treeTitle" :visible.sync="treeVisible"  :close-on-press-escape="false"  :close-on-click-modal="false">
             <el-form :model="treeForm" :rules="rulesTreeForm" ref="treeForm">
                 <el-form-item label="分类名称" prop="folderName">
-                    <el-input v-model="treeForm.folderName" autocomplete="off"></el-input>
+                    <el-input v-model="treeForm.folderName" autocomplete="off" maxlength="30" show-word-limit></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -238,9 +238,19 @@ export default {
                             this.treeVisible = false;
                             this.getRuleFolder()
                             this.$bus.$emit('updateRuleData');
+                        } else {
+                            this.btnLoading = false;
+                            this.$message({
+                                message: "添加失败",
+                                type: "error",
+                            });
                         }
                     }).catch(() => {
                         this.btnLoading = false;
+                        this.$message({
+                            message: "添加失败",
+                            type: "error",
+                        });
                     })
                 }
             });
@@ -270,9 +280,20 @@ export default {
                             this.treeVisible = false;
                             this.getRuleFolder()
                             this.$bus.$emit('updateRuleData');
+                        } else {
+                            this.btnLoading = false;
+                            this.$message({
+                                message: "添加失败",
+                                type: "error",
+                            });
                         }
                     }).catch(() => {
                         this.btnLoading = false;
+                        this.$message({
+                            message: "编辑失败",
+                            type: "error",
+                        });
+
                     })
                 }
             });
@@ -373,21 +394,23 @@ export default {
 .rule-tree-box {
     // min-width: 288px;
     /deep/ .filter-text {
-        // padding: 20px !important;
         width: 80%;
         margin: 10px 0 10px 10px;
     }
-    .custom-tree-label {
-        max-width: 200px;
+    .custom-tree-node {
+        width: 100%;
+        display: flex;
+        display: inline-block;
+    }
+    .tree-label {
+        max-width: 180px;
         display: inline-block;
         overflow:hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        -o-text-overflow:ellipsis
+        -o-text-overflow:ellipsis;
     }
     .folder-icon {
-        // backgroundImage:'url(' + data.icon + ')';
-        // background: url(../images/folder.png);
         background: url(../../assets/img/folder.png);
         background-size: 100% 100%;
         background-repeat: no-repeat;
@@ -395,22 +418,12 @@ export default {
         width: 13px;
         height: 16px;
     }
-    .cut-width {
-        max-width: 100px;
-    }
-    /deep/ .el-tree-node__children .custom-tree-node{
-        // width: 100%;
-        // display: inline-block;
-        // .custom-tree-label {
-        //     width: 100%;
-        //     display: inline-block;
-        // }
-    }
     /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
         background-color: #e3edfa;
-
     }
-
+    /deep/ .el-tree-node__children {
+        overflow: unset !important;
+    }
 }
 
 </style>
