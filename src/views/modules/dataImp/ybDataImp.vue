@@ -673,8 +673,6 @@
       },
       // 文件类型是否为dmp或者bak
       checkType(fileType) {
-        console.log('fileType.toUpperCase()')
-        console.log(fileType.toUpperCase())
          switch (fileType.toUpperCase()) {
             case 'BAK':
             case 'DMP':
