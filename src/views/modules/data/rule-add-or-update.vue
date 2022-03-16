@@ -151,7 +151,8 @@
           createTime: '',
           ruleSqlValue: '',
           ruleType: '',
-          folderPath: ''
+          folderPath: '',
+          ruleId:''
         },
         dataRule: {
           ruleName: [
@@ -231,6 +232,8 @@
         this.dataForm.ruleSqlValue = '';
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
+        this.dataForm.ruleId = '';
+
         // this.dataForm={
         //   id: 0,
         //   ruleName: '',
@@ -267,6 +270,7 @@
           }).then(({data}) => {
             if (data && data.code === 200) {
               var datas = data.result;
+              this.dataForm.ruleId = datas.ruleId;
               this.dataForm.ruleName = datas.ruleName;
               this.dataForm.ruleCategory = datas.ruleCategory;
               this.dataForm.folderId = datas.folderId;
@@ -300,10 +304,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/rule/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
+              url: this.$http.adornUrl(`/rule/${!this.dataForm.ruleId ? 'add' : 'updateByUuId'}`),
               method: 'post',
               data: this.$http.adornData({
-                'ruleId': this.dataForm.id || undefined,
+                'ruleId': this.dataForm.ruleId || undefined,
                 'ruleName': this.dataForm.ruleName,
                 'ruleCategory': this.dataForm.ruleCategory,
                 'folderId': this.dataForm.folderId,
