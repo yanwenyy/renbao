@@ -49,6 +49,12 @@
                 ></el-pagination>
         </div>
         <el-dialog title="导入数据" :visible.sync="importVisible">
+            <div style="padding-bottom:10px;">
+                <span>导入类型</span>
+                <el-select v-model="importType" placeholder="请选择" style="margin-left:10px;">
+                        <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                </el-select>
+            </div>
             <el-upload
                 class="upload-demo"
                 action=""
@@ -60,7 +66,7 @@
                 <el-button size="small" type="primary" @click="handlePreview">选择文件</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
             </el-upload>
-            </el-dialog>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -96,7 +102,15 @@ export default {
                 value:'三级丙等',
                 label:'三级丙等'
             }],
-            fileList:[]
+            fileList:[],
+            importType:'',
+            selectOption:[{
+                    value: '0',
+                    label: '全量'
+                },{
+                    value: '1',
+                    label: '增量'
+            }],
         }
     },
     mounted(){
@@ -137,9 +151,13 @@ export default {
             let formData = new FormData()
             formData.append('file',this.fileList[0].raw)
             this.$http({
-                url:this.$http.adornUrl('/hospitalBasicInfo/dataImprot'),
+                url:this.$http.adornUrl('/threeCatalog/dataImportCommonMethod'),
                 method: "post",
-                data: formData
+                data: formData,
+                params :this.$http.adornParams({
+                    importType:this.importType,
+                    catalogType:10,
+                })
                 }).then(({data})=>{
                     if(data && data.code === 200){
                         this.$message({
@@ -178,35 +196,34 @@ export default {
         },
         //导出
         exportData(){
-             this.$http({
-                url:this.$http.adornUrl('/hospitalBasicInfo/excelDataExport'),
-                method: "get",
-                responseType: 'blob',//解决乱码问题
-                params :this.$http.adornParams({
-                    hospitalName:this.dataForm.hospitalName,
-                    hospitalType:this.dataForm.hospitalType,
-                    moneyEnd:this.dataForm.moneyEnd,
-                    moneyStart:this.dataForm.moneyStart
-                })
-            }).then(({data})=>{
-                const blob =  new Blob([data]);
-                let fileName = "excel.xls";
-                if("download" in document.createElement("a")){
-                    const elink = document.createElement("a")
-                    elink.download = fileName;
-                    elink.style.display = "none";
-                    elink.href = URL.createObjectURL(blob);  // 创建下载的链接
-                    document.body.appendChild(elink)
-                    elink.click(); // 点击下载
-                    URL.revokeObjectURL(elink.href);// 释放掉blob对象
-                    document.body.removeChild(elink)// 下载完成移除元素
-                }else{
-                    navigator.msSaveBlob(blob,fileName)
-                }
-            })
-            // var url ='/hospitalBasicInfo/excelDataExport?hospitalName='+this.dataForm.hospitalName+'&hospitalType='+this.dataForm.hospitalType+'&moneyEnd='+this.dataForm.moneyEnd+'&moneyStart='+this.dataForm.moneyStart;
-            // console.log(this.$http.adornUrl(url))
-            // window.open(this.$http.adornUrl(url))
+            //  this.$http({
+            //     url:this.$http.adornUrl('/hospitalBasicInfo/excelDataExport'),
+            //     method: "get",
+            //     responseType: 'blob',//解决乱码问题
+            //     params :this.$http.adornParams({
+            //         hospitalName:this.dataForm.hospitalName,
+            //         hospitalType:this.dataForm.hospitalType,
+            //         moneyEnd:this.dataForm.moneyEnd,
+            //         moneyStart:this.dataForm.moneyStart
+            //     })
+            // }).then(({data})=>{
+            //     const blob =  new Blob([data]);
+            //     let fileName = "excel.xls";
+            //     if("download" in document.createElement("a")){
+            //         const elink = document.createElement("a")
+            //         elink.download = fileName;
+            //         elink.style.display = "none";
+            //         elink.href = URL.createObjectURL(blob);  // 创建下载的链接
+            //         document.body.appendChild(elink)
+            //         elink.click(); // 点击下载
+            //         URL.revokeObjectURL(elink.href);// 释放掉blob对象
+            //         document.body.removeChild(elink)// 下载完成移除元素
+            //     }else{
+            //         navigator.msSaveBlob(blob,fileName)
+            //     }
+            // })
+            let url = this.$http.adornUrl('/hospitalBasicInfo/excelDataExport?hospitalName='+this.dataForm.hospitalName+'&hospitalType='+this.dataForm.hospitalType+'&moneyEnd='+this.dataForm.moneyEnd+'&moneyStart='+this.dataForm.moneyStart+'&token=')+ this.$cookie.get('token')
+            window.open(url)
         },
         // 关闭弹窗确认
         importSucceed(){
@@ -225,7 +242,7 @@ export default {
         handleCurrentChange(val){
             this.apComServerData.pageIndex = val;
             this.getInitList()
-        }
+        },
     }
 }
 </script>

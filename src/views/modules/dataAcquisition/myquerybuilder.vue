@@ -111,7 +111,8 @@ export default {
       }
       if (
         columnObj.columnType.toUpperCase().indexOf("VARCHAR") != -1 ||
-        columnObj.columnType.toUpperCase().indexOf("CLOB") != -1
+        columnObj.columnType.toUpperCase().indexOf("CLOB") != -1||
+        columnObj.columnType.toUpperCase().indexOf("VARCHAR2") != -1
       ) {
         // operators = ['=',"<>", "like", "not like"];
         // operators = ['id',"=", "label", "等于"];

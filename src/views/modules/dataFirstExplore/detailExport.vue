@@ -209,14 +209,17 @@ export default {
   },
   data() {
     return {
+      //条件查询
       dataForm: {
         ruleName: "",
         ruleCategory: ""
       },
+      //医院数据
       dataForm1: {
         batchId: "",
         hospital: ""
       },
+      //必填校验
       rules: {
         hospital: [{ required: true, message: "请选择", trigger: "blur" }]
       },
@@ -228,6 +231,7 @@ export default {
       ],
       //全选状态
       checked: false,
+      //loading
       treeLoading: false,
       layoutTreeProps: {
         label(data, node) {
@@ -467,7 +471,6 @@ export default {
       } */
       // console.log(hospitalCodes);
       // console.log(hospitalNames);
-      console.log(this.dataForm1);
       this.$http({
         url: this.$http.adornUrl("ruleResult/exportResult"),
         method: "post",

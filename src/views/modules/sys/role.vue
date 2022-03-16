@@ -86,12 +86,7 @@
           scope.row.createTime | dateformat
         }}</template>
       </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        label="操作"
-      >
+      <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="editHandle(scope.row)">修改</el-button>
           <el-button type="text" @click="deleteHandle(scope.row)"

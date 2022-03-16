@@ -130,7 +130,7 @@
                     type="text"
                     v-if="scope.row.runStatus == 3"
                     @click="resultViewClick(scope.row)"
-                    >查看日志</el-button
+                    >结果查看</el-button
                   >
                 </template>
               </el-table-column>
@@ -177,40 +177,54 @@ export default {
   },
   data() {
     return {
+      //详情弹窗是否显示
       showDetailDialog: false,
+      //树loading
       treeLoading: false,
+      //列表loading
       tableLoading: false,
+      //左侧批次树数据
       batchTreeList: [
         {
           label: "批次名称",
           children: []
         }
       ],
+      //详情弹窗id传值
       id: "",
+      //条件查询
       searchForm: {
         ruleName: "",
         ruleCategory: "",
         runStatus: ""
       },
+      //规则类别
       ruleCategory: [
         { id: 1, name: "门诊规则" },
         { id: 2, name: "住院规则" }
       ],
+      //运行状态
       runStatus: [
         { id: 1, name: "待执行" },
         { id: 2, name: "执行中" },
         { id: 3, name: "执行失败" },
         { id: 4, name: "已完成" }
       ],
+      //列表数据
       tableData: [],
+      //分页
       Pager: {
         pageSize: 10,
         pageIndex: 1,
         total: 0
       },
+      //批次类型
       batchType: 1,
+      //多选数据
       multipleTable: [],
+      //批次id
       batchId: "",
+      //
       layoutTreeProps: {
         label(data, node) {
           const config = data.__config__ || data;
@@ -224,6 +238,7 @@ export default {
     this.getTableData();
   },
   methods: {
+    //获取列表数据
     getTableData() {
       this.tableLoading = true;
       this.$http({
@@ -256,6 +271,7 @@ export default {
           this.tableLoading = false;
         });
     },
+    //获取左侧批次树数据
     getbatchList() {
       this.treeLoading = true;
       this.$http({
@@ -297,23 +313,26 @@ export default {
       };
       this.getTableData();
     },
+    //分页
     currentChangeHandle(val) {
       this.Pager.pageIndex = val;
       this.getTableData();
     },
+    //分页
     handleSelectionChange(val) {
       this.multipleTable = val;
       this.getTableData();
     },
+    //分页
     sizeChangeHandle(val) {
       this.Pager.pageSize = val;
       this.getTableData();
     },
-    // 日志查看
+    //日志查看
     resultViewClick(data) {
       this.showDetailDialog = true;
       this.id = data.resultId;
-      this.name = data.ruleName
+      this.name = data.ruleName;
     },
     //关闭日志弹窗
     closeDetail() {

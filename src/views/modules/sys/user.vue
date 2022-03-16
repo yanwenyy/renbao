@@ -56,6 +56,7 @@
           :on-success="handleChange"
           :on-error="handleChange"
           :show-file-list="false"
+          style="float:right;margin-left:13px"
         >
           <el-button type="warning">导入</el-button>
         </el-upload>
@@ -209,7 +210,7 @@ export default {
   methods: {
     //导入
     handleChange(response, file, fileList) {
-      if (response && response.code === 0) {
+      if (response && response.code === 200) {
         this.$message({
           message: "导入成功",
           type: "success",
@@ -220,7 +221,7 @@ export default {
           }
         });
       } else {
-        this.$message.error(response.msg);
+        this.$message.error(response.message);  
       }
     },
     //下载模板

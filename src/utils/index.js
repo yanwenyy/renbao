@@ -192,3 +192,28 @@ export function getDate () {
   }
   return date.year+"-"+date.month+"-"+date.date;
 }
+// 处理二级制文件
+export function exportZip (response, fileName) {
+  let data = response.data;
+  let fileReader = new FileReader();
+  fileReader.onload = function() {
+      try {
+          let jsonData = JSON.parse(this.result);  // 说明是普通对象数据，后台转换失败
+      if (jsonData.code) {
+          that.$message.error(jsonData.message)
+      }
+      } catch (err) {   // 解析成对象失败，说明是正常的文件流
+          const blob = new Blob([response.data], {type: 'application/zip'});
+          const filename = response.headers['content-disposition'];
+          const downloadElement = document.createElement('a');
+          const href = window.URL.createObjectURL(blob); //创建下载的链接
+          downloadElement.href = href;
+          [downloadElement.download] = [fileName + '.zip'];
+          document.body.appendChild(downloadElement);
+          downloadElement.click(); //点击下载
+          document.body.removeChild(downloadElement); //下载完成移除元素
+          window.URL.revokeObjectURL(href); //释放blob对
+      }
+  };
+  fileReader.readAsText(data)
+}

@@ -68,7 +68,7 @@
           <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="ruleImport">导入</el-button>
-          <el-button type="warning" @click="getDataList()">全部导出</el-button>
+          <el-button type="warning" @click="ruleExport('all')">全部导出</el-button>
           <el-button type="warning" @click="ruleExport">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
@@ -112,7 +112,7 @@
             align="center"
             label="规则类型">
             <template slot-scope="scope">
-              {{scope.row.ruleType=='1'?'sql编辑器':scope.row.ruleType=='2'?'图形化工具':''}}
+              {{scope.row.ruleType=='1'?'sql编辑器':scope.row.ruleType=='2'?'图形化':''}}
             </template>
           </el-table-column>
           <el-table-column
@@ -305,13 +305,15 @@ import ImportFile from './Import-file.vue'
         })
       },
       // 批量导出
-      ruleExport () {
-        if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
-        console.log(this.dataListSelections, '所选列表')
+      ruleExport (all) {
         var exportList = []
-        this.dataListSelections.forEach( item =>{
-            exportList.push( item.ruleId )
-        })
+        // 判断是否为全部导出，全部导出的话exportList为空列表
+        if (all) {
+          if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+          this.dataListSelections.forEach( item =>{
+              exportList.push( item.ruleId )
+          })
+        }
         this.$http({
             isLoading:false,
             url: this.$http.adornUrl('/rule/ruleExport'),
@@ -319,7 +321,7 @@ import ImportFile from './Import-file.vue'
             data: this.$http.adornData(exportList, false)
         }).then(({data}) => {
             if (data && data.code === 200) {
-              console.log(data, 'datadatadatadata')
+
               this.$message({message: '导出成功',type: 'success'});
               this.getDataList();
             } else {
