@@ -86,12 +86,12 @@
           </div>
           <div class="content">
             <div class="tableTitle">
-              <span
+              <!-- <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
-              >
+              > -->
               <div style="float:right;margin-bottom:10px">
-                <el-button @click="addData" type="primary">新增</el-button>
+                <!-- <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
                     this.multipleSelection.length <= 0 ||
@@ -106,7 +106,7 @@
                   :disabled="this.multipleSelection.length <= 0"
                   type="danger"
                   >删除</el-button
-                >
+                > -->
               </div>
             </div>
             <el-table
@@ -230,7 +230,7 @@ import addOrUpdate from "@/views/modules/data/rule-add-or-update.vue";
 export default {
   components: {
     detail,
-    // AddOrEdit,
+    // AddOrEdit, 
     runNow,
     ruleTree,
     addOrUpdate
