@@ -2,8 +2,12 @@
     <div class='Edit'>
         <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" style="width: 100%">
             <el-table-column label="步骤规则" align="center" prop="stepName"></el-table-column>
-            <el-table-column label="步骤开始时间" align="center" :formatter="dateFormat" prop="stepEndTime"></el-table-column>
-            <el-table-column label="步骤结束时间" align="center" :formatter="dateEndFormat" prop="stepStartTime"></el-table-column>
+            <el-table-column label="步骤开始时间" align="center">
+                <template slot-scope="scope">{{scope.row.stepStartTime | datetimeformat}}</template>
+            </el-table-column>
+            <el-table-column label="步骤结束时间" align="center">
+                <template slot-scope="scope">{{scope.row.stepEndTime | datetimeformat}}</template>
+            </el-table-column>
             <el-table-column label="步骤状态" align="center" prop="stepStatus">
                 <template slot-scope="scope">
                     <div class="tac" v-if="scope.row.stepStatus=='0'">待采集</div>

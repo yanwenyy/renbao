@@ -10,8 +10,8 @@
         <!-- 列表 -->
         <div class="listDisplay">
             <div class='f_right'>             
-                <el-button size="mini" type="warning" v-show="isShow" @click="ImportLists">下载模板</el-button>       
-                <el-button size="mini" type="warning"  @click="ImportList">导入数据</el-button>
+                <el-button size="mini" type="warning" v-show="isShow" @click="exportData">下载模板</el-button>       
+                <el-button size="mini" type="warning"  @click="ImportData">导入数据</el-button>
             </div>
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
@@ -260,34 +260,36 @@ export default {
                 })
         },
         //导出
-        ImportLists(){
-            this.$http({
-                url:this.$http.adornUrl('/threeCatalog/exportExcelFileCommon'),
-                method: "get",
-                responseType: 'blob',//解决乱码问题
-                params :this.$http.adornParams({
-                    catalogType:this.dataForm.dataType,
-                })
-            }).then(({data})=>{
-                console.log(data)
-                const blob =  new Blob([data]);
-                let fileName = this.fileName + '.xls';
-                if("download" in document.createElement("a")){
-                    const elink = document.createElement("a")
-                    elink.download = fileName;
-                    elink.style.display = "none";
-                    elink.href = URL.createObjectURL(blob);  // 创建下载的链接
-                    document.body.appendChild(elink)
-                    elink.click(); // 点击下载
-                    URL.revokeObjectURL(elink.href);// 释放掉blob对象
-                    document.body.removeChild(elink)// 下载完成移除元素
-                }else{
-                    navigator.msSaveBlob(blob,fileName)
-                }
-            })
+        exportData(){
+            let url = this.$http.adornUrl('/threeCatalog/exportExcelFileCommon?catalogType='+this.dataForm.dataType+'&token=') + this.$cookie.get('token')
+            window.open(url)
+            // this.$http({
+            //     url:this.$http.adornUrl('/threeCatalog/exportExcelFileCommon'),
+            //     method: "get",
+            //     responseType: 'blob',//解决乱码问题
+            //     params :this.$http.adornParams({
+            //         catalogType:this.dataForm.dataType,
+            //     })
+            // }).then(({data})=>{
+            //     console.log(data)
+            //     const blob =  new Blob([data]);
+            //     let fileName = this.fileName + '.xls';
+            //     if("download" in document.createElement("a")){
+            //         const elink = document.createElement("a")
+            //         elink.download = fileName;
+            //         elink.style.display = "none";
+            //         elink.href = URL.createObjectURL(blob);  // 创建下载的链接
+            //         document.body.appendChild(elink)
+            //         elink.click(); // 点击下载
+            //         URL.revokeObjectURL(elink.href);// 释放掉blob对象
+            //         document.body.removeChild(elink)// 下载完成移除元素
+            //     }else{
+            //         navigator.msSaveBlob(blob,fileName)
+            //     }
+            // })
         },
         //导入数据
-        ImportList(){
+        ImportData(){
             this.addUploadVisible = true
         },
         //点击上传

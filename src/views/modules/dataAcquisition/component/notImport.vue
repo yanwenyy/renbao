@@ -1,17 +1,19 @@
 <template>
     <div class='notImport'>
         <el-table :data="tableList" border height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" style="width: 100%">
-            <el-table-column label="医院名称" align="center" prop="HospitalName"></el-table-column>
-            <el-table-column label="医院编码" align="center" prop="HospitalCode"></el-table-column>
-            <el-table-column label="医院性质" align="center" prop="HospitalNature"></el-table-column>
-            <el-table-column label="医院类别" align="center" prop="HospitalType"></el-table-column>
-            <el-table-column label="医院基金支付总金额" align="center" prop="HospitalAmount"></el-table-column>
+        <el-table-column v-for="(column,index) in columnList" :prop="column.columnName" :label="column.columnName" :key="index" align="center"/>
         </el-table>
-        <div class='pager'>
-            <el-pagination small layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total"></el-pagination>
-        </div>
+        <el-pagination 
+                :page-size="apComServerData.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="apComServerData.total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="apComServerData.pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                ></el-pagination>
         <div class="itemBtn">
-            <el-button type="primary" @click="close">关闭</el-button>
+            <el-button  @click="visible = false">关闭</el-button>
         </div>
     </div>
 </template>
@@ -20,40 +22,54 @@ export default {
     name:"notImport",
     data(){
         return{
-            tableList:[{
-                'id':'0',
-                'HospitalName':'商洛市中医医院',
-                'HospitalCode':'1760000',
-                'HospitalNature':'综合医院',
-                'HospitalType':'三级甲等',
-                'HospitalAmount':'23241234.35'
-            },{
-                'id':'0',
-                'HospitalName':'商洛康健精神病医院',
-                'HospitalCode':'1450000',
-                'HospitalNature':'综合医院',
-                'HospitalType':'三级甲等',
-                'HospitalAmount':'45423465.78'
-            },{
-                'id':'0',
-                'HospitalName':'柞水祥瑞医院',
-                'HospitalCode':'1250000',
-                'HospitalNature':'专科医院',
-                'HospitalType':'三级甲等',
-                'HospitalAmount':'4547786.43'
-            }],
+            tableList:[],
+            columnList:[],
             apComServerData:{
                 current: 1,
                 pageSize: 10,
                 pageNum:1,
                 total:0,
+                pageIndex:1
             },
         }
     },
+    mounted() {
+        this.getInitList();
+    },
     methods:{
+        //初始化数据
+        getInitList(){
+            this.$http({
+                url: this.$http.adornUrl('/hospitalCollectPlan/getUnImportHospitalList'),
+                method: "get",
+                params: this.$http.adornParams({
+                    pageNo :this.apComServerData.pageIndex,
+                    pageSize:this.apComServerData.pageSize,
+                })
+            }).then(({ data }) => {
+                if (data && data.code === 200) {
+                    this.tableList = data.result.result
+                    this.columnList = data.result.columnInfo.columnList
+                    this.apComServerData.total = data.result.pagination.dataCount
+                }else{
+                    this.tableList = []
+                }
+            })
+        },
         //关闭
         close(){
           this.$emit('close')
+        },
+        // 页数
+        handleSizeChange(val){
+            this.apComServerData.pageSize = val;
+            this.apComServerData.pageIndex = 1
+            this.getInitList()
+        },
+        //当前页
+        handleCurrentChange(val){
+            this.apComServerData.pageIndex = val;
+            this.getInitList()
         },
     }
 }
