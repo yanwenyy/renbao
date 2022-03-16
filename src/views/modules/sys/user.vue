@@ -44,9 +44,6 @@
       <!--</el-select>-->
       <!--</el-form-item>-->
       <el-form-item class="searchBtn">
-        <el-button type="primary" @click="(pageIndex = 1), getDataList()"
-          >查询</el-button
-        >
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="warning" @click="down()">下载模板</el-button>
         <el-upload
@@ -62,6 +59,10 @@
         </el-upload>
         <!--<el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
+      <el-button type="primary" @click="(pageIndex = 1), getDataList()"
+        >查询</el-button
+      >
+      <el-button @click="reset()">重置</el-button>
     </el-form>
     <el-table
       :data="dataList"
@@ -188,7 +189,8 @@ export default {
       dataForm: {
         userName: "",
         userNumber: "",
-        userSex: ""
+        userSex: "",
+        userPhone: ""
       },
       dataList: [],
       pageIndex: 1,
@@ -226,7 +228,11 @@ export default {
     },
     //下载模板
     down() {
-       this.$http({
+      let url =
+        this.$http.adornUrl("/user/exportTemplate?token=") +
+        this.$cookie.get("token");
+      window.open(url);
+      /*  this.$http({
         method: "get",
         url: this.$http.adornUrl("/user/exportTemplate"),
         // data: this.query.data,
@@ -249,7 +255,7 @@ export default {
             desc: "系统数据错误"
           });
           console.log(error);
-        });
+        }); */
     },
     // 获取数据列表
     getDataList() {
@@ -347,6 +353,17 @@ export default {
     },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    //重置
+    reset() {
+      this.dataForm = {
+        userName: "",
+        userNumber: "",
+        userSex: "",
+        userPhone: ""
+      };
+      this.pageIndex = 1;
+      this.getDataList();
     }
   }
 };
