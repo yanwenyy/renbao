@@ -259,7 +259,7 @@ import ImportFile from './Import-file.vue'
         this.$http({
           url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
           method: 'get',
-          params: this.$http.adornParams({folderSorts: ''})
+          params: this.$http.adornParams({folderSorts: '', folderTypes: ''})
         }).then(({data}) => {
           this.ruleData = data.result;
         })

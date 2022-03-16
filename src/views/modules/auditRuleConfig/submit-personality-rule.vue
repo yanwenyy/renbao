@@ -9,7 +9,7 @@
             :before-close="handleClose">
             <div class="rule-tree-box">
                 <span>选择规则：</span>
-                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="3" folderType="3" :isShowIcon="true"></rule-tree>
+                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="3" folderTypes="3" :isShowIcon="true"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
