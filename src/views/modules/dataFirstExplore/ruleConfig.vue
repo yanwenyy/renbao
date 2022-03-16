@@ -223,14 +223,14 @@
 </template>
 <script>
 import detail from "./component/ruleConfig-detail.vue";
-import AddOrEdit from "./component/ruleConfig-addOredit.vue";
+// import AddOrEdit from "./component/ruleConfig-addOredit.vue";
 import runNow from "./component/ruleConfig-runNow.vue";
 import ruleTree from "../../common/rule-tree.vue";
 import addOrUpdate from "@/views/modules/data/rule-add-or-update.vue";
 export default {
   components: {
     detail,
-    AddOrEdit,
+    // AddOrEdit,
     runNow,
     ruleTree,
     addOrUpdate

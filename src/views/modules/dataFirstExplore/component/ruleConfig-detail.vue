@@ -33,7 +33,7 @@
           v-popover:menuListPopover
           v-model="dataForm.parentName"
           :readonly="true"
-          placeholder="点击选择上级菜单"
+          placeholder="规则分类"
           class="menu-list__input"
         ></el-input>
       </el-form-item>
