@@ -3,7 +3,7 @@
     <el-dialog
       custom-class="rule-dialog"
       width="80%"
-      :title="!dataForm.id ? '新增' : '修改'"
+      :title="!dataForm.ruleId ? '新增' : '修改'"
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
@@ -49,14 +49,11 @@
               <el-date-picker
                 readonly
                 v-model="dataForm.createTime"
-                type="date"
-                value-format="yyyy-MM-dd"
+                type="datetime"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 placeholder="请选择时间">
               </el-date-picker>
             </el-form-item>
-
-
-
         </el-tab-pane>
         <el-tab-pane name="2" label="sql编写">
           <el-button type="primary" @click="openSql()">sql编译器</el-button>
@@ -95,10 +92,10 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
   import { isInteger } from '@/utils/validate'
   import sqlElement from '../projectManage/codemirror'
+  import formatDate from '@/utils/formatDate'
   export default {
     components: {
       sqlElement
@@ -179,7 +176,8 @@
           todayConsumeMoney: [
             { required: true, validator: validateMoney, trigger: 'blur' }
           ],
-        }
+        },
+        ruleCheckData: {}
       }
     },
     methods: {
@@ -202,7 +200,7 @@
         },
       //获取当前登录人信息
       getUserInfo () {
-        this.dataForm.createTime=this.getNowFormatDay();
+        this.dataForm.createTime = formatDate.getDate();
         this.$http({
           url: this.$http.adornUrl('/sys/currentUser'),
           method: 'get',
@@ -227,11 +225,11 @@
         this.dataForm.id = 0;
         this.dataForm.ruleName = '';
         this.dataForm.ruleCategory = '';
-        this.dataForm.folderId = '';
+        // this.dataForm.folderId = '';
         this.dataForm.parentName = '';
         this.dataForm.ruleSqlValue = '';
         this.dataForm.ruleType = '';
-        this.dataForm.folderPath = '';
+        // this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
 
         // this.dataForm={
@@ -250,8 +248,9 @@
           this.$refs['dataForm'].clearValidate()
         });
       },
-      init (id) {
-        this.dataForm.id = id || 0;
+      init (id, ruleCheckData) {
+        this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
+        this.dataForm.ruleId = id || 0;
         this.visible = true;
         this.getUserInfo();
         this.visible = true
@@ -262,9 +261,9 @@
           this.$refs.menuListTree.setCheckedKeys([]);
           this.$refs.menuListTree.setCurrentKey(null);
         })
-        if (this.dataForm.id) {
+        if (this.dataForm.ruleId) {
           this.$http({
-            url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.id}`),
+            url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.ruleId}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
@@ -282,10 +281,17 @@
               console.log(this.sqlEditMsg,33333)
               this.dataForm.ruleType = datas.ruleType;
 
-              this.menuListTreeSetCurrentNode();
+              // this.menuListTreeSetCurrentNode();
             }
           })
+        } else {
+          // 新增时规则分类默认为左侧选则的规则
+          if(this.ruleCheckData && this.ruleCheckData.folderId) {
+            this.$set(this.dataForm,"folderId", this.ruleCheckData.folderId)
+            this.$set(this.dataForm,"folderPath", this.ruleCheckData.folderPath)
+          }
         }
+        this.menuListTreeSetCurrentNode();
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
@@ -296,8 +302,14 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
-        this.dataForm.parentName = (this.$refs.menuListTree.getCurrentNode() || {})['folderName']
+        this.$nextTick(() => {
+          // console.log(this.dataForm, 'dataFormdataFormdataForm')
+          if (this.dataForm.folderId) {
+            this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
+            this.dataForm.parentName = (this.$refs.menuListTree.getCurrentNode() || {})['folderName']
+          }
+          
+        })
       },
       // 表单提交
       dataFormSubmit () {
@@ -330,7 +342,7 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }else{

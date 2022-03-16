@@ -16,9 +16,11 @@
                     >
                         <el-date-picker
                             v-model="ruleOperationForm.expectedBeginTime"
-                            type="date"
-                            format="yyyy/MM/dd"
-                            value-format="yyyy-MM-dd"
+                            type="datetime"
+                            format="yyyy-MM-dd HH:mm:ss"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            :picker-options="pickerOptions"
+                           
                             >
                         </el-date-picker>
                     </el-form-item>
@@ -84,7 +86,22 @@ export default {
                 ]
             },
             type: '',
-            checkRuleData: []
+            checkRuleData: [],
+            pickerOptions: {
+                disabledDate(time) {
+                    const date = new Date();
+                    const oneday = date.getTime();
+                    return time.getTime() < new Date().getTime() - 86400000;
+                    },
+                    selectableRange: (() => {
+                        let data = new Date();
+                        let hour = data.getHours();
+                        let minute = data.getMinutes();
+                        let second = data.getSeconds();
+                        return [`${hour}:${minute}:${second} - 23:59:59`]
+                    }
+                )(),
+            }
         }
     },
     methods: {

@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="false" parentGetTreeData="getTreeData" :folderSorts="folderSorts" ></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="true" parentGetTreeData="getTreeData" :folderSorts="folderSorts" ></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box"> 
@@ -122,7 +122,8 @@ export default {
             },
             treeData: [],
             addOrUpdateVisible: false,
-            folderSorts: 3
+            folderSorts: 3,
+            ruleCheckData: {}
         }
     },
     activated () {
@@ -144,13 +145,13 @@ export default {
                 this.tableLoading = false
                 if (data.code == 200) {
                     data.result.records.map(i => {
-                        i.createTime = i.createTime.split('T')[0];
+                        i.createTime = i.createTime;
                         i.ruleCategory = i.ruleCategory == 1 ? '门诊规则':  i.ruleCategory == 2 ? '住院规则' : ''
                     })
                     this.tableData = data.result.records;
                     this.Pager.pageSize = data.result.size;
                     this.Pager.pageIndex = data.result.current;
-                    this.Pager.total = data.result.total;  
+                    this.Pager.total = data.result.total;
                 }
             }).catch(() => {
                 this.tableLoading = false
@@ -175,6 +176,7 @@ export default {
             })
         },
         getTreeData (data) {
+            this.ruleCheckData = data;
             // 规则列表有子节点时folderId为空
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
@@ -203,7 +205,7 @@ export default {
             // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
             this.addOrUpdateVisible = true
             this.$nextTick(() => {
-                this.$refs.addOrUpdate.init()
+                this.$refs.addOrUpdate.init('', this.ruleCheckData)
             })
         },
         editorFun () {
@@ -211,7 +213,7 @@ export default {
             // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
             this.addOrUpdateVisible = true
             this.$nextTick(() => {
-            this.$refs.addOrUpdate.init(this.multipleTable[0].ruleId)
+            this.$refs.addOrUpdate.init(this.multipleTable[0].ruleId, this.ruleCheckData)
             })
 
         },
