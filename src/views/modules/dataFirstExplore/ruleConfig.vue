@@ -308,11 +308,6 @@ export default {
     //获取列表数据
     initData() {
       this.loading = true;
-     /*  this.folderPath = (ruleData.folderPath && ruleData.folderPath) || "";
-      this.folderId = (ruleData.folderId && ruleData.folderId) || "";
-      if (ruleData.children) {
-        this.folderId = "";
-      } */
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
@@ -485,9 +480,13 @@ export default {
       this.choseRule = this.multipleSelection;
     },
     //拿到选择树的id
-    getTreeId(data) {
-      this.folderId = data.folderId;
-      this.folderPath = data.folderPath;
+    getTreeId(data) { 
+      // 规则列表有子节点时folderId为空
+      this.folderPath = (data.folderPath && data.folderPath) || "";
+      this.folderId = (data.folderId && data.folderId) || "";
+      if (data.children) {
+        this.folderId = "";
+      }
       this.initData();
     },
     //获取每行数据id
