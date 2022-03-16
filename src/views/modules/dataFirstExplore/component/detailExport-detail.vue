@@ -6,7 +6,8 @@
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="warning" @click="reportList">导出</el-button>
       </div>
-      <div @click="handleChange" style="cursor:pointer;">
+      <!-- 复杂条件查询 -->
+      <div @click="handleChange" style="cursor:pointer">
         查询条件<i
           v-show="!show"
           class="el-icon-arrow-down"
@@ -15,12 +16,15 @@
         ><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
       </div>
       <transition name="sub-comments">
-        <vue-query-builder
-          :rules="rules"
+        <myquerybuilder
+          ref="myquerybuilder"
+          :rules="queryRules"
           class="mask"
           v-show="show"
           v-model="output"
-        ></vue-query-builder>
+          :columns="columns"
+          :data="data"
+        ></myquerybuilder>
       </transition>
       <el-table
         :data="tableList"
@@ -28,6 +32,7 @@
         style="100%"
         :header-cell-style="{ textAlign: 'center' }"
         class="demo-ruleForm"
+        :v-loading="listLoading"
       >
         <template v-for="(item, index) in tableColumns">
           <el-table-column
@@ -42,9 +47,13 @@
     </div>
     <div>
       <el-pagination
-        small
         layout="total, sizes, prev, pager, next, jumper"
         :total="apComServerData.total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="apComServerData.pageIndex"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="apComServerData.size"
       ></el-pagination>
     </div>
     <!-- <el-button type="primary" @click="ok">确定</el-button> -->
@@ -52,25 +61,24 @@
   </div>
 </template>
 <script>
-import VueQueryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
+import myquerybuilder from "@/views/modules/dataAcquisition/myquerybuilder.vue";
 export default {
   props: {
     info: String,
     resultTableName: String
   },
   components: {
-    VueQueryBuilder
+    myquerybuilder
   },
   data() {
     return {
-      dataForm: {
-        basicName: "",
-        basicType: "",
-        data2: "",
-        data1: ""
-      },
+      //分页
       apComServerData: {
-        total: ""
+        current: 1,
+        size: 10,
+        pageNum: 1,
+        total: 0,
+        pageIndex: 1
       },
       //loading
       listLoading: false,
@@ -80,73 +88,12 @@ export default {
       //table表格数据
       tableList: [],
       tableColumns: [],
-      options: [
-        {
-          value: "0",
-          label: "三级甲等"
-        },
-        {
-          value: "1",
-          label: "三级乙等"
-        },
-        {
-          value: "2",
-          label: "三级丙等"
-        }
-      ],
-      rules: [
-        {
-          type: "text",
-          id: "医疗机构编码",
-          label: "医疗机构编码 "
-        },
-        {
-          type: "text",
-          id: "医疗机构名称",
-          label: "医疗机构名称"
-        },
-        {
-          type: "text",
-          id: "结算单据号",
-          label: "结算单据号"
-        },
-        {
-          type: "text",
-          id: " 住院号",
-          label: " 住院号"
-        },
-        {
-          type: "text",
-          id: " 结算类别",
-          label: " 结算类别"
-        },
-        {
-          type: "text",
-          id: "结算日期",
-          label: "结算日期"
-        },
-        {
-          type: "text",
-          id: "入院科室名称",
-          label: "入院科室名称"
-        },
-        {
-          type: "text",
-          id: "患者姓名",
-          label: "患者姓名"
-        }
-      ],
-      resultTableName:'',
-      tableList2: [],
-      tableList: [],
-      tableList3: [],
-      tableList4: [],
-      tableList5: [],
-      tableColumns2: [],
-      tableColumns3: [],
-      tableColumns4: [],
-      tableColumns5: [],
-      tableColumns: []
+      queryRules: [],
+      // resultTableName: "",
+      output: {},
+      data: [],
+      columns: {},
+      sqlData: ""
     };
   },
   created() {
@@ -166,10 +113,11 @@ export default {
         if (data && data.code === 200) {
           this.tableColumns = data.result.columns;
           this.tableList = data.result.result;
+          this.columns = data.result.columnInfo;
           // this.apComServerData.total;
         } else {
-          this.tyqab = [];
-          this.apComServerData.total = 0;
+          this.tableColumns = [];
+          // this.apComServerData.total = 0;
         }
       });
     },
@@ -178,29 +126,84 @@ export default {
     //查询
     getDataList() {},
     //确定
-    ok() {
+   /*  ok() {
       this.$emit("ok");
-    },
+    }, */
     //取消
     close() {
       this.$emit("close");
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
     },
     //多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    //查询条件事件
+    //查询
+    searchList() {
+      this.listLoading = true;
+      var getSql = this.$refs.myquerybuilder.getSelectSql();
+      this.sqlData = getSql.sql;
+      this.$http({
+        url: this.$http.adornUrl("/threeCatalog/getThreeCatalogDataList"),
+        method: "get",
+        params: this.$http.adornParams({
+          catalogType: this.ruleForm.catalogType,
+          complexWhere: getSql.sql
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableList = data.result.records;
+          this.apComServerData.total = data.result.total;
+          this.getDataList();
+        } else {
+          this.dataList = [];
+          this.apComServerData.total = 0;
+        }
+        this.listLoading = false;
+      });
+    },
+    //导出
+    reportList() {
+      this.$http({
+        url: this.$http.adornUrl("/threeCatalog/excelDataExport"),
+        method: "get",
+        responseType: "blob", //解决乱码问题
+        params: this.$http.adornParams({
+          catalogType: this.ruleForm.catalogType
+        })
+      }).then(({ data }) => {
+        const blob = new Blob([data]);
+        let fileName = this.fileName + ".xls";
+        if ("download" in document.createElement("a")) {
+          const elink = document.createElement("a");
+          elink.download = fileName;
+          elink.style.display = "none";
+          elink.href = URL.createObjectURL(blob); // 创建下载的链接
+          document.body.appendChild(elink);
+          elink.click(); // 点击下载
+          URL.revokeObjectURL(elink.href); // 释放掉blob对象
+          document.body.removeChild(elink); // 下载完成移除元素
+        } else {
+          navigator.msSaveBlob(blob, fileName);
+        }
+      });
+    },
+    //复杂查询展开事件
     handleChange() {
+      console.log(this.columns);
       this.show = !this.show;
+      this.columns = this.columns;
+      this.data = this.output;
+    },
+    // 页数
+    handleSizeChange(val) {
+      this.apComServerData.size = val;
+      this.apComServerData.pageIndex = 1;
+      this.initList();
+    },
+    //当前页
+    handleCurrentChange(val) {
+      this.apComServerData.pageIndex = val;
+      this.initList();
     }
   }
 };
@@ -211,8 +214,8 @@ export default {
   padding: 5px;
 }
 .mask {
-  width: 85%;
-  padding-top: 23px;
+  width: 95%;
+  padding-top: 15px;
   position: fixed;
   z-index: 998;
   overflow: hidden;

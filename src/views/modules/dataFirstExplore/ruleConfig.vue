@@ -1,6 +1,6 @@
 <!--初探规则配置-->
 <template>
-  <div class="lawsAregulations">
+  <div>
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
@@ -14,8 +14,8 @@
           ></rule-tree>
         </el-card>
       </el-col>
-      <el-col :span="19" style="height:800px;overflow-y:auto">
-        <el-card class="box-card">
+      <el-col :span="19">
+        <el-card class="box-card" style="height:800px;overflow-y:auto">
           <div slot="header" class="clearfix">
             <el-row>
               <el-col :span="4">
@@ -91,7 +91,7 @@
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
-               <!--  <el-button @click="addData" type="primary">新增</el-button>
+                <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
                     this.multipleSelection.length <= 0 ||
@@ -100,7 +100,7 @@
                   @click="editData"
                   type="primary"
                   >修改</el-button
-                > -->
+                >
                 <el-button
                   @click="deleteData"
                   :disabled="this.multipleSelection.length <= 0"
@@ -196,7 +196,7 @@
             ></runNow>
           </el-dialog>
           <!-- 弹窗, 新增 / 修改 -->
-          <el-dialog :title="treeTitle" :visible.sync="treeVisible">
+          <!--  <el-dialog :title="treeTitle" :visible.sync="treeVisible">
             <el-form :model="form">
               <el-form-item label="分类名称">
                 <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -208,12 +208,12 @@
                 >确 定</el-button
               >
             </div>
-          </el-dialog>
+          </el-dialog> -->
           <!-- 弹窗, 新增 / 修改 -->
           <add-or-update
             v-if="addOrUpdateVisible"
             ref="addOrUpdate"
-            @refreshDataList="getDataList"
+            @refreshDataList="initData"
             :ruleData="ruleData"
           ></add-or-update>
         </el-card>
@@ -242,11 +242,12 @@ export default {
         ruleName: "",
         ruleCategory: ""
       },
-      ruleData: [],
+      //规则树是否可见
       treeVisible: false,
-      treeTitle: "",
-      form: { name: "" },
+      // treeTitle: "",
+      // form: { name: "" },
       getDataList: [],
+      //规则树数据
       ruleData: [],
       //树id
       folderId: "",
@@ -296,6 +297,7 @@ export default {
       info: "",
       //规则id
       ruleId: "",
+      //新增、修改弹窗是否显示
       addOrUpdateVisible: false
     };
   },
@@ -306,6 +308,11 @@ export default {
     //获取列表数据
     initData() {
       this.loading = true;
+     /*  this.folderPath = (ruleData.folderPath && ruleData.folderPath) || "";
+      this.folderId = (ruleData.folderId && ruleData.folderId) || "";
+      if (ruleData.children) {
+        this.folderId = "";
+      } */
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
@@ -354,15 +361,16 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(this.multipleSelection[0].ruleId);
       });
+      console.log(this.multipleSelection[0].ruleId);
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
       this.ruleData = this.$refs.ruleTree.treeData;
     },
-    // 关闭编辑弹窗
+    // 关闭详情弹窗
     closeDetail() {
       this.showDetailDialog = false;
     },
-    // 关闭弹窗确认
+    // 关闭详情弹窗确认
     editSucceed() {
       this.closeDetail();
     },
@@ -461,16 +469,6 @@ export default {
       this.initData();
       this.clearTableChecked();
     },
-    //关闭新增、修改弹窗
-    closeAddOrEdit() {
-      this.addOrUpdateVisible = false;
-    },
-    //新增、修改成功后关闭页面并刷新
-    succeed() {
-      this.closeAddOrEdit();
-      this.initData();
-      this.clearTableChecked();
-    },
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val;
@@ -482,8 +480,6 @@ export default {
       this.pageIndex = val;
       this.initData();
     },
-    //
-    filterNode() {},
     //查看已选规则
     seeChoseRule() {
       this.choseRule = this.multipleSelection;
