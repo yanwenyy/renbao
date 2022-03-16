@@ -137,16 +137,13 @@
                   @click="timeRun"
                   >定时运行</el-button
                 >
-                <el-popover placement="right" trigger="click">
-                  <el-table :data="choseRule" :show-header="false" style="width:300px">
-                    <el-table-column
-                      prop="ruleName"
-                    ></el-table-column>
-                  </el-table>
-                  <el-button slot="reference" @click="seeChoseRule"
-                    >当前所选规则</el-button
-                  >
+                <el-popover placement="top" trigger="click" v-if="this.multipleSelection.length>0">
+                  <p v-for="(i, k) in multipleSelection" :key="k">
+                    {{ i.ruleName }}
+                  </p>
+                  <el-button slot="reference">当前所选规则</el-button>
                 </el-popover>
+                <el-button v-else>当前所选规则</el-button>
               </el-button-group>
             </div>
             <div class="pager">
@@ -263,7 +260,7 @@ export default {
       //总页数
       totalPage: 0,
       //当前所选规则
-      choseRule: [],
+      // choseRule: [],
       //树数据
       dataTree: [],
       //规则类别
@@ -475,9 +472,9 @@ export default {
       this.initData();
     },
     //查看已选规则
-    seeChoseRule() {
+    /* seeChoseRule() {
       this.choseRule = this.multipleSelection;
-    },
+    }, */
     //拿到选择树的id
     getTreeId(data) {
       // 规则列表有子节点时folderId为空
