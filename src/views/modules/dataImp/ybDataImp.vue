@@ -521,16 +521,20 @@
       },
       // 检查文件和匹配的表信息
       checkFileTable () {
+        if (this.selectedFileData.length == 0) {
+          this.$message.error("请选择要采集的文件")
+          return
+        }
         this.$http({
-          url: this.$http.adornUrl(`dataImp/checkFileTable`),
+          url: this.$http.adornUrl(`dataImp/checkFileTable/${2}`),
           method: 'post',
           data: this.selectedFileData
         }).then(({data}) => {
-             if (data && data.code === 200) {
-               this.fileTableInfos = data.result
-               this.findFileTable()
-             } else if (data && data.code == 500 && data.result) {
-               this.fileTableInfos = data.result
+            if (data && (data.code === 200 || data.code == 500) && data.result) {
+              //  this.fileTableInfos = data.result
+              //  this.findFileTable()
+             //} else if (data && data.code == 500 && data.result) {
+              this.fileTableInfos = data.result
               this.$http({
                 url: this.$http.adornUrl(`dataImp/getTableInfos/${2}`),
                 method: 'get'
@@ -541,7 +545,7 @@
                     }
                   }
               })
-               this.checkFileTableDialogVisible = true
+              this.checkFileTableDialogVisible = true
              } else {
                this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
              }
@@ -549,10 +553,6 @@
       },
       // 获取文件中涉及到的表名
       findFileTable () {
-        if (this.selectedFileData.length == 0) {
-          this.$message.error("请选择要采集的文件")
-          return
-        }
         this.$http({
           url: this.$http.adornUrl(`dataImp/getFileTable/${2}`),
           method: 'post',
@@ -657,6 +657,8 @@
         this.columnTableDialogVisible = false
         // 查看字段弹窗
         this.tableColumnViewDialogVisible = false
+        // 表匹配弹窗
+        this.checkFileTableDialogVisible = false
       },
       // 查看字段
       tableColumnView (tableName) {
