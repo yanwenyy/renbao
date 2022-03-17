@@ -251,7 +251,7 @@ import ImportFile from './Import-file.vue'
           } else {
             this.$refs.addOrUpdate.init('',this.ruleCheckData)
           }
-          
+
         })
       },
       // 获取规则树
@@ -321,16 +321,19 @@ import ImportFile from './Import-file.vue'
         if (!isAll) {
           this.ruleExportAllLoading = true;
         }
-       
+
         this.$http({
             isLoading:false,
-            url: this.$http.adornUrl('/rule/ruleExport'),
+            url: this.$http.adornUrl('/rule/setSessionRule'),
             method: 'post',
             data: this.$http.adornData(exportList, false)
         }).then(({data}) => {
             this.ruleExportLoading = false
             this.ruleExportAllLoading = false;
             if (data && data.code === 200) {
+                alert(123)
+                let url = this.$http.adornUrl('/rule/ruleExport?token=') + this.$cookie.get("token");
+                window.open(url);
               this.$message({message: '导出成功',type: 'success'});
               this.getDataList();
             } else {
