@@ -758,6 +758,11 @@
       },
       treedata: function (newValue, oldValue) {
        // console.log(newValue, oldValue)
+        newValue.forEach(item=>{
+          if(item.children){
+            this.treeDataToHint=this.treeDataToHint.concat(item.children);
+          }
+        });
       },
       loadTree:{
         deep: true,
@@ -778,6 +783,7 @@
     },
     mounted(){
       this.dragControllerDiv();
+
     },
     methods: {
       //sql执行结果tab切换事件
@@ -834,11 +840,6 @@
       },
       loadNode(node, resolve) {
         if (node.level === 0) {
-          this.treedata.forEach(item=>{
-            if(item.children){
-              this.treeDataToHint=this.treeDataToHint.concat(item.children);
-            }
-          });
           return resolve(this.treedata);
         }
         // if (node.level > 1) return resolve([]);

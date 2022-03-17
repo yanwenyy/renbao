@@ -35,7 +35,7 @@ function hideFullScreenLoading () {
 }
 
 const http = axios.create({
-  timeout: 1000 * 300,
+  timeout: 0,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
