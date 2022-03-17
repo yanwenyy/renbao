@@ -834,7 +834,6 @@
       },
       loadNode(node, resolve) {
         if (node.level === 0) {
-          console.log(77777);
           this.treedata.forEach(item=>{
             if(item.children){
               this.treeDataToHint=this.treeDataToHint.concat(item.children);

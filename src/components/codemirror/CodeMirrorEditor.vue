@@ -109,7 +109,19 @@
             :label="'结果'+(index+1)"
             :name="String(index)"
           >
-            <div v-if="item.list==''">{{item.msg}}</div>
+            <div v-if="item.list==''">
+              <div v-if="!item.columnList">{{item.msg}}</div>
+              <el-table v-if="item.columnList" border :data="item.columnListSelf" stripe style="width: 100%" class="box-table">
+                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+
+                  <template slot-scope="scope">
+                    <div>
+                      <span>{{scope.row[key]}}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
             <el-table v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">
               <el-table-column v-if="item.list[0]" v-for="(vtem,key,index) in item.list[0]" :key="index" :label="key">
                 <template slot-scope="scope">
@@ -541,6 +553,15 @@
             if (val !== "") {
               this.resultTableTabsValue=this.resultTableTabs.length>0?String(this.resultTableTabs.length-1):'0';
               this.resultTableTabs=val;
+              this.resultTableTabs.forEach(item=>{
+                if(item.columnList){
+                  var v={};
+                  item.columnList.forEach(vtem=>{
+                    v[vtem.columnName]='';
+                  });
+                  item.columnListSelf=[v];
+                }
+              })
               // console.log( this.resultTableTabsValue)
             }
           }
@@ -1068,7 +1089,7 @@
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
-        this.completeIfInTag(cm);
+        // this.completeIfInTag(cm);
         // if(this.editorValue!=''){
         //   this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         // }
@@ -1080,10 +1101,10 @@
         return this.completeAfter(cm, function () {          //智能提示
           var tok = cm.getTokenAt(cm.getCursor());
           if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
-          console.log(that.$refs.myCm.codemirror)
-          // var inner = that.$refs.myCm.codemirror.innerMode(cm.getMode(), tok.state).state;
-          // console.log(inner.tagName)
-          // return inner.tagName;
+          // console.log(that.$refs.myCm.codemirror)
+          var inner = that.$refs.myCm.codemirror.innerMode(cm.getMode(), tok.state).state;
+          console.log(inner.tagName)
+          return inner.tagName;
         });
       },
       completeAfter(cm, pred){
