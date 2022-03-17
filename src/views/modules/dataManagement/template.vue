@@ -3,7 +3,9 @@
     <div class='template'>
         <el-table :data="tableData" border style="100%" :header-cell-style="{textAlign:'center'}" height='600' class="demo-ruleForm" v-loading="listLoading">
             <el-table-column prop="templateName" align="center" label="模板名称"></el-table-column>
-            <el-table-column prop="uploadTime" align="center" label="上传时间"></el-table-column>
+            <el-table-column align="center" label="上传时间">
+                 <template slot-scope="scope">{{scope.row.uploadTime | datetimeformat}}</template>
+            </el-table-column>
             <el-table-column prop="uploadUserName" align="center" label="上传人"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
