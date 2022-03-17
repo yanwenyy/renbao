@@ -296,7 +296,11 @@
       hintShowName: {
         type: String,
         default: null,
-      },
+      },//hint提示要显示的name名字
+      paramsNode: {
+        type: Object,
+        default: null,
+      },//左侧参数树拖拽的节点
       cmMode: {
         type: String,
         default: null,
@@ -458,28 +462,37 @@
     },
     watch: {
       treeDataToHint: {
+        deep: true,
+        handler(val,old) {
+          if(val){
+            val=this.setHintList(val);
+            val.forEach(item=>{
+              this.hintTable[item.name]=item.childHints||[];
+              this.$refs.myCm.codemirror.options.hintOptions.tables[item.name]=item.childHints||[];
+              this.$refs.myCm.codemirror.options.hintOptions.tablesTitle[item.name]=item.childHints||[];
+            });
+            console.log(val,88888);
+            console.log( this.hintTable)
+            // this.$refs.myCm.codemirror.setOption('hintOptions', { // 自定义提示选项
+            //   completeSingle: false, // 当匹配只有一项的时候是否自动补全
+            //   tables: this.hintTable
+            // });
+            // console.log(this.$refs.myCm.codemirror.options)
+
+          }
+        }
+      },
+      paramsNode: {
+        // 实时监控数据变化
         immediate: true,
         deep: true,
         handler(val) {
-          if(val!=''){
-            if(val!=''){
-              console.log(val,9999999)
-              val=this.setHintList(val);
-              console.log(val,88888)
-              val.forEach(item=>{
-                this.hintTable[item.name]=[];
-                this.$refs.myCm.codemirror.options.hintOptions.tables[item.name]=[];
-                this.$refs.myCm.codemirror.options.hintOptions.tablesTitle[item.name]=[];
-              });
-              // console.log(this.$refs.myCm.codemirror.options.hintOptions.tables)
-              // console.log( this.hintTable)
-              // this.$refs.myCm.codemirror.setOption('hintOptions', { // 自定义提示选项
-              //   completeSingle: false, // 当匹配只有一项的时候是否自动补全
-              //   tables: this.hintTable
-              // });
+          if (val) {
+            if (val) {
+              this.paramsNode=val;
             }
           }
-        }
+        },
       },
       treeLable: {
         // 实时监控数据变化
@@ -489,11 +502,30 @@
           if (val !== "") {
             this.treeValve = val;
             if (val !== "") {
-              let pos1 = this.$refs.myCm.codemirror.getCursor();
-              let pos2 = {};
-              pos2.line = pos1.line;
-              pos2.ch = pos1.ch;
-              this.$refs.myCm.codemirror.replaceRange(val, pos2);
+
+
+              if( Object.keys(this.paramsNode).length>0){
+                //制作标签dom(颜色样式自行设置)
+                var _cursor=this.$refs.myCm.codemirror.getCursor();
+                var id="{#"+this.paramsNode.id+"#}";
+                this.$refs.myCm.codemirror.replaceRange(id, _cursor,_cursor);
+                var dom = document.createElement("button");
+                dom.className = "parmasBtn";
+                dom.innerHTML = val;
+                dom.id=id;
+                const endPos = { line: _cursor.line, ch: _cursor.ch + id.length,sticky:null };
+                this.$refs.myCm.codemirror.markText(_cursor, endPos, {
+                  replacedWith: dom,
+                  className:"paramBlock",
+                });
+                console.log(this.$refs.myCm.codemirror.getValue());//获取codemirror内容
+              }else{
+                let pos1 = this.$refs.myCm.codemirror.getCursor();
+                let pos2 = {};
+                pos2.line = pos1.line;
+                pos2.ch = pos1.ch;
+                this.$refs.myCm.codemirror.replaceRange(val, pos2);
+              }
             } else {
               let dimId =
                 "cursor.execute{#('select * from MLC_RELATION_MODEL')#}#执行sql语句";
@@ -593,11 +625,6 @@
         list.forEach(item=>{
           item.name=item[this.hintShowName];
           if(item.childrens){
-            var _list=[];
-            item.childrens.forEach(vtem=>{
-              _list.push(vtem[this.hintShowName]);
-            });
-            item.hintChildList=_list;
             this.setHintList(item.childrens)
           }
         });
@@ -760,119 +787,13 @@
       },
       // 执行
       implement: function () {
-        this.getwsData(this.editorValue);
-        // //清空上一次的执行结果
-        // this.arr = [];
-        // //执行按钮禁用
-        // var executeFlag = false;
-        // this.implementDisabled = true;
-        // /*if (this.batchId.trim() == "") {
-        //   // this.$emit("result", "false");
-        //   this.$message({
-        //     message: "获取登录信息失败，请重新加载网页",
-        //   });
-        //   this.implementDisabled = false;
-        //   return false;
-        // }*/
-        // //每次执行重新给一个执行的uuid
-        // this.batchId = "";
-        // generateUUID().split("-").forEach(e => {
-        //   this.batchId += e;
-        // })
-        // // this.batchId = generateUUID().replace("-","");
-        // /*if (this.selectNumber.trim() != "") {
-        //   //设置cookie
-        //   setCookie("selectNumber", this.selectNumber);
-        // }*/
-        // //显示开始进行执行
-        // this.$emit("result", "true");
-        // //逐行拆分
-        // var valueList = this.editorValue.split("\n");
-        // //检测python删除文件的方法
-        // //删除文件方法组
-        // var delArr = [
-        //   "remove",
-        //   "rmdir",
-        //   "removedirs",
-        //   "unlink",
-        //   "rmtree",
-        //   "delete",
-        //   "del",
-        //   "Send2trash"
-        // ];
-        // //小括号
-        // var regex = /\([^\)]*\)/g;
-        // //对代码进行检测
-        // valueList.forEach(item => {
-        //   if (item.search(regex) !== -1) {
-        //     delArr.forEach(delarr => {
-        //       if (item.indexOf(("." + delarr + "(")) !== -1) {
-        //         // this.$emit("result", "false");
-        //         this.$message({
-        //           message: "函数不能以" + delarr + "命名或使用",
-        //         });
-        //         //返回前解禁按钮
-        //         this.implementDisabled = false;
-        //         return false;
-        //       }
-        //     })
-        //   }
-        // })
-        // //进行特殊方法的包装
-        // var data = [];
-        // valueList.forEach((item) => {
-        //   if (item.indexOf("execute") != -1) {
-        //     // replace(/(\s*$)/g, "")
-        //     var a = item;
-        //     var b = a + "&}";
-        //     // var b = a.replace(")", ")#}")
-        //     var str = b.replace("execute", "execute{&");
-        //     data.push(str);
-        //   } else if (item.indexOf("outPutPrint") != -1) {
-        //     // replace(/(\s*$)/g, "")
-        //     var a = item;
-        //     var b = a + "%}";
-        //     // var b = a.replace(")", ")#}")
-        //     var str = b.replace("outPutPrint", "outPutPrint{%");
-        //     data.push(str);
-        //   } else if (item.indexOf("outPutPicture") != -1) {
-        //     // replace(/(\s*$)/g, "")
-        //     var a = item;
-        //     var b = a + "%}";
-        //     // var b = a.replace(")", ")#}")
-        //     var str = b.replace("outPutPicture", "outPutPicture{%");
-        //     data.push(str);
-        //   } else if (item.indexOf("outPutTable") != -1) {
-        //     // replace(/(\s*$)/g, "")
-        //     var a = item;
-        //     var b = a + "%}";
-        //     // var b = a.replace(")", ")#}")
-        //     var str = b.replace("outPutTable", "outPutTable{%");
-        //     data.push(str);
-        //   } else if (item.indexOf("fileDownloadOutPut") != -1) {
-        //     // replace(/(\s*$)/g, "")
-        //     var a = item;
-        //     var b = a + "%}";
-        //     // var b = a.replace(")", ")#}")
-        //     var str = b.replace("fileDownloadOutPut", "fileDownloadOutPut{%");
-        //     data.push(str);
-        //   } else {
-        //     data.push(item);
-        //   }
-        // });
-        // data = data.join("\n");
-        // if (this.funLists.length > 0) {
-        //   this.funLists.forEach((item) => {
-        //     var m = "import " + item.name;
-        //     if (data.indexOf(m) != -1) {
-        //       var f = "{|(" + m + ")|}";
-        //       data = data.replace(m, f);
-        //     }
-        //   });
-        // }
-        // // this.arr = [];
-        // //取消禁用按钮
-        // this.implementDisabled = false;
+        var _marks=this.$refs.myCm.codemirror.getAllMarks(),_list=[];
+        _marks.forEach((item)=>{
+          if(item.className=='paramBlock'){
+            _list.push(item.replacedWith.id)
+          }
+        });
+        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list);
       },
       // 打开
       openPython() {
@@ -908,14 +829,7 @@
        * 另存为
        */
       saveAs() {
-        let obj = {};
-        selectTree(obj).then((res) => {
-          this.sheetData = res.data;
-          this.sheetData.forEach((m) => {
-            this.idArr.push(m.id);
-          });
-        });
-        this.draftFlag = true;
+
       },
       // 查找
       lookups() {
@@ -1091,6 +1005,8 @@
         this.getSqlMsg(this.editorValue);
         // this.completeIfInTag(cm);
         // if(this.editorValue!=''){
+        //   var tok = cm.getTokenAt(cm.getCursor());
+        //   if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
         //   this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
         // }
         this.resetLint();
@@ -1232,5 +1148,11 @@
   }
   >>>.self-dialog{
     z-index: 9999999999!important;
+  }
+  .parmasBtn{
+    border:1px solid #000;
+    border-radius: 4px;
+    padding: 5px;
+    display: inline-block;
   }
 </style>
