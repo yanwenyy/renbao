@@ -301,7 +301,9 @@ export default {
       addOrUpdateVisible: false,
       conheight: {
         height: ""
-      }
+      },
+      // 选中的规则节点
+      ruleCheckData: {}, 
     };
   },
   created() {
@@ -309,12 +311,21 @@ export default {
     window.addEventListener("resize", this.getHeight);
     this.getHeight();
     //获取列表
-    this.initData();
+    // this.initData();
   },
   methods: {
     //获取列表数据
     initData() {
+      // 判断不选左侧规则节点列表为空
+      if (!this.ruleCheckData.folderId) {
+          this.$message({message: '请选择对应的规则分类',type: 'warning'});
+          return;
+      }
       this.loading = true;
+      // 如何改规则节点有子节点的话folderId为空
+      if (this.ruleCheckData.children) {
+          this.dataForm.folderId = '';
+      }
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
@@ -433,7 +444,7 @@ export default {
         createUserName: "",
         createTime: ""
       };
-      this.initData();
+      // this.initData();
       this.clearTableChecked();
     },
     //立即运行
@@ -489,12 +500,12 @@ export default {
     }, */
     //拿到选择树的id
     getTreeId(data) {
-      // 规则列表有子节点时folderId为空
+      this.ruleCheckData = data;
       this.folderPath = (data.folderPath && data.folderPath) || "";
       this.folderId = (data.folderId && data.folderId) || "";
-      if (data.children) {
-        this.folderId = "";
-      }
+      // if (data.children) {
+      //   this.folderId = "";
+      // }
       this.initData();
     },
     //获取每行数据id

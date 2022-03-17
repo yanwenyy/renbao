@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <div class="auditRuleConfig-left">
-            <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="false" :isShowEdit="true" parentGetTreeData="getTreeData" :folderSorts="folderSorts" ></rule-tree>
+            <rule-tree ref="ruleTree" :isShowSearch="true" :isShowCheckBox="false" :isShowEdit="true" parentGetTreeData="getTreeData" :folderSorts="folderSorts" ></rule-tree>
         </div>
         <div class="auditRuleConfig-right">
             <div class="search-box"> 
@@ -127,7 +127,7 @@ export default {
         }
     },
     activated () {
-        this.getSelectPage();
+        // this.getSelectPage();
         // this.getRuleFolder();
     },
     created () {
@@ -135,7 +135,16 @@ export default {
     },
     methods: {
         getSelectPage () {
+            // 判断不选左侧规则节点列表为空
+            if (!this.ruleCheckData.folderId) {
+                this.$message({message: '请选择对应的规则分类',type: 'warning'});
+                return;
+            }
             this.tableLoading = true;
+            // 如何改规则节点有子节点的话folderId为空
+            if (this.ruleCheckData.children) {
+                this.searchForm.folderId = '';
+            }
             this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl(`/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`),
@@ -177,14 +186,10 @@ export default {
         },
         getTreeData (data) {
             this.ruleCheckData = data;
-            // 规则列表有子节点时folderId为空
             this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
             this.searchForm.folderPath = data.folderPath && data.folderPath || '';
             this.searchForm.folderId = data.folderId && data.folderId || '';
-            if (data.children) {
-                this.searchForm.folderId = '';
-            }
             this.getSelectPage();
         },
         queryClick () {
@@ -199,7 +204,6 @@ export default {
             // this.$refs.ruleTree.clearCheckedKeys();
             // this.searchForm.folderPath = '';
             // this.searchForm.folderId = '';
-            
         },
         addFun () {
             // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
