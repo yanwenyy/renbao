@@ -157,7 +157,7 @@ export default {
         }
     },
     mounted () {
-        // this.getRuleFolder();
+        this.getRuleFolder();
     },
     activated () {
         this.getRuleFolder();

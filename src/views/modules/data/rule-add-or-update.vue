@@ -225,11 +225,11 @@
         this.dataForm.id = 0;
         this.dataForm.ruleName = '';
         this.dataForm.ruleCategory = '';
-        // this.dataForm.folderId = '';
-        // this.dataForm.parentName = '';
+        this.dataForm.folderId = '';
+        this.dataForm.parentName = '';
         this.dataForm.ruleSqlValue = '';
         this.dataForm.ruleType = '';
-        // this.dataForm.folderPath = '';
+        this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
 
         // this.dataForm={
@@ -244,12 +244,13 @@
         //   ruleType: '',
         //   folderPath: ''
         // };
-        this.$nextTick(() => {
+       
+        if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
-        });
+        }
       },
       init (id, ruleCheckData) {
-
+        this.cleanMsg();
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
         this.dataForm.ruleId = id;
         this.dataForm.folderId = this.ruleCheckData.folderId;
@@ -388,9 +389,9 @@
     },
     watch : {
       'visible'(nval, oval) {
-          if (nval ) {   
-            this.cleanMsg();
-          }
+          // if (nval ) {   
+          //   this.cleanMsg();
+          // }
       },
     }
   }
