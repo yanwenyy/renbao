@@ -28,13 +28,13 @@
                <el-upload
                     class="upload-demo"
                     action=""
-                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    accept=""
                     multiple
                     :limit="1"
                     :file-list="fileList"
                     :http-request="uploadFile" :on-change="handleChange">
                     <el-button size="small" type="primary" @click="chooseClick">选择文件</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
+                    <!-- <div slot="tip" class="el-upload__tip">只能上传Excel文件</div> -->
                 </el-upload>
             <div class="itemBtn" slot="footer">
                 <el-button type="primary" @click="showImportVisible = false">关闭</el-button>

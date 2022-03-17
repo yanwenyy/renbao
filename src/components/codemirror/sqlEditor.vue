@@ -3,6 +3,7 @@
     <div class="code-mirror-tree left" v-if="!fullScreen">
       <div class="tree-left">
         <div class="tree-left-one" :class="treeType==='1'?'tree-left-active':''" @click="changeTree('1')">数据表</div>
+        <div class="tree-left-three" :class="treeType==='3'?'tree-left-active':''" @click="changeTree('3')">参数</div>
         <div class="tree-left-two" :class="treeType==='2'?'tree-left-active':''" @click="changeTree('2')">函数表</div>
       </div>
       <div class="tree-right">
@@ -69,6 +70,33 @@
                 </span>
             </el-tree>
           </div>
+          <div class="custom-tree-container"  v-show="treeType==='3'">
+            <el-tree
+              class="sql-tree-self"
+              :props="parmsDefaultProps"
+              :data="paramsData"
+              :filter-node-method="filterNode3"
+              ref="tree3"
+              node-key="id"
+              :default-expand-all="false"
+              @node-drag-start="handleDragStart"
+              @node-drag-enter="handleDragEnter"
+              @node-drag-leave="handleDragLeave"
+              @node-drag-over="handleDragOver"
+              @node-drag-end="handleDragEnd"
+              @node-drop="handleDrop"
+              draggable
+              :allow-drop="returnFalse"
+              :allow-drag="allowDrag">
+               <span class="custom-tree-node" slot-scope="{ node, data }">
+                    <span>
+                         <img v-if="node.data.type=='funFolder'" class="tree-icon" src="./icons/files.png" alt="">
+                         <img v-if="node.data.type=='params'" class="tree-icon" src="./icons/params.png" alt="">
+                        {{ node.label }}
+                    </span>
+                </span>
+            </el-tree>
+          </div>
 
         </div>
 
@@ -121,6 +149,7 @@
         :autoFormatJson="autoFormatJson"
         :jsonIndentation="jsonIndentation"
         :exportSql="exportSql"
+        :paramsNode="paramsNode"
         @setFS="getFullScreen"
         :treeDataToHint="treeDataToHint"
         :hintShowName="defaultProps.label"
@@ -177,6 +206,10 @@
         type: Array,
         default: null,
       },
+      paramsData: {
+        type: Array,
+        default: null,
+      },
       sqlListData: {
         type: Array,
         default: null,
@@ -201,9 +234,14 @@
         type: Object,
         default: null,
       },
+      parmsDefaultProps: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
+        paramsNode:{},//参数数拖拽的节点
         treeDataToHint:[],//tree数据给sql编译器提示
         resultTableTabsList:[],//拖拽条显示高度判断
         funData:[
@@ -661,6 +699,15 @@
             }
           }
         },
+        defaultPropsParams: {
+          children: 'children',
+          label: this.parmsDefaultProps.label?this.parmsDefaultProps.label:'label',
+          isLeaf:(data,node) => {
+            if (node.level >2) {// 根据需要进行条件判断添加is-leaf类名
+              return true
+            }
+          }
+        },
         visible:true,
         cmTheme: "default", // codeMirror主题
         // codeMirror主题选项
@@ -754,12 +801,18 @@
           this.$refs.tree1.filter(val);
         }else if(this.treeType==='2'){
           this.$refs.tree2.filter(val);
+        }else if(this.treeType==='3'){
+          this.$refs.tree3.filter(val);
         }
       },
       treedata: function (newValue, oldValue) {
        // console.log(newValue, oldValue)
         newValue.forEach(item=>{
           if(item.children){
+            // item.children.forEach(vtem=>{
+            //   vtem.childHints=[];
+            //   vtem.childrens=[];
+            // });
             this.treeDataToHint=this.treeDataToHint.concat(item.children);
           }
         });
@@ -768,6 +821,14 @@
         deep: true,
         handler(val) {
           // console.log(val,3333)
+        }
+      },
+      treeDataToHint:{
+        deep: true,
+        handler(val) {
+          if(val){
+            this.treeDataToHint=val;
+          }
         }
       },
       resultTableTabs:{
@@ -847,18 +908,22 @@
           return resolve(node.data.children);
         }else{
           setTimeout(() => {
-            resolve(this.loadTree);
-            this.treeDataToHint.forEach(item=>{
-              if(item.id==node.data.id){
-                item.childrens=[];
-                if(node.childNodes){
-                  node.childNodes.forEach(vtem=>{
-                    item.childrens.push(vtem.data);
+            if(this.loadTree.length>0){
+              this.treeDataToHint.forEach((item,index)=>{
+                if(item.id==this.loadTree[0].parentId){
+                  item.childrens=this.loadTree;
+                  item.childHints=[];
+                  this.loadTree.forEach(vtem=>{
+                    item.childHints.push(vtem[this.defaultProps.label])
                   })
+                  this.$set(this.treeDataToHint,index,item)
                 }
-              }
-            })
+
+              });
+            }
+            resolve(this.loadTree);
           }, 500);
+
         }
 
       },
@@ -874,9 +939,13 @@
       },
       filterNode(value, data) {
         if (!value) return true;
-        return data.title.indexOf(value) !== -1;
+        return data[this.defaultProps.label].indexOf(value) !== -1;
       },
       filterNode2(value, data) {
+        if (!value) return true;
+        return data.name.indexOf(value) !== -1;
+      },
+      filterNode3(value, data) {
         if (!value) return true;
         return data.name.indexOf(value) !== -1;
       },
@@ -886,23 +955,24 @@
       },
       allowDrag(draggingNode) {
         // return draggingNode.data.level>2||draggingNode.data.type=='funNode';
-        return Number(draggingNode.data.dataType)>1||draggingNode.data.type=='funNode';
+        return Number(draggingNode.data.dataType)>1||draggingNode.data.type=='funNode'||draggingNode.data.type=='params';
       },
       handleDragStart(node, ev) {
-        console.log('drag start', node);
+        // console.log('drag start', node);
       },
       handleDragEnter(draggingNode, dropNode, ev) {
-        console.log('tree drag enter: ', dropNode.label);
+        // console.log('tree drag enter: ', dropNode.label);
       },
       handleDragLeave(draggingNode, dropNode, ev) {
-        console.log('tree drag leave: ', dropNode.label);
+        // console.log('tree drag leave: ', dropNode.label);
       },
       handleDragOver(draggingNode, dropNode, ev) {
-        console.log('tree drag over: ', dropNode.label);
+        // console.log('tree drag over: ', dropNode.label);
       },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
         console.log(draggingNode, dropNode, dropType, ev);
-
+        console.log(this.$refs.cmEditor)
+        this.paramsNode={};
         if (draggingNode.childNodes.length == 0 ) {
           this.treeLable = this.treeDefaultProps.label?draggingNode.data[this.treeDefaultProps.label]:draggingNode.data.label;
         }
@@ -914,6 +984,10 @@
           draggingNode.data.type === "funNode"
         ) {
           this.treeLable = draggingNode.data.name;
+        }
+        if (draggingNode.data.type === "params") {
+          this.treeLable = draggingNode.data.name;
+          this.paramsNode=draggingNode.data;
         }
       },
       // 拖拽成功完成时
@@ -1071,13 +1145,10 @@
     border-top-right-radius:20px;
     border-bottom-left-radius:5px;
     border-bottom-right-radius:20px;
+    margin: 5px 0;
   }
   .tree-left>.tree-left-active{
     color: #000;
-  }
-  .tree-left-one{
-   margin-bottom: 10px;
-    /*padding-top: 2%;*/
   }
   .tree-right{
     width: 89%;
