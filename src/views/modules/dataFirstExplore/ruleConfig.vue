@@ -61,7 +61,7 @@
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
-                <!-- <el-button @click="addData" type="primary">新增</el-button>
+                <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
                     this.multipleSelection.length <= 0 ||
@@ -76,7 +76,7 @@
                   :disabled="this.multipleSelection.length <= 0"
                   type="danger"
                   >删除</el-button
-                > -->
+                >
               </div>
             </div>
             <el-table
@@ -318,7 +318,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
-        isLoading:false,
+        isLoading: false,
         params: this.$http.adornParams(
           {
             pageNo: this.pageIndex,
