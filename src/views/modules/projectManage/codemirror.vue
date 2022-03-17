@@ -96,26 +96,28 @@
     methods: {
       //导出按钮点击
       exportSql(data){
-       if(data){
-         this.$http({
-           url: this.$http.adornUrl('/sqlScript/exportExcel'),
-           method: 'post',
-           responseType: 'blob',
-           data: this.$http.adornData({
-             sqlScript:data,
-             dataSize:50000,
-             exportSize:50000,
-           }),
-         }).then(({data}) => {
-           if(data.code==200){
-
-           }else{
-             this.$message.error(data.message);
-           }
-         })
-       }else{
-         this.$message.error("sql语句不能为空")
-       }
+        if(data){
+          //let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
+          //window.open(url)
+          this.$http({
+            url: this.$http.adornUrl('/sqlScript/setSession'),
+            method: 'post',
+            data: this.$http.adornData({
+              sqlScript:data,
+              dataSize:50000,
+              exportSize:50000,
+            }),
+          }).then(({data}) => {
+            if(data.code==200){
+              let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
+              window.location.href = url;
+            }else{
+              this.$message.error(data.message);
+            }
+          })
+        }else{
+          this.$message.error("sql语句不能为空")
+        }
       },
       //获取sql运行websocket返回的数据
       getDataList(datas){
@@ -127,11 +129,13 @@
           if(datas.data&&datas.data.result){
             v={
               list:datas.data.result||[],
+              columnList:datas.data.columnList,
               msg:datas.message
             };
           }else{
             v={
               list:[],
+              columnList:datas.data.columnList,
               msg:datas.message
             };
           }
