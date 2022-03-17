@@ -160,7 +160,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
         method: "get",
-        params: this.$http.adornParams({ folderSorts: "1,2", folderTypes: '' })
+        params: this.$http.adornParams({ folderSorts: "1,2" })
       }).then(({ data }) => {
         this.ruleData = data.result;
       });

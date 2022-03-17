@@ -102,9 +102,9 @@ export default {
             type: Boolean, // 是否显示文件夹
             default: true
         },
-        folderTypes: { // 规则树查询参数
-            default: ''
-        }
+        // folderTypes: { // 规则树查询参数
+        //     default: ''
+        // }
 
     },
     computed: {
@@ -157,7 +157,7 @@ export default {
         }
     },
     mounted () {
-        this.getRuleFolder();
+        // this.getRuleFolder();
     },
     activated () {
         this.getRuleFolder();
@@ -170,7 +170,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId, folderTypes: this.folderType}, false)
+                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false
