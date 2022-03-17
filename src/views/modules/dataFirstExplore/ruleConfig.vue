@@ -324,7 +324,7 @@ export default {
       this.loading = true;
       // 如何改规则节点有子节点的话folderId为空
       if (this.ruleCheckData.children) {
-          this.dataForm.folderId = '';
+          this.folderId = '';
       }
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
