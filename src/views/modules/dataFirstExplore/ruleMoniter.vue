@@ -14,6 +14,7 @@
               :props="layoutTreeProps"
             >
               <span
+                :title="node.label"
                 class="custom-tree-node"
                 slot-scope="{ node, data }"
                 @click="nodeClick(node, data)"
@@ -233,8 +234,10 @@ export default {
       }
     };
   },
-  created() {
+  activated() {
     this.getbatchList();
+  },
+  created() {
     this.getTableData();
   },
   methods: {
