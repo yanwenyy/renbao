@@ -60,7 +60,7 @@
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
-              <div style="float:right;margin-bottom:10px">
+              <!-- <div style="float:right;margin-bottom:10px">
                 <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
@@ -77,7 +77,7 @@
                   type="danger"
                   >删除</el-button
                 >
-              </div>
+              </div> -->
             </div>
             <el-table
               :data="tableData"
