@@ -22,7 +22,7 @@
           class="mask"
           v-show="show"
           v-model="output"
-          :columns="columns"
+          :columns="selectColumns"
           :data="data"
         ></myquerybuilder>
       </transition>
@@ -84,16 +84,16 @@ export default {
       listLoading: false,
       importVisible: false,
       show: false,
-      output: null,
+      output: {},
       //table表格数据
       tableList: [],
       tableColumns: [],
       queryRules: [],
       // resultTableName: "",
-      output: {},
       data: [],
-      columns: {},
-      sqlData: ""
+      selectColumns: {},
+      sqlData: "",
+      columnType: ""
     };
   },
   created() {
@@ -102,31 +102,42 @@ export default {
   methods: {
     //初始化数据列表
     initList() {
+      this.listLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
+        url: this.$http.adornUrl("dataInfoBase/getTableDataListByPage"),
         method: "get",
         params: this.$http.adornParams({
           tableName: this.resultTableName,
-          resultId: this.info
+          resultId: this.info,
+          complexWhere: this.sqlData,
+          pageNum: this.apComServerData.pageIndex,
+          pageSize: this.apComServerData.size
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          this.tableColumns = data.result.columns;
-          this.tableList = data.result.result;
-          this.columns = data.result.columnInfo;
-          // this.apComServerData.total;
+          /* let tablePositionKey = Object.keys(data.result.records[0]);
+          tablePositionKey.map((i, k) => {
+            this.tableColumns.push({
+              columnName: i,
+              columnType: typeof i
+            });
+          }); */
+          this.tableColumns = data.result.data.columns
+          this.tableList = data.result.data.result;
+          this.selectColumns = data.result.data.columnInfo;
+          this.apComServerData.total = data.result.total;
+          this.listLoading = false;
         } else {
           this.tableColumns = [];
-          // this.apComServerData.total = 0;
+          this.apComServerData.total = 0;
+          this.listLoading = false;
         }
       });
     },
     //重置
     resetForm() {},
-    //查询
-    getDataList() {},
     //确定
-   /*  ok() {
+    /*  ok() {
       this.$emit("ok");
     }, */
     //取消
@@ -142,24 +153,7 @@ export default {
       this.listLoading = true;
       var getSql = this.$refs.myquerybuilder.getSelectSql();
       this.sqlData = getSql.sql;
-      this.$http({
-        url: this.$http.adornUrl("/threeCatalog/getThreeCatalogDataList"),
-        method: "get",
-        params: this.$http.adornParams({
-          catalogType: this.ruleForm.catalogType,
-          complexWhere: getSql.sql
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.tableList = data.result.records;
-          this.apComServerData.total = data.result.total;
-          this.getDataList();
-        } else {
-          this.dataList = [];
-          this.apComServerData.total = 0;
-        }
-        this.listLoading = false;
-      });
+      this.initList();
     },
     //导出
     reportList() {
@@ -189,9 +183,8 @@ export default {
     },
     //复杂查询展开事件
     handleChange() {
-      console.log(this.columns);
+      this.selectColumns = this.selectColumns;
       this.show = !this.show;
-      this.columns = this.columns;
       this.data = this.output;
     },
     // 页数
