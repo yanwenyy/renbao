@@ -1,10 +1,12 @@
 <!-- 采集模板导出 -->
 <template>
     <div class='template'>
-        <el-table :data="tableData" border style="100%" height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
+        <el-table :data="tableData" border style="100%" :header-cell-style="{textAlign:'center'}" height='600' class="demo-ruleForm" v-loading="listLoading">
             <el-table-column prop="templateName" align="center" label="模板名称"></el-table-column>
-            <el-table-column prop="Uploadtime" align="center" label="上传时间"></el-table-column>
-            <el-table-column prop="Uploader" align="center" label="上传人"></el-table-column>
+            <el-table-column align="center" label="上传时间">
+                 <template slot-scope="scope">{{scope.row.uploadTime | datetimeformat}}</template>
+            </el-table-column>
+            <el-table-column prop="uploadUserName" align="center" label="上传人"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
                     <el-button size="small" type="text" @click="getImportclick(scope.row)">导入模板</el-button>
@@ -16,14 +18,24 @@
         <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="apComServerData.currentPage"
+        :current-page="apComServerData.pageIndex"
         :page-sizes="[10, 20, 50, 100]"
         :page-size="apComServerData.pageSize"
         :total="apComServerData.total"
         layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <el-dialog title="导入" :visible.sync="showImportVisible">
-            <el-button size="mini" type="primary" @click="chooseClick">选择文件</el-button>
+               <el-upload
+                    class="upload-demo"
+                    action=""
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    multiple
+                    :limit="1"
+                    :file-list="fileList"
+                    :http-request="uploadFile" :on-change="handleChange">
+                    <el-button size="small" type="primary" @click="chooseClick">选择文件</el-button>
+                    <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
+                </el-upload>
             <div class="itemBtn" slot="footer">
                 <el-button type="primary" @click="showImportVisible = false">关闭</el-button>
             </div>
@@ -34,30 +46,22 @@
 export default {
     data(){
         return{
-            tableData:[{
-               'id':'0',
-               'templateName':'医保数据模板',
-               'Uploadtime':'2022-2-23',
-               'Uploader':'系统管理员'
-            },{
-               'id':'1',
-               'templateName':'医保数据模板',
-               'Uploadtime':'2022-2-25',
-               'Uploader':'系统管理员'
-            },{
-               'id':'2',
-               'templateName':'医院基本信息模板',
-               'Uploadtime':'2022-2-27',
-               'Uploader':'系统管理员'
-            }],
+            tableData:[],
             listLoading:false,
             showImportVisible:false,
             apComServerData:{
-                currentPage: 1,
+                current: 1,
                 pageSize: 10,
                 total: 0,
+                pageIndex:1
             },
+            fileList:[],
+            token:'',
+            fileInfoId:''
         }
+    },
+    created(){
+        this.token = this.$cookie.get("token");
     },
     mounted() {
         this.initData()
@@ -65,23 +69,76 @@ export default {
     methods:{
         //初始化数据
         initData(){
+            this.listLoading = true;
+            this.$http({
+                url: this.$http.adornUrl("/collectTemplate/selectPage"),
+                method: "get",
+                params: this.$http.adornParams({
+                    // 'catalogType':this.dataForm.dataType,
+                    // 'complexWhere':  '',
+                    'pageSize':this.apComServerData.pageSize,
+                    'pageNum':this.apComServerData.pageIndex,
+                    // 'pageCount':this.apComServerData.current,
+                    // 'dataCount':this.dataCount || ''
+                })
+            }).then(({data}) =>{
+                if(data && data.code === 200){
+                    this.tableData = data.result.records,
+                    this.apComServerData.total = data.result.total
+                }else{
+                    this.tableData = [];
+                    this.apComServerData.total = 0; 
+                }
+                this.listLoading = false;
+            })
+        },
+        handleChange(file,fileList){
+            this.fileList = fileList
+        },
 
+        //上传文件 导入
+        uploadFile(){
+            let formData = new FormData()
+            formData.append('file',this.fileList[0].raw)
+            this.$http({
+                url:this.$http.adornUrl('/fileInfo/pa/fileInfo/adds'),
+                method: "post",
+                data:formData,
+                }).then(({data})=>{
+                    if(data && data.code === 200){
+                        this.fileInfoId = data.result.fileInfoId
+                        console.log( this.fileInfoId )
+                        this.$message({
+                            message: '导入成功',
+                            type: 'success',
+                            onClose: () => {
+                                this.showImportVisible=false;
+                                this.initData();
+                            }
+                        })
+                    }else{
+                        this.$message.error(data.message)
+                    }
+                })
         },
         //导入模板
         getImportclick(){
             this.showImportVisible = true
         },
         //导出模板
-        getExportClick(){},
+        getExportClick(data){
+             let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+this.fileInfoId +'&token=') + this.$cookie.get('token')
+            window.open(url)
+        },
         // 每页数
         handleSizeChange(val){
-            this.pageSize = val
-            this.currentPage = 1
+            this.apComServerData.pageSize = val
+            this.apComServerData.pageIndex = 1
             this.initData()
         }, 
         // 当前页
         handleCurrentChange (val) {
-            this.currentPage = val
+            this.apComServerData.pageIndex = val
             this.initData()
         },
         //选择文件
