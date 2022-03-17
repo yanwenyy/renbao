@@ -30,7 +30,7 @@
                 <el-button size="mini" type="warning" @click="exportData">导出数据</el-button>
                 <el-button size="mini" type="warning" @click="importData">导入数据</el-button>
             </div>
-            <el-table :data="tableList" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading'>
+            <el-table :data="tableList" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading'>
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="医院名称" header-align="center" align="center" label="医院名称"></el-table-column>
                 <el-table-column prop="医院编码" header-align="center" align="center" label="医院编码"></el-table-column>
@@ -112,6 +112,9 @@ export default {
                     label: '增量'
             }],
         }
+    },
+     created(){
+        this.token = this.$cookie.get("token");
     },
     mounted(){
         this.getInitList()

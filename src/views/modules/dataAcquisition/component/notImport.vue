@@ -1,6 +1,6 @@
 <template>
     <div class='notImport'>
-        <el-table :data="tableList" border height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" style="width: 100%">
+        <el-table :data="tableList" border height="60vh" :header-cell-style="{textAlign:'center'}" style="width: 100%">
         <el-table-column v-for="(column,index) in columnList" :prop="column.columnName" :label="column.columnName" :key="index" align="center"/>
         </el-table>
         <el-pagination 
@@ -13,7 +13,7 @@
                 :page-sizes="[10, 20, 50, 100]"
                 ></el-pagination>
         <div class="itemBtn">
-            <el-button  @click="visible = false">关闭</el-button>
+            <el-button  @click="close">关闭</el-button>
         </div>
     </div>
 </template>

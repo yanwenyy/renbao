@@ -4,11 +4,10 @@
          <div class='listDisplay'>
              <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
         </div>
-        <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" v-loading="dataListLoading" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="60vh" v-loading="dataListLoading" @selection-change="handleSelectionChange">
             <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
             <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
             <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
-            <el-table-column label="采集表名称" align="center" prop="fileName"></el-table-column>
             <el-table-column label="采集数据文件路径" align="center" prop="collectPath"> </el-table-column>
             <el-table-column label="数据类型" align="center">
                     <template slot-scope="scope">
@@ -71,6 +70,7 @@ export default {
         NotImport,
         ViewProgress
     },
+    props:{ dataList: { type: Object } },
     data(){
         return{
             tableData:[],
@@ -85,16 +85,16 @@ export default {
             multipleSelection:'',
             dataListLoading:false,
             dataForm:{
-                fileName:'',
                 filePath:'',
                 collectStatus:'',
                 startTime:'',
-                endTime:''
+                startTimeEnd:''
             },
         }
     },
     mounted(){
         this.getInitList()
+        console.log(this.dataList)
     },
     methods:{
         getInitList(){
@@ -105,18 +105,16 @@ export default {
                 params: this.$http.adornParams({
                     pageSize:this.apComServerData.pageSize,
                     pageNo:this.apComServerData.pageIndex,
-                    // fileName:this.dataForm.fileName || '',
-                    // filePath:this.dataForm.filePath || '',
+                    filePath:this.dataForm.filePath || '',
                     collectStatus:this.dataForm.collectStatus || '',
                     startTimeBegin:this.dataForm.startTime || '',
-                    // endTime:this.dataForm.endTime || ''
+                    startTimeEnd:this.dataForm.startTimeEnd || ''
                     
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableData = data.result.records
                     this.apComServerData.total = data.result.total
-                      
                 }else{
                     this.tableData = []
                     this.apComServerData.total = 0
@@ -127,7 +125,6 @@ export default {
         //查看进度
         edit(){
             this.showViewVisible = true
-            //  this.collectPlanMonitorId = id
         },
         //多选
         handleSelectionChange(val){
@@ -135,10 +132,6 @@ export default {
             this.$emit('satDataHospital',this.multipleSelection); // 回显医院名称
         },
       
-        //进度条
-        format(percentage) {
-           return percentage === 100 ? '满' : `${percentage}%`;
-        },
         //查看未导入数据
         getStopCollection(){
             this.notImportVisible = true

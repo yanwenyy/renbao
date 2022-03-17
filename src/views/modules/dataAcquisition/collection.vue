@@ -1,7 +1,7 @@
 <template>
     <div class='collection'>
-        <el-form :inline="true" :model="dataForm" ref ="dataForm">
-            <el-form-item label="文件名：">
+        <el-form :inline="true" :model="dataForm" ref="dataForm">
+            <el-form-item label="文件名：" v-if="activeName == 'audit'">
                 <el-input v-model="dataForm.fileName" placeholder="请输入文件名"></el-input>
             </el-form-item>
             <el-form-item label="文件路径：">
@@ -18,7 +18,7 @@
                 </el-col>
                 <el-col class="line" :span="2">-</el-col>
                 <el-col :span="11">
-                    <el-time-picker placeholder="选择日期"  v-model="dataForm.startTimeEnd" style="width: 100%;"></el-time-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeEnd" style="width: 100%;"></el-date-picker>
                 </el-col>
             </el-form-item>
             <el-form-item>
@@ -32,11 +32,11 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="600" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="60vh" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
-                    <el-table-column label="采集表名称" align="center" prop="fileName"></el-table-column>
+                    <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
                     <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
                     <el-table-column label="数据类型" align="center" prop="dataType">
                         <template slot-scope="scope">
@@ -87,8 +87,8 @@
             </el-tab-pane>
          <!--医院数据-->
         <el-tab-pane label="医院数据" name="pass">
-            <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital'></HospitalList></el-tab-pane>
-        <!--医院基本信息-->
+            <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital' @dataList ="dataForm"></HospitalList></el-tab-pane>
+        <!--医院基本信息 暂时注释-->
         <!-- <el-tab-pane label="医院基本信息" name="noPass">
             <InformationList v-if="activeName == 'noPass'" @satDatalist='satDatalist' ref="noPass" @dataList ="dataForm"></InformationList>
         </el-tab-pane> -->
@@ -125,17 +125,17 @@ export default {
                 startTimeBegin:''
             },
             options:[{
+                value:'0',
+                label:'待采集'
+            },{
                 value:'1',
-                label:'已完成'
+                label:'进行中'
             },{
                 value:'2',
-                label:'进行中'
+                label:'已完成'
             },{
                 value:'3',
                 label:'失败'
-            },{
-                value:'4',
-                label:'待采集'
             }],
             activeName:'audit',
             tableList:[],//医保数据 医院基本信息
@@ -170,8 +170,15 @@ export default {
         
         //tab事件
         handleClick(tab,event){
-            this.activeName = tab.name;
-            this.getInitList()
+            if(tab.name == 'audit'){
+                this.activeName = tab.name;
+                this.getInitList()
+            }else if(tab.name == 'pass'){
+                this.activeName = tab.name;
+                this.dataList = this.dataForm
+            }
+          
+
         },
         //初始化数据
         getInitList(){
@@ -217,12 +224,6 @@ export default {
             this.editShowVisible = true
             this.collectPlanMonitorId = id
         },
-
-
-        //进度条
-        format(percentage) {
-           return percentage === 100 ? '满' : `${percentage}%`;
-        },
         EditSucceed(){this.closeEditDrawer()},
         closeEditDrawer(){ this.editShowVisible = false},
         // 页数
@@ -250,8 +251,10 @@ export default {
         getSearch(){
             if(this.activeName === 'audit'){
                 this.getInitList()
-            }else if(this.activeName === 'noPass'){
+            }else if(this.activeName === 'pass'){
                 this.dataList = this.dataForm
+                this.$refs.pass.getInitList()
+              
             }
            
             // this.dataListLoading = true;
