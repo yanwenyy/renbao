@@ -284,7 +284,7 @@ export default {
         min-width: 300px;
         height: 75vh;
         /deep/ .el-tree {
-            min-height: 70vh;
+            min-height: 60vh;
         }
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;

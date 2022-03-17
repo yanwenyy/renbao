@@ -37,6 +37,12 @@
                   :default-expand-all="false"
                   :highlight-current="true"
                   :expand-on-click-node="false">
+                   <span  slot-scope="{ node }">
+                      <span class="tree-label">
+                          <span class="folder-icon"></span>
+                          <span :title="node.label" > {{node.label}}</span>
+                      </span>
+                  </span>
                 </el-tree>
               </el-popover>
               <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
@@ -102,8 +108,7 @@
     },
     props:{
       ruleData: {
-        type: Array,
-        default: null,
+        default: [],
       },
     },
     data () {
@@ -251,13 +256,13 @@
       },
       init (id, ruleCheckData) {
         this.cleanMsg();
+        this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
         this.dataForm.ruleId = id;
         this.dataForm.folderId = this.ruleCheckData.folderId;
         this.dataForm.folderPath = this.ruleCheckData.folderPath;
-        this.visible = true;
+
         this.getUserInfo();
-        this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
           this.$refs['dataForm'].clearValidate();
@@ -285,7 +290,7 @@
               this.sqlEditMsg = datas.ruleSqlValue;
               console.log(this.sqlEditMsg,33333)
               this.dataForm.ruleType = datas.ruleType;
-              this.menuListTreeSetCurrentNode();
+              // this.menuListTreeSetCurrentNode();
             }
           })
         }
@@ -418,6 +423,14 @@
     left: 0;
     padding-right: 2%;
     box-sizing: border-box;
+  }
+  .folder-icon {
+    background: url(../../../assets/img/folder.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 13px;
+    height: 16px;
   }
   .infoForm .el-input,.infoForm .el-select{
     width: 30%;

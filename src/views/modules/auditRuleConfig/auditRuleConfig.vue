@@ -339,7 +339,7 @@ export default {
         min-width: 300px;
         padding: 10px 0 0 10px;
         /deep/ .el-tree {
-            min-height: 70vh;
+            min-height: 60vh;
         }
 
     }

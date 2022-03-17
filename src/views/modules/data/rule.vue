@@ -69,7 +69,7 @@
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="ruleImport">导入</el-button>
           <el-button type="warning" @click="ruleExport('all')" :loading="ruleExportAllLoading">全部导出</el-button>
-          <el-button type="warning" @click="ruleExport" :loading="ruleExportLoading">导出</el-button>
+          <el-button type="warning" @click="ruleExport('one')" :loading="ruleExportLoading">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
@@ -154,7 +154,7 @@
       </div>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
+    <add-or-update  ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
     <Import-file ref="ImportFile"></Import-file>
   </div>
 </template>
@@ -244,15 +244,15 @@ import ImportFile from './Import-file.vue'
     methods: {
       // 新增 / 修改
       addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
+        // this.addOrUpdateVisible = true
+        // this.$nextTick(() => {
           if (id) {
             this.$refs.addOrUpdate.init(id,this.ruleCheckData)
           } else {
             this.$refs.addOrUpdate.init('',this.ruleCheckData)
           }
 
-        })
+        // })
       },
       // 获取规则树
       getRuleFolder () {
@@ -311,14 +311,13 @@ import ImportFile from './Import-file.vue'
       ruleExport (isAll) {
         var exportList = []
         // 判断是否为全部导出，全部导出的话exportList为空列表
-        if (isAll) {
+        if (isAll == 'one') { // 单个导出
           if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
           this.dataListSelections.forEach( item =>{
-              exportList.push( item.ruleId )
+            exportList.push( item.ruleId )
           })
           this.ruleExportLoading = true
-        }
-        if (!isAll) {
+        } else { // 全部导出
           this.ruleExportAllLoading = true;
         }
 
@@ -331,7 +330,6 @@ import ImportFile from './Import-file.vue'
             this.ruleExportLoading = false
             this.ruleExportAllLoading = false;
             if (data && data.code === 200) {
-                alert(123)
                 let url = this.$http.adornUrl('/rule/ruleExport?token=') + this.$cookie.get("token");
                 window.open(url);
               this.$message({message: '导出成功',type: 'success'});

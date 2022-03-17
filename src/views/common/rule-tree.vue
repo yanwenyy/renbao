@@ -394,7 +394,7 @@ export default {
 </script>
 <style scoped lang="scss">
 .rule-tree-box {
-    // min-width: 288px;
+    width: 100%;
     /deep/ .filter-text {
         width: 80%;
         margin: 10px 0 10px 10px;
@@ -425,7 +425,7 @@ export default {
         background-color: #e3edfa;
     }
     /deep/ .el-tree-node__children {
-        overflow: unset !important;
+        overflow:visible;  
     }
 }
 
