@@ -24,15 +24,19 @@
                 ><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
             </div>
             <transition name="sub-comments">
-                <vue-query-builder
-                :rules="rules"
-                class="mask"
-                v-show="show"
-                v-model="output"
-                ></vue-query-builder>
+                <myquerybuilder
+                  ref="myquerybuilder"
+                  :rules="queryRules"
+                  class="mask"
+                  v-show="show"
+                  v-model="output"
+                  :columns="columns"
+                  :data="myquerybuilderData"
+                ></myquerybuilder>
             </transition>
             <el-table
                 :data="tableList"
+                v-loading="tableLoading"
                 border
                 style="100%"
                 :header-cell-style="{ textAlign: 'center' }"
@@ -66,13 +70,14 @@
  
 </template>
 <script>
-import VueQueryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
+import myquerybuilder from "@/views/modules/dataAcquisition/myquerybuilder.vue";
 export default {
   components: {
-    VueQueryBuilder
+    myquerybuilder
   },
   data() {
     return {
+        tableLoading: false,
         showDetailDialog: false,
         Pager: {
             pageSize: 10,
@@ -140,7 +145,11 @@ export default {
             label: "患者姓名"
             }
         ],
-        viewDetailsData: []
+        viewDetailsData: [],
+        queryRules: [],
+        columns: {},
+        sqlData: "",
+        myquerybuilderData: [],
     };
   },
   created() {
@@ -160,14 +169,47 @@ export default {
     },
     // 查询
     searchList () {
+      this.tableLoading = true;
+      var getSql = this.$refs.myquerybuilder.getSelectSql();
+      this.sqlData = getSql.sql;
+      this.$http({
+        url: this.$http.adornUrl("/threeCatalog/getThreeCatalogDataList"),
+        method: "get",
+        params: this.$http.adornParams({
+          // catalogType: this.ruleForm.catalogType,
+          complexWhere: getSql.sql
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.tableList = data.result.records;
+          this.apComServerData.total = data.result.total;
+          this.getDataList();
+        } else {
+          this.dataList = [];
+          this.apComServerData.total = 0;
+        }
+        this.tableLoading = false;
+      });
 
     },
     // 导出
     reportList () {
+      this.$http({
+        url: this.$http.adornUrl("/threeCatalog/excelDataExport"),
+        method: "get",
+        responseType: "blob", //解决乱码问题
+        params: this.$http.adornParams({
+          catalogType: this.ruleForm.catalogType
+        })
+      }).then(({ data }) => {
+      
+      
+      });
 
     },
     //初始化数据列表
     initList() {
+      this.tableLoading = true
       this.$http({
         url: this.$http.adornUrl("/dataInfoBase/getTableDataList"),
         method: 'get',
@@ -183,19 +225,22 @@ export default {
         } else {
          
         }
+        this.tableLoading = false
       });
     },
     //查询条件事件
     handleChange() {
       this.show = !this.show;
+      this.columns = this.columns;
+      this.myquerybuilderData = this.output;
     },
     sizeChangeHandle (val) {
         this.Pager.pageSize = val
-        // this.getTableData()
+        this.initList()
     },
     currentChangeHandle (val) {
         this.Pager.pageIndex = val;
-        // this.getTableData()
+        this.initList()
     },
   }
 };

@@ -108,7 +108,7 @@ export default {
                 {dataname:'ruleName' , label:'审核规则名称' , issortable:false , type:''},
                 {dataname:'ruleCategory' , label:'审核规则类别' , issortable:false , type:''},
                 {dataname:'createUserName' , label:'创建人' , issortable:false , type:''},
-                {dataname:'createTime' , label:'创建时间' , issortable:false , type:''},
+                {dataname:'createTime' , label:'创建时间' , issortable:false , type:'', minWidth: 200},
             ],
             Pager: {
                 pageSize: 10,
