@@ -86,6 +86,7 @@
     <el-dialog
       custom-class="sql-dialog"
       width="100%"
+      height="100vh"
       title="sql编译器"
       :close-on-click-modal="false"
       :show-close="false"
@@ -221,9 +222,14 @@
       },
       //sql编译器点击保存
       sqlSave(){
-        this.sqlVisible=false;
-        this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
-        this.dataForm.ruleType='1';
+        if(this.$refs.sqler.sqlMsg.indexOf("医疗机构编码")==-1||this.$refs.sqler.sqlMsg.indexOf("医疗机构名称")==-1){
+          this.$message.error("医疗机构编码和医疗机构名称是必填项")
+        }else{
+          this.sqlVisible=false;
+          this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
+          this.dataForm.ruleType='1';
+        }
+
       },
       cleanMsg(){
         this.activeName='1';
@@ -249,7 +255,7 @@
         //   ruleType: '',
         //   folderPath: ''
         // };
-       
+
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
@@ -295,7 +301,7 @@
           })
         }
         this.menuListTreeSetCurrentNode();
-       
+
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
@@ -312,10 +318,10 @@
           }
           this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.folderId)[0].folderName;
         }
-        
+
 
         // if (this.dataForm.folderId) {
-          
+
         //   // this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
         //   // this.getTreeData(this.treeData, this.checkedData[0].folderId);
         //   // console.log(this.getTreeData(this.ruleData,this.dataForm.folderId), '1111111')
@@ -394,7 +400,7 @@
     },
     watch : {
       'visible'(nval, oval) {
-          // if (nval ) {   
+          // if (nval ) {
           //   this.cleanMsg();
           // }
       },
@@ -444,6 +450,8 @@
   >>>.sql-dialog{
     margin-top: 0!important;
     height: 100%;
+    max-height: 100vh;
+    overflow: auto;
   }
   >>>.sql-dialog .el-dialog__body{
     padding-top: 0!important;

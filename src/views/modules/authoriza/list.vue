@@ -1,316 +1,373 @@
 <template>
-    <div class="box">
-      <div class="left">
-        <!--<el-input-->
-          <!--placeholder="输入关键字进行过滤"-->
-          <!--v-model="filterText">-->
-        <!--</el-input>-->
-        <!--<el-tree-->
-          <!--class="filter-tree"-->
-          <!--:data="dataLeft"-->
-          <!--:props="defaultProps"-->
-          <!--default-expand-all-->
-          <!--:filter-node-method="filterNode"-->
-          <!--@node-click="getRightData"-->
-          <!--ref="tree">-->
-        <!--</el-tree>-->
-        <div>用户列表:</div>
-        <ul class="user-list">
-          <li v-for="(item,index) in userList" :key="index">
-            <div class="userList-div" @click="item.checkd=false,getRightData(item.userId)">{{item.userName}}</div>
-            <!--<el-checkbox  class="userlist-checkbox" v-model="item.checkd">勾选授权</el-checkbox>-->
-            <el-checkbox  @change="checkTree(item.userId,item)" class="userlist-checkbox" :checked="item.checkd">勾选授权</el-checkbox>
-          </li>
-        </ul>
+  <div class="box">
+    <div class="left">
+      <!--<el-input-->
+      <!--placeholder="输入关键字进行过滤"-->
+      <!--v-model="filterText">-->
+      <!--</el-input>-->
+      <!--<el-tree-->
+      <!--class="filter-tree"-->
+      <!--:data="dataLeft"-->
+      <!--:props="defaultProps"-->
+      <!--default-expand-all-->
+      <!--:filter-node-method="filterNode"-->
+      <!--@node-click="getRightData"-->
+      <!--ref="tree">-->
+      <!--</el-tree>-->
+      <div>用户列表:</div>
+      <ul class="user-list">
+        <li v-for="(item, index) in userList" :key="index">
+          <div
+            class="userList-div"
+            :class="activeClass == item.userId ? 'active' : ''"
+            @click="(item.checkd = false), getRightData(item.userId)"
+          >
+            {{ item.userName }}
+          </div>
+          <!--<el-checkbox  class="userlist-checkbox" v-model="item.checkd">勾选授权</el-checkbox>-->
+          <el-checkbox
+            @change="checkTree(item.userId, item)"
+            class="userlist-checkbox"
+            :checked="item.checkd"
+            >勾选授权</el-checkbox
+          >
+        </li>
+      </ul>
+    </div>
+    <div class="right">
+      <div class="buttons" v-if="dataRight != ''">
+        <el-button type="primary" @click="getCheckedNodes">保存</el-button>
+        <!--<el-button @click="getCheckedKeys">通过 key 获取</el-button>-->
+        <!--<el-button @click="setCheckedNodes">通过 node 设置</el-button>-->
+        <!--<el-button @click="setCheckedKeys">通过 key 设置</el-button>-->
+        <!--<el-button @click="resetChecked">清空</el-button>-->
       </div>
-      <div class="right">
-        <div class="buttons" v-if="dataRight!=''">
-          <el-button type="primary" @click="getCheckedNodes">保存</el-button>
-          <!--<el-button @click="getCheckedKeys">通过 key 获取</el-button>-->
-          <!--<el-button @click="setCheckedNodes">通过 node 设置</el-button>-->
-          <!--<el-button @click="setCheckedKeys">通过 key 设置</el-button>-->
-          <!--<el-button @click="resetChecked">清空</el-button>-->
-        </div>
-        <div style="margin-top: 5%">
-          <el-tree
-            :default-checked-keys="selTree"
-            :data="dataRight"
-            show-checkbox
-            default-expand-all
-            node-key="menuId"
-            ref="tree"
-            highlight-current
-            :props="defaultProps">
-          </el-tree>
-        </div>
+      <div style="margin-top: 5%">
+        <el-tree
+          :default-checked-keys="selTree"
+          :data="dataRight"
+          show-checkbox
+          default-expand-all
+          node-key="menuId"
+          ref="tree"
+          highlight-current
+          :props="defaultProps"
+        >
+        </el-tree>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
-  import { treeDataTranslate } from '@/utils'
-    export default {
-      data() {
-        return {
-          checkboxTree:0,
-          selTree:[],
-          userIdList:[],
-          userId:'',
-          userList:[],
-          filterText: '',
-          dataLeft: [{
-            id: 1,
-            label: '一级 1',
-            children: [{
+import { treeDataTranslate } from "@/utils";
+export default {
+  data() {
+    return {
+      checkboxTree: 0,
+      selTree: [],
+      userIdList: [],
+      userId: "",
+      userList: [],
+      filterText: "",
+      dataLeft: [
+        {
+          id: 1,
+          label: "一级 1",
+          children: [
+            {
               id: 4,
-              label: '二级 1-1',
-              children: [{
-                id: 9,
-                label: '三级 1-1-1'
-              }, {
-                id: 10,
-                label: '三级 1-1-2'
-              }]
-            }]
-          }, {
-            id: 2,
-            label: '一级 2',
-            children: [{
+              label: "二级 1-1",
+              children: [
+                {
+                  id: 9,
+                  label: "三级 1-1-1"
+                },
+                {
+                  id: 10,
+                  label: "三级 1-1-2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 2,
+          label: "一级 2",
+          children: [
+            {
               id: 5,
-              label: '二级 2-1'
-            }, {
+              label: "二级 2-1"
+            },
+            {
               id: 6,
-              label: '二级 2-2'
-            }]
-          }, {
-            id: 3,
-            label: '一级 3',
-            children: [{
+              label: "二级 2-2"
+            }
+          ]
+        },
+        {
+          id: 3,
+          label: "一级 3",
+          children: [
+            {
               id: 7,
-              label: '二级 3-1'
-            }, {
+              label: "二级 3-1"
+            },
+            {
               id: 8,
-              label: '二级 3-2'
-            }]
-          }],
-          defaultProps: {
-            children: 'children',
-            label: 'menuName'
-          },
-          dataRight:[],
-          datafake: [{
-            id: 1,
-            label: '一级 1',
-            children: [{
+              label: "二级 3-2"
+            }
+          ]
+        }
+      ],
+      defaultProps: {
+        children: "children",
+        label: "menuName"
+      },
+      dataRight: [],
+      datafake: [
+        {
+          id: 1,
+          label: "一级 1",
+          children: [
+            {
               id: 4,
-              label: '二级 1-1',
-              children: [{
-                id: 9,
-                label: '三级 1-1-1'
-              }, {
-                id: 10,
-                label: '三级 1-1-2'
-              }]
-            }]
-          }, {
-            id: 2,
-            label: '一级 2',
-            children: [{
+              label: "二级 1-1",
+              children: [
+                {
+                  id: 9,
+                  label: "三级 1-1-1"
+                },
+                {
+                  id: 10,
+                  label: "三级 1-1-2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 2,
+          label: "一级 2",
+          children: [
+            {
               id: 5,
-              label: '二级 2-1'
-            }, {
+              label: "二级 2-1"
+            },
+            {
               id: 6,
-              label: '二级 2-2'
-            }]
-          }, {
-            id: 3,
-            label: '一级 3',
-            children: [{
+              label: "二级 2-2"
+            }
+          ]
+        },
+        {
+          id: 3,
+          label: "一级 3",
+          children: [
+            {
               id: 7,
-              label: '二级 3-1'
-            }, {
+              label: "二级 3-1"
+            },
+            {
               id: 8,
-              label: '二级 3-2'
-            }]
-          }],
-        };
-      },
-      watch: {
-        filterText(val) {
-          this.$refs.tree.filter(val);
+              label: "二级 3-2"
+            }
+          ]
         }
-      },
-      activated () {
-        this.getLeftTree();
-        this.token=this.$cookie.get('token')
-      },
-      methods: {
-        //勾选
-        checkTree(id,item){
-          if(this.userIdList.length==0){
-            this.getRightData(id);
-            item.checkd=true;
-          }
-          if(this.userIdList.indexOf(id)==-1){
-            this.userIdList.push(id);
-            item.checkd=true;
-          }else{
-            var i=this.userIdList.findIndex((item,index)=>{item.userId==id});
-            this.userIdList.splice(i,1);
-            item.checkd=false;
-          }
-          this.$set(this.userList,this.userList);
-          console.log(this.userIdList)
-        },
-        getLeftTree(){
-          this.$http({
-            url: this.$http.adornUrl('/user/getUser'),
-            method: 'get',
-          }).then(({data}) => {
-            this.userList=data.result;
-            this.userList.forEach(item=>{
-              item.checkd=false;
-            })
-          })
-        },
-        getRightData(data, node, obj){
-          var id=data;
-          // console.log(data, node, obj);
-          // this.dataRight=this.datafake;
-          this.userId=data;
-          this.userIdList=[];
-          this.selTree=[];
-          this.$http({
-            url: this.$http.adornUrl('/menu/getUserMenuList'),
-            method: 'get',
-            params: this.$http.adornParams({userId:id})
-          }).then(({data}) => {
-            var datas=data.result;
-            datas.forEach(item=>{
-              this.selTree.push(item.menuId);
-            });
-            this.$http({
-              url: this.$http.adornUrl('/menu/getMenuList'),
-              method: 'get',
-              params: this.$http.adornParams({userId:id})
-            }).then(({data}) => {
-              this.dataRight = treeDataTranslate(data.result, 'menuId','menuParentId');
-
-            })
-          });
-        },
-        filterNode(value, data) {
-          if (!value) return true;
-          return data.label.indexOf(value) !== -1;
-        },
-        getCheckedNodes() {
-          // console.log(this.$refs.tree.getCheckedNodes());
-          var list=this.$refs.tree.getCheckedNodes(),
-              dataList=[];
-          if(this.userIdList.length>0){
-            list.forEach((item)=>{
-              var _s=[];
-              this.userIdList.forEach(vtem=>{
-                var v={userId:vtem,menuId:item.menuId};
-                _s.push(v);
-              });
-              dataList=dataList.concat(_s);
-            })
-          }
-          if(this.userIdList.length==0){
-            list.forEach((item)=>{
-              var v={userId:this.userId,menuId:item.menuId};
-              dataList.push(v);
-            })
-          }
-          console.log(dataList)
-          if(dataList.length>0){
-            // console.log(JSON.stringify(dataList));
-            // dataList=JSON.stringify(dataList);
-            this.$http({
-              url: this.$http.adornUrl(`/userMenuRel/menuEmpower`),
-              method: 'post',
-              data: {userMenuListStr:dataList}
-            }).then(({data}) => {
-              if (data && data.code === 200) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-
-                  }
-                })
-              }
-            })
-          }
-        },
-        getCheckedKeys() {
-          console.log(this.$refs.tree.getCheckedKeys());
-        },
-        setCheckedNodes() {
-          this.$refs.tree.setCheckedNodes([{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 9,
-            label: '三级 1-1-1'
-          }]);
-        },
-        setCheckedKeys() {
-          this.$refs.tree.setCheckedKeys([3]);
-        },
-        resetChecked() {
-          this.$refs.tree.setCheckedKeys([]);
-        }
-      },
+      ],
+      //点击样式
+      activeClass: ""
+    };
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val);
     }
+  },
+  activated() {
+    this.getLeftTree();
+    this.token = this.$cookie.get("token");
+  },
+  methods: {
+    //勾选
+    checkTree(id, item) {
+      if (this.userIdList.length == 0) {
+        this.getRightData(id);
+        item.checkd = true;
+      }
+      if (this.userIdList.indexOf(id) == -1) {
+        this.userIdList.push(id);
+        item.checkd = true;
+      } else {
+        var i = this.userIdList.findIndex((item, index) => {
+          item.userId == id;
+        });
+        this.userIdList.splice(i, 1);
+        item.checkd = false;
+      }
+      this.$set(this.userList, this.userList);
+      console.log(this.userIdList);
+    },
+    getLeftTree() {
+      this.$http({
+        url: this.$http.adornUrl("/user/getUser"),
+        method: "get"
+      }).then(({ data }) => {
+        this.userList = data.result;
+        this.userList.forEach(item => {
+          item.checkd = false;
+        });
+      });
+    },
+    getRightData(data, node, obj) {
+      this.activeClass = data;
+      var id = data;
+      // console.log(data, node, obj);
+      // this.dataRight=this.datafake;
+      this.userId = data;
+      this.userIdList = [];
+      this.selTree = [];
+      this.$http({
+        url: this.$http.adornUrl("/menu/getUserMenuList"),
+        method: "get",
+        params: this.$http.adornParams({ userId: id })
+      }).then(({ data }) => {
+        var datas = data.result;
+        datas.forEach(item => {
+          this.selTree.push(item.menuId);
+        });
+        this.$http({
+          url: this.$http.adornUrl("/menu/getMenuList"),
+          method: "get",
+          params: this.$http.adornParams({ userId: id })
+        }).then(({ data }) => {
+          this.dataRight = treeDataTranslate(
+            data.result,
+            "menuId",
+            "menuParentId"
+          );
+        });
+      });
+    },
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
+    getCheckedNodes() {
+      // console.log(this.$refs.tree.getCheckedNodes());
+      var list = this.$refs.tree.getCheckedNodes(),
+        dataList = [];
+      if (this.userIdList.length > 0) {
+        list.forEach(item => {
+          var _s = [];
+          this.userIdList.forEach(vtem => {
+            var v = { userId: vtem, menuId: item.menuId };
+            _s.push(v);
+          });
+          dataList = dataList.concat(_s);
+        });
+      }
+      if (this.userIdList.length == 0) {
+        list.forEach(item => {
+          var v = { userId: this.userId, menuId: item.menuId };
+          dataList.push(v);
+        });
+      }
+      console.log(dataList);
+      if (dataList.length > 0) {
+        // console.log(JSON.stringify(dataList));
+        // dataList=JSON.stringify(dataList);
+        this.$http({
+          url: this.$http.adornUrl(`/userMenuRel/menuEmpower`),
+          method: "post",
+          data: { userMenuListStr: dataList }
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {}
+            });
+          }
+        });
+      }
+    },
+    getCheckedKeys() {
+      console.log(this.$refs.tree.getCheckedKeys());
+    },
+    setCheckedNodes() {
+      this.$refs.tree.setCheckedNodes([
+        {
+          id: 5,
+          label: "二级 2-1"
+        },
+        {
+          id: 9,
+          label: "三级 1-1-1"
+        }
+      ]);
+    },
+    setCheckedKeys() {
+      this.$refs.tree.setCheckedKeys([3]);
+    },
+    resetChecked() {
+      this.$refs.tree.setCheckedKeys([]);
+    }
+  }
+};
 </script>
 
 <style scoped>
-  .box{
-    display: flex;
-    justify-content: space-between;
-  }
-  .box>div{
-    height: 74vh;
-    border: 1px solid #ddd;
-    padding: 1%;
-    overflow: auto;
-  }
-  .left{
-    width: 40%;
-    border-right: none;
-  }
-  .right{
-    width: 60%;
-    position: relative;
-  }
-  .buttons{
-    text-align: right;
-    width: 100%;
-    position: fixed;
-    right: 5%;
-    z-index: 999;
-  }
-  .user-list{
-    padding: 0;
-    overflow: auto;
-  }
-  .user-list>li{
-    cursor: pointer;
-    border-bottom: 1px solid #ddd;
-    list-style-type:none;
-    padding: 2%;
-  }
-  .user-list>li:nth-child(odd){
-    background: #f2f2f2;
-  }
-  .userlist-checkbox{
-    float: right;
-  }
-  .userList-div{
-    display: inline-block;
-    width: 70%;
-  }
+.box {
+  display: flex;
+  justify-content: space-between;
+}
+.box > div {
+  height: 74vh;
+  border: 1px solid #ddd;
+  padding: 1%;
+  overflow: auto;
+}
+.left {
+  width: 40%;
+  border-right: none;
+}
+.right {
+  width: 60%;
+  position: relative;
+}
+.buttons {
+  text-align: right;
+  width: 100%;
+  position: fixed;
+  right: 5%;
+  z-index: 999;
+}
+.user-list {
+  padding: 0;
+  overflow: auto;
+}
+.user-list > li {
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  list-style-type: none;
+  padding: 2%;
+}
+.user-list > li:nth-child(odd) {
+  background: #f2f2f2;
+}
+.userlist-checkbox {
+  float: right;
+}
+.userList-div {
+  display: inline-block;
+  width: 70%;
+}
+.userList-div:hover {
+  color: #af0f16;
+}
+.active {
+  color: #af0f16;
+}
 </style>

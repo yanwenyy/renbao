@@ -129,9 +129,10 @@ export default {
     activated () {
         // this.getSelectPage();
         // this.getRuleFolder();
+        this.getRuleFolder();
     },
     created () {
-        this.getRuleFolder();
+        // this.getRuleFolder();
     },
     methods: {
         getSelectPage () {
@@ -185,12 +186,21 @@ export default {
             })
         },
         getTreeData (data) {
-            this.ruleCheckData = data;
-            this.$refs.multipleTable.clearSelection(this.multipleTable);
-            this.multipleTable = [];
-            this.searchForm.folderPath = data.folderPath && data.folderPath || '';
-            this.searchForm.folderId = data.folderId && data.folderId || '';
-            this.getSelectPage();
+            if (data && data.folderId) {
+                this.ruleCheckData = data;
+                this.$refs.multipleTable.clearSelection(this.multipleTable);
+                this.multipleTable = [];
+                this.searchForm.folderPath = data.folderPath && data.folderPath || '';
+                this.searchForm.folderId = data.folderId && data.folderId || '';
+                this.getSelectPage();
+            } else {
+                this.ruleCheckData = {};
+                this.$refs.multipleTable.clearSelection(this.multipleTable);
+                this.multipleTable = [];
+                this.searchForm.folderPath = '';
+                this.searchForm.folderId = '';
+                // this.getSelectPage();
+            }
         },
         queryClick () {
             this.Pager.pageIndex = 1;
@@ -255,8 +265,8 @@ export default {
             this.multipleTable = rows;
         },
         setTableChecked () {
-            this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
+            this.$refs.multipleTable.clearSelection(this.multipleTable); 
         },
         sizeChangeHandle (val) {
             this.Pager.pageSize = val
@@ -313,7 +323,9 @@ export default {
     watch: {
         projectId (nval, oval) {
             if (nval) {
-                this.getRuleFolder()
+                this.getRuleFolder();
+                this.getTreeData();
+
             }
 
         }

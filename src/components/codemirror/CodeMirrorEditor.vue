@@ -73,6 +73,7 @@
           ref="myCm"
           :value="editorValue"
           :options="cmOptions"
+          @beforeChange="cmBeforChange"
           @changes="onCmCodeChanges"
           @blur="onCmBlur"
           @keydown.native="onKeyDown"
@@ -111,14 +112,9 @@
           >
             <div v-if="item.list==''">
               <div v-if="!item.columnList">{{item.msg}}</div>
-              <el-table v-if="item.columnList" border :data="item.columnListSelf" stripe style="width: 100%" class="box-table">
-                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+              <el-table v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
-                  <template slot-scope="scope">
-                    <div>
-                      <span>{{scope.row[key]}}</span>
-                    </div>
-                  </template>
                 </el-table-column>
               </el-table>
             </div>
@@ -235,6 +231,24 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="saveSqlVisible = false,sqlSaveForm.draftName=''">取消</el-button>
         <el-button type="primary" @click="saveSqlClick()">确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
+      <el-form>
+        <el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">
+          <el-select class="paramsSel" v-model="item.paramsValue" multiple placeholder="请选择">
+            <el-option
+              v-for="(vtem,i) in item.list"
+              :key="i"
+              :label="vtem.name||vtem.id"
+              :value="vtem.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeParams()">取消</el-button>
+        <el-button type="primary" @click="Paramssub()">确定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -369,9 +383,30 @@
         type: Function,
         default: null,
       },
+      //后台返回的参数列表
+      paramsList: {
+        type: Array,
+        default: null,
+      },
+      paramsSub: {
+        type: Function,
+        default: null,
+      },
     },
     data() {
       return {
+        dragParmasList:[],//拖拽进来的参数数组
+        SelfparamsList:[],//参数设置列表
+        SlefparamsListVisible:false,//参数设置显示状态
+        sqlKeyWord:[
+          "select ",
+          "from",
+          "left",
+          "join",
+          "right",
+          "inner",
+          "sum",
+        ],//需要高亮的关键字
         hintTable:{},//自定义提示的table
         resultTableTabsValue: '2',//动态标签显示项
         sqlSaveType:'',
@@ -405,6 +440,7 @@
           hintOptions: { // 自定义提示选项
             tables: {},
             tablesTitle:{},
+
           },
           theme:'solarized light',
           mode:'text/x-mysql',
@@ -505,6 +541,7 @@
 
 
               if( Object.keys(this.paramsNode).length>0){
+                this.dragParmasList.push(this.paramsNode);
                 //制作标签dom(颜色样式自行设置)
                 var _cursor=this.$refs.myCm.codemirror.getCursor();
                 var id="{#"+this.paramsNode.id+"#}";
@@ -518,7 +555,6 @@
                   replacedWith: dom,
                   className:"paramBlock",
                 });
-                console.log(this.$refs.myCm.codemirror.getValue());//获取codemirror内容
               }else{
                 let pos1 = this.$refs.myCm.codemirror.getCursor();
                 let pos2 = {};
@@ -577,6 +613,35 @@
           }
         },
       },
+      paramsListVisible: {
+        // 实时监控数据变化
+        deep: true,
+        handler(val) {
+          if (val) {
+            this.SlefparamsListVisible=true;
+          }
+        },
+      },
+      paramsList: {
+        deep: true,
+        handler(val) {
+          if (val) {
+            if (val.length>0) {
+              this.SelfparamsList=val;
+            }
+          }
+        },
+      },
+      SelfparamsList: {
+        deep: true,
+        handler(val) {
+          if (val) {
+            if (val.length>0) {
+              this.SlefparamsListVisible=true;
+            }
+          }
+        },
+      },
       resultTableTabs: {
         // 实时监控数据变化
         deep: true,
@@ -621,6 +686,31 @@
       this.dragControllerDiv2();
     },
     methods: {
+      //参数设置确定点击
+      Paramssub(){
+
+        var _str=JSON.parse(JSON.stringify(this.editorValue));
+        this.paramsList.forEach(item=>{
+          console.log(item)
+          if(this.editorValue.indexOf("{#"+item.id+"#}")!=-1&&item.paramsValue){
+
+            var _reg=new RegExp("{#"+item.id+"#}",'g');
+            var _s=JSON.parse(JSON.stringify(item.paramsValue.join(",")));
+            var _sreg=new RegExp(",",'g');
+            _s=_s.replace(_sreg ,"','");
+            _s="'"+_s+"'";
+            _str=_str.replace(_reg, _s);
+            console.log(_str)
+          }
+        });
+        this.closeParams();
+        this.paramsSub(_str);
+      },
+      //参数设置取消点击
+      closeParams(){
+        this.SelfparamsList=[];
+        this.SlefparamsListVisible=false;
+      },
       setHintList(list){
         list.forEach(item=>{
           item.name=item[this.hintShowName];
@@ -643,6 +733,7 @@
       dragControllerDiv2: function () {
         var resize = document.getElementById('resize');
         var _top = document.getElementsByClassName('CodeMirror');
+        var _topBtn=document.getElementsByClassName("btn-group");
         var _bottom = document.getElementById('bottom');
         var _box = document.getElementById('box');
         resize.onmousedown = function (e) {
@@ -650,7 +741,8 @@
           resize.style.background = '#818181';
           resize.style.cursor = 'n-resize';
           var startY = e.clientY;
-          resize.top = resize.offsetTop-70;
+          resize.top = resize.offsetTop-_topBtn[0].offsetHeight-_box.offsetTop;
+          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].offsetHeight)
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
@@ -793,7 +885,8 @@
             _list.push(item.replacedWith.id)
           }
         });
-        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list);
+        this.dragParmasList=this.dragParmasList.filter(item=>{return _list.indexOf("{#"+item.id+"#}")!=-1});
+        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list,this.dragParmasList);
       },
       // 打开
       openPython() {
@@ -999,6 +1092,11 @@
       // 按下鼠标时事件处理函数
       onMouseDown(event) {
         this.$refs.myCm.codemirror.closeHint();
+
+      },
+      //codemirror 改变之前的事件
+      cmBeforChange(){
+
       },
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
@@ -1011,7 +1109,6 @@
         // }
         this.resetLint();
       },
-
       completeIfInTag(cm){
         var that=this;
         return this.completeAfter(cm, function () {          //智能提示
@@ -1072,6 +1169,11 @@
   .CodeMirror-selectedtext {
     color: white !important;
   }
+  .cm-keyword{
+    line-height: 1em;
+    font-weight: bold;
+    color: #281EF9;
+  }
   .codeMirror-blue{
     background: blue !important;
   }
@@ -1092,6 +1194,7 @@
     width:100%;
     min-height: 85vh;
     height: 100%;
+    position: relative;
   }
   #top{
     width:100%;
@@ -1154,5 +1257,8 @@
     border-radius: 4px;
     padding: 5px;
     display: inline-block;
+  }
+  .paramsSel{
+    width: 80%;
   }
 </style>

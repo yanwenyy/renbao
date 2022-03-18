@@ -41,6 +41,14 @@ var commonDate = {
       // 拼接
       return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
     },
+    getTime : function (cellValue) {
+      let date = new Date(); 
+      let hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+      let minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+      let seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+      // 拼接
+      return hours+":"+minutes+":"+seconds;
+    },
   clearTime(cellValue){
     return cellValue.replace(/.[0-9]*$/,'')
   },
