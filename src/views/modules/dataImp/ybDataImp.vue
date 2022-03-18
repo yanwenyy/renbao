@@ -182,6 +182,8 @@
                 value-key="tableInfoId"
                 placeholder="请选择匹配表"
                 clearable
+                filterable
+                @clear="setTableNull(scope.row.path)"
                 >
                 <el-option
                   v-for="itemdbm in tableInfos"
@@ -196,6 +198,7 @@
                 value-key="tableInfoId"
                 placeholder="请选择匹配表"
                 clearable
+                filterable
                 >
                 <el-option
                   v-for="itemdbm in tableInfos"
@@ -263,6 +266,8 @@
                     value-key="columnInfoId"
                     placeholder="请选择匹配字段"
                     clearable
+                    @clear="setColumnNull(scope.row,getMapKey(scope.row))"
+                    filterable
                     >
                     <el-option
                       v-for="itemdbm in item.dbColumns[selectTableNames[index]]"
@@ -395,6 +400,19 @@
                   :value="itemdbm">
                 </el-option>
               </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            width="200"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="deleteRow(scope.$index, dmpFileTables)"
+                type="text"
+                size="small">
+                移除
+              </el-button>
             </template>
           </el-table-column>
       </el-table>
@@ -791,6 +809,17 @@
       // 重置查询条件
       resetSelect() {
          this.dataForm.tableName = null
+      },
+       // 数据表匹配清空
+      setTableNull(val) {
+        this.fileTableInfos[val][0] = {}
+      },
+      // 列清空
+      setColumnNull(val,key) {
+        val[key] = {}
+      },
+      deleteRow(index, rows) {
+        rows.splice(index, 1)
       },
       // 文件类型是否为dmp或者bak
       checkType(fileType) {
