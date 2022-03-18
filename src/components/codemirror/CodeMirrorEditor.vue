@@ -73,6 +73,7 @@
           ref="myCm"
           :value="editorValue"
           :options="cmOptions"
+          @beforeChange="cmBeforChange"
           @changes="onCmCodeChanges"
           @blur="onCmBlur"
           @keydown.native="onKeyDown"
@@ -235,11 +236,11 @@
     <el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
       <el-form>
         <el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">
-          <el-select v-model="paramsValue" multiple placeholder="请选择">
+          <el-select class="paramsSel" v-model="item.paramsValue" multiple placeholder="请选择">
             <el-option
               v-for="(vtem,i) in item.list"
               :key="i"
-              :label="vtem.name"
+              :label="vtem.name||vtem.id"
               :value="vtem.id">
             </el-option>
           </el-select>
@@ -394,9 +395,9 @@
     },
     data() {
       return {
+        dragParmasList:[],//拖拽进来的参数数组
         SelfparamsList:[],//参数设置列表
         SlefparamsListVisible:false,//参数设置显示状态
-        paramsValue:'',//选中的参数值
         sqlKeyWord:[
           "select ",
           "from",
@@ -540,6 +541,7 @@
 
 
               if( Object.keys(this.paramsNode).length>0){
+                this.dragParmasList.push(this.paramsNode);
                 //制作标签dom(颜色样式自行设置)
                 var _cursor=this.$refs.myCm.codemirror.getCursor();
                 var id="{#"+this.paramsNode.id+"#}";
@@ -687,8 +689,22 @@
       //参数设置确定点击
       Paramssub(){
 
+        var _str=JSON.parse(JSON.stringify(this.editorValue));
+        this.paramsList.forEach(item=>{
+          console.log(item)
+          if(this.editorValue.indexOf("{#"+item.id+"#}")!=-1&&item.paramsValue){
+
+            var _reg=new RegExp("{#"+item.id+"#}",'g');
+            var _s=JSON.parse(JSON.stringify(item.paramsValue.join(",")));
+            var _sreg=new RegExp(",",'g');
+            _s=_s.replace(_sreg ,"','");
+            _s="'"+_s+"'";
+            _str=_str.replace(_reg, _s);
+            console.log(_str)
+          }
+        });
         this.closeParams();
-        this.paramsSub(this.paramsValue);
+        this.paramsSub(_str);
       },
       //参数设置取消点击
       closeParams(){
@@ -869,7 +885,8 @@
             _list.push(item.replacedWith.id)
           }
         });
-        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list);
+        this.dragParmasList=this.dragParmasList.filter(item=>{return _list.indexOf("{#"+item.id+"#}")!=-1});
+        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list,this.dragParmasList);
       },
       // 打开
       openPython() {
@@ -1075,6 +1092,11 @@
       // 按下鼠标时事件处理函数
       onMouseDown(event) {
         this.$refs.myCm.codemirror.closeHint();
+
+      },
+      //codemirror 改变之前的事件
+      cmBeforChange(){
+
       },
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
@@ -1150,7 +1172,7 @@
   .cm-keyword{
     line-height: 1em;
     font-weight: bold;
-    color: #000080;
+    color: #281EF9;
   }
   .codeMirror-blue{
     background: blue !important;
@@ -1235,5 +1257,8 @@
     border-radius: 4px;
     padding: 5px;
     display: inline-block;
+  }
+  .paramsSel{
+    width: 80%;
   }
 </style>
