@@ -100,7 +100,7 @@
     },
 
     mounted(){
-      if(this.treeData==[]){
+      if(this.treeData==[]||this.treeData.length==0){
         this.$refs.sqlEdits.dragControllerDiv()
         this.sqlListData=[];
         this.sqlListTotal=0;

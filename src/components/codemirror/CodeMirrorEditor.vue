@@ -725,8 +725,8 @@
           resize.style.background = '#818181';
           resize.style.cursor = 'n-resize';
           var startY = e.clientY;
-          resize.top = resize.offsetTop-(_topBtn[0].clientHeight+_box.offsetTop);
-          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].clientHeight)
+          resize.top = resize.offsetTop-_topBtn[0].offsetHeight-_box.offsetTop;
+          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].offsetHeight)
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
