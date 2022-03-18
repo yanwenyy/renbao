@@ -75,8 +75,6 @@ export default {
      */
     setQueryBuilderColumn() {
       const queryRules = [];
-      console.log(this.columns.columnList)
-      debugger
       for (var i = 0; i < this.columns.columnList.length; i++) {
         const operators = this.getQueryBuilderOperators(
           this.columns.columnList[i]
