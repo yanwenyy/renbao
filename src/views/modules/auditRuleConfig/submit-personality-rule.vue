@@ -93,11 +93,11 @@ export default {
                     })
                     this.dialogVisible = false;
                     this.$parent.getSelectPage();
-                    this.$parent.setTableChecked()
+                    this.$parent.setTableChecked();
                 } else {
                     this.loading = false
                     this.$message({
-                        message: '提交失败',
+                        message: data.message,
                         type: 'error',
                         duration: 1500,
                     })
@@ -105,14 +105,10 @@ export default {
                 }
             }).catch(() => {
                 this.loading = false
-            })  
-           
-
-            
+            })   
         },
         cancel () {
             this.dialogVisible = false;
-           
         },
         reset () {
             this.folderData = {}

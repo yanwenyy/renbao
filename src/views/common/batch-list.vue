@@ -2,7 +2,7 @@
     <div class="batch-list-box">
          <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="batchLoading" node-key="id"      ref="batchList" :props="layoutTreeProps" @node-click="nodeClick">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                    <span :title="node.label">
+                    <span :title="node.label" class="batch-label">
                         {{node.label}}
                     </span>
                     <span class="batch-btn">
@@ -52,7 +52,6 @@ export default {
     },
     activated () {
         // this.getRuleFolder();
-        console.log('加载批次组件')
     },
     methods: {
         nodeClick (data, node) {
@@ -102,8 +101,57 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-.rule-tree-box {
+.batch-list-box {
     width: 100%;
+    /deep/ .el-tree {
+        min-height: 60vh;
+        // color: #AF0F16 !important;
+    }
+    /deep/ .el-tree-node__children .custom-tree-node{
+        // text-decoration: underline;
+        // color: #0000FF;
+        // color: #AF0F16 !important;
+        width: 100%;
+        padding: 0 5px;
+        display: inline-block;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow:ellipsis;
+    }
+    /deep/ .is-current {
+        display: flex;
+        align-items: center;
+    }
+    /deep/ .el-tree-node {
+        height: 35px;
+        line-height: 35px;
+    }
+    /deep/ .is-current {
+        position: relative;
+    }
+    /deep/ .is-current::before {
+        position: absolute;
+        content: '';
+        width: 2px;
+        height: 35px;
+        display: inline-block;
+        background: #AF0F16;
+        color:#AF0F16;
+        margin-left: 3px;
+        
+    }
+    .batch-label {
+        // padding-left: 2px;
+    }
+    /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        // background-color: #e3edfa;
+        color: #AF0F16 !important;
+        background: #fff !important;
+    }
+    /deep/ .el-tree-node__content:hover{
+        background: #fff;
+    }
   
 }
 

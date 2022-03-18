@@ -423,7 +423,7 @@ import ImportFile from './Import-file.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
-        if (data && data.folderPath) {
+        if (data && data.folderId) {
           let checkedData = JSON.parse(JSON.stringify(data))
           this.ruleCheckData = data
           this.dataForm.folderPath=data.folderPath && data.folderPath || '';
@@ -434,7 +434,6 @@ import ImportFile from './Import-file.vue'
           this.dataForm.folderPath=  '';
           this.dataForm.folderId = '';
         }
-        
       }
     }
   }

@@ -1,14 +1,14 @@
 <template>
     <div class="box">
         <div class="auditRuleMonitoring-left">
-            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
+            <!-- <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
                     <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
                         <span :title="node.label">
                             {{node.label}}
                         </span>
                     </span>
-            </el-tree>
-            <!-- <batch-list :batchLoading="batchLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList"></batch-list> -->
+            </el-tree> -->
+            <batch-list :batchLoading="batchLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList"></batch-list>
         </div>
         <div class="auditRuleMonitoring-right">
             <div class="search-box">
@@ -316,27 +316,27 @@ export default {
         // min-height: 100vh;
         // min-height: calc(100vh - 165px);
         // margin-right: 20px;
-        border: 1px solid #ddd;
+        // border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
         height: 75vh;
-        /deep/ .el-tree {
-            min-height: 60vh;
-        }
-        /deep/ .el-tree-node__children .custom-tree-node{
-            text-decoration: underline;
-            color: #0000FF;
-            width: 100%;
-            padding: 0 5px;
-            display: inline-block;
-            overflow:hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            -o-text-overflow:ellipsis;
-        }
-        /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-            background-color: #e3edfa;
-        }
+        // /deep/ .el-tree {
+        //     min-height: 60vh;
+        // }
+        // /deep/ .el-tree-node__children .custom-tree-node{
+        //     text-decoration: underline;
+        //     color: #0000FF;
+        //     width: 100%;
+        //     padding: 0 5px;
+        //     display: inline-block;
+        //     overflow:hidden;
+        //     white-space: nowrap;
+        //     text-overflow: ellipsis;
+        //     -o-text-overflow:ellipsis;
+        // }
+        // /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        //     background-color: #e3edfa;
+        // }
     }
     .auditRuleMonitoring-right {
         flex: 1;
