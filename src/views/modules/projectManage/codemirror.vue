@@ -86,7 +86,9 @@
       }
     },
     activated(){
-      this.$refs.sqlEdits.dragControllerDiv()
+      if(this.$refs.sqlEdits){
+        this.$refs.sqlEdits.dragControllerDiv()
+      }
       this.sqlListData=[];
       this.sqlListTotal=0;
       this.sqlData='';

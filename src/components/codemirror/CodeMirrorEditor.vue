@@ -717,6 +717,7 @@
       dragControllerDiv2: function () {
         var resize = document.getElementById('resize');
         var _top = document.getElementsByClassName('CodeMirror');
+        var _topBtn=document.getElementsByClassName("btn-group");
         var _bottom = document.getElementById('bottom');
         var _box = document.getElementById('box');
         resize.onmousedown = function (e) {
@@ -724,8 +725,8 @@
           resize.style.background = '#818181';
           resize.style.cursor = 'n-resize';
           var startY = e.clientY;
-          resize.top = resize.offsetTop-70;
-          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop)
+          resize.top = resize.offsetTop-(_topBtn[0].clientHeight+_box.offsetTop);
+          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].clientHeight)
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
@@ -1171,6 +1172,7 @@
     width:100%;
     min-height: 85vh;
     height: 100%;
+    position: relative;
   }
   #top{
     width:100%;
