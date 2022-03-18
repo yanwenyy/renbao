@@ -16,8 +16,11 @@
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
-                    <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                    <template v-for="(item,index) in tableColumns">
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                    </template>
+                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                     <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -39,11 +42,14 @@
                     <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                     <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%"  height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                    <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                     <template v-for="(item,index) in tableColumns">
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                    </template>
+                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                     <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -64,11 +70,14 @@
                     <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
                     <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                    <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                     <template v-for="(item,index) in tableColumns">
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                    </template>
+                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                     <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                     <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -87,7 +96,7 @@
                     <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
                     <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                     <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 病种目录 -->
                 <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
@@ -193,7 +202,8 @@ export default {
             exportFilelist: [],
             fileLists:[],
             token:'',
-            dataCount:''
+            dataCount:'',
+            tableColumns:[]
         }
     },
     created(){
@@ -217,8 +227,9 @@ export default {
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
-                    this.tableList = data.result.records,
-                    this.apComServerData.total = data.result.total
+                    this.tableList = data.result.result
+                    this.tableColumns = data.result.columns
+                    this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.dataList = [];
                     this.apComServerData.total = 0; 
