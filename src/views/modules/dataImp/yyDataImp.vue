@@ -333,6 +333,48 @@
         <el-button type="primary" @click="impYYData">导入</el-button>
       </span>
     </el-dialog>
+     <!-- dmp数据表匹配 -->
+    <el-dialog 
+      title="数据表匹配" 
+      :visible.sync="checkDmpFileTableDialogVisible" 
+      width="60%" 
+      :close-on-click-modal="false">
+      <el-table
+        border
+        style="width: 100%;height:45vh; overflow:auto;"
+        :data="this.dmpFileTables">
+        <el-table-column
+          align="center"
+          label="数据表">
+          <template slot-scope="scope">
+            {{ getMapKey(scope.row) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          align="center"
+          label="目标表">
+            <template slot-scope="scope">
+              <el-select
+                v-model="scope.row[getMapKey(scope.row)]"
+                value-key="tableInfoId"
+                placeholder="请选择匹配表"
+                clearable
+                >
+                <el-option
+                  v-for="itemdbm in tableInfos"
+                  :key="itemdbm.tableInfoId"
+                  :label="itemdbm.tableNameCn"
+                  :value="itemdbm">
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="checkDmpFileTableDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="findFileTableDmp">下一步</el-button>
+      </span>
+    </el-dialog>
     <!-- 查看字段 -->
     <el-dialog
       :title="checkTableName"
@@ -387,6 +429,8 @@
         tableDataViewDialogVisible: false, 
         // 匹配表弹窗
         checkFileTableDialogVisible: false,
+        // dmp文件匹配表弹窗
+        checkDmpFileTableDialogVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -416,7 +460,9 @@
         // 导入数据集合
         importDataModelList: [],
         // 文件表对应关系
-        fileTableInfos: {}
+        fileTableInfos: {},
+        //dmp文件表对应关系
+        dmpFileTables: []
       }
     },
     components: {
@@ -451,31 +497,101 @@
           this.$message.error("请选择要采集的文件")
           return
         }
-        this.$http({
-          url: this.$http.adornUrl(`dataImp/checkFileTable/${1}`),
-          method: 'post',
-          data: this.selectedFileData
-        }).then(({data}) => {
-             if (data && (data.code === 200 || data.code == 500) && data.result) {
-              //  this.fileTableInfos = data.result
-              //  this.findFileTable()
-             //} else if (data && data.code == 500 && data.result) {
-               this.fileTableInfos = data.result
-               this.$http({
-                url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
-                method: 'get'
-               }).then(({data}) => {
-                  if (data && data.code == 200) {
-                    if(data.result != null) {
-                      this.tableInfos = data.result
+        var flag = true
+        this.selectedFileData.forEach(item=>{
+          if(this.checkType(item.fileType) && this.selectedFileData.length >1) {
+             this.$message.error("dmp文件只能单独导入")
+             flag = false
+             return
+          }
+          // dmp文件导入
+          if(this.checkType(item.fileType) && this.selectedFileData.length ==1) {
+            this.$http({
+              url: this.$http.adornUrl(`dataImp/impDmpFile/${1}`),
+              method: 'post',
+              data: this.selectedFileData
+            }).then(({data}) => {
+                if (data && (data.code === 200 || data.code == 500) && data.result) {
+                  //  this.fileTableInfos = data.result
+                  //  this.findFileTable()
+                //} else if (data && data.code == 500 && data.result) {
+                  this.dmpFileTables = data.result
+                  this.$http({
+                    url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
+                    method: 'get'
+                  }).then(({data}) => {
+                      if (data && data.code == 200) {
+                        if(data.result != null) {
+                          this.tableInfos = data.result
+                        }
+                      }
+                  })
+                  this.checkDmpFileTableDialogVisible = true
+                } else {
+                  this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+                }
+            })
+            flag = false
+            return
+          }
+        })
+        if(flag){
+          this.$http({
+            url: this.$http.adornUrl(`dataImp/checkFileTable/${1}`),
+            method: 'post',
+            data: this.selectedFileData
+          }).then(({data}) => {
+              if (data && (data.code === 200 || data.code == 500) && data.result) {
+                //  this.fileTableInfos = data.result
+                //  this.findFileTable()
+              //} else if (data && data.code == 500 && data.result) {
+                this.fileTableInfos = data.result
+                this.$http({
+                  url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
+                  method: 'get'
+                }).then(({data}) => {
+                    if (data && data.code == 200) {
+                      if(data.result != null) {
+                        this.tableInfos = data.result
+                      }
                     }
-                  }
-               })
-               this.checkFileTableDialogVisible = true
-             } else {
-               this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
-             }
-         })
+                })
+                this.checkFileTableDialogVisible = true
+              } else {
+                this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+              }
+          })
+         }
+      },
+      // dmp文件匹配
+      findFileTableDmp(){
+        const map = new Map();
+        map.set(this.selectedFileData[0].path,this.dmpFileTables)
+        const path = this.selectedFileData[0].path
+        this.fileTableInfos = {}
+        this.fileTableInfos[this.selectedFileData[0].path] = this.dmpFileTables
+        this.$http({
+          url: this.$http.adornUrl(`dataImp/getDmpFileTable/${2}`),
+          method: 'post',
+          data: this.fileTableInfos
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            // 获取表和列的信息
+            if (data.result != null) {
+              this.importDataModelList = data.result
+              // 页签默认选中第一个
+              this.fileTableActiveName = this.importDataModelList[0].fileName
+              this.selectTableNames[0] = this.importDataModelList[0].tableInfos[0].tableNameCn
+              this.columnTableActiveName = this.importDataModelList[0].fileName
+              this.selectTableViewNames[0] =this.importDataModelList[0].tableInfos[0].tableNameCn
+            }
+            // 打开文件表弹窗
+            this.fileTableDialogVisible = true
+          } else {
+            this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+          }
+        })
+        
       },
       // 获取文件中涉及到的表名
       findFileTable () {
@@ -585,6 +701,8 @@
         this.tableColumnViewDialogVisible = false
         // 表匹配弹窗
         this.checkFileTableDialogVisible = false
+        // dmp表匹配弹窗
+        this.checkDmpFileTableDialogVisible = false
       },
       // 查看字段
       tableColumnView (tableName) {
