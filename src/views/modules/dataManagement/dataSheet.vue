@@ -6,11 +6,11 @@
                 <el-card style="height:600px;overflow-y:auto">
                     <div style='padding:5px'><el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input></div>
                     <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading">
-                        <!-- <span class="custom-tree-node" slot-scope="{ node, data }"> -->
+                         <span class="custom-tree-node" slot-scope="{ node, data }"> 
                         <!-- <span> -->
-                             <!-- <img class="tree-icon" src="./icon/column.png" alt=""> -->
-                               <!-- {{ node.label }} -->
-                        <!-- </span> -->
+                             <img class="tree-icon" src="./icon/column.png" alt="">
+                               {{ node.label }}
+                        </span> 
                       <!-- </span> -->
                     </el-tree>
                 </el-card>
@@ -19,11 +19,11 @@
                 <div>
                     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
                         <el-form-item label="表名:">
-                            <el-input v-model="dataForm.tableName" placeholder="请输入搜索内容" clearable></el-input>
+                            <el-input v-model="dataForm.title" placeholder="请输入搜索内容" clearable></el-input>
                         </el-form-item>
-                        <el-form-item label="数据库:">
+                        <!-- <el-form-item label="数据库:">
                             <el-input v-model="dataForm.database" placeholder="请输入搜索内容" clearable></el-input>
-                        </el-form-item>
+                        </el-form-item> -->
                         <el-form-item>
                             <el-button type="primary" @click="getSearchList()">查询</el-button>
                             <el-button @click="resetForm('dataForm')">重置</el-button>
@@ -31,7 +31,7 @@
                     </el-form>
                     <el-table :data="dataList" border v-loading="dataListLoading" height="600" style="width: 100%;">
                         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                        <el-table-column prop="tableName" align="center" label="表名"></el-table-column>
+                        <el-table-column prop="title" align="center" label="表名"></el-table-column>
                         <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
                         <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>
                         <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
@@ -83,8 +83,7 @@ export default {
         return{
             filterText:'',
             dataForm:{
-                tableName:'',
-                database:''
+                title:'',
             },
             Title:'住院结算明细',
             tableList:[],
@@ -99,17 +98,20 @@ export default {
             },
             dataTree:[
                 {
-                label: "规划库",
-                children: []
-                }
+                label: '规划库',
+                icon: 'el-icon-s-home',
+                children: [{
+                }]
+            }
             ],
             defaultProps:{ 
-                //  children: 'children',
-                //  label:'projectName'
+                children: 'children',
+                // label: '',
+                isLeaf:'leaf',
                 label(data, node) {
                     const config = data.__config__ || data
                     return  config.label || config.projectName
-                },
+                }
             },
             childArr:[],
             StructureDialog:false,
@@ -120,6 +122,7 @@ export default {
             structureList:'',
             structureName:'',
             isCheckedId: [], //数据授权回显id
+            treeDataToHint:[]
         }
     },
     mounted() {
@@ -128,7 +131,7 @@ export default {
     watch:{
         filterText(val) {
         this.$refs.ruleTreeRoot.filter(val.trim());
-      },
+        },
     },
     methods:{
         //初始化tree
@@ -145,55 +148,55 @@ export default {
             })
         },
 
+      
+
         //tree点击事件
         handleNodeClick(data,node){
-             this.childArr = []
-             this.getTreeChild(data)
+            //  this.childArr = []
+            this.getTreeChild(data,node)
         },
 
         // 获取列表
-        getTreeChild(data,resolve){
-            console.log(this.dataTree[0].children)
-            this.projectList = data
+        getTreeChild(datas,node){
+            this.projectList = datas
             this.$http({
                 url: this.$http.adornUrl("/prjBusDatabaseRelation/listAllTablesByDB"),
                 method: "get",
                 params: this.$http.adornParams({
-                projectId: data.projectId,
+                projectId: this.projectList.projectId,
                 },false)
             }).then(({data}) => {
                 if(data && data.code === 200){
-                    // this.isCheckedId = []
                     this.dataList = data.result
-                    // data.result.forEach(i => {
-                    //     let childrens = [{
-                    //         id:i.projectId,
-                    //         label: i.tableName,
-                    //         children: i
-
-                    //     }]
-                    //     this.dataTree[0].children.push(childrens)
-                    // })
-            
-                    // console.log( this.dataTree[0].children)
+                    // setTimeout(() => {
+                        // debugger
+                        // const children = []
+                    //     data.result.forEach(i => {
+                    //         // i.children = []
+                    //         if(i.parentId == datas.projectId){
+                    //             // i.children = []
+                    //             children.push(i)
+                    //         }
+                    //     })
+                    //    this.dataTree =  children
+                    // },500)
                  }
                     // this.treeLoading = false
-
             })
+            // return datas
         },
         //查询
         getSearchList(){
-            // this.$http({
-            //     url: this.$http.adornUrl("/prjBusDatabaseRelation/listAllTablesByDB"),
-            //     method: "get",
-            //     params: this.$http.adornParams({
-            //     tableName: this.dataForm.tableName
-            //     },false)
-            // }).then(({data}) => {
-            //     if(data && data.code === 200){
-            //         this.dataList = data.result
-            //     }
-            // })
+            let _search = this.dataForm.title.toLowerCase()
+            let _SearchList = []
+            if(_search){
+               this.dataList.forEach(i => {
+                   if(i.title.toLowerCase().indexOf(_search) !== -1){
+                       _SearchList.push(i)
+                   }
+               })
+            this.dataList = _SearchList
+            }
         },
         //表结构
         getTableStructure(data){
@@ -232,12 +235,9 @@ export default {
             this.$emit('close')
         },
         //重置
-        resetForm(formName){
-            this.dataForm = {
-                tableName:'',
-                database:''
-            }
-            this.$refs[formName].resetFields()
+        resetForm(){
+            this.dataForm.title = '';
+            this.apComServerData.pageIndex = 1
         }
     }
 }
