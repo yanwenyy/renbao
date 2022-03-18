@@ -439,14 +439,7 @@
           hintOptions: { // 自定义提示选项
             tables: {},
             tablesTitle:{},
-            keywords:[
-              "select ",
-              "from",
-              "left",
-              "join",
-              "right",
-              "inner",
-              "sum",]
+
           },
           theme:'solarized light',
           mode:'text/x-mysql',
@@ -693,6 +686,7 @@
     methods: {
       //参数设置确定点击
       Paramssub(){
+
         this.closeParams();
         this.paramsSub(this.paramsValue);
       },
@@ -731,6 +725,7 @@
           resize.style.cursor = 'n-resize';
           var startY = e.clientY;
           resize.top = resize.offsetTop-70;
+          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop)
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
@@ -1150,6 +1145,11 @@
   }
   .CodeMirror-selectedtext {
     color: white !important;
+  }
+  .cm-keyword{
+    line-height: 1em;
+    font-weight: bold;
+    color: #000080;
   }
   .codeMirror-blue{
     background: blue !important;

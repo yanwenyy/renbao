@@ -86,6 +86,7 @@
       }
     },
     activated(){
+      this.$refs.sqlEdits.dragControllerDiv()
       this.sqlListData=[];
       this.sqlListTotal=0;
       this.sqlData='';
@@ -98,6 +99,7 @@
 
     mounted(){
       if(this.treeData==[]){
+        this.$refs.sqlEdits.dragControllerDiv()
         this.sqlListData=[];
         this.sqlListTotal=0;
         this.sqlData='';
