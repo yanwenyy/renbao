@@ -153,6 +153,8 @@
         @setFS="getFullScreen"
         :treeDataToHint="treeDataToHint"
         :hintShowName="defaultProps.label"
+        :paramsList="paramsList"
+        :paramsSub="paramsSub"
       ></code-mirror-editor>
 
     </div>
@@ -166,6 +168,16 @@
       CodeMirrorEditor
     },
     props:{
+      //参数设置确定点击事件
+      paramsSub: {
+        type: Function,
+        default: null,
+      },
+      //后台返回的参数列表
+      paramsList: {
+        type: Array,
+        default: false,
+      },
       formatContent: {
         type: Function,
         default: null,
@@ -865,7 +877,7 @@
             resize[i].style.background = '#818181';
             resize[i].style.cursor = 'w-resize';
             var startX = e.clientX;
-            resize[i].left = resize[i].offsetLeft-35;
+            resize[i].left = resize[i].offsetLeft-(box[i].offsetLeft);
 
             // 鼠标拖动事件
             document.onmousemove = function (e) {
@@ -873,8 +885,8 @@
               var moveLen = resize[i].left + (endX - startX); // （endx-startx）=移动的距离。resize[i].left+移动的距离=左边区域最后的宽度
               var maxT = box[i].clientWidth - resize[i].offsetWidth; // 容器宽度 - 左边区域的宽度 = 右边区域的宽度
               // console.log(resize[i].left,endX,startX,moveLen);
-              if (moveLen < 10) moveLen = 10; // 左边区域的最小宽度为32px
-              if (moveLen > maxT - 10) moveLen = maxT - 10; //右边区域最小宽度为150px
+              if (moveLen < 280) moveLen = 280; // 左边区域的最小宽度为32px
+              if (moveLen > maxT - 280) moveLen = maxT - 280; //右边区域最小宽度为150px
 
               resize[i].style.left = moveLen; // 设置左侧区域的宽度
               for (let j = 0; j < left.length; j++) {
@@ -970,8 +982,8 @@
         // console.log('tree drag over: ', dropNode.label);
       },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log(draggingNode, dropNode, dropType, ev);
-        console.log(this.$refs.cmEditor)
+        // console.log(draggingNode, dropNode, dropType, ev);
+        // console.log(this.$refs.cmEditor)
         this.paramsNode={};
         if (draggingNode.childNodes.length == 0 ) {
           this.treeLable = this.treeDefaultProps.label?draggingNode.data[this.treeDefaultProps.label]:draggingNode.data.label;

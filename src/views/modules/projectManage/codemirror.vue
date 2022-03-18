@@ -21,6 +21,8 @@
       :saveSql="saveSql"
       :useChinese="true"
       :exportSql="exportSql"
+      :paramsList="paramsList"
+      :paramsSub="paramsSub"
     ></sql-edit>
   </div>
 
@@ -41,6 +43,7 @@
     },
     data() {
       return {
+        paramsList:[],//后台返回的参数列表
         ws:{},//websoket对象
         treeDefaultProps:{
           label:'title',
@@ -114,6 +117,10 @@
       this.ws.close();
     },
     methods: {
+      //参数设置确定事件点击
+      paramsSub(data){
+        console.log("设置参数了"+data)
+      },
       //导出按钮点击
       exportSql(data){
         if(data){
@@ -286,23 +293,37 @@
       //点击运行获取websoket数据
       getwsData(sql,marks) {
         console.log(sql,marks);
-        // this.resultTableTabs=[];
-        // var params={
-        //   sqlScript:sql,
-        //   loadOnce:false,
-        //   dataSize:"500"
-        // };
-        // this.$http({
-        //   url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
-        //   method: 'post',
-        //   data: this.$http.adornData(params)
-        // }).then(({data}) => {
-        //   if(data.code==200){
-        //
-        //   }else{
-        //     this.$message.error(data.message);
-        //   }
-        // })
+        if(marks.length>0){
+          var _List=[ {
+            label:'参数111', //label 显示的label名字 必须
+            list:[
+              {
+                name:'医院1',//name是必须的
+                id:'1111',//id是必须的
+              }
+            ],//参数下拉列表
+          }];
+          this.paramsList=_List;
+        }else{
+          this.resultTableTabs=[];
+          var params={
+            sqlScript:sql,
+            loadOnce:false,
+            dataSize:"500"
+          };
+          this.$http({
+            url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+            method: 'post',
+            data: this.$http.adornData(params)
+          }).then(({data}) => {
+            if(data.code==200){
+
+            }else{
+              this.$message.error(data.message);
+            }
+          })
+        }
+
       },
     }
   }

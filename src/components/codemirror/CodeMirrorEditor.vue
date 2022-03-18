@@ -111,14 +111,9 @@
           >
             <div v-if="item.list==''">
               <div v-if="!item.columnList">{{item.msg}}</div>
-              <el-table v-if="item.columnList" border :data="item.columnListSelf" stripe style="width: 100%" class="box-table">
-                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+              <el-table v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
-                  <template slot-scope="scope">
-                    <div>
-                      <span>{{scope.row[key]}}</span>
-                    </div>
-                  </template>
                 </el-table-column>
               </el-table>
             </div>
@@ -235,6 +230,24 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="saveSqlVisible = false,sqlSaveForm.draftName=''">取消</el-button>
         <el-button type="primary" @click="saveSqlClick()">确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
+      <el-form>
+        <el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">
+          <el-select v-model="paramsValue" multiple placeholder="请选择">
+            <el-option
+              v-for="(vtem,i) in item.list"
+              :key="i"
+              :label="vtem.name"
+              :value="vtem.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeParams()">取消</el-button>
+        <el-button type="primary" @click="Paramssub()">确定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -369,9 +382,30 @@
         type: Function,
         default: null,
       },
+      //后台返回的参数列表
+      paramsList: {
+        type: Array,
+        default: null,
+      },
+      paramsSub: {
+        type: Function,
+        default: null,
+      },
     },
     data() {
       return {
+        SelfparamsList:[],//参数设置列表
+        SlefparamsListVisible:false,//参数设置显示状态
+        paramsValue:'',//选中的参数值
+        sqlKeyWord:[
+          "select ",
+          "from",
+          "left",
+          "join",
+          "right",
+          "inner",
+          "sum",
+        ],//需要高亮的关键字
         hintTable:{},//自定义提示的table
         resultTableTabsValue: '2',//动态标签显示项
         sqlSaveType:'',
@@ -405,6 +439,14 @@
           hintOptions: { // 自定义提示选项
             tables: {},
             tablesTitle:{},
+            keywords:[
+              "select ",
+              "from",
+              "left",
+              "join",
+              "right",
+              "inner",
+              "sum",]
           },
           theme:'solarized light',
           mode:'text/x-mysql',
@@ -518,7 +560,6 @@
                   replacedWith: dom,
                   className:"paramBlock",
                 });
-                console.log(this.$refs.myCm.codemirror.getValue());//获取codemirror内容
               }else{
                 let pos1 = this.$refs.myCm.codemirror.getCursor();
                 let pos2 = {};
@@ -577,6 +618,35 @@
           }
         },
       },
+      paramsListVisible: {
+        // 实时监控数据变化
+        deep: true,
+        handler(val) {
+          if (val) {
+            this.SlefparamsListVisible=true;
+          }
+        },
+      },
+      paramsList: {
+        deep: true,
+        handler(val) {
+          if (val) {
+            if (val.length>0) {
+              this.SelfparamsList=val;
+            }
+          }
+        },
+      },
+      SelfparamsList: {
+        deep: true,
+        handler(val) {
+          if (val) {
+            if (val.length>0) {
+              this.SlefparamsListVisible=true;
+            }
+          }
+        },
+      },
       resultTableTabs: {
         // 实时监控数据变化
         deep: true,
@@ -621,6 +691,16 @@
       this.dragControllerDiv2();
     },
     methods: {
+      //参数设置确定点击
+      Paramssub(){
+        this.closeParams();
+        this.paramsSub(this.paramsValue);
+      },
+      //参数设置取消点击
+      closeParams(){
+        this.SelfparamsList=[];
+        this.SlefparamsListVisible=false;
+      },
       setHintList(list){
         list.forEach(item=>{
           item.name=item[this.hintShowName];
@@ -1011,7 +1091,6 @@
         // }
         this.resetLint();
       },
-
       completeIfInTag(cm){
         var that=this;
         return this.completeAfter(cm, function () {          //智能提示
