@@ -26,17 +26,16 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <div class='f_right'>                    
+            <div class='f_right'>         
+                <el-button size="mini" type="warning" @click="templateExport">下载模板</el-button>           
                 <el-button size="mini" type="warning" @click="exportData">导出数据</el-button>
                 <el-button size="mini" type="warning" @click="importData">导入数据</el-button>
             </div>
             <el-table :data="tableList" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading'>
-                <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                <el-table-column prop="医院名称" header-align="center" align="center" label="医院名称"></el-table-column>
-                <el-table-column prop="医院编码" header-align="center" align="center" label="医院编码"></el-table-column>
-                <el-table-column prop="医院性质" header-align="center" align="center" label="医院性质"> </el-table-column>
-                <el-table-column prop="医院类别" header-align="center" align="center" label="医院类别"></el-table-column>
-                <el-table-column prop="医保基金支付总金额" header-align="center" align="center" label="医院基金支付总金额"></el-table-column>
+                <el-table-column type="selection" width="55"></el-table-column>
+                <template v-for="(item,index) in tableColumns">
+                    <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                </template>
             </el-table>
             <el-pagination 
                 :page-size="apComServerData.size"
@@ -111,6 +110,7 @@ export default {
                     value: '1',
                     label: '增量'
             }],
+            catalogType:10
         }
     },
      created(){
@@ -137,8 +137,9 @@ export default {
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
-                    this.tableList = data.result.records
-                    this.apComServerData.total = data.result.total
+                    this.tableList = data.result.result
+                    this.tableColumns = data.result.columns
+                    this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.tableList = []
                     this.apComServerData.total = 0
@@ -199,35 +200,15 @@ export default {
         },
         //导出
         exportData(){
-            //  this.$http({
-            //     url:this.$http.adornUrl('/hospitalBasicInfo/excelDataExport'),
-            //     method: "get",
-            //     responseType: 'blob',//解决乱码问题
-            //     params :this.$http.adornParams({
-            //         hospitalName:this.dataForm.hospitalName,
-            //         hospitalType:this.dataForm.hospitalType,
-            //         moneyEnd:this.dataForm.moneyEnd,
-            //         moneyStart:this.dataForm.moneyStart
-            //     })
-            // }).then(({data})=>{
-            //     const blob =  new Blob([data]);
-            //     let fileName = "excel.xls";
-            //     if("download" in document.createElement("a")){
-            //         const elink = document.createElement("a")
-            //         elink.download = fileName;
-            //         elink.style.display = "none";
-            //         elink.href = URL.createObjectURL(blob);  // 创建下载的链接
-            //         document.body.appendChild(elink)
-            //         elink.click(); // 点击下载
-            //         URL.revokeObjectURL(elink.href);// 释放掉blob对象
-            //         document.body.removeChild(elink)// 下载完成移除元素
-            //     }else{
-            //         navigator.msSaveBlob(blob,fileName)
-            //     }
-            // })
-            let url = this.$http.adornUrl('/hospitalBasicInfo/excelDataExport?hospitalName='+this.dataForm.hospitalName+'&hospitalType='+this.dataForm.hospitalType+'&moneyEnd='+this.dataForm.moneyEnd+'&moneyStart='+this.dataForm.moneyStart+'&token=')+ this.$cookie.get('token')
+            let url = this.$http.adornUrl('/threeCatalog/excelDataExport?catalogType='+this.catalogType+'&token=')+ this.$cookie.get('token')
             window.open(url)
         },
+        //模板导出
+        templateExport(){
+            let url = this.$http.adornUrl('/threeCatalog/exportExcelFileCommon?catalogType='+this.catalogType+'&token=')+ this.$cookie.get('token')
+            window.open(url)
+        },
+        
         // 关闭弹窗确认
         importSucceed(){
             this.closeimportDrawer()
