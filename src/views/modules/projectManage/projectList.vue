@@ -8,7 +8,7 @@
       <el-form-item label="项目名称:">
         <el-input v-model="dataForm.projectName" placeholder="项目名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="项目时间:">
+      <el-form-item label="创建时间:">
         <el-date-picker
           :picker-options="pickerOptionsStart"
           v-model="dataForm.createTimeBegin"
@@ -90,7 +90,7 @@
         align="center"
         label="创建时间">
         <template slot-scope="scope">
-          {{scope.row.createTime | dateformat }}
+          {{scope.row.createTime }}
         </template>
       </el-table-column>
       <el-table-column

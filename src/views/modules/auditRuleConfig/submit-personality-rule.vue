@@ -8,7 +8,7 @@
             :close-on-press-escape="false"
             :before-close="handleClose">
             <div class="rule-tree-box">
-                <span>选择规则：</span>
+                <span style="display: inline-block;width: 80px;">选择规则：</span>
                 <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="2" :isShowIcon="true"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">

@@ -384,8 +384,8 @@ export default {
         projectId (nval, oval) {
             if (nval) {
                 this.getRuleFolder()
+                // this.nodeClick()
             }
-
         }
 
     },
