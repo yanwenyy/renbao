@@ -1,6 +1,6 @@
 <!--初探规则配置-->
 <template>
-  <div>
+  <div :style="conheight">
     <el-row :gutter="20">
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
@@ -55,13 +55,13 @@
             </el-row>
           </div>
           <div class="content">
-            <div class="tableTitle">
+            <!-- <div class="tableTitle">
               <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
               >
               <div style="float:right;margin-bottom:10px">
-                <!-- <el-button @click="addData" type="primary">新增</el-button>
+                <el-button @click="addData" type="primary">新增</el-button>
                 <el-button
                   :disabled="
                     this.multipleSelection.length <= 0 ||
@@ -76,9 +76,9 @@
                   :disabled="this.multipleSelection.length <= 0"
                   type="danger"
                   >删除</el-button
-                > -->
+                >
               </div>
-            </div>
+            </div> -->
             <el-table
               :data="tableData"
               border
@@ -137,7 +137,11 @@
                   @click="timeRun"
                   >定时运行</el-button
                 >
-                <el-popover placement="top" trigger="click" v-if="this.multipleSelection.length>0">
+                <el-popover
+                  placement="top"
+                  trigger="click"
+                  v-if="this.multipleSelection.length > 0"
+                >
                   <p v-for="(i, k) in multipleSelection" :key="k">
                     {{ i.ruleName }}
                   </p>
@@ -294,19 +298,38 @@ export default {
       //规则id
       ruleId: "",
       //新增、修改弹窗是否显示
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      conheight: {
+        height: ""
+      },
+      // 选中的规则节点
+      ruleCheckData: {}, 
     };
   },
   created() {
-    this.initData();
+    //高度自适应
+    window.addEventListener("resize", this.getHeight);
+    this.getHeight();
+    //获取列表
+    // this.initData();
   },
   methods: {
     //获取列表数据
     initData() {
+      // 判断不选左侧规则节点列表为空
+      if (!this.ruleCheckData.folderId) {
+          this.$message({message: '请选择对应的规则分类',type: 'warning'});
+          return;
+      }
       this.loading = true;
+      // 如何改规则节点有子节点的话folderId为空
+      if (this.ruleCheckData.children) {
+          this.folderId = '';
+      }
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
         method: "get",
+        isLoading: false,
         params: this.$http.adornParams(
           {
             pageNo: this.pageIndex,
@@ -421,7 +444,7 @@ export default {
         createUserName: "",
         createTime: ""
       };
-      this.initData();
+      // this.initData();
       this.clearTableChecked();
     },
     //立即运行
@@ -477,12 +500,12 @@ export default {
     }, */
     //拿到选择树的id
     getTreeId(data) {
-      // 规则列表有子节点时folderId为空
+      this.ruleCheckData = data;
       this.folderPath = (data.folderPath && data.folderPath) || "";
       this.folderId = (data.folderId && data.folderId) || "";
-      if (data.children) {
-        this.folderId = "";
-      }
+      // if (data.children) {
+      //   this.folderId = "";
+      // }
       this.initData();
     },
     //获取每行数据id
@@ -493,6 +516,10 @@ export default {
     clearTableChecked() {
       this.$refs.tableData.clearSelection(this.multipleTable);
       this.multipleSelection = [];
+    },
+    //高度自适应
+    getHeight() {
+      this.conheight.height = window.innerHeight - 170 + "px";
     }
   }
 };

@@ -1,14 +1,19 @@
 
 <template>
     <div class='InformationList'>
-        <el-table :data="tableData" border ref="tableData" :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" @selection-change="handleSelectionChanges">
+        <el-table :data="tableData" border ref="tableData" :header-cell-style="{textAlign:'center'}" style="width: 100%" height="600" v-loading="dataListLoading" @selection-change="handleSelectionChanges">
             <el-table-column type="selection"  header-align="center" align="center" width="50"></el-table-column>
             <el-table-column label="批次" align="center" prop="collectPlanMonitorBath"> </el-table-column>
             <el-table-column label="文件名" align="center" prop="fileName"></el-table-column>
+            <el-table-column label="采集表名称" align="center" prop="fileName"></el-table-column>
             <el-table-column label="采集数据文件路径" align="center" prop="filePath"> </el-table-column>
             <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
-            <el-table-column label="开始时间" align="center" :formatter="dateFormat" prop="startTime"></el-table-column>
-            <el-table-column label="结束时间" align="center" :formatter="dateEndFormat" prop="endTime"> </el-table-column>
+            <el-table-column label="开始时间" align="center">
+                <template slot-scope="scope">{{scope.row.startTime | datetimeformat}}</template>
+            </el-table-column>
+            <el-table-column label="结束时间" align="center"> 
+              <template slot-scope="scope">{{scope.row.endTime | datetimeformat}}</template>
+            </el-table-column>
             <el-table-column label="状态" align="center" prop="collectStatus">
                 <template slot-scope="scope">
                     <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
@@ -50,9 +55,11 @@
 <script>
 import Edit from './edit.vue'
 export default {
-     components:{
+    props: { dataList: { type: Object } },
+    components:{
         Edit,
     },
+    
     name:'InformationList',
     data(){
         return{
@@ -64,19 +71,21 @@ export default {
                 total:0,
             },
             editShowVisible:false,  //弹框显示
+            dataListLoading:false,
             collectPlanMonitorId:'',
             collectPlanMonitorId:'',
-            dataForm:{
-                fileName:'',
-                filePath:'',
-                collectStatus:'',
-                startTime:'',
-                endTime:''
-            },
+            // dataForm:{
+            //     fileName:'',
+            //     filePath:'',
+            //     collectStatus:'',
+            //     startTime:'',
+            //     endTime:''
+            // },
             multipleSelection:''
         }
     }, 
      mounted(){
+         console.log(this.dataList)
         this.getInitList()
     },
     methods:{
@@ -85,29 +94,7 @@ export default {
             this.multipleSelection = val
             this.$emit('satDatalist',this.multipleSelection); // 回显医院名称
         },
-         //开始时间转换
-        dateFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.startTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-        //结束时间转换
-        dateEndFormat(row, column, cellValue, index){
-            let date = new Date(parseInt(row.endTime) * 1000);
-            let Y = date.getFullYear() + '-';
-            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '-' : date.getMonth() + 1 + '-';
-            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ' ';
-            let h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':';
-            let m = date.getMinutes()  < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            return Y + M + D + h + m + s;
-        },
-
+        
         //查看
         editClick(id){
             this.editShowVisible = true
@@ -117,14 +104,15 @@ export default {
          //初始化数据
         getInitList(){
             this.tableData = []
+            this.dataListLoading = true;
             this.$http({
                 url:this.$http.adornUrl('/collectPlanMonitor/selectPageList'),
                 method: 'get',
                 params: this.$http.adornParams({
                     pageSize:this.apComServerData.pageSize,
                     pageNo:this.apComServerData.pageIndex,
-                    fileName:this.dataForm.fileName || '',
-                    filePath:this.dataForm.filePath || '',
+                    // fileName:this.dataList.fileName || '',
+                    // filePath:this.dataList.filePath || '',
                     // collectStatus:this.dataForm.collectStatus || '',
                     // startTime:this.dataForm.startTime || '',
                     // endTime:this.dataForm.endTime || ''

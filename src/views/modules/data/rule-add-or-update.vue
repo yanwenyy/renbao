@@ -37,6 +37,12 @@
                   :default-expand-all="false"
                   :highlight-current="true"
                   :expand-on-click-node="false">
+                   <span  slot-scope="{ node }">
+                      <span class="tree-label">
+                          <span class="folder-icon"></span>
+                          <span :title="node.label" > {{node.label}}</span>
+                      </span>
+                  </span>
                 </el-tree>
               </el-popover>
               <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
@@ -102,8 +108,7 @@
     },
     props:{
       ruleData: {
-        type: Array,
-        default: null,
+        default: [],
       },
     },
     data () {
@@ -225,11 +230,11 @@
         this.dataForm.id = 0;
         this.dataForm.ruleName = '';
         this.dataForm.ruleCategory = '';
-        // this.dataForm.folderId = '';
+        this.dataForm.folderId = '';
         this.dataForm.parentName = '';
         this.dataForm.ruleSqlValue = '';
         this.dataForm.ruleType = '';
-        // this.dataForm.folderPath = '';
+        this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
 
         // this.dataForm={
@@ -244,16 +249,20 @@
         //   ruleType: '',
         //   folderPath: ''
         // };
-        this.$nextTick(() => {
+       
+        if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
-        });
+        }
       },
       init (id, ruleCheckData) {
-        this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
-        this.dataForm.ruleId = id || 0;
+        this.cleanMsg();
         this.visible = true;
+        this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
+        this.dataForm.ruleId = id;
+        this.dataForm.folderId = this.ruleCheckData.folderId;
+        this.dataForm.folderPath = this.ruleCheckData.folderPath;
+
         this.getUserInfo();
-        this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
           this.$refs['dataForm'].clearValidate();
@@ -261,6 +270,7 @@
           this.$refs.menuListTree.setCheckedKeys([]);
           this.$refs.menuListTree.setCurrentKey(null);
         })
+
         if (this.dataForm.ruleId) {
           this.$http({
             url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.ruleId}`),
@@ -280,18 +290,12 @@
               this.sqlEditMsg = datas.ruleSqlValue;
               console.log(this.sqlEditMsg,33333)
               this.dataForm.ruleType = datas.ruleType;
-
               // this.menuListTreeSetCurrentNode();
             }
           })
-        } else {
-          // 新增时规则分类默认为左侧选则的规则
-          if(this.ruleCheckData && this.ruleCheckData.folderId) {
-            this.$set(this.dataForm,"folderId", this.ruleCheckData.folderId)
-            this.$set(this.dataForm,"folderPath", this.ruleCheckData.folderPath)
-          }
         }
         this.menuListTreeSetCurrentNode();
+       
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
@@ -302,14 +306,44 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        this.$nextTick(() => {
-          // console.log(this.dataForm, 'dataFormdataFormdataForm')
-          if (this.dataForm.folderId) {
+        if (this.dataForm.folderId) {
+          if (this.$refs.menuListTree) {
             this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
-            this.dataForm.parentName = (this.$refs.menuListTree.getCurrentNode() || {})['folderName']
           }
+          this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.folderId)[0].folderName;
+        }
+        
+
+        // if (this.dataForm.folderId) {
           
-        })
+        //   // this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
+        //   // this.getTreeData(this.treeData, this.checkedData[0].folderId);
+        //   // console.log(this.getTreeData(this.ruleData,this.dataForm.folderId), '1111111')
+        //   // this.dataForm.parentName = (this.$refs.menuListTree.getCurrentNode() || {})['folderName']
+        //   // this.$forceUpdate()
+        //   // if (this.$refs.menuListTree) {
+        //   //   alert(1)
+        //   //   this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
+        //   // }
+        //   // this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.folderId)[0].folderName;
+        // }
+      },
+      // 通过folderId 获取对应的item
+      getTreeData (treeData,folderId) {
+          const getTreeDataItem = [];
+          const traverse = function(treeData,folderId) {
+              treeData.map(i => {
+                  if (i.folderId == folderId) {
+                      getTreeDataItem.push(i);
+                  }
+                  if (i.children) {
+                    traverse(i.children, folderId);
+                  }
+              })
+
+          }
+          traverse(treeData,folderId)
+          return getTreeDataItem
       },
       // 表单提交
       dataFormSubmit () {
@@ -360,9 +394,9 @@
     },
     watch : {
       'visible'(nval, oval) {
-          if (nval ) {   
-            this.cleanMsg();
-          }
+          // if (nval ) {   
+          //   this.cleanMsg();
+          // }
       },
     }
   }
@@ -389,6 +423,14 @@
     left: 0;
     padding-right: 2%;
     box-sizing: border-box;
+  }
+  .folder-icon {
+    background: url(../../../assets/img/folder.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 13px;
+    height: 16px;
   }
   .infoForm .el-input,.infoForm .el-select{
     width: 30%;

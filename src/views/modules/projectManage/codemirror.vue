@@ -3,9 +3,11 @@
     <sql-edit
       ref="sqlEdits"
       :treeDefaultProps="treeDefaultProps"
+      :parmsDefaultProps="parmsDefaultProps"
       :changeTree="changeTree"
       :getLoadTree="getLoadTree"
       :treedata="treeData"
+      :paramsData="paramsData"
       :loadTree="loadTree"
       :getwsData="getwsData"
       :resultTableTabs="resultTableTabs"
@@ -41,15 +43,31 @@
       return {
         ws:{},//websoket对象
         treeDefaultProps:{
-          label:'title'
-        },//tree显示数据绑定的参数名字
+          label:'title',
+        },//tree显示数据绑定的名字
+        parmsDefaultProps:{
+          label:'name',
+        },//tree显示数据绑定的名字
         sqlListData:[],//sql列表data
         sqlListTotal:0,//sql列表data
         sqlData:'',//sql编译器内容
         sqlMsg:'',//sql编译器吐给外层的内容
         resultTableTabs: [],//sql执行返回的动态tab
         loadTree: [],//左边树懒加载的数据
-        treeData: [],//左边树初始的数据
+        treeData: [],//左边树数据表初始的数据
+        paramsData: [
+          {
+            name:'参数',
+            type:'funFolder',//图标类型 文件夹
+            children:[
+              {
+                id:'11111',
+                name:'医院',
+                type:'params',//图标类型 参数
+              },
+            ],
+          }
+        ],//左边树参数初始的数据
         useChinese:true,//是否汉字化
         userId:sessionStorage.getItem("userId"),
       }
@@ -76,14 +94,16 @@
     },
 
     mounted(){
-      this.sqlListData=[];
-      this.sqlListTotal=0;
-      this.sqlData='';
-      this.resultTableTabs=[];
-      this.loadTree=[];
-      this.treeData=[];
-      this.getSjbData();
-      this.getSqlList();
+      if(this.treeData==[]){
+        this.sqlListData=[];
+        this.sqlListTotal=0;
+        this.sqlData='';
+        this.resultTableTabs=[];
+        this.loadTree=[];
+        this.treeData=[];
+        this.getSjbData();
+        this.getSqlList();
+      }
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -96,26 +116,28 @@
     methods: {
       //导出按钮点击
       exportSql(data){
-       if(data){
-         this.$http({
-           url: this.$http.adornUrl('/sqlScript/exportExcel'),
-           method: 'post',
-           responseType: 'blob',
-           data: this.$http.adornData({
-             sqlScript:data,
-             dataSize:50000,
-             exportSize:50000,
-           }),
-         }).then(({data}) => {
-           if(data.code==200){
-
-           }else{
-             this.$message.error(data.message);
-           }
-         })
-       }else{
-         this.$message.error("sql语句不能为空")
-       }
+        if(data){
+          //let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
+          //window.open(url)
+          this.$http({
+            url: this.$http.adornUrl('/sqlScript/setSession'),
+            method: 'post',
+            data: this.$http.adornData({
+              sqlScript:data,
+              dataSize:50000,
+              exportSize:50000,
+            }),
+          }).then(({data}) => {
+            if(data.code==200){
+              let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
+              window.location.href = url;
+            }else{
+              this.$message.error(data.message);
+            }
+          })
+        }else{
+          this.$message.error("sql语句不能为空")
+        }
       },
       //获取sql运行websocket返回的数据
       getDataList(datas){
@@ -127,11 +149,13 @@
           if(datas.data&&datas.data.result){
             v={
               list:datas.data.result||[],
+              columnList:datas.data.columnList,
               msg:datas.message
             };
           }else{
             v={
               list:[],
+              columnList:datas.data.columnList,
               msg:datas.message
             };
           }
@@ -260,24 +284,25 @@
 
       },
       //点击运行获取websoket数据
-      getwsData(sql) {
-        this.resultTableTabs=[];
-        var params={
-          sqlScript:sql,
-          loadOnce:false,
-          dataSize:"500"
-        };
-        this.$http({
-          url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
-          method: 'post',
-          data: this.$http.adornData(params)
-        }).then(({data}) => {
-          if(data.code==200){
-
-          }else{
-            this.$message.error(data.message);
-          }
-        })
+      getwsData(sql,marks) {
+        console.log(sql,marks);
+        // this.resultTableTabs=[];
+        // var params={
+        //   sqlScript:sql,
+        //   loadOnce:false,
+        //   dataSize:"500"
+        // };
+        // this.$http({
+        //   url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+        //   method: 'post',
+        //   data: this.$http.adornData(params)
+        // }).then(({data}) => {
+        //   if(data.code==200){
+        //
+        //   }else{
+        //     this.$message.error(data.message);
+        //   }
+        // })
       },
     }
   }

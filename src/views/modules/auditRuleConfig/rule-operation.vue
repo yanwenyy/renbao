@@ -168,7 +168,7 @@ export default {
                             });
                         } else {
                             this.$message({
-                                message: '执行失败',
+                                message: data.message,
                                 type: 'error',
                                 duration: 1500,
                             })

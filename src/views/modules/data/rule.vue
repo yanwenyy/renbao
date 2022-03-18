@@ -65,11 +65,11 @@
           </el-form-item>
         </el-form>
         <div class="search-btn">
-          <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+          <el-button type="primary" @click="addOrUpdateHandle('')">新增</el-button>
           <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
           <el-button type="warning" @click="ruleImport">导入</el-button>
           <el-button type="warning" @click="ruleExport('all')" :loading="ruleExportAllLoading">全部导出</el-button>
-          <el-button type="warning" @click="ruleExport" :loading="ruleExportLoading">导出</el-button>
+          <el-button type="warning" @click="ruleExport('one')" :loading="ruleExportLoading">导出</el-button>
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
@@ -154,7 +154,7 @@
       </div>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
+    <add-or-update  ref="addOrUpdate" @refreshDataList="getDataList" :ruleData="ruleData"></add-or-update>
     <Import-file ref="ImportFile"></Import-file>
   </div>
 </template>
@@ -233,7 +233,7 @@ import ImportFile from './Import-file.vue'
       ImportFile
     },
     activated () {
-      this.getDataList();
+      // this.getDataList();
       this.getRuleFolder();
     },
     mounted () {
@@ -242,6 +242,18 @@ import ImportFile from './Import-file.vue'
       });
     },
     methods: {
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        // this.addOrUpdateVisible = true
+        // this.$nextTick(() => {
+          if (id) {
+            this.$refs.addOrUpdate.init(id,this.ruleCheckData)
+          } else {
+            this.$refs.addOrUpdate.init('',this.ruleCheckData)
+          }
+
+        // })
+      },
       // 获取规则树
       getRuleFolder () {
         this.$http({
@@ -254,37 +266,24 @@ import ImportFile from './Import-file.vue'
       },
       //重置点击
       reset(){
-        this.dataForm={
-          ruleName: '',
-          createUserName: '',
-          folderPath:'',//规则分类主键
-        };
+        this.dataForm.ruleName = '';
+        this.dataForm.createUserName = ''
         this.pageIndex=1;
         this.pageSize=10;
-        this.getDataList();
-      },
-      append(data,type) {
-        // console.log(data)
-       this.treeTitle=type=='add'?'填写分类信息':'编辑分类信息';
-       this.treeVisible=true;
-       this.form.name=type=='add'?'':data.label;
-
-        // const newChild = { id: id++, label: 'testtest', children: [] };
-        // if (!data.children) {
-        //   this.$set(data, 'children', []);
-        // }
-        // data.children.push(newChild);
-      },
-
-      remove(node, data) {
-        const parent = node.parent;
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
       },
       // 获取数据列表
       getDataList () {
+        // 判断不选左侧规则节点列表为空
+        if (!this.ruleCheckData.folderId) {
+          this.$message({message: '请选择对应的规则分类',type: 'warning'});
+          return;
+        }
+
         this.dataListLoading = true
+        // 如何改规则节点有子节点的话folderId为空
+        if (this.ruleCheckData.children) {
+          this.dataForm.folderId = '';
+        }
         this.$http({
           isLoading: false,
           url: this.$http.adornUrl('/rule/selectPage'),
@@ -312,26 +311,27 @@ import ImportFile from './Import-file.vue'
       ruleExport (isAll) {
         var exportList = []
         // 判断是否为全部导出，全部导出的话exportList为空列表
-        if (isAll) {
+        if (isAll == 'one') { // 单个导出
           if( this.dataListSelections.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
           this.dataListSelections.forEach( item =>{
-              exportList.push( item.ruleId )
+            exportList.push( item.ruleId )
           })
           this.ruleExportLoading = true
-        }
-        if (!isAll) {
+        } else { // 全部导出
           this.ruleExportAllLoading = true;
         }
-       
+
         this.$http({
             isLoading:false,
-            url: this.$http.adornUrl('/rule/ruleExport'),
+            url: this.$http.adornUrl('/rule/setSessionRule'),
             method: 'post',
             data: this.$http.adornData(exportList, false)
         }).then(({data}) => {
             this.ruleExportLoading = false
             this.ruleExportAllLoading = false;
             if (data && data.code === 200) {
+                let url = this.$http.adornUrl('/rule/ruleExport?token=') + this.$cookie.get("token");
+                window.open(url);
               this.$message({message: '导出成功',type: 'success'});
               this.getDataList();
             } else {
@@ -358,13 +358,6 @@ import ImportFile from './Import-file.vue'
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
-      },
-      // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id, this.ruleCheckData)
-        })
       },
       //图片预览
       preImg(src){
@@ -431,13 +424,9 @@ import ImportFile from './Import-file.vue'
       },
       getTreeData (data) {
         let checkedData = JSON.parse(JSON.stringify(data))
-        this.ruleCheckData = checkedData
-        // 规则列表有子节点时folderId为空
+        this.ruleCheckData = data
         this.dataForm.folderPath=data.folderPath && data.folderPath || '';
         this.dataForm.folderId = data.folderId && data.folderId || '';
-        if (data.children) {
-          this.dataForm.folderId = '';
-        }
         this.getDataList();
       }
     }

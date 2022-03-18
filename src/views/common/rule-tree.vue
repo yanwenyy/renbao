@@ -101,7 +101,10 @@ export default {
         isShowIcon: {
             type: Boolean, // 是否显示文件夹
             default: true
-        }
+        },
+        // folderTypes: { // 规则树查询参数
+        //     default: ''
+        // }
 
     },
     computed: {
@@ -391,7 +394,7 @@ export default {
 </script>
 <style scoped lang="scss">
 .rule-tree-box {
-    // min-width: 288px;
+    width: 100%;
     /deep/ .filter-text {
         width: 80%;
         margin: 10px 0 10px 10px;
@@ -399,7 +402,8 @@ export default {
     .custom-tree-node {
         width: 100%;
         display: flex;
-        display: inline-block;
+        // display: inline-block;
+        align-items: center;
     }
     .tree-label {
         max-width: 180px;
@@ -421,7 +425,7 @@ export default {
         background-color: #e3edfa;
     }
     /deep/ .el-tree-node__children {
-        overflow: unset !important;
+        overflow:visible;  
     }
 }
 

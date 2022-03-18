@@ -15,7 +15,9 @@
           v-model="dataForm.expectedBeginTime"
           type="datetime"
           placeholder="选择日期时间"
-          
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          :picker-options="pickerOptions"
         >
         </el-date-picker>
       </el-form-item>
@@ -91,7 +93,21 @@ export default {
         hospitalName: [{ required: true, message: "请选择", trigger: "blur" }],
         batchName: [{ required: true, message: "请输入", trigger: "blur" }]
       },
-      showHospitalDialog: false
+      showHospitalDialog: false,
+      pickerOptions: {
+        disabledDate(time) {
+          const date = new Date();
+          const oneday = date.getTime();
+          return time.getTime() < new Date().getTime() - 86400000;
+        },
+        selectableRange: (() => {
+          let data = new Date();
+          let hour = data.getHours();
+          let minute = data.getMinutes();
+          let second = data.getSeconds();
+          return [`${hour}:${minute}:${second} - 23:59:59`];
+        })()
+      }
     };
   },
   methods: {
@@ -130,7 +146,7 @@ export default {
                 );
                 this.$emit("ok");
               } else {
-                this.$message.error("操作失败");
+                this.$message.error(data.message);
                 this.$emit("close");
               }
             });
@@ -169,7 +185,7 @@ export default {
                 );
                 this.$emit("close");
               } else {
-                this.$message.error("操作失败");
+                this.$message.error(data.message);
                 this.$emit("close");
               }
             });

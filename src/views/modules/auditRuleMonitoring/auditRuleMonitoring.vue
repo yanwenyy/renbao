@@ -106,12 +106,12 @@ export default {
             },
             tableData: [],
             tablePositionKey: [
-                {dataname:'ruleName', label:'审核规则名称' , issortable:false , type:''},
-                {dataname:'dealRuleType', label:'审核规则类别' , issortable:false , type:''},
-                {dataname:'expectedBeginTime', label:'预计开始时间' , issortable:false , type:''},
-                {dataname:'actualBeginTime', label:'实际开始时间' , issortable:false , type:''},
-                {dataname:'expectedEndTime', label:'预计结束时间' , issortable:false , type:''},
-                {dataname:'actualEndTime', label:'实际结束时间' , issortable:false , type:''},
+                {dataname:'ruleName', label:'审核规则名称' , issortable:false , type:'', minWidth: 120},
+                {dataname:'dealRuleType', label:'审核规则类别' , issortable:false , type:'', minWidth: 110},
+                {dataname:'expectedBeginTime', label:'预计开始时间' , issortable:false , type:'', minWidth: 160},
+                {dataname:'actualBeginTime', label:'实际开始时间' , issortable:false , type:'', minWidth: 160},
+                {dataname:'expectedEndTime', label:'预计结束时间' , issortable:false , type:'', minWidth: 160},
+                {dataname:'actualEndTime', label:'实际结束时间' , issortable:false , type:'', minWidth: 160},
                 {dataname:'runStatusName', label:'运行状态' , issortable:false , type:''},
                 {dataname:'option', label:'操作' , issortable:false , type:'option'},
             ],
@@ -284,7 +284,7 @@ export default {
         min-width: 300px;
         height: 75vh;
         /deep/ .el-tree {
-            min-height: 70vh;
+            min-height: 60vh;
         }
         /deep/ .el-tree-node__children .custom-tree-node{
             text-decoration: underline;

@@ -1,7 +1,7 @@
 <template>
     <div class='collection'>
-        <el-form :inline="true" :model="dataForm">
-            <el-form-item label="文件名：">
+        <el-form :inline="true" :model="dataForm" ref="dataForm">
+            <el-form-item label="文件名：" v-if="activeName == 'audit'">
                 <el-input v-model="dataForm.fileName" placeholder="请输入文件名"></el-input>
             </el-form-item>
             <el-form-item label="文件路径：">
@@ -12,19 +12,19 @@
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="开始时间：">
+            <el-form-item label="开始时间:">
                 <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTime" style="width: 100%;"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeBegin" style="width: 100%;"></el-date-picker>
                 </el-col>
                 <el-col class="line" :span="2">-</el-col>
                 <el-col :span="11">
-                    <el-time-picker placeholder="选择日期" v-model="dataForm.endTime" style="width: 100%;"></el-time-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeEnd" style="width: 100%;"></el-date-picker>
                 </el-col>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="getSearch()">查询</el-button>
                 <el-button @click="getReset('dataForm')">重置</el-button>
-                <el-button type="warning" @click="getStopCollection()">停止采集</el-button>
+                <!-- <el-button type="warning" @click="getStopCollection()">停止采集</el-button> -->
             </el-form-item>
         </el-form>
         <!-- 列表 -->
@@ -32,10 +32,11 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="600" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="60vh" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
+                    <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
                     <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
                     <el-table-column label="数据类型" align="center" prop="dataType">
                         <template slot-scope="scope">
@@ -44,15 +45,12 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
-                    <el-table-column label="开始时间" align="center" prop="startTime">
-                        <template slot-scope="scope">
-                        {{scope.row.startTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}
-                        </template>
+                    <el-table-column label="开始时间" align="center">
+                        <template slot-scope="scope">{{scope.row.startTime | datetimeformat}}</template>
                     </el-table-column>
-                    <el-table-column label="结束时间" align="center" prop="endTime"></el-table-column>
-                     <!-- <template slot-scope="scope">
-                        {{scope.row.endTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}
-                        </template> -->
+                    <el-table-column label="结束时间" align="center">
+                        <template slot-scope="scope">{{scope.row.endTime | datetimeformat}}</template>
+                    </el-table-column>
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
                             <div class="tac" v-if="scope.row.collectStatus=='0'">待采集</div>
@@ -89,11 +87,11 @@
             </el-tab-pane>
          <!--医院数据-->
         <el-tab-pane label="医院数据" name="pass">
-            <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital'></HospitalList></el-tab-pane>
-        <!--医院基本信息-->
-        <el-tab-pane label="医院基本信息" name="noPass">
-            <InformationList v-if="activeName == 'noPass'" @satDatalist='satDatalist' ref="noPass" ></InformationList>
-        </el-tab-pane>
+            <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital' @dataList ="dataForm"></HospitalList></el-tab-pane>
+        <!--医院基本信息 暂时注释-->
+        <!-- <el-tab-pane label="医院基本信息" name="noPass">
+            <InformationList v-if="activeName == 'noPass'" @satDatalist='satDatalist' ref="noPass" @dataList ="dataForm"></InformationList>
+        </el-tab-pane> -->
         </el-tabs>
          <!-- 查看弹框-->
         <el-dialog title='查看日志' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="editShowVisible">
@@ -123,21 +121,21 @@ export default {
                 fileName:'',
                 filePath:'',
                 collectStatus:'',
-                startTime:'',
-                endTime:''
+                startTimeEnd:'',
+                startTimeBegin:''
             },
             options:[{
+                value:'0',
+                label:'待采集'
+            },{
                 value:'1',
-                label:'已完成'
+                label:'进行中'
             },{
                 value:'2',
-                label:'进行中'
+                label:'已完成'
             },{
                 value:'3',
                 label:'失败'
-            },{
-                value:'4',
-                label:'待采集'
             }],
             activeName:'audit',
             tableList:[],//医保数据 医院基本信息
@@ -152,13 +150,15 @@ export default {
             },
             collectPlanMonitorId:'',
             dataSelectTable:[], //选中数据
-            dataLoading:false
+            dataLoading:false,
+            dataList:[],
         }
     },
     activated(){
         this.getInitList()
     },
     methods:{
+
         satDatalist(data){
             this.dataSelectTable = data
         },
@@ -170,8 +170,15 @@ export default {
         
         //tab事件
         handleClick(tab,event){
-            this.activeName = tab.name;
-            this.getInitList()
+            if(tab.name == 'audit'){
+                this.activeName = tab.name;
+                this.getInitList()
+            }else if(tab.name == 'pass'){
+                this.activeName = tab.name;
+                this.dataList = this.dataForm
+            }
+          
+
         },
         //初始化数据
         getInitList(){
@@ -184,9 +191,9 @@ export default {
                     pageNo:this.apComServerData.pageIndex,
                     fileName:this.dataForm.fileName || '',
                     filePath:this.dataForm.filePath || '',
-                    // collectStatus:this.dataForm.collectStatus || '',
-                    // startTime:this.dataForm.startTime || '',
-                    // endTime:this.dataForm.endTime || ''
+                    collectStatus:this.dataForm.collectStatus || '',
+                    startTimeBegin:this.dataForm.startTimeBegin || '',
+                    startTimeEnd:this.dataForm.startTimeEnd || ''
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
@@ -217,12 +224,6 @@ export default {
             this.editShowVisible = true
             this.collectPlanMonitorId = id
         },
-
-
-        //进度条
-        format(percentage) {
-           return percentage === 100 ? '满' : `${percentage}%`;
-        },
         EditSucceed(){this.closeEditDrawer()},
         closeEditDrawer(){ this.editShowVisible = false},
         // 页数
@@ -248,7 +249,15 @@ export default {
             this.$refs[formName].resetFields()
         },
         getSearch(){
-            this.getInitList()
+            if(this.activeName === 'audit'){
+                this.getInitList()
+            }else if(this.activeName === 'pass'){
+                this.dataList = this.dataForm
+                this.$refs.pass.getInitList()
+              
+            }
+           
+            // this.dataListLoading = true;
             // this.$http({
             //     url:this.$http.adornUrl('/collectPlanMonitor/selectPageList'),
             //     method: 'get',

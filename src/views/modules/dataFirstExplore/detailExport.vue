@@ -15,6 +15,7 @@
               :props="layoutTreeProps"
             >
               <span
+                :title="node.label"
                 class="custom-tree-node"
                 slot-scope="{ node, data }"
                 @click="nodeClick(node, data)"
@@ -278,9 +279,11 @@ export default {
       }
     };
   },
+  activated() {
+    this.initTree();
+  },
   created() {
     this.initData();
-    this.initTree();
     this.initHospital();
   },
   methods: {
