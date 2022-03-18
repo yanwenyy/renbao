@@ -1,5 +1,5 @@
 <template>
-  <div class="threeData" style="height:600px">
+  <div class="threeData">
     <!-- 列表 -->
     <div class="listDisplay" style="height:500px;overflow-y:auto;">
       <div class="f_right">
@@ -9,18 +9,18 @@
       <!-- 复杂条件查询 -->
       <div @click="handleChange" style="cursor:pointer">
         查询条件<i
-          v-show="!show"
+          v-if="!show"
           class="el-icon-arrow-down"
           style="padding-left:5px"
         ></i
-        ><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
+        ><i v-if="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
       </div>
       <transition name="sub-comments">
         <myquerybuilder
           ref="myquerybuilder"
           :rules="queryRules"
           class="mask"
-          v-show="show"
+          v-if="show"
           v-model="output"
           :columns="selectColumns"
           :data="data"
@@ -93,10 +93,14 @@ export default {
       data: [],
       selectColumns: {},
       sqlData: "",
-      columnType: ""
+      columnType: "",
+      dataForm1: {
+        resultTableName: ""
+      }
     };
   },
-  created() {
+  created() {},
+  mounted() {
     this.initList();
   },
   methods: {
@@ -122,7 +126,7 @@ export default {
               columnType: typeof i
             });
           }); */
-          this.tableColumns = data.result.data.columns
+          this.tableColumns = data.result.data.columns;
           this.tableList = data.result.data.result;
           this.selectColumns = data.result.data.columnInfo;
           this.apComServerData.total = data.result.total;
@@ -157,29 +161,50 @@ export default {
     },
     //导出
     reportList() {
-      this.$http({
-        url: this.$http.adornUrl("/threeCatalog/excelDataExport"),
-        method: "get",
-        responseType: "blob", //解决乱码问题
-        params: this.$http.adornParams({
-          catalogType: this.ruleForm.catalogType
+      this.dataForm1.resultTableName = this.resultTableName;
+      this.$http
+        .post(this.$http.adornUrl("ruleResult/viewExport"), this.dataForm1, {
+          responseType: "blob",
+          headers: {
+            "Content-Type": "application/json; application/octet-stream"
+          }
         })
-      }).then(({ data }) => {
-        const blob = new Blob([data]);
-        let fileName = this.fileName + ".xls";
-        if ("download" in document.createElement("a")) {
-          const elink = document.createElement("a");
-          elink.download = fileName;
-          elink.style.display = "none";
-          elink.href = URL.createObjectURL(blob); // 创建下载的链接
-          document.body.appendChild(elink);
-          elink.click(); // 点击下载
-          URL.revokeObjectURL(elink.href); // 释放掉blob对象
-          document.body.removeChild(elink); // 下载完成移除元素
-        } else {
-          navigator.msSaveBlob(blob, fileName);
+        .then(response => {
+          this.exportExcel(response, "数据导出");
+          // this.loading = false;
+          this.$message({
+            // message: data.message,
+            message: "导出成功",
+            type: "success",
+            duration: 1500
+          });
+          this.detailExportDialog = false;
+        });
+    },
+    exportExcel(response, fileName) {
+      let data = response.data;
+      let fileReader = new FileReader();
+      fileReader.onload = function() {
+        try {
+          let jsonData = JSON.parse(this.result); // 说明是普通对象数据，后台转换失败
+          if (jsonData.code) {
+            that.$message.error(jsonData.message);
+          }
+        } catch (err) {
+          // 解析成对象失败，说明是正常的文件流
+          const blob = new Blob([response.data], { type: "application/x-xls" });
+          const filename = response.headers["content-disposition"];
+          const downloadElement = document.createElement("a");
+          const href = window.URL.createObjectURL(blob); //创建下载的链接
+          downloadElement.href = href;
+          [downloadElement.download] = [fileName + ".xls"];
+          document.body.appendChild(downloadElement);
+          downloadElement.click(); //点击下载
+          document.body.removeChild(downloadElement); //下载完成移除元素
+          window.URL.revokeObjectURL(href); //释放blob对
         }
-      });
+      };
+      fileReader.readAsText(data);
     },
     //复杂查询展开事件
     handleChange() {

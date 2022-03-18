@@ -68,10 +68,15 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="onQuery">查询</el-button>
-                <el-button @click="onReset">重置</el-button>
-              </el-form-item>
+              <el-button type="primary" @click="onQuery">查询</el-button>
+              <el-button @click="onReset">重置</el-button>
+              <el-button
+                style="float:right"
+                @click="deleteData"
+                type="danger"
+                :disabled="this.multipleTable.length <= 0"
+                >删除</el-button
+              >
             </el-form>
           </div>
 
@@ -85,7 +90,11 @@
               style="width: 100%"
               @selection-change="handleSelectionChange"
             >
-              <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
+              <el-table-column
+                type="selection"
+                :reserve-selection="true"
+                width="55"
+              ></el-table-column>
               <el-table-column
                 prop="ruleName"
                 label="规则名称"
@@ -298,6 +307,39 @@ export default {
           this.treeLoading = false;
         });
     },
+    //删除
+    deleteData() {
+      var uuids = [];
+      for (var i = 0; i < this.multipleTable.length; i++) {
+        uuids.push(this.multipleTable[i].resultId);
+      }
+      this.$confirm(`确定进行删除操作?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/ruleResult/deleteByIds"),
+            method: "delete",
+            data: this.$http.adornData(uuids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.initData();
+                }
+              });
+            } else {
+              this.$message.error("操作失败");
+            }
+          });
+        })
+        .catch(() => {});
+    },
     //左点右显
     nodeClick(node, data) {
       this.batchId = data.batchId;
@@ -322,10 +364,9 @@ export default {
       this.Pager.pageIndex = val;
       this.getTableData();
     },
-    //分页
+    //多选
     handleSelectionChange(val) {
       this.multipleTable = val;
-      this.getTableData();
     },
     //分页
     sizeChangeHandle(val) {
@@ -363,6 +404,12 @@ export default {
       text-decoration: underline;
       color: #0000ff;
       width: 100%;
+      padding: 0 5px;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      -o-text-overflow: ellipsis;
     }
   }
   .auditRuleMonitoring-right {

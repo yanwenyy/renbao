@@ -1,13 +1,14 @@
 <template>
     <div class="box">
         <div class="auditRuleMonitoring-left">
-            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
+            <!-- <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
                     <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
                         <span :title="node.label">
                             {{node.label}}
                         </span>
                     </span>
-            </el-tree>
+            </el-tree> -->
+            <batch-list :batchLoading="batchLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList"></batch-list>
         </div>
         <div class="auditRuleMonitoring-right">
             <div class="search-box">
@@ -34,6 +35,9 @@
             </div>
           
             <div class="table-box">
+                <div class="option-box">
+                    <el-button size="small" type="danger" @click="deleteFn">删除</el-button>
+                </div>
                 <el-table
                     v-loading="tableLoading"
                     ref="multipleTable"
@@ -87,10 +91,11 @@
 </template>
 <script>
 import resultView from './result-view.vue'
+import batchList from '../../common/batch-list.vue'
 export default {
     data () {
         return {
-            treeLoading: false,
+            batchLoading: false,
             tableLoading: false,
             batchTreeList: [ 
                 {
@@ -204,23 +209,53 @@ export default {
             })
         },
         getbatchList () {
-            this.treeLoading = true;
+            this.batchLoading = true;
             this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl('/batch/selectList'),
                 method: 'get',
                 params:  this.$http.adornParams({batchType: 2}, false)
             }).then(({data}) => {
-                this.treeLoading = false;
+                this.batchLoading = false;
                 if (data.code == 200) {
                     this.batchTreeList[0].children = data.result
                 }
             }).catch(() => {
-                this.treeLoading = false;
+                this.batchLoading = false;
             })
         },
+        // 删除
+        deleteFn () {
+            if( this.multipleTable.length === 0 ) return this.$message({message: '请选择至少一条数据',type: 'warning'});
+            var deleteList = []
+            this.multipleTable.forEach( item =>{
+                deleteList.push( item.resultId )
+            })
+            this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                this.$http({
+                    isLoading:false,
+                    url: this.$http.adornUrl('ruleResult/deleteByIds'),
+                    method: 'DELETE',
+                    data: this.$http.adornData( deleteList, false)
+                }).then(({data}) => {
+                    if (data && data.code === 200) {
+                    this.$message({message: '删除成功',type: 'success',})
+                    this.Pager.pageIndex = 1;
+                    this.Pager.pageSize = 10;
+                    this.getTableData();
+                    this.setTableChecked();
+                    } else {
+                    this.$message.error(data.msg)
+                    }
+            })
+            }).catch(() => {})
+        },
 
-        nodeClick (node,data) {
+        getbatchData (data,node) {
             this.batchItem = data;
             this.getTableData()
         },
@@ -247,23 +282,25 @@ export default {
             this.Pager.pageIndex = val;
             this.getTableData();
         },
-        handleSelectionChange (val) {
-            this.multipleTable = val;
-            this.getTableData();
-
-        },
         sizeChangeHandle (val) {
             this.Pager.pageSize = val
+            this.getTableData();
+        },
+        handleSelectionChange (val) {
+            this.multipleTable = val;
         },
         // 列表查看
         resultViewClick (data) {
             this.$refs.resultView.showDialog(data)
-
-        }
+        },
+        setTableChecked () {
+            this.multipleTable = [];
+            this.$refs.multipleTable.clearSelection(this.multipleTable);
+        },
     },
     components: {
-        resultView
-      
+        resultView,
+        batchList
     }
 }
 
@@ -279,27 +316,27 @@ export default {
         // min-height: 100vh;
         // min-height: calc(100vh - 165px);
         // margin-right: 20px;
-        border: 1px solid #ddd;
+        // border: 1px solid #ddd;
         overflow: auto;
         min-width: 300px;
         height: 75vh;
-        /deep/ .el-tree {
-            min-height: 60vh;
-        }
-        /deep/ .el-tree-node__children .custom-tree-node{
-            text-decoration: underline;
-            color: #0000FF;
-            width: 100%;
-            padding: 0 5px;
-            display: inline-block;
-            overflow:hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            -o-text-overflow:ellipsis;
-        }
-        /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-            background-color: #e3edfa;
-        }
+        // /deep/ .el-tree {
+        //     min-height: 60vh;
+        // }
+        // /deep/ .el-tree-node__children .custom-tree-node{
+        //     text-decoration: underline;
+        //     color: #0000FF;
+        //     width: 100%;
+        //     padding: 0 5px;
+        //     display: inline-block;
+        //     overflow:hidden;
+        //     white-space: nowrap;
+        //     text-overflow: ellipsis;
+        //     -o-text-overflow:ellipsis;
+        // }
+        // /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        //     background-color: #e3edfa;
+        // }
     }
     .auditRuleMonitoring-right {
         flex: 1;
@@ -307,6 +344,7 @@ export default {
         height: 75vh;
         overflow: auto;
         // padding-left: 20px;
+
         // 
         .search-box {
             display: flex;
@@ -318,10 +356,14 @@ export default {
         }
         .table-box {
             margin-top: 10px;
+            padding-left: 20px;
             // padding-left: 20px;
             .result-view-text {
                 color: #0CBDE5;
                 cursor: pointer;
+            }
+            .option-box {
+                margin-bottom: 10px;
             }
         }
       

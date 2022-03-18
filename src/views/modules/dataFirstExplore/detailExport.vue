@@ -75,7 +75,7 @@
                 >条</span
               > -->
               <div style="float:right;margin-bottom:10px">
-                <el-button @click="detailExport" type="warning"
+                <el-button @click="detailExport()" type="warning"
                   >结果明细导出</el-button
                 >
                 <el-button
@@ -164,6 +164,7 @@
             :close-on-click-modal="false"
             :modal-append-to-body="false"
             width="30%"
+            height="60%"
             :close-on-press-escape="false"
             v-if="detailExportDialog"
           >
@@ -230,7 +231,7 @@ export default {
       },
       //必填校验
       rules: {
-        dataForm1: [{ required: true, message: "请选择", trigger: "blur" }]
+        hospId: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       batchTreeList: [
         {
@@ -393,13 +394,6 @@ export default {
     },
     //删除
     deleteData() {
-      /* var uuids = "";
-      for (var i = 0; i < this.multipleSelection.length; i++) {
-        uuids += this.multipleSelection[i].resultId + ",";
-      }
-      if (uuids.length > 0) {
-        var uuids = uuids.substring(0, uuids.length - 1);
-      } */
       var uuids = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         uuids.push(this.multipleSelection[i].resultId);
@@ -577,6 +571,12 @@ export default {
       text-decoration: underline;
       color: #0000ff;
       width: 100%;
+      padding: 0 5px;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      -o-text-overflow: ellipsis;
     }
   }
   .auditRuleMonitoring-right {

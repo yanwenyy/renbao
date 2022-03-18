@@ -294,8 +294,8 @@ export default {
             })
         },
         setTableChecked () {
-            this.$refs.multipleTable.clearSelection(this.multipleTable);
             this.multipleTable = [];
+            this.$refs.multipleTable.clearSelection(this.multipleTable);
         },
         // 关闭详细弹窗
         closeDetail() {
