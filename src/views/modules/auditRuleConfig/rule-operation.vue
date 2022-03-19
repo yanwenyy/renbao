@@ -185,8 +185,8 @@ export default {
             let hospitalName = [];
             let hospitalCode = [];
             checkHospitalList.map(i => {
-                hospitalName.push(i['医院名称'])
-                hospitalCode.push(i['医院编码'])
+                hospitalName.push(i['医疗机构名称'])
+                hospitalCode.push(i['医疗机构编码'])
             })
             this.ruleOperationForm.hospital = hospitalName.join(',');
             this.ruleOperationForm.hospitalName = hospitalName.join(',');
