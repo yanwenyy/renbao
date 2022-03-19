@@ -25,7 +25,7 @@
                 </span>
               </span>
             </el-tree> -->
-            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="initTree" ></batch-list>
+            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" @getbatchData="getbatchData" v-on:refreshBitchData="initTree" :isParent="false"></batch-list>
           </div>
         </el-card>
       </el-col>
@@ -176,7 +176,7 @@
               label-width="120px"
               :rules="rules"
             >
-              <el-form-item prop="hospital" label="请选择医院：">
+              <el-form-item prop="hospId" label="请选择医院：">
                 <el-select
                   v-model="dataForm1.hospId"
                   filterable
@@ -187,9 +187,9 @@
                 >
                   <el-option
                     v-for="item in hospitals"
-                    :key="item['医院编码']"
-                    :label="item['医院名称']"
-                    :value="item['医院编码']"
+                    :key="item['医疗机构编码']"
+                    :label="item['医疗机构名称']"
+                    :value="item['医疗机构编码']"
                   >
                   </el-option>
                 </el-select>
@@ -358,7 +358,7 @@ export default {
       })
         .then(({ data }) => {
           if (data.code == 200) {
-            this.hospitals = data.result.records;
+            this.hospitals = data.result.result;
           }
         })
         .catch(() => {});
@@ -506,18 +506,18 @@ export default {
     },
     //选择数据
     checkChange(val) {
-      this.exportForm.hospName = [];
+      this.dataForm1.hospName = [];
       // 判断是否为全选状态
-      if (val.length == this.hospitalTableData.length) {
+      if (val.length == this.hospitals.length) {
         this.checked = true;
       } else {
         this.checked = false;
       }
       for (let i = 0; i <= val.length - 1; i++) {
-        this.hospitalTableData.find(item => {
+        this.hospitals.find(item => {
           //这里的options就是数据源
-          if (item["医院编码"] == val[i]) {
-            this.exportForm.hospName.push(item["医院名称"]);
+          if (item["医疗机构编码"] == val[i]) {
+            this.dataForm1.hospName.push(item["医疗机构名称"]);
           }
         });
       }
@@ -532,16 +532,16 @@ export default {
       } else {
         this.dataForm1.hospital = [];
       } */
-      this.exportForm.hospId = [];
-      this.exportForm.hospName = [];
+      // this.dataForm1.hospId = [];
+      // this.dataForm1.hospName = [];
       if (this.checked) {
-        this.hospitalTableData.map(i => {
-          this.exportForm.hospId.push(i["医院编码"]);
-          this.exportForm.hospName.push(i["医院名称"]);
+        this.hospitals.map(i => {
+          this.dataForm1.hospId.push(i["医疗机构编码"]);
+          this.dataForm1.hospName.push(i["医疗机构名称"]);
         });
       } else {
-        this.exportForm.hospId = [];
-        this.exportForm.hospName = [];
+        this.dataForm1.hospId = [];
+        this.dataForm1.hospName = [];
       }
     },
     //重置已选

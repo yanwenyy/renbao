@@ -15,9 +15,9 @@
                             <el-checkbox  v-model="checked" @change="selectAll" style="padding-left: 20px;">全选</el-checkbox>
                             <el-option
                                 v-for="item in hospitalTableData"
-                                :key="item['医院编码']"
-                                :label="item['医院名称']"
-                                :value="item['医院编码']"
+                                :key="item['医疗机构编码']"
+                                :label="item['医疗机构名称']"
+                                :value="item['医疗机构编码']"
                                >
                             </el-option>
                         </el-select>
@@ -85,8 +85,8 @@ export default {
             }
             for(let i=0;i<=val.length-1;i++){
                 this.hospitalTableData.find((item)=>{ //这里的options就是数据源
-                    if(item['医院编码'] == val[i]){
-                        this.exportForm.hospName.push(item['医院名称'])
+                    if(item['医疗机构编码'] == val[i]){
+                        this.exportForm.hospName.push(item['医疗机构名称'])
                     }
                 });
             }
@@ -97,8 +97,8 @@ export default {
             this.exportForm.hospName = [];
             if (this.checked) {
                 this.hospitalTableData.map(i => {
-                    this.exportForm.hospId.push(i['医院编码'])
-                    this.exportForm.hospName.push(i['医院名称'])
+                    this.exportForm.hospId.push(i['医疗机构编码'])
+                    this.exportForm.hospName.push(i['医疗机构名称'])
                 })
             } else {
                 this.exportForm.hospId = [];
@@ -114,7 +114,8 @@ export default {
                 params:  this.$http.adornParams(this.searchHospitalForm, false)
             }).then(({data}) => {
                 if (data.code == 200) {
-                    this.hospitalTableData = data.result.records;
+                    console.log(data, 'data')
+                    this.hospitalTableData = data.result.result;
                 }
             }).catch(() => {
                 // this.tableLoading = false

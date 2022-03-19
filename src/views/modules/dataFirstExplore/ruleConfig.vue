@@ -232,7 +232,7 @@ export default {
     // AddOrEdit,
     runNow,
     ruleTree,
-    addOrUpdate
+    addOrUpdate,
   },
   data() {
     return {
@@ -300,13 +300,13 @@ export default {
         height: ""
       },
       // 选中的规则节点
-      ruleCheckData: {}, 
+      ruleCheckData: {},
     };
   },
   created() {
     //高度自适应
-    window.addEventListener("resize", this.getHeight);
-    this.getHeight();
+    // window.addEventListener("resize", this.getHeight);
+    // this.getHeight();
     //获取列表
     // this.initData();
   },
@@ -315,13 +315,13 @@ export default {
     initData() {
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
-          this.$message({message: '请选择对应的规则分类',type: 'warning'});
-          return;
+        this.$message({ message: "请选择对应的规则分类", type: "warning" });
+        return;
       }
       this.loading = true;
       // 如何改规则节点有子节点的话folderId为空
       if (this.ruleCheckData.children) {
-          this.folderId = '';
+        this.folderId = "";
       }
       this.$http({
         url: this.$http.adornUrl("/rule/selectPage"),
@@ -358,16 +358,17 @@ export default {
     },
     //新增弹框
     addData() {
-
-     
-      this.$refs.addOrUpdate.init('', this.ruleCheckData);
+      this.$refs.addOrUpdate.init("", this.ruleCheckData);
       this.ruleId = "";
       this.folderId = "";
       this.ruleData = this.$refs.ruleTree.treeData;
     },
     //修改弹框
     editData() {
-      this.$refs.addOrUpdate.init(this.multipleSelection[0].ruleId, this.ruleCheckData);
+      this.$refs.addOrUpdate.init(
+        this.multipleSelection[0].ruleId,
+        this.ruleCheckData
+      );
       console.log(this.multipleSelection[0].ruleId);
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
@@ -510,10 +511,6 @@ export default {
       this.$refs.tableData.clearSelection(this.multipleTable);
       this.multipleSelection = [];
     },
-    //高度自适应
-    getHeight() {
-      this.conheight.height = window.innerHeight - 170 + "px";
-    }
   }
 };
 </script>

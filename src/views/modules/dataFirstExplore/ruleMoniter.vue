@@ -24,7 +24,7 @@
                 </span>
               </span>
             </el-tree> -->
-            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList" ></batch-list>
+            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" @getbatchData="getbatchData" v-on:refreshBitchData="getbatchList" :isParent="false" ></batch-list>
           </div>
         </el-card>
       </el-col>
@@ -82,14 +82,6 @@
           </div>
 
           <div class="table-box">
-           
-            <div style="float:right;margin-bottom:10px">
-              <el-button
-                @click="deleteData"
-                type="danger"
-                :disabled="this.multipleTable.length <= 0"
-                >删除</el-button>
-            </div>
             <el-table
               v-loading="tableLoading"
               ref="multipleTable"
@@ -190,7 +182,7 @@
 </template>
 <script>
 import detail from "./component/ruleMoniter-detail.vue";
-import batchList from '../../common/batch-list.vue'
+import batchList from "../../common/batch-list.vue";
 export default {
   components: {
     detail,
@@ -394,8 +386,8 @@ export default {
     closeDetail() {
       this.showDetailDialog = false;
     },
-    deleteData () {
-      console.log('删除')
+    deleteData() {
+      console.log("删除");
       var uuids = [];
       for (var i = 0; i < this.multipleTable.length; i++) {
         uuids.push(this.multipleTable[i].resultId);
@@ -444,7 +436,6 @@ export default {
     // border: 1px solid #ddd;
     overflow: auto;
     min-width: 300px;
-    
   }
   .auditRuleMonitoring-right {
     flex: 1;

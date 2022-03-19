@@ -80,12 +80,30 @@
             </el-pagination>
         </div>
        <result-detail-out-dialog ref="resultDetailOutDialog"></result-detail-out-dialog>
-        <view-details ref="viewDetails"></view-details>
+        <!-- <view-details ref="viewDetails"></view-details> -->
+          <!--查看详细弹窗 -->
+        <el-dialog
+            :visible.sync="showDetailDialog"
+            title="查看结果明细"
+            :close-on-click-modal="false"
+            :modal-append-to-body="false"
+            width="90%"
+            :close-on-press-escape="false"
+          >
+            <detail
+              @close="closeDetail"
+              @ok="editSucceed"
+              :info="info"
+              :resultTableName="resultTableName"
+              v-if="showDetailDialog"
+            ></detail>
+        </el-dialog>
     </div>
 </template>
 <script>
 import resultDetailOutDialog from './resultDetailOutDialog.vue'
-import viewDetails from './viewDetails.vue'
+import detail from "../dataFirstExplore/component/detailExport-detail.vue";
+// import viewDetails from './viewDetails.vue'
 import batchList from '../../common/batch-list.vue'
 export default {
     data () {
@@ -124,6 +142,10 @@ export default {
                 },
             },
             batchItem: {},
+            // 查看明细相关
+            info: "",
+            resultTableName: '',
+            showDetailDialog: false
         }
     },
     activated () {
@@ -226,7 +248,19 @@ export default {
             // this.resultTableName = data.resultTableName
             // console.log(data.resultTableName, 'data.resultTableNamedata.resultTableName')
             // this.showDetailDialog = true;
-            this.$refs.viewDetails.showDialog(data);
+            // this.$refs.viewDetails.showDialog(data);
+
+            this.info = data.resultId;
+            this.resultTableName = data.resultTableName;
+            this.showDetailDialog = true;
+        },
+        // 关闭详细弹窗
+        closeDetail() {
+            this.showDetailDialog = false;
+        },
+        // 关闭弹窗确认
+        editSucceed() {
+            this.closeDetail();
         },
         resultDetailsExportClick () {
             if( !this.batchItem.batchId ) return this.$message({message: '请选择对应的批次',type: 'warning'});
@@ -282,19 +316,12 @@ export default {
             this.multipleTable = [];
             this.$refs.multipleTable.clearSelection(this.multipleTable);
         },
-        // 关闭详细弹窗
-        closeDetail() {
-            this.showDetailDialog = false;
-        },
-        // 关闭弹窗确认
-        editSucceed() {
-            this.closeDetail();
-        },
     },
     components: {
         resultDetailOutDialog,
-        viewDetails,
-        batchList
+        // viewDetails,
+        batchList,
+        detail
     }
    
 }

@@ -146,7 +146,8 @@ export default {
             this.reset();
         },
         onSubmit (formName) {
-            this.ruleOperationForm.batchType= 2
+            this.ruleOperationForm.batchType= 2;
+            this.ruleOperationForm.projectId= this.projectId;
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true
@@ -184,8 +185,8 @@ export default {
             let hospitalName = [];
             let hospitalCode = [];
             checkHospitalList.map(i => {
-                hospitalName.push(i['医院名称'])
-                hospitalCode.push(i['医院编码'])
+                hospitalName.push(i['医疗机构名称'])
+                hospitalCode.push(i['医疗机构编码'])
             })
             this.ruleOperationForm.hospital = hospitalName.join(',');
             this.ruleOperationForm.hospitalName = hospitalName.join(',');
@@ -213,7 +214,27 @@ export default {
                this.reset()
             }
         },
-    }
+    },
+    computed: {
+      projectId: {
+        get () {
+          if(this.$store.state.common.projectId){
+            return this.$store.state.common.projectId
+          }else{
+            this.$http({
+              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+              method: "get",
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                return data.result.projectId;
+              }
+            });
+          }
+
+        }
+      },
+    },
 }
 </script>
 

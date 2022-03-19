@@ -5,10 +5,10 @@
             title="选择医院"
             :visible.sync="innerVisible"
             :close-on-click-modal="false"
-            width="900px"
+            width="1200px"
             :close-on-press-escape="false"
             :before-close="handleClose">
-            <div class="hospital-selection">
+            <!-- <div class="hospital-selection">
                 <div class="seachbox">
                     <el-form ref="searchHospitalForm" :model="searchHospitalForm" :inline="true">
                         <el-form-item label="医院名称：">
@@ -28,7 +28,6 @@
                     </el-form>
                 </div>
                 <div class="hospital-selection-table">
-                    <!-- 默认全选 -->
                     <el-table
                         v-loading="tableLoading"
                         ref="hospitalSelectionTable"
@@ -50,7 +49,8 @@
                         </el-table-column>
                     </el-table>
                 </div>
-            </div>
+            </div> -->
+            <basicInformation  ref="hospital" ></basicInformation>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
                 <el-button @click="cancel" size="small">取 消</el-button>
@@ -59,6 +59,7 @@
     </div>
 </template>
 <script>
+import basicInformation from "@/views/modules/dataAcquisition/basicInformation.vue";
 export default {
     props: [
         'getData'
@@ -128,6 +129,9 @@ export default {
         },
         onSubmit (formName) {
             this.innerVisible = false;
+            // console.log(this.$refs.hospital.multipleSelection, '查看选中的列表')
+            // debugger
+            this.checkHospitalList = this.$refs.hospital.multipleSelection
             this.$parent.showDialog(this.checkRuleData,this.type, this.checkHospitalList, this.ruleOperationForm, 'hospitalBack');
             this.$parent.setHospital(this.checkHospitalList); // 回显医院名称
         },
@@ -146,6 +150,9 @@ export default {
         }
     },
     watch : {
+    },
+    components: {
+        basicInformation
     }
 }
 </script>
