@@ -92,9 +92,14 @@ export default {
         //默认打开页面
         showDialog(checkRuleData,type,ruleOperationForm) {
             this.innerVisible = true;
+            this.$nextTick(() => {
+                if (this.$refs.hospital) {
+                    this.$refs.hospital.reSetHospital();
+                } 
+            })
             this.type = type;
             this.checkRuleData = checkRuleData;
-            this.getHospital();
+            // this.getHospital();
             this.ruleOperationForm = ruleOperationForm;
         },
         mounted () {

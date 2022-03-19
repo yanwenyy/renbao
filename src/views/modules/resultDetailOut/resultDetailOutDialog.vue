@@ -114,7 +114,6 @@ export default {
                 params:  this.$http.adornParams(this.searchHospitalForm, false)
             }).then(({data}) => {
                 if (data.code == 200) {
-                    console.log(data, 'data')
                     this.hospitalTableData = data.result.result;
                 }
             }).catch(() => {
@@ -123,7 +122,6 @@ export default {
         },
         // 导出
         exportClick (formName) {
-            console.log(this.exportForm, 'exportForm')
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.loading = true

@@ -1,11 +1,11 @@
 <template>
     <div class="batch-list-box">
-        <!-- <el-input
+        <el-input
             class="filter-text"
             placeholder="输入关键字进行过滤"
             v-model="filterText">
-        </el-input> -->
-         <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="batchLoading" node-key="id" ref="batchList" :props="layoutTreeProps" @node-click="nodeClick">
+        </el-input>
+         <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="batchLoading" node-key="id" ref="batchList" :props="layoutTreeProps" @node-click="nodeClick" :filter-node-method="filterNode">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span :title="node.label" class="batch-label">
                         {{node.label}}
@@ -54,7 +54,6 @@ export default {
         }
     },
     mounted () {
-        // this.getRuleFolder();
     },
     activated () {
         // this.getRuleFolder();
@@ -99,12 +98,19 @@ export default {
 
 
 
+        },
+        filterNode(value, data) {
+            if (!value) return true
+            if (data.batchName) {
+                return data.batchName.indexOf(value) !== -1;
+            } else {
+                return data.label.indexOf(value) !== -1;
+            }  
         }
     },
     watch: {
         filterText(val) {
-            // console.log(val, 'valvalval')
-            // this.$refs.batchList.filter(val.trim());
+            this.$refs.batchList.filter(val.trim());
         },
     }
 
