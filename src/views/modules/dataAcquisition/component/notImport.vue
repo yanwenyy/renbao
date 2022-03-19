@@ -48,7 +48,7 @@ export default {
                 })
             }).then(({ data }) => {
                 if (data && data.code === 200) {
-                    this.tableList = data.result.result
+                    this.tableList = data.result.records
                     this.columnList = data.result.columnInfo.columnList
                     this.apComServerData.total = data.result.pagination.dataCount
                 }else{

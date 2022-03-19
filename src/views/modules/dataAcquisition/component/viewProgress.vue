@@ -38,9 +38,15 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class='pager'>
-            <el-pagination small layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total"></el-pagination>
-        </div>
+         <el-pagination 
+                :page-size="apComServerData.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="apComServerData.total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="apComServerData.pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                ></el-pagination>
         <div class="itemBtn">
             <el-button @click="close">关闭</el-button>
         </div>
@@ -83,7 +89,7 @@ export default {
             apComServerData:{
                 current: 1,
                 pageSize: 10,
-                pageNum:1,
+                pageIndex:1,
                 total:0,
                 pageIndex:1
             },
