@@ -80,7 +80,6 @@
           <el-row>请选择导入文件:</el-row>
           <el-table
             ref="fileTree"
-            title="请选择导入文件"
             v-loading="fileTreeLoading"
             stripe
             fit
@@ -156,6 +155,7 @@
     <el-dialog 
       title="数据表匹配" 
       :visible.sync="checkFileTableDialogVisible" 
+      v-if="checkFileTableDialogVisible"
       width="60%" 
       :close-on-click-modal="false">
       <el-table
@@ -183,7 +183,6 @@
                 placeholder="请选择匹配表"
                 clearable
                 filterable
-                @clear="setTableNull(scope.row.path)"
                 >
                 <el-option
                   v-for="itemdbm in tableInfos"
@@ -199,6 +198,7 @@
                 placeholder="请选择匹配表"
                 clearable
                 filterable
+                @clear="setTableNull(scope.row.path)"
                 >
                 <el-option
                   v-for="itemdbm in tableInfos"
@@ -392,6 +392,8 @@
                 value-key="tableInfoId"
                 placeholder="请选择匹配表"
                 clearable
+                filterable
+                @clear="setColumnNull(scope.row,getMapKey(scope.row))"
                 >
                 <el-option
                   v-for="itemdbm in tableInfos"
@@ -812,11 +814,11 @@
       },
        // 数据表匹配清空
       setTableNull(val) {
-        this.fileTableInfos[val][0] = {}
+        this.fileTableInfos[val] = []
       },
       // 列清空
       setColumnNull(val,key) {
-        val[key] = {}
+        val[key] = null
       },
       deleteRow(index, rows) {
         rows.splice(index, 1)
