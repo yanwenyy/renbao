@@ -14,6 +14,7 @@
           size="small"
           placeholder="请输入内容"
           clearable
+          :readonly="readonly"
         ></el-input>
       </el-form-item>
       <el-form-item label="角色名称" prop="roleName" class="item-a">
@@ -22,6 +23,7 @@
           size="small"
           placeholder="请输入内容"
           clearable
+          :readonly="readonly"
         ></el-input>
       </el-form-item>
       <el-form-item label="角色描述" prop="roleDes" class="item-b">
@@ -29,6 +31,7 @@
           type="textarea"
           v-model="ruleForm.roleDes"
           placeholder="请输入内容"
+          :readonly="readonly"
         ></el-input>
       </el-form-item>
     </el-form>
@@ -43,7 +46,11 @@
 <script>
 export default {
   name: "addOrUpdate",
-  props: { id: { type: String }, showBtn: { type: Boolean } },
+  props: {
+    id: { type: String },
+    showBtn: { type: Boolean },
+    readonly: { type: Boolean }
+  },
   data() {
     return {
       // form对象
@@ -52,14 +59,14 @@ export default {
         roleName: "",
         roleDes: ""
       },
-      //   form校验
+      //form校验
       rules: {
         roleNumber: [{ required: true, message: "请输入", trigger: "blur" }],
         roleName: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       loading: false,
-      // 单位选择页是否显示
-      showDetailDialog: false
+      //单位选择页是否显示
+      showDetailDialog: false,
     };
   },
   created() {

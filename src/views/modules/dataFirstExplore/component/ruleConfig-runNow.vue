@@ -47,37 +47,38 @@
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="submitForm('dataForm')">确定</el-button>
-    <el-button @click="close">取消</el-button>
+    <el-button @click="closeRun">取消</el-button>
     <!--选择医院弹窗 -->
     <el-dialog
       :visible.sync="showHospitalDialog"
       title="选择医院"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
-      width="60%"
-      append-to-body
+      width="90%"
       :close-on-press-escape="false"
+      append-to-body
     >
-      <choose
-        @close="close"
-        @ok="succeed"
-        :info="info"
-        @returnData="returnData"
+      <basicInformation
+        ref="hospital"
         v-if="showHospitalDialog"
-      ></choose>
+      ></basicInformation>
+      <el-button type="primary" @click="getData">确定</el-button>
+      <el-button @click="close">取消</el-button>
     </el-dialog>
     <!--新增/修改页面 -->
   </div>
 </template>
 <script>
 import choose from "./ruleConfig-chooseHospital.vue";
+import basicInformation from "@/views/modules/dataAcquisition/basicInformation.vue";
 export default {
   props: {
     info: { type: Boolean },
     runIds: { type: String }
   },
   components: {
-    choose
+    choose,
+    basicInformation
   },
   data() {
     return {
@@ -107,11 +108,12 @@ export default {
           let second = data.getSeconds();
           return [`${hour}:${minute}:${second} - 23:59:59`];
         })()
-      }
+      },
+      showHospitalDialog: false
     };
   },
   methods: {
-    //确定
+    //运行确定
     submitForm(dataForm) {
       if (this.info == false) {
         //立即运行
@@ -193,25 +195,28 @@ export default {
         });
       }
     },
-    //取消
-    close() {
-      this.showHospitalDialog = false;
+    //关闭运行弹窗
+    closeRun() {
       this.$emit("close");
     },
-    succeed() {
+    //关闭医院弹窗
+    close() {
       this.showHospitalDialog = false;
     },
     //选择医院弹窗
     chooseHospital() {
       this.showHospitalDialog = true;
     },
-    //处理选择的医院编码和医院名称
-    returnData(data) {
+    //选择医院确定
+    getData() {
+      //获取已选医院数据
+      let data = this.$refs.hospital.multipleSelection;
+      //处理医院数据并反显
       var hospitalCodes = "";
       var hospitalNames = "";
       for (var i = 0; i < data.length; i++) {
-        hospitalCodes += data[i].医院编码 + ",";
-        hospitalNames += data[i].医院名称 + ",";
+        hospitalCodes += data[i].医疗机构编码 + ",";
+        hospitalNames += data[i].医疗机构名称 + ",";
       }
       if (hospitalCodes.length > 0 && hospitalNames.length > 0) {
         hospitalCodes = hospitalCodes.substr(0, hospitalCodes.length - 1);

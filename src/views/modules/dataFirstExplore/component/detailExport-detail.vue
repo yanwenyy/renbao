@@ -9,11 +9,11 @@
       <!-- 复杂条件查询 -->
       <div @click="handleChange" style="cursor:pointer">
         查询条件<i
-          v-if="!show"
+          v-show="!show"
           class="el-icon-arrow-down"
           style="padding-left:5px"
         ></i
-        ><i v-if="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
+        ><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i>
       </div>
       <transition name="sub-comments">
         <myquerybuilder
@@ -119,13 +119,6 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          /* let tablePositionKey = Object.keys(data.result.records[0]);
-          tablePositionKey.map((i, k) => {
-            this.tableColumns.push({
-              columnName: i,
-              columnType: typeof i
-            });
-          }); */
           this.tableColumns = data.result.data.columns;
           this.tableList = data.result.data.result;
           this.selectColumns = data.result.data.columnInfo;
@@ -181,6 +174,7 @@ export default {
           this.detailExportDialog = false;
         });
     },
+    //导出excel处理方法
     exportExcel(response, fileName) {
       let data = response.data;
       let fileReader = new FileReader();

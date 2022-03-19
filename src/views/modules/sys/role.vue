@@ -125,6 +125,7 @@
         v-if="showAddDialog"
         :id="id"
         :showBtn="showBtn"
+        :readonly="readonly"
       ></addOrUpdate>
     </el-dialog>
     <!-- 弹窗, 授权用户 -->
@@ -239,6 +240,7 @@ export default {
       this.title = "修改角色";
       this.id = data.roleId;
       this.showBtn = true;
+      this.readonly = false;
     },
     //查看详情
     detail(data) {
@@ -246,6 +248,7 @@ export default {
       this.title = "查看角色";
       this.id = data.roleId;
       this.showBtn = false;
+      this.readonly = true;
     },
     //关闭新增/修改弹窗
     closeAddDrawer() {
