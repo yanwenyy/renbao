@@ -31,9 +31,9 @@
                 <el-button size="mini" type="warning" @click="exportData">导出数据</el-button>
                 <el-button size="mini" type="warning" @click="importData">导入数据</el-button>
             </div>
-            <el-table :data="tableList" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading'>
-                <el-table-column type="selection" width="55"></el-table-column>
-                <template v-for="(item,index) in tableColumns">
+            <el-table :data="tableList" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading' @selection-change="handleSelectionChange">
+                <el-table-column type="selection"></el-table-column>
+                <template v-for="(item,index) in tableColumns" width="55">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
             </el-table>
@@ -110,7 +110,9 @@ export default {
                     value: '1',
                     label: '增量'
             }],
-            catalogType:10
+            catalogType:10,
+            multipleSelection:'',
+            
         }
     },
      created(){
@@ -147,6 +149,11 @@ export default {
                 this.tableLoading = false;
             })
         },
+          //多选
+        handleSelectionChange(val){
+             this.multipleSelection = val
+        },
+        //上传文件事件
         handleChange(file,fileList){
             this.fileList = fileList
             console.log(this.fileList)
