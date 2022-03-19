@@ -60,7 +60,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <el-button @click="close">取消</el-button>
+    <el-button @click="close">关闭</el-button>
     <!-- sql编辑弹窗 -->
     <el-dialog
       title="sql编辑"
