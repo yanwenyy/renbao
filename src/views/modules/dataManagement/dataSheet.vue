@@ -5,13 +5,12 @@
             <el-col :span="5">
                 <el-card style="height:600px;overflow-y:auto">
                     <div style='padding:5px'><el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input></div>
-                    <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading">
+                    <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading" :filter-node-method="filterNode">
                          <span class="custom-tree-node" slot-scope="{ node, data }"> 
-                        <!-- <span> -->
-                             <img class="tree-icon" src="./icon/column.png" alt="">
-                               {{ node.label }}
-                        </span> 
-                      <!-- </span> -->
+                            <img v-if="node.data.type =='funFolder'" class="tree-icon" src="./icon/folder.png" alt="">
+                            <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt=""> 
+                            {{ node.label }}
+                        </span>
                     </el-tree>
                 </el-card>
             </el-col>
@@ -99,14 +98,14 @@ export default {
             dataTree:[
                 {
                 label: '规划库',
-                icon: 'el-icon-s-home',
+                type: 'funFolder',
                 children: [{
                 }]
             }
             ],
             defaultProps:{ 
                 children: 'children',
-                // label: '',
+                // label: 'title',
                 isLeaf:'leaf',
                 label(data, node) {
                     const config = data.__config__ || data
@@ -130,10 +129,15 @@ export default {
     },
     watch:{
         filterText(val) {
-        this.$refs.ruleTreeRoot.filter(val.trim());
+        // this.$refs.ruleTreeRoot.filter(val);
         },
     },
     methods:{
+         // 树形控件input 过滤
+        filterNode(value, data) {
+            // if (!value) return true
+            // return data.title.indexOf(value) !== -1
+        },
         //初始化tree
         initDataTree(){
             this.treeLoading = true
@@ -147,8 +151,6 @@ export default {
                 this.treeLoading = false
             })
         },
-
-      
 
         //tree点击事件
         handleNodeClick(data,node){
@@ -202,13 +204,13 @@ export default {
         getTableStructure(data){
             this.StructureDialog = true
             this.structureList = this.projectList
-            this.structureName = data.tableName
+            this.structureName = data.title
 
         },
         //表数据
         getTableData(data){
             this.tableDataVisible = true
-            this.structureName = data.tableName
+            this.structureName = data.title
             this.structureList = this.projectList
         },
          // 每页数

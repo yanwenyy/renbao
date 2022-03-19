@@ -345,7 +345,7 @@
       <el-table
         border
         style="width: 100%;height:45vh; overflow:auto;"
-        :data="this.dmpFileTables">
+        :data="dmpImp.dmpTableInfoMaps">
         <el-table-column
           align="center"
           label="数据表">
@@ -380,7 +380,7 @@
             label="操作">
             <template slot-scope="scope">
               <el-button
-                @click.native.prevent="deleteRow(scope.$index, dmpFileTables)"
+                @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpTableInfoMaps)"
                 type="text"
                 size="small">
                 移除
@@ -480,7 +480,9 @@
         // 文件表对应关系
         fileTableInfos: {},
         //dmp文件表对应关系
-        dmpFileTables: []
+        dmpFileTables: [],
+        // dmp文件对象
+        dmpImp: {}
       }
     },
     components: {
@@ -533,7 +535,8 @@
                   //  this.fileTableInfos = data.result
                   //  this.findFileTable()
                 //} else if (data && data.code == 500 && data.result) {
-                  this.dmpFileTables = data.result
+                  //this.dmpFileTables = data.result
+                  this.dmpImp = data.result
                   this.$http({
                     url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
                     method: 'get'
@@ -583,15 +586,16 @@
       },
       // dmp文件匹配
       findFileTableDmp(){
-        const map = new Map();
-        map.set(this.selectedFileData[0].path,this.dmpFileTables)
-        const path = this.selectedFileData[0].path
-        this.fileTableInfos = {}
-        this.fileTableInfos[this.selectedFileData[0].path] = this.dmpFileTables
+        //const map = new Map();
+       // map.set(this.selectedFileData[0].path,this.dmpFileTables)
+       // const path = this.selectedFileData[0].path
+        //this.fileTableInfos = {}
+        //this.fileTableInfos[this.selectedFileData[0].path] = this.dmpFileTables
+        this.dmpImp.filePath = this.selectedFileData[0].path
         this.$http({
           url: this.$http.adornUrl(`dataImp/getDmpFileTable/${2}`),
           method: 'post',
-          data: this.fileTableInfos
+          data: this.dmpImp
         }).then(({data}) => {
           if (data && data.code === 200) {
             // 获取表和列的信息

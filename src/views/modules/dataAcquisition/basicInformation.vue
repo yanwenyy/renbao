@@ -2,15 +2,15 @@
 <template>
     <div class='threeData'>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
-            <el-form-item label="医院名称：">
+            <el-form-item label="医疗机构名称：">
                 <el-input v-model="dataForm.hospitalName" placeholder="请输入搜索内容" clearable></el-input>
             </el-form-item>
-             <el-form-item label="医院类别：">
+             <el-form-item label="医疗机构类别：">
                 <el-select v-model="dataForm.hospitalType" placeholder="请输入搜索内容" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="医保基金支付总金额：">
+            <el-form-item label="年度医保基金支付总金额：">
                 <el-col :span="11">
                 <el-input placeholder="请输入搜索内容" v-model="dataForm.moneyStart" style="width: 100%;"></el-input>
                 </el-col>
@@ -37,7 +37,7 @@
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
             </el-table>
-            <el-pagination 
+            <!-- <el-pagination 
                 :page-size="apComServerData.size"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="apComServerData.total"
@@ -45,7 +45,7 @@
                 @current-change="handleCurrentChange"
                 :current-page="apComServerData.pageIndex"
                 :page-sizes="[10, 20, 50, 100]"
-                ></el-pagination>
+                ></el-pagination> -->
         </div>
         <el-dialog title="导入数据" :visible.sync="importVisible">
             <div style="padding-bottom:10px;">
@@ -141,7 +141,7 @@ export default {
                 if(data && data.code === 200){
                     this.tableList = data.result.result
                     this.tableColumns = data.result.columns
-                    this.apComServerData.total = data.result.pagination.dataCount
+                    // this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.tableList = []
                     this.apComServerData.total = 0
