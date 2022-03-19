@@ -123,10 +123,10 @@ export default {
             tablePositionKey: [
                 {dataname:'ruleName' , label:'规则名称' , issortable:false , type:'', minWidth: 100},
                 {dataname:'dealRuleType' , label:'规则类别' , issortable:false , type:''},
-                {dataname:'expectedBeginTime' , label:'开始时间' , issortable:false , type:'', minWidth: 160},
-                {dataname:'actualBeginTime' , label:'结束时间' , issortable:false , type:'', minWidth: 160},
+                {dataname:'actualBeginTime' , label:'开始时间' , issortable:false , type:'', minWidth: 160},
+                {dataname:'actualEndTime' , label:'结束时间' , issortable:false , type:'', minWidth: 160},
                 {dataname:'resultCount' , label:'结果条数' , issortable:false , type:''},
-                {dataname:'actualEndTime' , label:'执行人' , issortable:false , type:''},
+                {dataname:'createUserName' , label:'执行人' , issortable:false , type:''},
                 {dataname:'q5' , label:'操作' , issortable:false , type:'option',  minWidth: 120},
             ],
             Pager: {
