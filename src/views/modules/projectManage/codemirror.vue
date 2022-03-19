@@ -64,8 +64,15 @@
             type:'funFolder',//图标类型 文件夹
             children:[
               {
-                id:'11111',
-                name:'医院',
+                id: "yljgbm",
+                name: "医疗机构编码",
+                sql: "select 医疗机构编码 id from 医院基本信息",
+                type:'params',//图标类型 参数
+              },
+              {
+                id: "yljgmc",
+                name: "医疗机构名称",
+                sql: "select 医疗机构名称 id from 医院基本信息",
                 type:'params',//图标类型 参数
               },
             ],
@@ -122,8 +129,30 @@
     },
     methods: {
       //参数设置确定事件点击
-      paramsSub(data){
-        console.log("设置参数了"+data)
+      paramsSub(sql){//sql传过来的替换过的sql
+
+        console.log("设置参数了"+sql)
+        if(sql!=''){
+          this.resultTableTabs=[];
+          var params={
+            sqlScript:sql,
+            loadOnce:false,
+            dataSize:"500"
+          };
+          this.$http({
+            url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+            method: 'post',
+            data: this.$http.adornData(params)
+          }).then(({data}) => {
+            if(data.code==200){
+
+            }else{
+              this.$message.error(data.message);
+            }
+          })
+        }else{
+          this.$message.error("sql语句不能为空")
+        }
       },
       //导出按钮点击
       exportSql(data){
@@ -295,39 +324,68 @@
 
       },
       //点击运行获取websoket数据
-      getwsData(sql,marks) {
-        console.log(sql,marks);
-        if(marks.length>0){
-          var _List=[ {
-            label:'参数111', //label 显示的label名字 必须
-            list:[
-              {
-                name:'医院1',//name是必须的
-                id:'1111',//id是必须的
+      getwsData(sql,marks,nodeList) {
+        console.log(sql,marks,nodeList);
+        if(sql!=''){
+          if(marks.length>0){
+            //传给组件内的参数列表格式
+            // var _List=[ {
+            //   label:'参数111', //label 显示的label名字 必须
+            //   list:[
+            //     {
+            //       name:'医院1',//name是必须的
+            //       id:'1111',//id是必须的
+            //     }
+            //   ],//参数下拉列表
+            // }];
+            this.paramsList=[];
+            var _dataList=[];
+            nodeList.forEach(item=>{
+              var v={
+                sqlScript:item.sql,
+                paramName:item.name,
+                id:item.id,
               }
-            ],//参数下拉列表
-          }];
-          this.paramsList=_List;
+              _dataList.push(v)
+            });
+            this.$http({
+              url: this.$http.adornUrl('/sqlScript/executeParamsSQL'),
+              method: 'post',
+              data: _dataList
+            }).then(({data}) => {
+              if(data.code==200){
+                var datas=data.result;
+                datas.forEach(item=>{
+                  item.label=item.paramName;
+                  item.list=item.jsonObject.data;
+                });
+                this.paramsList=datas;
+              }else{
+                this.$message.error(data.message);
+              }
+            });
+          }else{
+            this.resultTableTabs=[];
+            var params={
+              sqlScript:sql,
+              loadOnce:false,
+              dataSize:"500"
+            };
+            this.$http({
+              url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+              method: 'post',
+              data: this.$http.adornData(params)
+            }).then(({data}) => {
+              if(data.code==200){
+
+              }else{
+                this.$message.error(data.message);
+              }
+            })
+          }
         }else{
-          this.resultTableTabs=[];
-          var params={
-            sqlScript:sql,
-            loadOnce:false,
-            dataSize:"500"
-          };
-          this.$http({
-            url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
-            method: 'post',
-            data: this.$http.adornData(params)
-          }).then(({data}) => {
-            if(data.code==200){
-
-            }else{
-              this.$message.error(data.message);
-            }
-          })
+          this.$message.error("sql语句不能为空")
         }
-
       },
     }
   }

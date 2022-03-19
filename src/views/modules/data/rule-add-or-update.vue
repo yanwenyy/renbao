@@ -222,8 +222,8 @@
       },
       //sql编译器点击保存
       sqlSave(){
-        if(this.$refs.sqler.sqlMsg.indexOf("医院名称")==-1||this.$refs.sqler.sqlMsg.indexOf("医院编码")==-1){
-          this.$message.error("医院名称和医院编码是必填项")
+        if(this.$refs.sqler.sqlMsg.indexOf("医疗机构编码")==-1||this.$refs.sqler.sqlMsg.indexOf("医疗机构名称")==-1){
+          this.$message.error("医疗机构编码和医疗机构名称是必填项")
         }else{
           this.sqlVisible=false;
           this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
