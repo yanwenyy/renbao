@@ -5,7 +5,7 @@
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
           <div class="auditRuleMonitoring-left" style="height:800px">
-            <el-tree
+            <!-- <el-tree
               :data="batchTreeList"
               highlight-current
               :default-expand-all="true"
@@ -24,7 +24,8 @@
                   {{ node.label }}
                 </span>
               </span>
-            </el-tree>
+            </el-tree> -->
+            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="initTree" ></batch-list>
           </div>
         </el-card>
       </el-col>
@@ -210,10 +211,12 @@
 <script>
 import detail from "./component/detailExport-detail.vue";
 import { exportZip } from "@/utils";
+import batchList from '../../common/batch-list.vue'
 export default {
   components: {
     detail,
-    exportZip
+    exportZip,
+    batchList
   },
   data() {
     return {
@@ -461,7 +464,7 @@ export default {
       this.initData();
     },
     //左点右显
-    nodeClick(node, data) {
+    getbatchData(data,node ) {
       this.batchId = data.batchId;
       this.initData();
     },
@@ -567,17 +570,6 @@ export default {
     // border: 1px solid #ddd;
     overflow: auto;
     min-width: 300px;
-    /deep/ .el-tree-node__children .custom-tree-node {
-      text-decoration: underline;
-      color: #0000ff;
-      width: 100%;
-      padding: 0 5px;
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      -o-text-overflow: ellipsis;
-    }
   }
   .auditRuleMonitoring-right {
     flex: 1;

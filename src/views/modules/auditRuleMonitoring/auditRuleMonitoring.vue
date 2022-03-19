@@ -45,7 +45,7 @@
                     tooltip-effect="dark"
                     style="width: 100%"
                     @selection-change="handleSelectionChange">
-                        <el-table-column type="selection" width="55"></el-table-column>
+                    <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column
                         v-for="( items , index ) in tablePositionKey"
                         :prop="items.dataname"
@@ -312,31 +312,11 @@ export default {
     min-width: 800px;
     // overflow-x: auto;
     .auditRuleMonitoring-left {
-        width: 300px;
-        // min-height: 100vh;
-        // min-height: calc(100vh - 165px);
-        // margin-right: 20px;
-        // border: 1px solid #ddd;
-        overflow: auto;
         min-width: 300px;
         height: 75vh;
-        // /deep/ .el-tree {
-        //     min-height: 60vh;
-        // }
-        // /deep/ .el-tree-node__children .custom-tree-node{
-        //     text-decoration: underline;
-        //     color: #0000FF;
-        //     width: 100%;
-        //     padding: 0 5px;
-        //     display: inline-block;
-        //     overflow:hidden;
-        //     white-space: nowrap;
-        //     text-overflow: ellipsis;
-        //     -o-text-overflow:ellipsis;
-        // }
-        // /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-        //     background-color: #e3edfa;
-        // }
+        overflow: auto;
+        border: 1px solid #ddd;
+        padding: 10px 0 0 10px;
     }
     .auditRuleMonitoring-right {
         flex: 1;

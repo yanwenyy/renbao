@@ -37,7 +37,7 @@
                         style="width: 100%"
                         :row-key="getRowKeys"
                         @selection-change="handleSelectionChange">
-                         <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
+                        <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
                         <el-table-column
                             v-for="( items , index ) in tablePositionKey"
                             :prop="items.dataname"
@@ -83,7 +83,7 @@
         <submit-personality-rule ref="submitPersonalityRule"></submit-personality-rule>
         <rule-operation ref="ruleOperation"></rule-operation>
         <rule-config-option-dialog ref="ruleConfigDialog"></rule-config-option-dialog>
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSelectPage" :ruleData="treeData" ></add-or-update>
+        <add-or-update  ref="addOrUpdate" @refreshDataList="getSelectPage" :ruleData="treeData" ></add-or-update>
     </div>
 </template>
 <script>
@@ -121,7 +121,6 @@ export default {
                 return row.ruleId;
             },
             treeData: [],
-            addOrUpdateVisible: false,
             folderSorts: 3,
             ruleCheckData: {}
         }
@@ -133,6 +132,11 @@ export default {
     },
     created () {
         // this.getRuleFolder();
+    },
+    mounted () {
+        this.$bus.$on('updateRuleData', () => {
+            this.getRuleFolder()
+        });
     },
     methods: {
         getSelectPage () {
@@ -217,18 +221,12 @@ export default {
         },
         addFun () {
             // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
-            this.addOrUpdateVisible = true
-            this.$nextTick(() => {
-                this.$refs.addOrUpdate.init('', this.ruleCheckData)
-            })
+            this.$refs.addOrUpdate.init('', this.ruleCheckData)
         },
         editorFun () {
             if( this.multipleTable.length != 1 ) return this.$message({message: '请选择一条数据进行编辑',type: 'warning'});
             // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
-            this.addOrUpdateVisible = true
-            this.$nextTick(() => {
             this.$refs.addOrUpdate.init(this.multipleTable[0].ruleId, this.ruleCheckData)
-            })
 
         },
         deleteFn () {

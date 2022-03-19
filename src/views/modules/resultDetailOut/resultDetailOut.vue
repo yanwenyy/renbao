@@ -1,13 +1,14 @@
 <template>
     <div class="box">
         <div class="resultDetailsExport-left">
-            <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
+            <!-- <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="treeLoading" node-key="id" ref="treesa" :props="layoutTreeProps">
                     <span class="custom-tree-node" slot-scope="{ node, data }" @click="nodeClick(node, data)">
                         <span :title="node.label">
                             {{node.label}}
                         </span>
                     </span>
-            </el-tree>
+            </el-tree> -->
+            <batch-list :batchLoading="batchLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList" ></batch-list>
         </div>
         <div class="resultDetailsExport-right">
             <div class="search-box">
@@ -79,33 +80,17 @@
             </el-pagination>
         </div>
        <result-detail-out-dialog ref="resultDetailOutDialog"></result-detail-out-dialog>
-        <!--查看详细弹窗 -->
-        <!-- <el-dialog
-            :visible.sync="showDetailDialog"
-            title="查看结果明细"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="90%"
-            :close-on-press-escape="false"
-        >
-            <detail
-                @close="closeDetail"
-                @ok="editSucceed"
-                :info="info"
-                :resultTableName="resultTableName"
-                v-if="showDetailDialog"
-            ></detail>
-        </el-dialog> -->
         <view-details ref="viewDetails"></view-details>
     </div>
 </template>
 <script>
 import resultDetailOutDialog from './resultDetailOutDialog.vue'
 import viewDetails from './viewDetails.vue'
+import batchList from '../../common/batch-list.vue'
 export default {
     data () {
         return {
-            treeLoading: false,
+            batchLoading: false,
             tableLoading: false,
             batchTreeList: [{
                 label: '批次名称',
@@ -146,7 +131,7 @@ export default {
         // this.getTableData()
     },
     methods: {
-        nodeClick (node,data) {
+        getbatchData (data, node) {
             this.batchItem = data;
             this.getTableData()
         },
@@ -278,19 +263,19 @@ export default {
             }).catch(() => {})
         },
         getbatchList () {
-            this.treeLoading = true;
+            this.batchLoading = true;
             this.$http({
                 isLoading:false,
                 url: this.$http.adornUrl('/batch/selectList'),
                 method: 'get',
                 params:  this.$http.adornParams({batchType: 2}, false)
             }).then(({data}) => {
-                this.treeLoading = false;
+                this.batchLoading = false;
                 if (data.code == 200) {
                     this.batchTreeList[0].children = data.result
                 }
             }).catch(() => {
-                this.treeLoading = false;
+                this.batchLoading = false;
             })
         },
         setTableChecked () {
@@ -308,7 +293,8 @@ export default {
     },
     components: {
         resultDetailOutDialog,
-        viewDetails
+        viewDetails,
+        batchList
     }
    
 }
@@ -326,27 +312,9 @@ export default {
         // min-height: calc(100vh - 165px);
         // margin-right: 20px;
         height: 75vh;
-        border: 1px solid #ddd;
         overflow: auto;
-        min-width: 300px;
-        /deep/ .el-tree {
-            min-height: 70vh;
-        }
-        /deep/ .el-tree-node__children .custom-tree-node{
-            padding: 0 5px;
-            text-decoration: underline;
-            color: #0000FF;
-            width: 100%;
-            display: inline-block;
-            overflow:hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            -o-text-overflow:ellipsis;
-        }
-        /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-            background-color: #e3edfa;
-
-        }
+        border: 1px solid #ddd;
+        padding: 10px 0 0 10px;
     }
     .resultDetailsExport-right {
         flex: 1;
