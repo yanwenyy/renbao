@@ -4,7 +4,7 @@
       <el-col :span="5">
         <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
           <div class="auditRuleMonitoring-left" style="height:800px">
-            <el-tree
+            <!-- <el-tree
               :data="batchTreeList"
               highlight-current
               :default-expand-all="true"
@@ -23,7 +23,8 @@
                   {{ node.label }}
                 </span>
               </span>
-            </el-tree>
+            </el-tree> -->
+            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList" ></batch-list>
           </div>
         </el-card>
       </el-col>
@@ -76,6 +77,14 @@
           </div>
 
           <div class="table-box">
+           
+            <div style="float:right;margin-bottom:10px">
+              <el-button
+                @click="deleteData"
+                type="danger"
+                :disabled="this.multipleTable.length <= 0"
+                >删除</el-button>
+            </div>
             <el-table
               v-loading="tableLoading"
               ref="multipleTable"
@@ -172,9 +181,11 @@
 </template>
 <script>
 import detail from "./component/ruleMoniter-detail.vue";
+import batchList from '../../common/batch-list.vue'
 export default {
   components: {
-    detail
+    detail,
+    batchList
   },
   data() {
     return {
@@ -299,7 +310,7 @@ export default {
         });
     },
     //左点右显
-    nodeClick(node, data) {
+    getbatchData(data, node) {
       this.batchId = data.batchId;
       this.getTableData();
     },
@@ -341,6 +352,39 @@ export default {
     //关闭日志弹窗
     closeDetail() {
       this.showDetailDialog = false;
+    },
+    deleteData () {
+      console.log('删除')
+      var uuids = [];
+      for (var i = 0; i < this.multipleTable.length; i++) {
+        uuids.push(this.multipleTable[i].resultId);
+      }
+      this.$confirm(`确定进行删除操作?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/ruleResult/deleteByIds"),
+            method: "delete",
+            data: this.$http.adornData(uuids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.getTableData();
+                }
+              });
+            } else {
+              this.$message.error("操作失败");
+            }
+          });
+        })
+        .catch(() => {});
     }
   }
 };
@@ -359,11 +403,7 @@ export default {
     // border: 1px solid #ddd;
     overflow: auto;
     min-width: 300px;
-    /deep/ .el-tree-node__children .custom-tree-node {
-      text-decoration: underline;
-      color: #0000ff;
-      width: 100%;
-    }
+    
   }
   .auditRuleMonitoring-right {
     flex: 1;

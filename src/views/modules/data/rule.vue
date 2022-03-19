@@ -423,17 +423,11 @@ import ImportFile from './Import-file.vue'
         window.open(this.$http.adornUrl(url));
       },
       getTreeData (data) {
-        if (data && data.folderId) {
-          let checkedData = JSON.parse(JSON.stringify(data))
-          this.ruleCheckData = data
-          this.dataForm.folderPath=data.folderPath && data.folderPath || '';
-          this.dataForm.folderId = data.folderId && data.folderId || '';
-          this.getDataList();
-        } else {
-          this.ruleCheckData = {}
-          this.dataForm.folderPath=  '';
-          this.dataForm.folderId = '';
-        }
+        let checkedData = JSON.parse(JSON.stringify(data))
+        this.ruleCheckData = data
+        this.dataForm.folderPath=data.folderPath && data.folderPath || '';
+        this.dataForm.folderId = data.folderId && data.folderId || '';
+        this.getDataList();
       }
     }
   }

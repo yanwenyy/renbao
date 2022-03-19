@@ -211,7 +211,6 @@
           </el-dialog> -->
           <!-- 弹窗, 新增 / 修改 -->
           <add-or-update
-            v-if="addOrUpdateVisible"
             ref="addOrUpdate"
             @refreshDataList="initData"
             :ruleData="ruleData"
@@ -297,8 +296,6 @@ export default {
       info: "",
       //规则id
       ruleId: "",
-      //新增、修改弹窗是否显示
-      addOrUpdateVisible: false,
       conheight: {
         height: ""
       },
@@ -361,20 +358,16 @@ export default {
     },
     //新增弹框
     addData() {
-      this.addOrUpdateVisible = true;
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.init();
-      });
+
+     
+      this.$refs.addOrUpdate.init('', this.ruleCheckData);
       this.ruleId = "";
       this.folderId = "";
       this.ruleData = this.$refs.ruleTree.treeData;
     },
     //修改弹框
     editData() {
-      this.addOrUpdateVisible = true;
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(this.multipleSelection[0].ruleId);
-      });
+      this.$refs.addOrUpdate.init(this.multipleSelection[0].ruleId, this.ruleCheckData);
       console.log(this.multipleSelection[0].ruleId);
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;

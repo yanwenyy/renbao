@@ -228,6 +228,8 @@
           this.sqlVisible=false;
           this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
           this.dataForm.ruleType='1';
+          this.dataForm.folderId = this.ruleCheckData.folderId;
+          this.dataForm.folderPath = this.ruleCheckData.folderPath;
         }
 
       },
@@ -307,7 +309,8 @@
       menuListTreeCurrentChangeHandle (data, node) {
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
-        this.dataForm.folderPath =  data.folderPath
+        this.dataForm.folderPath =  data.folderPath;
+        this.ruleCheckData = data;
         this.treeVisible=false;
       },
       // 规则树设置当前选中节点
@@ -319,8 +322,7 @@
           this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.folderId)[0].folderName;
         }
 
-
-        // if (this.dataForm.folderId) {
+         // if (this.dataForm.folderId) {
 
         //   // this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
         //   // this.getTreeData(this.treeData, this.checkedData[0].folderId);

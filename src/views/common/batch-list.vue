@@ -1,6 +1,11 @@
 <template>
     <div class="batch-list-box">
-         <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="batchLoading" node-key="id"      ref="batchList" :props="layoutTreeProps" @node-click="nodeClick">
+        <!-- <el-input
+            class="filter-text"
+            placeholder="输入关键字进行过滤"
+            v-model="filterText">
+        </el-input> -->
+         <el-tree :data="batchTreeList" highlight-current :default-expand-all="true" v-loading="batchLoading" node-key="id" ref="batchList" :props="layoutTreeProps" @node-click="nodeClick">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span :title="node.label" class="batch-label">
                         {{node.label}}
@@ -38,6 +43,7 @@ export default {
     },
     data () {
         return {
+            filterText: '',
             layoutTreeProps: {
                 label(data, node) {
                     const config = data.__config__ || data
@@ -64,7 +70,6 @@ export default {
 
         }, 
         remove (node, data) {
-            console.log(data, 'datadatadata')
             this.$confirm(`确认要该条批次吗?`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -72,20 +77,19 @@ export default {
                 }).then(() => {
                     this.$http({
                         isLoading:false,
-                        url: this.$http.adornUrl(`ruleFolder/delete/${data.folderId}`),
-                        method: 'post',
+                        url: this.$http.adornUrl('batch/removeBatchByIds/'),
+                        method: 'DELETE',
+                        data: this.$http.adornData( [data.batchId], false)
                     }).then(({data}) => {
-                      
                         if (data.code == 200) {
                             this.$message({
-                                message: '操作成功',
+                                message: '删除成功',
                                 type: 'success',
                             })
                             // 更新批次列表
                             this.$emit('refreshBitchData');
                         } else {
-                            this.$message.error(data.msg)
-
+                            this.$message.error('删除失败')
                         }
                     }).catch(() => {
                     })
@@ -97,62 +101,75 @@ export default {
 
         }
     },
+    watch: {
+        filterText(val) {
+            // console.log(val, 'valvalval')
+            // this.$refs.batchList.filter(val.trim());
+        },
+    }
 
 }
 </script>
 <style scoped lang="scss">
 .batch-list-box {
     width: 100%;
-    /deep/ .el-tree {
-        min-height: 60vh;
-        // color: #AF0F16 !important;
+    height: 100%;
+    overflow: auto;
+    /deep/ .filter-text {
+        width: 80%;
+        margin: 10px 0 10px 10px;
     }
-    /deep/ .el-tree-node__children .custom-tree-node{
-        // text-decoration: underline;
-        // color: #0000FF;
-        // color: #AF0F16 !important;
-        width: 100%;
-        padding: 0 5px;
-        display: inline-block;
-        overflow:hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        -o-text-overflow:ellipsis;
+    /deep/ .el-tree {
+        height: 100%;
     }
     /deep/ .is-current {
-        display: flex;
-        align-items: center;
+        // display: flex;
+        // align-items: center;
     }
-    /deep/ .el-tree-node {
+    /deep/ .el-tree-node__children .el-tree-node {
         height: 35px;
         line-height: 35px;
     }
     /deep/ .is-current {
         position: relative;
+        .el-icon-delete {
+            color:#AF0F16;
+        }
     }
     /deep/ .is-current::before {
         position: absolute;
         content: '';
         width: 2px;
-        height: 35px;
+        height: 25px;
         display: inline-block;
         background: #AF0F16;
-        color:#AF0F16;
-        margin-left: 3px;
         
+        margin-left: 3px; 
     }
-    .batch-label {
-        // padding-left: 2px;
+
+    /deep/ .el-tree-node__children .custom-tree-node{
+        display: flex;
     }
+   
     /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-        // background-color: #e3edfa;
         color: #AF0F16 !important;
         background: #fff !important;
     }
     /deep/ .el-tree-node__content:hover{
         background: #fff;
     }
-  
+    
+    .batch-label {
+        max-width: 190px;
+        display: inline-block;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow:ellipsis;
+    }
+    .batch-btn {
+        padding-left: 10px;
+    }
 }
 
 </style>
