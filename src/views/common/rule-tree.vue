@@ -309,35 +309,64 @@ export default {
             this.editRuleItemNode = node; // 获取点击node
             this.optionType = type; // 编辑或新增
         },
+        // 获取数据列表
+        getDataList (data, callBack) {
+            // 如何改规则节点有子节点的话folderId为空
+            let dataForm = {
+                folderPath: data.folderPath,
+                folderId: data.folderId,
+            }
+            if (data.children) {
+                dataForm.folderId = '';
+            }
+            this.$http({
+            isLoading: false,
+            url: this.$http.adornUrl('/rule/selectPage'),
+            method: 'get',
+            params: this.$http.adornParams({
+                'folderPath': dataForm.folderPath,
+                'folderId': dataForm.folderId,
+            })
+            }).then(({data}) => {
+                callBack(data)
+            })
+        },
         remove (node, data) {
-            if( data.children ) return this.$message({message: '此规则不可删除',type: 'warning'});
-            this.$confirm(`确认要该条规则吗?`, '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-                }).then(() => {
-                    this.$http({
-                        isLoading:false,
-                        url: this.$http.adornUrl(`ruleFolder/delete/${data.folderId}`),
-                        method: 'post',
-                    }).then(({data}) => {
-                        this.btnLoading = false;
-                        if (data.code == 200) {
-                            this.$message({
-                                message: '操作成功',
-                                type: 'success',
-                            })
-                            this.getRuleFolder()
-                            this.$bus.$emit('updateRuleData');
-                        } else {
-                            this.$message.error(data.msg)
+            // 删除校验改规则下是否有规则列表
+            this.getDataList(data, (res) => {
+                if (res.result.records.length>0) {
+                    return this.$message({message: '此规则分类下存在规则，请先删除规则再删除规则分类！',type: 'warning'});
+                }
+                this.$confirm(`确认要该条规则吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                    }).then(() => {
+                        this.$http({
+                            isLoading:false,
+                            url: this.$http.adornUrl(`ruleFolder/delete/${data.folderId}`),
+                            method: 'post',
+                        }).then(({data}) => {
+                            this.btnLoading = false;
+                            if (data.code == 200) {
+                                this.$message({
+                                    message: '操作成功',
+                                    type: 'success',
+                                })
+                                this.getRuleFolder()
+                                this.$bus.$emit('updateRuleData');
+                            } else {
+                                this.$message.error(data.msg)
 
-                        }
-                    }).catch(() => {
-                        this.btnLoading = false;
-                    })
+                            }
+                        }).catch(() => {
+                            this.btnLoading = false;
+                        })
 
-            }).catch(() => {})
+                }).catch(() => {})
+
+            })
+           
         },
         nodeClick (data, node) {
             // 调用父组件的获取规则树id的方法

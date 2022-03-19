@@ -24,7 +24,7 @@
                 </span>
               </span>
             </el-tree> -->
-            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" parentGetTreeData="getbatchData" v-on:refreshBitchData="getbatchList" ></batch-list>
+            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" @getbatchData="getbatchData" v-on:refreshBitchData="getbatchList" :isParent="false" ></batch-list>
           </div>
         </el-card>
       </el-col>
