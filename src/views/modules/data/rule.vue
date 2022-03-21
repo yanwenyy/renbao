@@ -333,7 +333,7 @@ import ImportFile from './Import-file.vue'
                 let url = this.$http.adornUrl('/rule/ruleExport?token=') + this.$cookie.get("token");
                 window.open(url);
               this.$message({message: '导出成功',type: 'success'});
-              this.getDataList();
+              // this.getDataList();
             } else {
               this.$message({message: data.message,type: 'error'});
             }
