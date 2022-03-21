@@ -12,22 +12,34 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <el-table :data="tableData" border style="100%" height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
+            <el-table :data="tableData" border style="100%" :height="$tableHeight-50" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="projectName" header-align="center" align="center" label="项目名称"></el-table-column>
-                <el-table-column prop="status" header-align="center" align="center" width="150" label="状态"></el-table-column>
-                <el-table-column prop="schedule" header-align="center" align="center" label="进度">
-                    <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.schedule)"></el-progress></template>
+                <el-table-column prop="status" header-align="center" align="center" width="150" label="状态">
+                   <template slot-scope="scope">
+                    <div class="tac" v-if="scope.row.status=='0'">未执行清除</div>
+                    <div class="tac" v-if="scope.row.status=='1'">清除中</div>
+                    <div class="tac" v-if="scope.row.status=='2'">清除完成</div>
+                    <div class="tac" v-if="scope.row.status=='3'">清除失败</div>
+                   </template>
                 </el-table-column>
-                <el-table-column prop="modifier" header-align="center" align="center" label="修改人"></el-table-column>
+                <el-table-column prop="status" header-align="center" align="center" label="进度">
+                    <template slot-scope="scope">
+                        <el-progress v-if="scope.row.status=='0'" :percentage="0"></el-progress>
+                        <el-progress v-if="scope.row.status=='1'" :percentage="50"></el-progress>
+                        <el-progress v-if="scope.row.status=='2'" :percentage="100"></el-progress>
+                        <el-progress v-if="scope.row.status=='3'" :percentage="0"></el-progress>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="updateUserName" header-align="center" align="center" label="修改人"></el-table-column>
                 <el-table-column align="center" width="150" label="操作">
                     <template slot-scope="scope">
-                        <el-button @click="resetClick(scope.row.id)" type="text" size="small">清除</el-button>
+                        <el-button @click="resetClick(scope.row.projectId)" type="text" size="small">清除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </div>
-        <el-dialog title="数据清除" :visible.sync="showResetVisible">
+        <!-- <el-dialog title="数据清除" :visible.sync="showResetVisible">
             <div class='content'>
                 <span>清除列表:</span>
                 <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
@@ -38,7 +50,7 @@
                 <el-button type="primary" @click="submitForm">确定</el-button>
                 <el-button @click="showResetVisible = false">取消</el-button>
             </div>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 <script>
@@ -52,25 +64,7 @@ export default {
             listLoading:false,
             checkedCities:[],
             cities:cityOptions,
-            tableData:[{
-                'id':'0',
-                'projectName':'呼和浩特市医疗保障局2021年“打击欺诈骗保”全覆盖',
-                'status':'清除中',
-                'schedule':'40',
-                'modifier':'张吉惟'
-            },{
-                'id':'1',
-                'projectName':'通辽市医疗保障局2021年“打击欺诈骗保”全覆盖',
-                'status':'清除中',
-                'schedule':'62',
-                'modifier':'林国瑞'
-            },{
-                'id':'2',
-                'projectName':'新疆自治区2022年医保基金监管飞行检查项目',
-                'status':'清除中',
-                'schedule':'23',
-                'modifier':'林雅南'
-            }],
+            tableData:[],
             showResetVisible:false
         }
     },
@@ -79,20 +73,49 @@ export default {
     },
     methods:{
         // 初始化数据列表
-        getDataList(){},
+        getDataList(){
+            this.tableLoading = true;
+            this.$http({
+                url:this.$http.adornUrl('/projectDump/selectPageList'),
+                method: 'get',
+                params: this.$http.adornParams({
+                    projectName: this.dataForm.projectName,
+                })
+            }).then(({data}) =>{
+                if(data && data.code === 200){
+                    this.tableData = data.result.records
+                    // this.tableColumns = data.result.columns
+                    // this.apComServerData.total = data.result.pagination.dataCount
+                }else{
+                    this.tableData = []
+                    // this.apComServerData.total = 0
+                }
+                this.tableLoading = false;
+            })
+        },
         //查询事件
-        getAllSearch(){},
+        getAllSearch(){
+            this.getDataList()
+        },
         //重置
-        resetForm(){},
+        resetForm(){
+            this.dataForm.projectName = ''
+        },
         //清除事件
-        resetClick(){
-           this.showResetVisible = true
+        resetClick(id){
+        //    this.showResetVisible = true
+         this.$http({
+                url:this.$http.adornUrl('/projectDump/dumpProjectById'),
+                method: 'get',
+                params: this.$http.adornParams({
+                    projectId: id,
+                })
+            }).then(({data}) =>{
+                if(data && data.code === 200){
+                    this.getDataList()
+                }
+            })
         },
-        handleCheckedCitiesChange(value){
-
-        },
-        //确定事件
-        submitForm(){}
     }
 }
 </script>
