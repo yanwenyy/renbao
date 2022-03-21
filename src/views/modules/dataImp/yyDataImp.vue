@@ -75,7 +75,7 @@
       >
       <el-row  v-if="!hosBatchFlag">
         医院名称：
-        <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur">
+        <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur" clearable>
           <el-option v-for="(item, index) in hospitalList"
                     :label="item['医疗机构名称']"
                     :value="item['医疗机构名称']"
@@ -86,7 +86,7 @@
       </el-row>
       <el-row v-if="hosBatchFlag">
         批次名称：
-        <el-select  v-model="hosBatchId" placeholder="" filterable>
+        <el-select  v-model="hosBatchId" placeholder="" filterable clearable>
           <el-option v-for="(item, index) in hosBatchList"
                     :label="item.hospitalCollectPlanBath"
                     :value="item.hospitalCollectPlanId"
