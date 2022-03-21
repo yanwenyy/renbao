@@ -22,9 +22,10 @@
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
+    <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      height="60vh"
+      :height="$tableHeight + 32"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
@@ -72,6 +73,15 @@
       width="70%"
       :close-on-click-modal="false"
       >
+      <!-- <el-row>批次名称：
+        <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur">
+          <el-option v-for="(item, index) in hospitalList"
+                    :label="item.hospitalName"
+                    :value="item.hospitalName"
+                    :key="index"
+          ></el-option>
+        </el-select>
+      </el-row> -->
       <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row> 
       <!-- 文件树 -->
       <el-row :gutter="6">
@@ -415,12 +425,30 @@
         <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
+    <el-dialog 
+      title="dmp还原日志"
+      :visible.sync="dmpLogDialogVisible"
+      width="60%"
+      :close-on-click-modal="false">
+      <el-row style="width: 100%;height:45vh; overflow:auto;">
+        <el-row  
+          v-for="(log,index) in webSocketDataList" 
+          :key="index">
+          {{log}}
+        </el-row>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeLog" v-if="dmpImpFlag">{{countDown}}s</el-button>
+        <el-button type="primary" @click="dmpLogDialogVisible = false" v-if="dmpImpFalseFlag">返回上一步</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import ColumnView from './columnView'
   import DataView from './dataView'
+  import {PxSocket} from '@/utils'
   export default {
     data () {
       return {
@@ -449,6 +477,8 @@
         checkFileTableDialogVisible: false,
         // dmp文件匹配表弹窗
         checkDmpFileTableDialogVisible: false,
+        // dmp还原日志
+        dmpLogDialogVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -475,6 +505,10 @@
         hospitalName: '',
         // 医院采集路径
         hospitalPath: '',
+        // 医院批次Id
+        hosBatchId: '',
+        // 医院批次名称
+        hosBatchName: '',
         // 导入数据集合
         importDataModelList: [],
         // 文件表对应关系
@@ -482,7 +516,21 @@
         //dmp文件表对应关系
         dmpFileTables: [],
         // dmp文件对象
-        dmpImp: {}
+        dmpImp: {},
+        // 所有医院列表
+        hospitalList: [],
+        // 长连接
+        webSocket: null,
+        // webSocket返回值
+        webSocketDataList: [],
+        // 登录用户ID
+        userId: sessionStorage.getItem("userId"),
+        // dmp导入成功标志
+        dmpImpFlag: false,
+        // dmp导入失败标志
+        dmpImpFalseFlag: false,
+        // count 倒计时
+        countDown: 0
       }
     },
     components: {
@@ -491,7 +539,62 @@
     activated () {
       this.getDataList()
     },
+    mounted(){
+      this.webSocket = new PxSocket({
+          url:this.$http.wsUrl('websocket?' + this.userId),
+          succ: this.getLogList
+        });
+        // 当服务端打开连接
+        this.webSocket.connect()
+    },
+    beforeDestory(){
+      this.webSocket.close();
+    },
+    watch: {
+      dmpImpFlag(val) {
+        if(val) {
+          this.countDown = 10
+          this.countDmpDown()
+        }
+      },
+    },
     methods: {
+      // 关闭日志弹窗
+      closeLog(){
+          this.dmpLogDialogVisible = false
+          this.checkDmpFileTableDialogVisible = true
+          this.countDown = 0
+      },
+       // 倒计时十秒
+      countDmpDown(){
+        if(this.countDown && this.countDown>0) {
+          this.timer = setInterval(()=>{
+            this.countDown--
+            if(this.countDown==0){
+              clearInterval(this.timer)
+              this.dmpLogDialogVisible = false
+              this.checkDmpFileTableDialogVisible = true
+            }
+          },1000)
+        }
+      },
+      //获取sql运行websocket返回的数据
+      getLogList(datas){
+        if(datas && datas != 'ping'){
+          datas=JSON.parse(datas)
+          if(datas.data){
+             this.webSocketDataList.push(datas.data)
+          }
+          if(datas.code && datas.code == 200) {
+            // 单次导入成功
+            this.dmpImpFlag = true
+          }
+          if(datas.code && datas.code == 500) {
+            // 单次导入失败
+            this.dmpImpFalseFlag = true
+          }
+        }
+      },
       // 获取医保数据文件树
       getFileTree () { 
         this.fileTreeData = []
@@ -500,7 +603,7 @@
         this.fileTreeLoading = true
         this.$http({
           url: this.$http.adornUrl(`dataImp/getFileTree/${1}`),
-          method: 'post'
+          method: 'get'
         }).then(({data}) => {
           if (data && data.code === 200) {
             // 获取文件数据
@@ -509,7 +612,26 @@
             this.sysPath = data.result.sysPath
           }
         })
+        // this.$http({
+        //   url: this.$http.adornUrl(`hospitalBasicInfo/getPageList`),
+        //   method: 'get',
+        //   params: this.$http.adornParams({
+        //         'pageNum': 1,
+        //         'pageSize': 1000,
+        //     })
+        // }).then(({data}) => {
+        //   if (data && data.code === 200) {
+        //     // 获取医院列表
+        //     this.hospitalList = data.result
+        //     console.log("-----this.hospitalList----")
+        //     console.log(this.hospitalList)
+        //   }
+        // })
         this.fileTreeLoading = false
+      },
+      // 获取输入项
+      selectBlur(e){
+        this.hospitalName= e.target.value
       },
       // 检查文件和匹配的表信息
       checkFileTable () {
@@ -520,12 +642,17 @@
         var flag = true
         this.selectedFileData.forEach(item=>{
           if(this.checkType(item.fileType) && this.selectedFileData.length >1) {
-             this.$message.error("dmp文件只能单独导入")
-             flag = false
-             return
+            if(flag) this.$message.error("dmp文件只能单独导入")
+            flag = false
+            return
           }
           // dmp文件导入
           if(this.checkType(item.fileType) && this.selectedFileData.length ==1) {
+            // dmp还原日志
+            this.webSocketDataList = []
+            this.dmpImpFlag = false
+            this.dmpImpFalseFlag = false
+            this.dmpLogDialogVisible = true
             this.$http({
               url: this.$http.adornUrl(`dataImp/impDmpFile/${1}`),
               method: 'post',
@@ -547,7 +674,7 @@
                         }
                       }
                   })
-                  this.checkDmpFileTableDialogVisible = true
+                  // this.checkDmpFileTableDialogVisible = true
                 } else {
                   this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
                 }
@@ -593,7 +720,7 @@
         //this.fileTableInfos[this.selectedFileData[0].path] = this.dmpFileTables
         this.dmpImp.filePath = this.selectedFileData[0].path
         this.$http({
-          url: this.$http.adornUrl(`dataImp/getDmpFileTable/${2}`),
+          url: this.$http.adornUrl(`dataImp/getDmpFileTable/${1}`),
           method: 'post',
           data: this.dmpImp
         }).then(({data}) => {
