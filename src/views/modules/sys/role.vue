@@ -187,7 +187,6 @@ export default {
   },
   created() {
     this.getDataList();
-    this.token = this.$cookie.get("token");
   },
   methods: {
     // 获取数据列表

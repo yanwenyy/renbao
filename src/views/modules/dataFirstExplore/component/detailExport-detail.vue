@@ -21,7 +21,7 @@
           ref="myquerybuilder"
           :rules="queryRules"
           class="mask"
-          v-if="show"
+          v-show="show"
           v-model="output"
           :columns="selectColumns"
           :data="data"

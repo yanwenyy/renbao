@@ -1,14 +1,15 @@
 <template>
-    <div class="detail-box">
-        <el-dialog
-            ref="hospitalSelection"
-            title="选择医院"
-            :visible.sync="innerVisible"
-            :close-on-click-modal="false"
-            width="1200px"
-            :close-on-press-escape="false"
-            :before-close="handleClose">
-            <!-- <div class="hospital-selection">
+  <div class="detail-box">
+    <el-dialog
+      ref="hospitalSelection"
+      title="选择医院"
+      :visible.sync="innerVisible"
+      :close-on-click-modal="false"
+      width="1200px"
+      :close-on-press-escape="false"
+      :before-close="handleClose"
+    >
+      <!-- <div class="hospital-selection">
                 <div class="seachbox">
                     <el-form ref="searchHospitalForm" :model="searchHospitalForm" :inline="true">
                         <el-form-item label="医院名称：">
@@ -50,133 +51,178 @@
                     </el-table>
                 </div>
             </div> -->
-            <basicInformation  ref="hospital" ></basicInformation>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
-                <el-button @click="cancel" size="small">取 消</el-button>
-            </span>
-        </el-dialog>
-    </div>
+      <basicInformation ref="hospital"></basicInformation>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          @click="onSubmit('form')"
+          :loading="loading"
+          size="small"
+          >确 定</el-button
+        >
+        <el-button @click="cancel" size="small">取 消</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 <script>
+import { transSql } from "@/utils/publicFun.js";
 import basicInformation from "@/views/modules/dataAcquisition/basicInformation.vue";
 export default {
-    props: [
-        'getData'
-    ],
-    data() {
-        return {
-            loading: false,
-            innerVisible: false,
-            tableLoading: false,
-            searchHospitalForm: {
-                hospitalName: '',
-                hospitalType: '',
-                pageCount: 1,
-                pageSize: 10000
-            },
-            tableData: [],
-            tablePositionKey: [
-                {dataname:'医院名称' , label:'医院名称' , issortable:false , type:''},
-                {dataname:'医院编码' , label:'医院编码' , issortable:false , type:''},
-                {dataname:'医院性质' , label:'医院性质' , issortable:false , type:''},
-                {dataname:'医院类别' , label:'医院类别' , issortable:false , type:''},
-            ],
-            type: '',
-            checkHospitalList: [], // 选中的医院列表
-            checkRuleData: [], // 选中的规则列表
-            ruleOperationForm: {}
+  props: ["getData"],
+  data() {
+    return {
+      loading: false,
+      innerVisible: false,
+      tableLoading: false,
+      searchHospitalForm: {
+        hospitalName: "",
+        hospitalType: "",
+        pageCount: 1,
+        pageSize: 10000
+      },
+      tableData: [],
+      tablePositionKey: [
+        {
+          dataname: "医院名称",
+          label: "医院名称",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "医院编码",
+          label: "医院编码",
+          issortable: false,
+          type: ""
+        },
+        {
+          dataname: "医院性质",
+          label: "医院性质",
+          issortable: false,
+          type: ""
+        },
+        { dataname: "医院类别", label: "医院类别", issortable: false, type: "" }
+      ],
+      type: "",
+      checkHospitalList: [], // 选中的医院列表
+      checkRuleData: [], // 选中的规则列表
+      ruleOperationForm: {}
+    };
+  },
+  methods: {
+    //默认打开页面
+    showDialog(checkRuleData, type, ruleOperationForm) {
+      this.innerVisible = true;
+      this.$nextTick(() => {
+        if (this.$refs.hospital) {
+          this.$refs.hospital.reSetHospital();
         }
+      });
+      this.type = type;
+      this.checkRuleData = checkRuleData;
+      // this.getHospital();
+      this.ruleOperationForm = ruleOperationForm;
     },
-    methods: {
-        //默认打开页面
-        showDialog(checkRuleData,type,ruleOperationForm) {
-            this.innerVisible = true;
-            this.$nextTick(() => {
-                if (this.$refs.hospital) {
-                    this.$refs.hospital.reSetHospital();
-                } 
-            })
-            this.type = type;
-            this.checkRuleData = checkRuleData;
-            // this.getHospital();
-            this.ruleOperationForm = ruleOperationForm;
-        },
-        mounted () {
+    mounted() {},
+    // 获取医院列表
+    getHospital() {
+      this.tableLoading = true;
+      this.$http({
+        isLoading: false,
+        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+        method: "get",
+        params: this.$http.adornParams(this.searchHospitalForm, false)
+      })
+        .then(({ data }) => {
+          this.tableLoading = false;
+          if (data.code == 200) {
+            this.tableData = data.result.records;
+            this.$refs.hospitalSelectionTable.toggleAllSelection(
+              this.tableData
+            );
+          }
+        })
+        .catch(() => {
+          this.tableLoading = false;
+        });
+    },
 
-        },
-        // 获取医院列表
-        getHospital () {
-            this.tableLoading = true;
-            this.$http({
-                isLoading:false,
-                url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
-                method: 'get',
-                params:  this.$http.adornParams(this.searchHospitalForm, false)
-            }).then(({data}) => {
-                this.tableLoading = false
-                if (data.code == 200) {
-                    this.tableData = data.result.records 
-                    this.$refs.hospitalSelectionTable.toggleAllSelection(this.tableData)
-                }
-            }).catch(() => {
-                this.tableLoading = false
-            })
-        },
-       
-        handleClose () {
-            this.innerVisible = false;
-            this.$parent.showDialog(this.checkRuleData,this.type, [], this.ruleOperationForm, 'hospitalBack');
-        },
-        handleSelectionChange (val) {
-            this.checkHospitalList = val
-
-        },
-        onSubmit (formName) {
-            this.innerVisible = false;
-            // console.log(this.$refs.hospital.multipleSelection, '查看选中的列表')
-            // debugger
-            this.checkHospitalList = this.$refs.hospital.multipleSelection
-            this.$parent.showDialog(this.checkRuleData,this.type, this.checkHospitalList, this.ruleOperationForm, 'hospitalBack');
-            this.$parent.setHospital(this.checkHospitalList); // 回显医院名称
-        },
-        onQuery () {
-            this.getHospital()
-        },
-        onReset () {
-            this.searchHospitalForm.hospitalName = '' 
-            this.searchHospitalForm.hospitalType = '' 
-
-        },
-        cancel () {
-            this.innerVisible = false;
-            this.$parent.showDialog(this.checkRuleData,this.type, [], this.ruleOperationForm, 'hospitalBack');
-           
+    handleClose() {
+      this.innerVisible = false;
+      this.$parent.showDialog(
+        this.checkRuleData,
+        this.type,
+        [],
+        this.ruleOperationForm,
+        "hospitalBack"
+      );
+    },
+    handleSelectionChange(val) {
+      this.checkHospitalList = val;
+    },
+    onSubmit(formName) {
+      this.innerVisible = false;
+      // console.log(this.$refs.hospital.multipleSelection, '查看选中的列表')
+      // debugger
+      this.checkHospitalList = this.$refs.hospital.multipleSelection;
+      this.$parent.showDialog(
+        this.checkRuleData,
+        this.type,
+        this.checkHospitalList,
+        this.ruleOperationForm,
+        "hospitalBack"
+      );
+      //转换sql处理
+      var resultSqlValue = [];
+      if (this.checkRuleData.length > 0) {
+        for (var i = 0; i < this.checkRuleData.length; i++) {
+          resultSqlValue.push(
+            transSql(this.checkRuleData[i].ruleSqlValue, this.checkHospitalList)
+          );
         }
+      }
+      this.$parent.setHospital(this.checkHospitalList, resultSqlValue); // 回显医院名称
     },
-    watch : {
+    onQuery() {
+      this.getHospital();
     },
-    components: {
-        basicInformation
+    onReset() {
+      this.searchHospitalForm.hospitalName = "";
+      this.searchHospitalForm.hospitalType = "";
+    },
+    cancel() {
+      this.innerVisible = false;
+      this.$parent.showDialog(
+        this.checkRuleData,
+        this.type,
+        [],
+        this.ruleOperationForm,
+        "hospitalBack"
+      );
     }
-}
+  },
+  watch: {},
+  components: {
+    basicInformation
+  }
+};
 </script>
 
 <style scoped lang="scss">
 .detail-box {
-    /deep/ .el-dialog__header {
-        border-bottom: 1px solid #ddd;
-        text-align: left;
-    }
-    /deep/ .el-dialog__footer {
-        text-align: center;
-    }
-    .rule-tree-box {
-        display: flex;
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-    }
+  /deep/ .el-dialog__header {
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  /deep/ .el-dialog__footer {
+    text-align: center;
+  }
+  .rule-tree-box {
+    display: flex;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
 }
 </style>

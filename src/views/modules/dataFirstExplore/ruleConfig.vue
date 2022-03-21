@@ -3,7 +3,7 @@
   <div :style="conheight">
     <el-row :gutter="20">
       <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
+        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
           <rule-tree
             :isShowSearch="true"
             :isShowCheckBox="false"
@@ -11,11 +11,12 @@
             :isParent="false"
             ref="ruleTree"
             folderSorts="1,2"
+            :height="$tableHeight"
           ></rule-tree>
         </el-card>
       </el-col>
       <el-col :span="19">
-        <el-card class="box-card" style="height:800px;overflow-y:auto">
+        <el-card class="box-card" style="height:80vh;overflow-y:auto">
           <div slot="header" class="clearfix">
             <el-row>
               <el-col :span="4">
@@ -46,12 +47,9 @@
                   </el-select>
                 </div>
               </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <el-button @click="getAllSearch()" type="primary"
-                  >查询</el-button
-                >
-                <el-button @click="reset()">重置</el-button>
-              </el-col>
+              <el-button @click="getAllSearch()" type="primary">查询</el-button>
+              <el-button @click="reset()">重置</el-button>
+              <el-col :span="4" style="margin-left:10px"> </el-col>
             </el-row>
           </div>
           <div class="content">
@@ -87,6 +85,7 @@
               v-loading="loading"
               style="width: 100%;margin-top: 20px"
               :row-key="getRowKeys"
+              :height="$tableHeight - 10"
             >
               <el-table-column
                 type="selection"
@@ -192,6 +191,7 @@
               @ok="succeedRun"
               :info="info"
               :runIds="runIds"
+              :sql="sql"
               v-if="showRunDialog"
             ></runNow>
           </el-dialog>
@@ -232,7 +232,7 @@ export default {
     // AddOrEdit,
     runNow,
     ruleTree,
-    addOrUpdate,
+    addOrUpdate
   },
   data() {
     return {
@@ -301,12 +301,11 @@ export default {
       },
       // 选中的规则节点
       ruleCheckData: {},
+      //sql语句
+      sql: ""
     };
   },
   created() {
-    //高度自适应
-    // window.addEventListener("resize", this.getHeight);
-    // this.getHeight();
     //获取列表
     // this.initData();
   },
@@ -444,13 +443,18 @@ export default {
     //立即运行
     runNow() {
       var arrIds = "";
+      var sql = [];
       for (var j = 0; j < this.multipleSelection.length; j++) {
         arrIds += this.multipleSelection[j].ruleId + ",";
       }
       if (arrIds != null && arrIds != "" && arrIds != undefined) {
         arrIds = arrIds.substr(0, arrIds.length - 1);
       }
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        sql.push(this.multipleSelection[i].ruleSqlValue);
+      }
       this.runIds = arrIds;
+      this.sql = sql;
       this.showRunDialog = true;
       this.info = false;
     },
@@ -510,7 +514,7 @@ export default {
     clearTableChecked() {
       this.$refs.tableData.clearSelection(this.multipleTable);
       this.multipleSelection = [];
-    },
+    }
   }
 };
 </script>

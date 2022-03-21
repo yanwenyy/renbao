@@ -25,7 +25,13 @@
                 </span>
               </span>
             </el-tree> -->
-            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" @getbatchData="getbatchData" v-on:refreshBitchData="initTree" :isParent="false"></batch-list>
+            <batch-list
+              :batchLoading="treeLoading"
+              :batchTreeList="batchTreeList"
+              @getbatchData="getbatchData"
+              v-on:refreshBitchData="initTree"
+              :isParent="false"
+            ></batch-list>
           </div>
         </el-card>
       </el-col>
@@ -211,7 +217,7 @@
 <script>
 import detail from "./component/detailExport-detail.vue";
 import { exportZip } from "@/utils";
-import batchList from '../../common/batch-list.vue'
+import batchList from "../../common/batch-list.vue";
 export default {
   components: {
     detail,
@@ -464,7 +470,7 @@ export default {
       this.initData();
     },
     //左点右显
-    getbatchData(data,node ) {
+    getbatchData(data, node) {
       this.batchId = data.batchId;
       this.initData();
     },

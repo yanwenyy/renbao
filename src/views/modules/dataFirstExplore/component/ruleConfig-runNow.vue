@@ -69,12 +69,14 @@
   </div>
 </template>
 <script>
+import { transSql } from "@/utils/publicFun.js";
 import choose from "./ruleConfig-chooseHospital.vue";
 import basicInformation from "@/views/modules/dataAcquisition/basicInformation.vue";
 export default {
   props: {
     info: { type: Boolean },
-    runIds: { type: String }
+    runIds: { type: String },
+    sql: { type: Array }
   },
   components: {
     choose,
@@ -109,7 +111,8 @@ export default {
           return [`${hour}:${minute}:${second} - 23:59:59`];
         })()
       },
-      showHospitalDialog: false
+      showHospitalDialog: false,
+      resultSqlValue: []
     };
   },
   methods: {
@@ -132,7 +135,8 @@ export default {
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
-                  runType: 1
+                  runType: 1,
+                  resultSqlValue: this.resultSqlValue
                 },
                 false
               )
@@ -171,7 +175,8 @@ export default {
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
-                  runType: 2
+                  runType: 2,
+                  resultSqlValue: this.resultSqlValue
                 },
                 false
               )
@@ -216,6 +221,10 @@ export default {
     getData() {
       //获取已选医院数据
       let data = this.$refs.hospital.multipleSelection;
+      //转换sql处理
+      for (var i = 0; i < this.sql.length; i++) {
+        this.resultSqlValue.push(transSql(this.sql[i], data));
+      }
       //处理医院数据并反显
       var hospitalCodes = "";
       var hospitalNames = "";

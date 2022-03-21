@@ -14,7 +14,7 @@
         <el-input class="no-autofill-pwd" v-model="dataForm.comfirmPassword" type="text" placeholder="确认密码"></el-input>
       </el-form-item>
       <el-form-item label="用户姓名" prop="userName">
-        <el-input v-model="dataForm.userName" placeholder="用户姓名"></el-input>
+        <el-input v-model="dataForm.userName" placeholder="用户姓名（30字以内）" maxlength="30"></el-input>
       </el-form-item>
       <el-form-item label="工号" prop="userNumber">
         <el-input v-model="dataForm.userNumber" placeholder="工号"></el-input>
