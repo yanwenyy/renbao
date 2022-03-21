@@ -22,9 +22,10 @@
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
+    <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      height="60vh"
+      :height="$tableHeight + 32"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
