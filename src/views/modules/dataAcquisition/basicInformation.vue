@@ -2,15 +2,15 @@
 <template>
     <div class='threeData'>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
-            <el-form-item label="医疗机构名称：">
+            <el-form-item label="医疗机构名称:">
                 <el-input v-model="dataForm.hospitalName" placeholder="请输入搜索内容" clearable></el-input>
             </el-form-item>
-             <el-form-item label="医疗机构类别：">
+             <el-form-item label="医疗机构类别:">
                 <el-select v-model="dataForm.hospitalType" placeholder="请输入搜索内容" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="年度医保基金支付总金额：">
+            <el-form-item label="年度医保基金支付总额:">
                 <el-col :span="11">
                 <el-input placeholder="请输入搜索内容" v-model="dataForm.moneyStart" style="width: 100%;"></el-input>
                 </el-col>
@@ -27,11 +27,11 @@
         <!-- 列表 -->
         <div class="listDisplay">
             <div class='f_right'>         
-                <el-button size="mini" type="warning" @click="templateExport">下载模板</el-button>           
-                <el-button size="mini" type="warning" @click="exportData">导出数据</el-button>
-                <el-button size="mini" type="warning" @click="importData">导入数据</el-button>
+                <el-button type="warning" @click="templateExport">下载模板</el-button>           
+                <el-button type="warning" @click="exportData">导出数据</el-button>
+                <el-button type="warning" @click="importData">导入数据</el-button>
             </div>
-            <el-table ref="multipleTable" :data="tableList" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading='tableLoading' @selection-change="handleSelectionChange">
+            <el-table ref="multipleTable" :data="tableList" border style="100%" height="60vh" class="demo-ruleForm" v-loading='tableLoading' @selection-change="handleSelectionChange">
                 <el-table-column type="selection"></el-table-column>
                 <template v-for="(item,index) in tableColumns" width="55">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
@@ -84,7 +84,7 @@ export default {
             importVisible:false,
             apComServerData:{
                 current: 1,
-                size: 10,
+                size: 10000,
                 pageNum:1,
                 total:0,
                 pageIndex:1,
@@ -105,14 +105,17 @@ export default {
             importType:'',
             selectOption:[{
                     value: '0',
-                    label: '全量'
+                    label: '删除现有数据'
                 },{
                     value: '1',
-                    label: '增量'
+                    label: '保留现有数据'
             }],
             catalogType:10,
             multipleSelection:'',
-            
+            hospitalType:{
+                yljgbm:'',
+                yljgmc:''
+            }
         }
     },
      created(){
@@ -151,7 +154,11 @@ export default {
         },
           //多选
         handleSelectionChange(val){
-             this.multipleSelection = val
+            this.multipleSelection = val
+            for(var i =0;i<this.multipleSelection.length;i++){
+                this.hospitalType.yljgbm = this.multipleSelection[i].医疗机构名称
+                this.hospitalType.yljgmc = this.multipleSelection[i].医疗机构编码
+            }
         },
         //上传文件事件
         handleChange(file,fileList){
@@ -186,6 +193,7 @@ export default {
         },
         handlePreview(){
             this.fileList = []
+            
         },
         //重置
         resetForm(formName){
