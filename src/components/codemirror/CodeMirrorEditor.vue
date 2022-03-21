@@ -118,7 +118,7 @@
                 </el-table-column>
               </el-table>
             </div>
-            <el-table v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">
+            <el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">
               <el-table-column v-if="item.list[0]" v-for="(vtem,key,index) in item.list[0]" :key="index" :label="key">
                 <template slot-scope="scope">
                   <div>
@@ -233,27 +233,30 @@
         <el-button type="primary" @click="saveSqlClick()">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
-      <el-form>
-        <el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">
-          <el-select class="paramsSel" v-model="item.paramsValue" multiple placeholder="请选择">
-            <el-option
-              v-for="(vtem,i) in item.list"
-              :key="i"
-              :label="vtem.name||vtem.id"
-              :value="vtem.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="closeParams()">取消</el-button>
-        <el-button type="primary" @click="Paramssub()">确定</el-button>
-      </span>
-    </el-dialog>
+    <!--<el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">-->
+      <!--<el-form>-->
+        <!--<el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">-->
+          <!--<el-select class="paramsSel" v-model="item.paramsValue" multiple placeholder="请选择">-->
+            <!--<el-option-->
+              <!--v-for="(vtem,i) in item.list"-->
+              <!--:key="i"-->
+              <!--:label="vtem.name||vtem.id"-->
+              <!--:value="vtem.id">-->
+            <!--</el-option>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
+      <!--</el-form>-->
+      <!--<span slot="footer" class="dialog-footer">-->
+        <!--<el-button @click="closeParams()">取消</el-button>-->
+        <!--<el-button type="primary" @click="Paramssub()">确定</el-button>-->
+      <!--</span>-->
+    <!--</el-dialog>-->
+    <params-list :paramsList="paramsList" :paramsSub="paramsSub" :paramsSql="editorValue"></params-list>
   </div>
 </template>
 <script>
+  import paramsList from './paramsList'
+
   import {codemirror} from "vue-codemirror";
   import "codemirror/theme/blackboard.css";
   import "codemirror/mode/javascript/javascript.js";
@@ -303,7 +306,8 @@
 
   export default {
     components: {
-      codemirror
+      codemirror,
+      paramsList
     },
     // props: ["cmTheme", "cmMode", "autoFormatJson", "jsonIndentation",'treeLable','tableData'],
     props: {
@@ -392,12 +396,18 @@
         type: Function,
         default: null,
       },
+      //左侧参数树的数据
+      paramsData: {
+        type: Array,
+        default: null,
+      },
     },
     data() {
       return {
+        boxHeight:0,
         dragParmasList:[],//拖拽进来的参数数组
-        SelfparamsList:[],//参数设置列表
-        SlefparamsListVisible:false,//参数设置显示状态
+        // SelfparamsList:[],//参数设置列表
+        // SlefparamsListVisible:false,//参数设置显示状态
         sqlKeyWord:[
           "select ",
           "from",
@@ -539,7 +549,6 @@
             this.treeValve = val;
             if (val !== "") {
 
-
               if( Object.keys(this.paramsNode).length>0){
                 this.dragParmasList.push(this.paramsNode);
                 //制作标签dom(颜色样式自行设置)
@@ -609,39 +618,43 @@
           if (val != "") {
             if (val !== "") {
               this.editorValue=val;
+              if(this.$refs.myCm){
+                this.idToButton();
+              }
+
             }
           }
         },
       },
-      paramsListVisible: {
-        // 实时监控数据变化
-        deep: true,
-        handler(val) {
-          if (val) {
-            this.SlefparamsListVisible=true;
-          }
-        },
-      },
-      paramsList: {
-        deep: true,
-        handler(val) {
-          if (val) {
-            if (val.length>0) {
-              this.SelfparamsList=val;
-            }
-          }
-        },
-      },
-      SelfparamsList: {
-        deep: true,
-        handler(val) {
-          if (val) {
-            if (val.length>0) {
-              this.SlefparamsListVisible=true;
-            }
-          }
-        },
-      },
+      // paramsListVisible: {
+      //   // 实时监控数据变化
+      //   deep: true,
+      //   handler(val) {
+      //     if (val) {
+      //       this.SlefparamsListVisible=true;
+      //     }
+      //   },
+      // },
+      // paramsList: {
+      //   deep: true,
+      //   handler(val) {
+      //     if (val) {
+      //       if (val.length>0) {
+      //         this.SelfparamsList=val;
+      //       }
+      //     }
+      //   },
+      // },
+      // SelfparamsList: {
+      //   deep: true,
+      //   handler(val) {
+      //     if (val) {
+      //       if (val.length>0) {
+      //         this.SlefparamsListVisible=true;
+      //       }
+      //     }
+      //   },
+      // },
       resultTableTabs: {
         // 实时监控数据变化
         deep: true,
@@ -684,33 +697,82 @@
     },
     mounted(){
       this.dragControllerDiv2();
+      if(this.sqlData!=''){
+       this.idToButton();
+      }
     },
     methods: {
-      //参数设置确定点击
-      Paramssub(){
+          //将参数id转换成按钮显示到页面
+      idToButton(){
+        this.$refs.myCm.codemirror.setCursor({line:1,ch:this.sqlData.length});
+        console.log(this.$refs.myCm.codemirror.getCursor())
+        this.paramsData.forEach(item=>{
+          if(item.children&&item.children.length>0){
+            item.children.forEach(vtem=>{
+              if(this.editorValue.indexOf("{#"+vtem.id+"#}")!=-1){
+                this.dragParmasList.push(vtem);
+                var line=this.$refs.myCm.codemirror.getCursor().line;
+                var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
+                var id="{#"+vtem.id+"#}";
+                this.editorValue=this.editorValue.replace(id,'');
 
-        var _str=JSON.parse(JSON.stringify(this.editorValue));
-        this.paramsList.forEach(item=>{
-          console.log(item)
-          if(this.editorValue.indexOf("{#"+item.id+"#}")!=-1&&item.paramsValue){
-
-            var _reg=new RegExp("{#"+item.id+"#}",'g');
-            var _s=JSON.parse(JSON.stringify(item.paramsValue.join(",")));
-            var _sreg=new RegExp(",",'g');
-            _s=_s.replace(_sreg ,"','");
-            _s="'"+_s+"'";
-            _str=_str.replace(_reg, _s);
-            console.log(_str)
+                var dom = document.createElement("button");
+                dom.className = "parmasBtn";
+                dom.innerHTML = vtem.name;
+                dom.id=id;
+                var startCursor = {ch: ch[0], line: line, sticky: null};
+                const endPos = { line: ch[0]+("{#"+vtem.id+"#}").length, ch: line + id.length,sticky:null };
+                this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
+                this.$refs.myCm.codemirror.markText(startCursor, endPos, {
+                  replacedWith: dom,
+                  className:"paramBlock",
+                });
+              }
+            })
           }
-        });
-        this.closeParams();
-        this.paramsSub(_str);
+        })
       },
-      //参数设置取消点击
-      closeParams(){
-        this.SelfparamsList=[];
-        this.SlefparamsListVisible=false;
+      /**
+       * 获取某行内容中字符串出现的位置数组
+       * @param text 文本内容
+       * @param str 字符串
+       * @param index 出现位置
+       * @param indexArr 位置数组
+       * */
+      getIndexArr(text, str, index, indexArr) {
+        index = text.indexOf(str, index);
+        console.log(index)
+        if (index > -1) {
+          indexArr.push(index);
+          indexArr = this.getIndexArr(text, str, parseInt(index + 1), indexArr);
+        }
+        return indexArr;
       },
+      // //参数设置确定点击
+      // Paramssub(){
+      //
+      //   var _str=JSON.parse(JSON.stringify(this.editorValue));
+      //   this.paramsList.forEach(item=>{
+      //     console.log(item)
+      //     if(this.editorValue.indexOf("{#"+item.id+"#}")!=-1&&item.paramsValue){
+      //
+      //       var _reg=new RegExp("{#"+item.id+"#}",'g');
+      //       var _s=JSON.parse(JSON.stringify(item.paramsValue.join(",")));
+      //       var _sreg=new RegExp(",",'g');
+      //       _s=_s.replace(_sreg ,"','");
+      //       _s="'"+_s+"'";
+      //       _str=_str.replace(_reg, _s);
+      //       console.log(_str)
+      //     }
+      //   });
+      //   this.closeParams();
+      //   this.paramsSub(_str);
+      // },
+      // //参数设置取消点击
+      // closeParams(){
+      //   this.SelfparamsList=[];
+      //   this.SlefparamsListVisible=false;
+      // },
       setHintList(list){
         list.forEach(item=>{
           item.name=item[this.hintShowName];
@@ -736,6 +798,7 @@
         var _topBtn=document.getElementsByClassName("btn-group");
         var _bottom = document.getElementById('bottom');
         var _box = document.getElementById('box');
+        this.boxHeight=_box.offsetHeight||'85vh';
         resize.onmousedown = function (e) {
           //颜色改变提醒
           resize.style.background = '#818181';
@@ -1101,6 +1164,7 @@
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
+
         // this.completeIfInTag(cm);
         // if(this.editorValue!=''){
         //   var tok = cm.getTokenAt(cm.getCursor());

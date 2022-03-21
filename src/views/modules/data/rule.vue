@@ -73,6 +73,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
+          :height="$tableHeight-75"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -457,7 +458,7 @@ import ImportFile from './Import-file.vue'
     justify-content: space-between;
   }
   .box>div{
-    height: 74vh;
+    height: 73vh;
     /*border: 1px solid #ddd;*/
     padding: 1%;
     overflow: auto;

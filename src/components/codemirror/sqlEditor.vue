@@ -103,7 +103,7 @@
       </div>
     </div>
     <div v-if="!fullScreen" class="resize tree-resize" title="收缩侧边栏">
-      <div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>
+      <!--<div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>-->
     </div>
     <div class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
       <!--<div class="tool-bar">-->
@@ -131,6 +131,7 @@
         <!--<el-button type="primary" size="small" style="margin-left:10x" @click="setValue">修改内容</el-button>-->
       <!--</div>-->
       <code-mirror-editor
+        :paramsData="paramsData"
         :resultTabClick="resultTabClick"
         :useChinese="useChinese"
         :getwsData="getwsData"

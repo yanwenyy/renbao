@@ -36,6 +36,7 @@ Vue.config.productionTip = false
 if (process.env.NODE_ENV !== 'production') {
   require('@/mock')
 }
+Vue.prototype.$tableHeight = document.documentElement.clientHeight-270;
 Vue.prototype.$moment = moment
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法

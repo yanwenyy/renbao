@@ -44,6 +44,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      :height="$tableHeight"
       :data="dataList"
       border
       v-loading="dataListLoading"
