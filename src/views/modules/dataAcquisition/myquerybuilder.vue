@@ -215,8 +215,8 @@ export default {
 
 <style scoped>
  .kongxi{
-   /* overflow-y: auto; */
-   /* overflow-x:hidden; */
+   overflow-y: auto;
+   overflow-x:hidden;
    position: absolute;
    max-height: 60vh;
  }
