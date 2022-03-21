@@ -20,7 +20,7 @@
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                     <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -49,7 +49,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -77,7 +77,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" height="60vh" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -119,7 +119,12 @@
                 </el-pagination>
             <el-dialog title="导入数据" :visible.sync="addUploadVisible">
                 <div style="padding-bottom:10px;">
-                    <span>导入类型</span>
+                    <span style="font-size:16px;">
+                        是否去重
+                    </span>
+                    <el-checkbox v-model="duplicateRemove"></el-checkbox>
+                    <br>
+                    <span style="font-size:16px;">导入类型</span>
                     <el-select v-model="importType" placeholder="请选择" style="margin-left:10px;">
                          <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
@@ -171,6 +176,7 @@ export default {
             show:false,
             isShow:false,
             importType: '',
+            duplicateRemove:false,
             options: [
                 {
                     value: '0',
@@ -249,6 +255,12 @@ export default {
   
         //上传文件 导入
         uploadFile(){
+            let arrDuplicate =''
+            if(this.duplicateRemove == false){
+                 arrDuplicate = 0
+            }else if(this.duplicateRemove == true){
+                 arrDuplicate = 1
+            }
             let formData = new FormData()
             formData.append('file',this.fileList[0].raw)
             this.$http({
@@ -257,58 +269,42 @@ export default {
                 data:formData,
                 params :this.$http.adornParams({
                     catalogType:this.dataForm.dataType,
+                    duplicateRemove:arrDuplicate,
                     importType:this.importType
                 })
-                }).then(({data})=>{
-                    if(data && data.code === 200){
-                        this.$message({
-                            message: '导入成功',
-                            type: 'success',
-                            onClose: () => {
-                                this.addUploadVisible=false;
-                                this.getDataList();
-                            }
-                        })
-                    }else{
-                        this.$message.error(data.message)
-                    }
-                })
+            }).then(({data})=>{
+                if(data && data.code === 200){
+                    this.$message({
+                        message: '导入成功',
+                        type: 'success',
+                        onClose: () => {
+                            this.addUploadVisible=false;
+                            this.getDataList();
+                        }
+                    })
+                }else{
+                    this.$message.error(data.message)
+                }
+            })
         },
         //导出
         exportData(){
             let url = this.$http.adornUrl('/threeCatalog/exportExcelFileCommon?catalogType='+this.dataForm.dataType+'&token=') + this.$cookie.get('token')
             window.open(url)
-            // this.$http({
-            //     url:this.$http.adornUrl('/threeCatalog/exportExcelFileCommon'),
-            //     method: "get",
-            //     responseType: 'blob',//解决乱码问题
-            //     params :this.$http.adornParams({
-            //         catalogType:this.dataForm.dataType,
-            //     })
-            // }).then(({data})=>{
-            //     console.log(data)
-            //     const blob =  new Blob([data]);
-            //     let fileName = this.fileName + '.xls';
-            //     if("download" in document.createElement("a")){
-            //         const elink = document.createElement("a")
-            //         elink.download = fileName;
-            //         elink.style.display = "none";
-            //         elink.href = URL.createObjectURL(blob);  // 创建下载的链接
-            //         document.body.appendChild(elink)
-            //         elink.click(); // 点击下载
-            //         URL.revokeObjectURL(elink.href);// 释放掉blob对象
-            //         document.body.removeChild(elink)// 下载完成移除元素
-            //     }else{
-            //         navigator.msSaveBlob(blob,fileName)
-            //     }
-            // })
         },
         //导入数据
         ImportData(){
             this.addUploadVisible = true
         },
         //点击上传
-        handlePreview(){},
+        handlePreview(){
+            // if(this.importType.length == 0){
+            //     this.$message.error("请选择要采集的文件")
+            //     return;
+            // }else{
+            //      this.uploadFile()
+            // }
+        },
         //select时间
         changeOption(val){
             if(val == 1){

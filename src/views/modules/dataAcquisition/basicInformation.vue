@@ -22,16 +22,19 @@
             <el-form-item>
                 <el-button type="primary" @click="getDataList()">查询</el-button>
                 <el-button @click="resetForm('dataForm')">重置</el-button>
+                <el-button type="warning" @click="templateExport">下载模板</el-button>           
+                <el-button type="warning" @click="exportData">导出数据</el-button>
+                <el-button type="warning" @click="importData">导入数据</el-button>
             </el-form-item>
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <div class='f_right'>         
-                <el-button type="warning" @click="templateExport">下载模板</el-button>           
+            <!-- <div class='f_right'>          -->
+                <!-- <el-button type="warning" @click="templateExport">下载模板</el-button>           
                 <el-button type="warning" @click="exportData">导出数据</el-button>
-                <el-button type="warning" @click="importData">导入数据</el-button>
-            </div>
-            <el-table ref="multipleTable" :data="tableList" border style="100%" height="60vh" class="demo-ruleForm" v-loading='tableLoading' @selection-change="handleSelectionChange">
+                <el-button type="warning" @click="importData">导入数据</el-button> -->
+            <!-- </div> -->
+            <el-table ref="multipleTable" :data="tableList" border style="100%" class="demo-ruleForm" v-loading='tableLoading' @selection-change="handleSelectionChange" :height="$tableHeight-75">
                 <el-table-column type="selection"></el-table-column>
                 <template v-for="(item,index) in tableColumns" width="55">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
@@ -49,6 +52,11 @@
         </div>
         <el-dialog title="导入数据" :visible.sync="importVisible">
             <div style="padding-bottom:10px;">
+                <span style="font-size:16px;">
+                是否去重
+                </span>
+                 <el-checkbox v-model="duplicateRemove"></el-checkbox>
+                 <br>
                 <span>导入类型</span>
                 <el-select v-model="importType" placeholder="请选择" style="margin-left:10px;">
                         <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -89,6 +97,7 @@ export default {
                 total:0,
                 pageIndex:1,
             },
+            duplicateRemove:false,
             tableList:[],
             tableColumns:[],
             options:[{
@@ -111,7 +120,7 @@ export default {
                     label: '保留现有数据'
             }],
             catalogType:10,
-            multipleSelection:'',
+            multipleSelection:[],
             hospitalType:{
                 yljgbm:'',
                 yljgmc:''
@@ -154,11 +163,7 @@ export default {
         },
           //多选
         handleSelectionChange(val){
-            this.multipleSelection = val
-            for(var i =0;i<this.multipleSelection.length;i++){
-                this.hospitalType.yljgbm = this.multipleSelection[i].医疗机构名称
-                this.hospitalType.yljgmc = this.multipleSelection[i].医疗机构编码
-            }
+            console.log(val)
         },
         //上传文件事件
         handleChange(file,fileList){
@@ -166,6 +171,12 @@ export default {
             console.log(this.fileList)
         },
         uploadFile(itme){
+            let arrDuplicate =''
+            if(this.duplicateRemove == false){
+                 arrDuplicate = 0
+            }else if(this.duplicateRemove == true){
+                 arrDuplicate = 1
+            }
             let formData = new FormData()
             formData.append('file',this.fileList[0].raw)
             this.$http({
@@ -174,6 +185,7 @@ export default {
                 data: formData,
                 params :this.$http.adornParams({
                     importType:this.importType,
+                    duplicateRemove:arrDuplicate,
                     catalogType:10,
                 })
                 }).then(({data})=>{
