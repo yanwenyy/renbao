@@ -57,7 +57,9 @@ export default {
             },
             fileList:[],
             token:'',
-            fileInfoId:''
+            fileInfoId:'',
+            fileId:'',
+            importId:''
         }
     },
     created(){
@@ -97,7 +99,7 @@ export default {
         },
 
         //上传文件 导入
-        uploadFile(){
+        uploadFile(data){
             let formData = new FormData()
             formData.append('file',this.fileList[0].raw)
             this.$http({
@@ -106,23 +108,52 @@ export default {
                 data:formData,
                 }).then(({data})=>{
                     if(data && data.code === 200){
-                        this.fileInfoId = data.result.fileInfoId
+                        this.fileId = data.result.uploaderId
                         console.log( this.fileInfoId )
                         this.$message({
                             message: '导入成功',
                             type: 'success',
                             onClose: () => {
                                 this.showImportVisible=false;
-                                this.initData();
+                                this.initDataList()
+                  
                             }
                         })
+                        // this.initData()
+                }else{
+                     this.$message.error(data.message)
+                }
+            })
+        },
+        initDataList(){
+            this.$http({
+                url:this.$http.adornUrl('/collectTemplate/importTemplate'),
+                method: "post",
+                params: this.$http.adornParams({
+                    collectTemplateId:this.importId,
+                    fileInfoId:this.fileId,
+                })
+                }).then(({data})=>{
+                    if(data && data.code === 200){
+                        // this.tableData = data.result
+                        this.$message({
+                            message: '导入成功',
+                            type: 'success',
+                            onClose: () => {
+                                // this.showImportVisible=false;
+                                this.initData()
+                  
+                            }
+                        })
+                        // this.initData()
                     }else{
                         this.$message.error(data.message)
                     }
                 })
         },
         //导入模板
-        getImportclick(){
+        getImportclick(data){
+            this.importId  = data.collectTemplateId
             this.showImportVisible = true
         },
         //导出模板
