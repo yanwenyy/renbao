@@ -410,7 +410,7 @@
       :visible.sync="tableDataViewDialogVisible"
       width="70%"
       :close-on-click-modal="false">
-      <data-view :table-name="checkTableName"/>
+      <data-view :table-name="checkTableName" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
       </span>

@@ -840,3 +840,10 @@
     }
   }
 </script>
+<style scoped lang="scss">
+.fileDia /deep/ .el-table thead tr, .el-table thead th {
+  background: #F5F5F7 !important;
+  border-radius: 4px;
+  height: 52px;
+}
+</style>
