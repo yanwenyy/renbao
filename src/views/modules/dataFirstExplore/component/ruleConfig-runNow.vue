@@ -206,6 +206,11 @@ export default {
     //选择医院弹窗
     chooseHospital() {
       this.showHospitalDialog = true;
+      this.$nextTick(() => {
+        if (this.$refs.hospital) {
+          this.$refs.hospital.reSetHospital();
+        }
+      });
     },
     //选择医院确定
     getData() {
