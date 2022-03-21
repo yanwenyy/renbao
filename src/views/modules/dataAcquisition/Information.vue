@@ -36,7 +36,10 @@
                 </transition>
             </div>
             <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <template v-for="(item,index) in tableColumns">
+                    <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                </template>
+                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                 <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -58,7 +61,7 @@
                 <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                 <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
                 <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
@@ -75,7 +78,10 @@
             </div>
              <!-- 医保诊疗项目 -->
             <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <template v-for="(item,index) in tableColumns">
+                    <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                </template>
+                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                 <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -96,7 +102,7 @@
                 <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
                 <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                 <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
@@ -114,7 +120,10 @@
             </div>
             <!-- 医保耗材目录 -->
             <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <template v-for="(item,index) in tableColumns">
+                    <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                </template>
+                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
                 <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
                 <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
@@ -133,7 +142,7 @@
                 <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
                 <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
                 <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column>
+                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
@@ -295,8 +304,13 @@ export default {
             }],
                 tableList:[],
                 tableList0:[],
-                sqlData:''
+                sqlData:'',
+                tableColumns:[]
         }
+    },
+     created(){
+        // this.getDataList();
+        this.token = this.$cookie.get("token");
     },
     methods:{
         //选中事件
@@ -341,8 +355,9 @@ export default {
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
-                    this.tableList = data.result.records
-                    this.apComServerData.total = data.result.total
+                    this.tableList = data.result.result
+                    this.tableColumns = data.result.columns
+                    this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.dataList = [];
                     this.apComServerData.total = 0; 
@@ -379,29 +394,31 @@ export default {
         },
         //导出
         reportList(){
-            this.$http({
-                url:this.$http.adornUrl('/threeCatalog/excelDataExport'),
-                method: "get",
-                responseType: 'blob',//解决乱码问题
-                params :this.$http.adornParams({
-                    catalogType:this.ruleForm.catalogType,
-                })
-            }).then(({data})=>{
-                const blob =  new Blob([data]);
-                let fileName = this.fileName + '.xls';
-                if("download" in document.createElement("a")){
-                    const elink = document.createElement("a")
-                    elink.download = fileName;
-                    elink.style.display = "none";
-                    elink.href = URL.createObjectURL(blob);  // 创建下载的链接
-                    document.body.appendChild(elink)
-                    elink.click(); // 点击下载
-                    URL.revokeObjectURL(elink.href);// 释放掉blob对象
-                    document.body.removeChild(elink)// 下载完成移除元素
-                }else{
-                    navigator.msSaveBlob(blob,fileName)
-                }
-            })
+            let url = this.$http.adornUrl('/threeCatalog/excelDataExport?catalogType='+this.ruleForm.catalogType+'&token=') + this.$cookie.get('token')
+            window.open(url)
+            // this.$http({
+            //     url:this.$http.adornUrl('/threeCatalog/excelDataExport'),
+            //     method: "get",
+            //     responseType: 'blob',//解决乱码问题
+            //     params :this.$http.adornParams({
+            //         catalogType:this.ruleForm.catalogType,
+            //     })
+            // }).then(({data})=>{
+            //     const blob =  new Blob([data]);
+            //     let fileName = this.fileName + '.xls';
+            //     if("download" in document.createElement("a")){
+            //         const elink = document.createElement("a")
+            //         elink.download = fileName;
+            //         elink.style.display = "none";
+            //         elink.href = URL.createObjectURL(blob);  // 创建下载的链接
+            //         document.body.appendChild(elink)
+            //         elink.click(); // 点击下载
+            //         URL.revokeObjectURL(elink.href);// 释放掉blob对象
+            //         document.body.removeChild(elink)// 下载完成移除元素
+            //     }else{
+            //         navigator.msSaveBlob(blob,fileName)
+            //     }
+            // })
         },
         //复杂查询展开事件
         handleChange(){
