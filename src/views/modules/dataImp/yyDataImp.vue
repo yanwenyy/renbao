@@ -73,15 +73,28 @@
       width="70%"
       :close-on-click-modal="false"
       >
-      <!-- <el-row>批次名称：
+      <el-row  v-if="!hosBatchFlag">
+        医院名称：
         <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur">
           <el-option v-for="(item, index) in hospitalList"
-                    :label="item.hospitalName"
-                    :value="item.hospitalName"
+                    :label="item['医疗机构名称']"
+                    :value="item['医疗机构名称']"
+                    :key="index"
+          ></el-option>
+          </el-select>
+          <el-button type="primary" @click="getHosBatch">选择已有批次</el-button>
+      </el-row>
+      <el-row v-if="hosBatchFlag">
+        批次名称：
+        <el-select  v-model="hosBatchId" placeholder="" filterable>
+          <el-option v-for="(item, index) in hosBatchList"
+                    :label="item.hospitalCollectPlanBath"
+                    :value="item.hospitalCollectPlanId"
                     :key="index"
           ></el-option>
         </el-select>
-      </el-row> -->
+        <el-button type="primary" @click="getHospital">选择医院</el-button>
+      </el-row>
       <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row> 
       <!-- 文件树 -->
       <el-row :gutter="6">
@@ -153,7 +166,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="fileTreeDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="checkFileTable">下一步</el-button>
+        <el-button type="primary" @click="checkFileTable">下一步</el-button>
       </span>
     </el-dialog>
     <el-dialog 
@@ -501,6 +514,8 @@
         checkTableName: '',
         // 导入数据集合
         importDataModelList: [],
+        // 文件名
+        fileName: '',
         // 医院名
         hospitalName: '',
         // 医院采集路径
@@ -508,7 +523,7 @@
         // 医院批次Id
         hosBatchId: '',
         // 医院批次名称
-        hosBatchName: '',
+        hosBatchFlag: false,
         // 导入数据集合
         importDataModelList: [],
         // 文件表对应关系
@@ -519,6 +534,8 @@
         dmpImp: {},
         // 所有医院列表
         hospitalList: [],
+        // 所有医院批次列表
+        hosBatchList: [],
         // 长连接
         webSocket: null,
         // webSocket返回值
@@ -559,6 +576,37 @@
       },
     },
     methods: {
+      // 获取医院批次
+      getHosBatch() {
+        this.hosBatchFlag = true
+        this.hosBatchId = ''
+        this.$http({
+          url: this.$http.adornUrl(`hospitalCollectPlan/selectList`),
+          method: 'get'
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            // 获取医院批次列表
+            this.hosBatchList = data.result
+          }
+        })
+      },
+      getHospital(){
+        this.hosBatchFlag = false
+        this.hospitalName = ''
+        this.$http({
+          url: this.$http.adornUrl(`hospitalBasicInfo/getPageList`),
+          method: 'get',
+          params: this.$http.adornParams({
+                'pageNum': 1,
+                'pageSize': 1000,
+            })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            // 获取医院列表
+            this.hospitalList = data.result.result
+          }
+        })
+      },
       // 关闭日志弹窗
       closeLog(){
           this.dmpLogDialogVisible = false
@@ -601,6 +649,10 @@
         this.selectedFileData = []
         this.fileTreeDialogVisible = true
         this.fileTreeLoading = true
+        // 医院名称清空
+        this.hospitalName = ''
+        this.fileName = ''
+        this.hosBatchFlag = false
         this.$http({
           url: this.$http.adornUrl(`dataImp/getFileTree/${1}`),
           method: 'get'
@@ -612,21 +664,7 @@
             this.sysPath = data.result.sysPath
           }
         })
-        // this.$http({
-        //   url: this.$http.adornUrl(`hospitalBasicInfo/getPageList`),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //         'pageNum': 1,
-        //         'pageSize': 1000,
-        //     })
-        // }).then(({data}) => {
-        //   if (data && data.code === 200) {
-        //     // 获取医院列表
-        //     this.hospitalList = data.result
-        //     console.log("-----this.hospitalList----")
-        //     console.log(this.hospitalList)
-        //   }
-        // })
+        this.getHospital()
         this.fileTreeLoading = false
       },
       // 获取输入项
@@ -638,6 +676,17 @@
         if (this.selectedFileData.length == 0) {
           this.$message.error("请选择要采集的文件")
           return
+        }
+        if(this.hosBatchFlag) {
+          if(this.hosBatchId == '') {
+             this.$message.error("请选择批次")
+             return
+          }
+        } else{
+          if(this.hospitalName == '') {
+             this.$message.error("请选择医院")
+             return
+          }
         }
         var flag = true
         this.selectedFileData.forEach(item=>{
@@ -828,7 +877,7 @@
       // 导入数据
       impYYData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName}`),
+          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName? this.hospitalName: -1}/${this.fileName}/${this.hosBatchId ? this.hosBatchId: -1}`),
           method: 'post',
           data: this.importDataModelList,
           isLoading: false
@@ -892,6 +941,7 @@
         if (row.ifDir) {
           this.selectedFileData = []
           this.hospitalName = row.name
+          this.fileName = row.name
           this.hospitalPath = row.path
           row.children.forEach(item => {
             // 去除选中的文件夹
