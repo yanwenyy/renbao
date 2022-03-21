@@ -363,6 +363,7 @@ export default {
             padding-left: 20px;
             .result-view-text {
                 color: #0CBDE5;
+                cursor: pointer;
             }
             .option-box {
                 margin-bottom: 10px;
