@@ -6,13 +6,17 @@
                     <el-option  v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item style="float:right">
+                <el-button type="warning" v-show="isShow" @click="exportData">下载模板</el-button> 
+                <el-button type="warning"  @click="ImportData">导入数据</el-button>
+            </el-form-item>
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <div class='f_right'>             
+            <!-- <div class='f_right'>             
                 <el-button size="mini" type="warning" v-show="isShow" @click="exportData">下载模板</el-button>       
                 <el-button size="mini" type="warning"  @click="ImportData">导入数据</el-button>
-            </div>
+            </div> -->
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
@@ -191,10 +195,10 @@ export default {
                 ],
             selectOption:[{
                     value: '0',
-                    label: '全量'
+                    label: '删除现有数据'
                 },{
                     value: '1',
-                    label: '增量'
+                    label: '保留现有数据'
                 }],
             tableList:[],
             tableList0:[],
