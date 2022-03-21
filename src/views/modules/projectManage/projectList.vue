@@ -33,6 +33,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      :height="$tableHeight-75"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"

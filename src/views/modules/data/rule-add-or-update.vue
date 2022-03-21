@@ -102,6 +102,7 @@
 </template>
 <script>
   import { isInteger } from '@/utils/validate'
+  import { transSql } from '@/utils/publicFun'
   import sqlElement from '../projectManage/codemirror'
   import formatDate from '@/utils/formatDate'
   export default {
@@ -190,15 +191,6 @@
       }
     },
     methods: {
-      transSql(str,list,nameList){
-        var _str=JSON.parse(JSON.stringify(str));
-
-        if(list.length>1){
-
-        }else if(list.length==1){
-
-        }
-      },
       //获取当前日期，格式YYYY-MM-DD
       getNowFormatDay() {
         var nowDate=new Date();
@@ -297,7 +289,18 @@
         }
       },
       init (id, ruleCheckData) {
-
+        var sql="select * from 医院基本信息 where 医疗机构编码 = '{#yljgbm#}'  or 医疗机构名称 = '{#yljgmc#}'";
+        var list=[
+          {
+            "yljgbm": "医疗机构编码1",
+            "yljgmc": "医疗机构名称1"
+          },
+          {
+            "yljgbm": "医疗机构编码2",
+            "yljgmc": "医疗机构名称2"
+          }
+        ];
+        transSql(sql,list);
         this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
