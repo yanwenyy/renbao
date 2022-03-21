@@ -438,7 +438,7 @@ export default {
         createUserName: "",
         createTime: ""
       };
-      // this.initData();
+      this.initData();
       this.clearTableChecked();
     },
     //立即运行

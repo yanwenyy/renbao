@@ -4,6 +4,7 @@
     <div class="listDisplay" style="height:500px;overflow-y:auto;">
       <div class="f_right">
         <el-button type="primary" @click="searchList">查询</el-button>
+        <el-button @click="resetForm">重置</el-button>
         <el-button type="warning" @click="reportList">导出</el-button>
       </div>
       <!-- 复杂条件查询 -->
@@ -132,7 +133,10 @@ export default {
       });
     },
     //重置
-    resetForm() {},
+    resetForm() {
+      this.sqlData = ''
+      this.initList();
+    },
     //确定
     /*  ok() {
       this.$emit("ok");
