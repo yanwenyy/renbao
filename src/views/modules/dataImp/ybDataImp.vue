@@ -517,7 +517,9 @@
         // dmp导入失败标志
         dmpImpFalseFlag: false,
         // count 倒计时
-        countDown: 0
+        countDown: 0,
+        //websocketId
+        webSocketId: ''
       }
     },
     components: {
@@ -527,8 +529,9 @@
       this.getDataList()
     },
     mounted(){
+      this.webSocketId = this.getUuid()
       this.webSocket = new PxSocket({
-          url:this.$http.wsUrl('websocket?' + this.userId),
+          url:this.$http.wsUrl('websocket?' + this.webSocketId),
           succ: this.getLogList
         });
         // 当服务端打开连接
@@ -546,6 +549,18 @@
       },
     },
     methods: {
+       getUuid() {
+        var s = []
+        var hexDigits = '0123456789abcdef'
+        for (var i = 0; i < 32; i++) {
+          s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
+        }
+        s[14] = '4' // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1) // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23]
+        var uuid = s.join('')
+        return uuid
+      },
       // 关闭日志弹窗
       closeLog(){
           this.dmpLogDialogVisible = false
@@ -696,7 +711,7 @@
             this.dmpImpFalseFlag = false
             this.dmpLogDialogVisible = true
             this.$http({
-              url: this.$http.adornUrl(`dataImp/impDmpFile/${2}`),
+              url: this.$http.adornUrl(`dataImp/impDmpFile/${2}/${this.webSocketId}`),
               method: 'post',
               data: this.selectedFileData
             }).then(({data}) => {
