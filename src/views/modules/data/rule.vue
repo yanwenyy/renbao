@@ -73,6 +73,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
+          :height="$tableHeight-75"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -333,7 +334,7 @@ import ImportFile from './Import-file.vue'
                 let url = this.$http.adornUrl('/rule/ruleExport?token=') + this.$cookie.get("token");
                 window.open(url);
               this.$message({message: '导出成功',type: 'success'});
-              this.getDataList();
+              // this.getDataList();
             } else {
               this.$message({message: data.message,type: 'error'});
             }
@@ -457,7 +458,7 @@ import ImportFile from './Import-file.vue'
     justify-content: space-between;
   }
   .box>div{
-    height: 74vh;
+    height: 73vh;
     /*border: 1px solid #ddd;*/
     padding: 1%;
     overflow: auto;

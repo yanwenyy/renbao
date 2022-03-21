@@ -27,7 +27,7 @@
                             :limit="1"
                             :file-list="fileList">
                             <el-button size="small" type="primary">点击上传</el-button>
-                            <div slot="tip" class="el-upload__tip">只能上传已导入的文件</div>
+                            <div slot="tip" class="el-upload__tip">只能上传导出的文件</div>
                         </el-upload>
                     </el-form-item>
                 </el-form>

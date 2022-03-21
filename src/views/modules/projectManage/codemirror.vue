@@ -36,13 +36,21 @@
       sqlEdit
     },
     props:{
+
+      //当前页面自己的属性,sql编辑传回来的数据
       sqlEditMsg: {
         type: String,
+        default: null,
+      },
+      //当前页面自己的属性,sql执行的列表数据
+      slqTabelEdt: {
+        type: Array,
         default: null,
       },
     },
     data() {
       return {
+        paramsSqlMsg:'',//当前页面自己的属性 参数点确定之后返回的转义的sql
         paramsList:[],//后台返回的参数列表
         ws:{},//websoket对象
         treeDefaultProps:{
@@ -83,12 +91,20 @@
       }
     },
     watch: {
-      sqlEditMsg(val) {
-        console.log(val,6666)
-        if(val!=''){
+      sqlEditMsg: {
+        // 实时监控数据变化
+        immediate: true,
+        deep: true,
+        handler(val) {
           if(val!=''){
             this.sqlData=val;
+
           }
+        }
+      },
+      slqTabelEdt(val) {
+        if(val){
+         this.resultTableTabs=val;
         }
       }
     },
@@ -102,6 +118,7 @@
       this.resultTableTabs=[];
       this.loadTree=[];
       this.treeData=[];
+      this.resultTableTabs=[];
       this.getSjbData();
       this.getSqlList();
     },
@@ -115,9 +132,11 @@
         this.resultTableTabs=[];
         this.loadTree=[];
         this.treeData=[];
+
         this.getSjbData();
         this.getSqlList();
       }
+      this.resultTableTabs=[];
       this.ws=new PxSocket({
         url:this.$http.wsUrl('websocket?'+this.userId),
         succ:this.getDataList
@@ -129,10 +148,10 @@
     },
     methods: {
       //参数设置确定事件点击
-      paramsSub(sql){//sql传过来的替换过的sql
-
-        console.log("设置参数了"+sql)
+      paramsSub(sql,paramsList){//sql传过来的替换过的sql
+        console.log(paramsList);
         if(sql!=''){
+          this.paramsSqlMsg=sql;
           this.resultTableTabs=[];
           var params={
             sqlScript:sql,
@@ -190,13 +209,15 @@
             v={
               list:datas.data.result||[],
               columnList:datas.data.columnList,
-              msg:datas.message
+              msg:datas.message,
+              codeName:datas.codeName
             };
           }else{
             v={
               list:[],
               columnList:datas.data.columnList,
-              msg:datas.message
+              msg:datas.message,
+              codeName:datas.codeName
             };
           }
           this.resultTableTabs.push(v);

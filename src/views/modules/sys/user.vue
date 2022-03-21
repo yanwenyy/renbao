@@ -65,6 +65,7 @@
       <el-button @click="reset()">重置</el-button>
     </el-form>
     <el-table
+      :height="$tableHeight-58"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"

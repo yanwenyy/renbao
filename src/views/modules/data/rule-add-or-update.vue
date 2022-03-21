@@ -65,14 +65,15 @@
           <el-button type="primary" @click="openSql()">sql编译器</el-button>
           <el-button type="primary">图形化工具</el-button>
           <el-form-item prop="ruleSqlValue" class="no-label">
-            <el-input
-              class="sql-text"
-              type="textarea"
-              :rows="4"
-              readonly
-              placeholder="sql编译器"
-              v-model="dataForm.ruleSqlValue">
-            </el-input>
+            <div class="sqlDiv-html" v-html="dataForm.ruleSqlValue"></div>
+            <!--<el-input-->
+              <!--class="sql-text"-->
+              <!--type="textarea"-->
+              <!--:rows="4"-->
+              <!--readonly-->
+              <!--placeholder="sql编译器"-->
+              <!--v-model="dataForm.ruleSqlValue">-->
+            <!--</el-input>-->
           </el-form-item>
 
         </el-tab-pane>
@@ -86,7 +87,7 @@
     <el-dialog
       custom-class="sql-dialog"
       width="100%"
-      height="100vh"
+      style="height:100vh;overflow: hidden;box-sizing: border-box"
       title="sql编译器"
       :close-on-click-modal="false"
       :show-close="false"
@@ -95,7 +96,7 @@
         <el-button @click="sqlVisible = false">取消</el-button>
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
-      <sql-element ref="sqler" :sqlEditMsg="sqlEditMsg"></sql-element>
+      <sql-element ref="sqler" :sqlEditMsg="sqlEditMsg" :slqTabelEdt="slqTabelEdt"></sql-element>
     </el-dialog>
   </div>
 </template>
@@ -132,6 +133,8 @@
         }
       };
       return {
+        paramsSqlSelf:'',//选择参数后返回的转义的sql
+        slqTabelEdt:[],//sql执行结果
         sqlEditMsg:'',//回显时候的sql语句
         activeName:'1',//tab页切换时的状态值
         sqlVisible:false,//sql编译器显示状态
@@ -187,6 +190,15 @@
       }
     },
     methods: {
+      transSql(str,list,nameList){
+        var _str=JSON.parse(JSON.stringify(str));
+
+        if(list.length>1){
+
+        }else if(list.length==1){
+
+        }
+      },
       //获取当前日期，格式YYYY-MM-DD
       getNowFormatDay() {
         var nowDate=new Date();
@@ -218,15 +230,51 @@
         })
       },
       openSql(){
+        this.sqlEditMsg=this.dataForm.ruleSqlValue;
+
+        // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
+        console.log(this.sqlEditMsg)
+        this.slqTabelEdt=[];
         this.sqlVisible=true;
       },
       //sql编译器点击保存
       sqlSave(){
-        if(this.$refs.sqler.sqlMsg.indexOf("医疗机构编码")==-1||this.$refs.sqler.sqlMsg.indexOf("医疗机构名称")==-1){
+        var paramData=this.$refs.sqler.paramsData;
+        var resultTableTabs=this.$refs.sqler.resultTableTabs;
+        if(resultTableTabs.length==0){
+          this.$message.error("请先执行sql");
+          return false;
+        }
+        var canSave=true;
+        resultTableTabs.forEach(item=>{
+          if(item.codeName=='error'){
+            canSave=false;
+            return false;
+          }
+        });
+        // if(this.$refs.sqler.sqlMsg.indexOf("医疗机构编码")==-1||this.$refs.sqler.sqlMsg.indexOf("医疗机构名称")==-1){
+        if(!canSave){
           this.$message.error("医疗机构编码和医疗机构名称是必填项")
         }else{
+          var SqlStr=JSON.parse(JSON.stringify(this.$refs.sqler.sqlMsg));
+          console.log(SqlStr)
+          paramData.forEach(item=>{
+            if(item.children&&item.children.length>0){
+              item.children.forEach(vtem=>{
+                if(SqlStr.indexOf("{#"+vtem.id+"#}")!=-1){
+                  var _reg=new RegExp("{#"+vtem.id+"#}",'g');
+                  var dom = document.createElement("button");
+                  dom.className = "parmasBtn";
+                  dom.innerHTML = vtem.name;
+                  dom.id=vtem.id;
+                  SqlStr=SqlStr.replace(_reg,`<button class="parmasBtn">${vtem.name}</button>`)
+                }
+              })
+            }
+          });
+          this.paramsSqlSelf=this.$refs.sqler.paramsSqlMsg;
           this.sqlVisible=false;
-          this.dataForm.ruleSqlValue=this.$refs.sqler.sqlMsg;
+          this.dataForm.ruleSqlValue=SqlStr;
           this.dataForm.ruleType='1';
           this.dataForm.folderId = this.ruleCheckData.folderId;
           this.dataForm.folderPath = this.ruleCheckData.folderPath;
@@ -244,25 +292,12 @@
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
-
-        // this.dataForm={
-        //   id: 0,
-        //   ruleName: '',
-        //   ruleCategory: '',
-        //   folderId: '',
-        //   parentName: '',
-        //   createUserName: '',
-        //   // createTime: '',
-        //   ruleSqlValue: '',
-        //   ruleType: '',
-        //   folderPath: ''
-        // };
-
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
       },
       init (id, ruleCheckData) {
+
         this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
@@ -296,7 +331,7 @@
               this.dataForm.createTime = datas.createTime;
               this.dataForm.ruleSqlValue = datas.ruleSqlValue;
               this.sqlEditMsg = datas.ruleSqlValue;
-              console.log(this.sqlEditMsg,33333)
+
               this.dataForm.ruleType = datas.ruleType;
               // this.menuListTreeSetCurrentNode();
             }
@@ -367,7 +402,7 @@
                 'folderId': this.dataForm.folderId,
                 'createUserName': this.dataForm.createUserName,
                 'createTime': this.dataForm.createTime,
-                'ruleSqlValue': this.dataForm.ruleSqlValue,
+                'ruleSqlValue': this.paramsSqlSelf,
                 'ruleType': this.dataForm.ruleType,
                 'folderPath': this.dataForm.folderPath,
               })
@@ -464,6 +499,21 @@
   }
   .no-label >>>.el-form-item__content{
     margin-left: 0!important;
+  }
+  .parmasBtn{
+    border:1px solid #000;
+    border-radius: 4px;
+    padding: 5px;
+    display: inline-block;
+  }
+  .sqlDiv-html{
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #999;
+    margin-top: 10px;
+    border-radius: 4px;
+    min-height: 150px;
+    height: auto;
   }
 </style>
 
