@@ -444,8 +444,10 @@
       title="dmp还原日志"
       :visible.sync="dmpLogDialogVisible"
       width="60%"
+      :before-close="dmpLoghandleClose"
       :close-on-click-modal="false">
-      <el-row style="width: 100%;height:45vh; overflow:auto;">
+      <el-row style="color:red">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
+      <el-row style="width: 100%;height:42vh; overflow:auto;">
         <el-row  
           v-for="(log,index) in webSocketDataList" 
           :key="index">
@@ -583,6 +585,16 @@
       },
     },
     methods: {
+      // dmp日志关闭
+      dmpLoghandleClose(done){
+         this.$confirm('<span style="color:red">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
+         ,{dangerouslyUseHTMLString: true,
+          confirmButtonText: '仍要关闭'})
+          .then(_ => {
+            done()
+          })
+          .catch(_ => {})
+      },
       // 检查文件获取表头情况
       tableRowClassName({row, rowIndex}){
         if(this.errFiles.length > 0) {

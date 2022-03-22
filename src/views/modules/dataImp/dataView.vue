@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div style="height:46vh;overflow:auto;">
     <el-table
       :data="dataList"
       v-loading="dataListLoading"
       border
-      style="width: 100%;height:45vh;overflow:auto;">
+      height="46vh"
+      style="width: 100%;">
       <el-table-column
        v-for="(column,index) in columnList"
        :prop="column.columnName"
