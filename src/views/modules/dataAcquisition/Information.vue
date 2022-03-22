@@ -185,16 +185,29 @@ export default {
             if(val == 1){
                 this.selectNum = val
                 this.fileName = '医保药品目录'
-                this.getDataList(val)
-                // this.show = false
-        
+                if(this.show == false){
+                    this.show = this.show
+                }else{
+                    this.show = !this.show
+                }
+                this.getDataList(val)       
             }else if(val == 2){
                 this.selectNum = val
                 this.fileName = '医保诊疗项目目录'
+                if(this.show == false){
+                    this.show = this.show
+                }else{
+                    this.show = !this.show
+                }
                 this.getDataList(val)
             }else if(val == 3){
                 this.selectNum = val
                 this.fileName = '医保耗材目录'
+                if(this.show == false){
+                    this.show = this.show
+                }else{
+                    this.show = !this.show
+                }
                 this.getDataList(val)
             // }
             // else if(val == 4){
