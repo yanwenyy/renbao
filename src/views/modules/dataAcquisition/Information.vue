@@ -26,46 +26,22 @@
         <div class="listDisplay"  v-if="selectNum == 1">
              <div class='f_right'>                    
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                 <!-- <el-button size="mini" type="primary" @click="searchList">ceshi </el-button> -->
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
             <div class='ax_default'>
-                <div @click="handleChange">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
+                <div @click="handleChange">查询条件<i v-if="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
                 <transition name="sub-comments">
-                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" v-show="show" class="mask" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
             <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
-                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                <el-table-column prop="剂型" header-align="center" align="center" label="剂型"></el-table-column>
-                <el-table-column prop="医保药品名称" header-align="center" align="center" label="医保药品名称"></el-table-column>
-                <el-table-column prop="医保药品编码" header-align="center" align="center" label="医保药品编码"></el-table-column>
-                <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
-                <el-table-column prop="用量" header-align="center" align="center" label="用量"></el-table-column>
-                <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
-        <div class="listDisplay"  v-if="selectNum == 2">
+        <div class="listDisplay" v-if="selectNum == 2">
             <div class='f_right'>                    
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
@@ -73,7 +49,7 @@
             <div class='ax_default'>
                 <div @click="handleChanges">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
                 <transition name="sub-comments">
-                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns2' :data='data'></myquerybuilder>
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
              <!-- 医保诊疗项目 -->
@@ -81,41 +57,18 @@
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
-                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                <el-table-column prop="医保目录除外内容" header-align="center" align="center" label="医保目录除外内容"></el-table-column>
-                <el-table-column prop="医保项目内涵" header-align="center" align="center" label="医保项目内涵"></el-table-column>
-                <el-table-column prop="医保药品名称" header-align="center" align="center" label="医保药品名称"></el-table-column>
-                <el-table-column prop="医保药品编码" header-align="center" align="center" label="医保药品编码"> </el-table-column>
-                <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
-                <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
         <div class="listDisplay"  v-if="selectNum == 3">
             <div class='f_right'>                    
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                 <!-- <el-button size="mini" type="primary" @click="searchList">ceshi </el-button> -->
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
             <div class='ax_default'>
                 <div @click="handleChange3">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
                 <transition name="sub-comments">
-                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns3' :data='data'></myquerybuilder>
+                    <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
             <!-- 医保耗材目录 -->
@@ -123,26 +76,6 @@
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
-                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                <el-table-column prop="医保目录除外内容" header-align="center" align="center" label="医保目录除外内容"></el-table-column>
-                <el-table-column prop="医保项目内涵" header-align="center" align="center" label="医保项目内涵"></el-table-column>
-                <el-table-column prop="医保项目名称" header-align="center" align="center" label="医保项目名称"></el-table-column>
-                <el-table-column prop="医保项目编码" header-align="center" align="center" label="医保项目编码"> </el-table-column>
-                <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
             </el-table>
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
@@ -197,77 +130,7 @@ export default {
             ],  
             fileName: "",
             data:[],
-            columns1:{
-                "columnList": [
-                    {"columnName":"医保药品编码","columnType": "VARCHAR"},
-                    {"columnName":"医保药品名称","columnType": "VARCHAR"},
-                    {"columnName":"剂型","columnType": "VARCHAR"},
-                    {"columnName":"规格","columnType": "VARCHAR"},
-                    {"columnName":"用法","columnType": "VARCHAR"},
-                    {"columnName":"用量","columnType": "VARCHAR"},      
-                    {"columnName":"支付单位","columnType": "VARCHAR"},
-                    {"columnName":"支付类别","columnType": "VARCHAR"},
-                    {"columnName":"备注","columnType": "VARCHAR"},
-                    {"columnName":"最高限价","columnType": "VARCHAR"},
-                    {"columnName":"三级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"二级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"一级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"离休价格","columnType": "VARCHAR"},
-                    {"columnName":"门诊住院用药标识","columnType": "VARCHAR"},
-                    {"columnName":"门诊自付比例","columnType": "VARCHAR"},
-                    {"columnName":"住院自付比例","columnType": "VARCHAR"},
-                    {"columnName":"工伤自付比例","columnType": "VARCHAR"},
-                    {"columnName":"生育自付比例","columnType": "VARCHAR"},
-                    {"columnName":"生效日期","columnType": "VARCHAR"},
-                    {"columnName":"终止日期","columnType": "VARCHAR"},
-                    {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
-                    ]},
-            columns2:{
-                "columnList": [
-                    {"columnName":"一级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"二级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"三级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"住院自付比例","columnType": "VARCHAR"},
-                    {"columnName":"医保目录除外内容","columnType": "VARCHAR"},
-                    {"columnName":"医保项目内涵","columnType": "VARCHAR"},      
-                    {"columnName":"医保药品名称","columnType": "VARCHAR"},
-                    {"columnName":"医保药品编码","columnType": "VARCHAR"},
-                    {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
-                    {"columnName":"备注","columnType": "VARCHAR"},
-                    {"columnName":"工伤自付比例","columnType": "VARCHAR"},
-                    {"columnName":"支付单位","columnType": "VARCHAR"},
-                    {"columnName":"支付类别","columnType": "VARCHAR"},
-                    {"columnName":"最高限价","columnType": "VARCHAR"},
-                    {"columnName":"生效日期","columnType": "VARCHAR"},
-                    {"columnName":"生育自付比例","columnType": "VARCHAR"},
-                    {"columnName":"用法","columnType": "VARCHAR"},
-                    {"columnName":"离休价格","columnType": "VARCHAR"},
-                    {"columnName":"终止日期","columnType": "VARCHAR"},
-                    {"columnName":"规格","columnType": "VARCHAR"},
-                    {"columnName":"门诊自付比例","columnType": "VARCHAR"},
-                    ]},
-            columns3:{
-                "columnList": [
-                    {"columnName":"一级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"二级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"三级医院最高价格","columnType": "VARCHAR"},
-                    {"columnName":"住院自付比例","columnType": "VARCHAR"},
-                    {"columnName":"医保目录除外内容","columnType": "VARCHAR"},
-                    {"columnName":"医保项目内涵","columnType": "VARCHAR"},      
-                    {"columnName":"医保药品名称","columnType": "VARCHAR"},
-                    {"columnName":"医保药品编码","columnType": "VARCHAR"},
-                    {"columnName":"国家医保贯标目录编码","columnType": "VARCHAR"},
-                    {"columnName":"备注","columnType": "VARCHAR"},
-                    {"columnName":"工伤自付比例","columnType": "VARCHAR"},
-                    {"columnName":"支付单位","columnType": "VARCHAR"},
-                    {"columnName":"支付类别","columnType": "VARCHAR"},
-                    {"columnName":"最高限价","columnType": "VARCHAR"},
-                    {"columnName":"生效日期","columnType": "VARCHAR"},
-                    {"columnName":"生育自付比例","columnType": "VARCHAR"},
-                    {"columnName":"终止日期","columnType": "VARCHAR"},
-                    {"columnName":"规格","columnType": "VARCHAR"},
-                    {"columnName":"门诊自付比例","columnType": "VARCHAR"},
-                    ]},
+            columns1:[],
             rules:  [
                 {
                 type: "text",
@@ -308,6 +171,9 @@ export default {
                 tableColumns:[]
         }
     },
+    mounted(){
+       this.getDataList()
+    },
     created(){
         // this.getDataList();
         this.token = this.$cookie.get("token");
@@ -320,6 +186,8 @@ export default {
                 this.selectNum = val
                 this.fileName = '医保药品目录'
                 this.getDataList(val)
+                // this.show = false
+        
             }else if(val == 2){
                 this.selectNum = val
                 this.fileName = '医保诊疗项目目录'
@@ -357,6 +225,8 @@ export default {
                 if(data && data.code === 200){
                     this.tableList = data.result.result
                     this.tableColumns = data.result.columns
+                    this.columns1 = data.result.columnInfo
+                    console.log(this.columns1)
                     this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.dataList = [];
@@ -431,14 +301,14 @@ export default {
         handleChanges(){
             if(this.selectNum = 2){ 
                 this.show = !this.show
-                this.columns = this.columns2
+                this.columns = this.columns1
                 this.data = this.output
             }
         },
         handleChange3(){
             if(this.selectNum = 3){ 
                 this.show = !this.show
-                this.columns = this.columns3
+                this.columns = this.columns1
                 this.data = this.output
             }
         },

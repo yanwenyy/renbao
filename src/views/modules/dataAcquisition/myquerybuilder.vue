@@ -16,45 +16,16 @@ export default {
     return {
       queryRules: [], // querybuilder的规则数据
       queryJson: {}, // queryBuilder上动态绑定的json数据
-      rules: [
-                {
-                type: "text",
-                id: "药品编码",
-                label: "药品编码 ",
-                },{
-                type: "text",
-                id: "通用中文名称",
-                label: "通用中文名称",
-                },{
-                type: "text",
-                id: "药理分类",
-                label: "药理分类",
-                },{
-                type: "text",
-                id: "药品序号",
-                label: "药品序号",
-                },{
-                type: "text",
-                id: "收费类别",
-                label: "收费类别",
-                },{
-                type: "text",
-                id: "处方药标志",
-                label: "处方药标志",
-                },{
-                type: "text",
-                id: "助记码",
-                label: "助记码",
-                }, {
-                type: "text",
-                id: "剂量单位",
-                label: "剂量单位",
-            }],
     };
   },
-  created() {
-    this.setQueryBuilderColumn();
+  watch:{
+    columns(val) {
+      this.setQueryBuilderColumn();
+    }
   },
+  // created() {
+  //        this.setQueryBuilderColumn();
+  // },
   mounted() {
     this.initData();
   },
@@ -64,7 +35,6 @@ export default {
      */
     initData() {
       // 如果数据不为0则证明是修改，需要反显数据
-
       if (this.data.children != null) {
         // 反显数据
         this.queryJson = this.data;
@@ -76,6 +46,7 @@ export default {
     setQueryBuilderColumn() {
       const queryRules = [];
       for (var i = 0; i < this.columns.columnList.length; i++) {
+        
         const operators = this.getQueryBuilderOperators(
           this.columns.columnList[i]
         );
