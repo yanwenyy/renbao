@@ -77,7 +77,7 @@
       <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row>
       <!-- 文件树 -->
       <el-row :gutter="6" >
-        <el-col :span="12" style="height:45vh; overflow:auto;">
+        <el-col :span="12" style="height:42vh; overflow:auto;">
           <el-row>请选择导入文件:</el-row>
           <el-table
             ref="fileTree"
@@ -101,7 +101,6 @@
             <el-table-column
               label="目录名称"
               align="left"
-              width="200"
               prop="name"
             />
             <el-table-column
@@ -117,7 +116,7 @@
           </el-table>
         </el-col>
         <!-- 已选择文件 -->
-        <el-col :span="12" style="height:45vh; overflow:auto;">
+        <el-col :span="12" style="height:42vh; overflow:auto;">
           <el-row>已选文件:</el-row>
           <el-table
             title="已选文件"
@@ -131,7 +130,6 @@
             <el-table-column
               label="目录名称"
               align="left"
-              width="200"
               prop="name"
             />
             <el-table-column
@@ -162,6 +160,7 @@
       <el-table
         border
         style="width: 100%;height:45vh; overflow:auto;"
+        :row-class-name="tableRowClassName"
         :data="this.selectedFileData">
         <!-- fileTableInfos  -->
         <el-table-column
@@ -224,7 +223,6 @@
       :close-on-click-modal="false"
       >
       <el-tabs
-        style="width: 100%;height:45vh; overflow:auto;"
         v-model="fileTableActiveName"
         type="card"
         @tab-click="fileTabClick">
@@ -235,6 +233,7 @@
               <el-select
                 v-model="selectTableNames[index]"
                 value-key="tableInfoId"
+                filterable
                 placeholder="请选择要匹配的数据表">
                 <el-option
                   v-for="it in item.tableInfos"
@@ -245,41 +244,44 @@
               </el-select>
             </el-col>
           </el-row>
-          <el-table
-            border
-            style="width: 70%; overflow: auto; margin-left: 15%; margin-top:10px"
-            :data="item.fileColumnMaps[selectTableNames[index]]">
-            <el-table-column
-              prop="fileColumnName"
-              align="center"
-              label="数据表字段">
-              <template slot-scope="scope">
-               {{ getMapKey(scope.row) }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="dbColumn"
-              align="center"
-              label="目标表字段">
+          <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
+            <el-table
+              border
+              style="width: 70%; overflow: auto; margin-left: 15%;"
+              :data="item.fileColumnMaps[selectTableNames[index]]">
+              <el-table-column
+                prop="fileColumnName"
+                align="center"
+                label="数据表字段">
                 <template slot-scope="scope">
-                  <el-select
-                    v-model="scope.row[getMapKey(scope.row)]"
-                    value-key="columnInfoId"
-                    placeholder="请选择匹配字段"
-                    clearable
-                    @clear="setColumnNull(scope.row,getMapKey(scope.row))"
-                    filterable
-                    >
-                    <el-option
-                      v-for="itemdbm in item.dbColumns[selectTableNames[index]]"
-                      :key="itemdbm.columnInfoId"
-                      :label="itemdbm.columnNameCn"
-                      :value="itemdbm">
-                    </el-option>
-                  </el-select>
+                {{ getMapKey(scope.row) }}
                 </template>
               </el-table-column>
-          </el-table>
+              <el-table-column
+                prop="dbColumn"
+                align="center"
+                label="目标表字段">
+                  <template slot-scope="scope">
+                    <el-select
+                      v-model="scope.row[getMapKey(scope.row)]"
+                      value-key="columnInfoId"
+                      placeholder="请选择匹配字段"
+                      clearable
+                      @clear="setColumnNull(scope.row,getMapKey(scope.row))"
+                      filterable
+                      >
+                      <el-option
+                        v-for="itemdbm in item.dbColumns[selectTableNames[index]]"
+                        :key="itemdbm.columnInfoId"
+                        :label="itemdbm.columnNameCn"
+                        :value="itemdbm">
+                      </el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+            </el-table>
+          </el-row>
+          
         </el-tab-pane>
       </el-tabs>
 
@@ -296,7 +298,6 @@
       :close-on-click-modal="false"
       >
       <el-tabs
-        style="width: 100%;height:45vh; overflow:auto;"
         v-model="columnTableActiveName"
         type="card"
         @tab-click="columnTabClick">
@@ -316,27 +317,29 @@
               </el-select>
             </el-col>
           </el-row>
-          <el-table
-            border
-            style="width: 70%; overflow: auto; margin-left: 15%; margin-top:10px"
-            :data="item.fileColumnMaps[selectTableViewNames[index]]">
-            <el-table-column
-              prop="fileColumnName"
-              align="center"
-              label="数据表字段">
-              <template slot-scope="scope">
-               {{ getMapKey(scope.row) }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="dbColumn"
-              align="center"
-              label="目标表字段">
+          <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
+            <el-table
+              border
+              style="width: 70%; overflow: auto; margin-left: 15%;"
+              :data="item.fileColumnMaps[selectTableViewNames[index]]">
+              <el-table-column
+                prop="fileColumnName"
+                align="center"
+                label="数据表字段">
                 <template slot-scope="scope">
-                 {{ scope.row[getMapKey(scope.row)] ? scope.row[getMapKey(scope.row)].columnNameCn : ''}}
+                {{ getMapKey(scope.row) }}
                 </template>
               </el-table-column>
-          </el-table>
+              <el-table-column
+                prop="dbColumn"
+                align="center"
+                label="目标表字段">
+                  <template slot-scope="scope">
+                  {{ scope.row[getMapKey(scope.row)] ? scope.row[getMapKey(scope.row)].columnNameCn : ''}}
+                  </template>
+                </el-table-column>
+            </el-table>
+          </el-row>
         </el-tab-pane>
       </el-tabs>
 
@@ -519,7 +522,9 @@
         // count 倒计时
         countDown: 0,
         //websocketId
-        webSocketId: ''
+        webSocketId: '',
+        // 出错的文件
+        errFiles: []
       }
     },
     components: {
@@ -533,12 +538,12 @@
       this.webSocket = new PxSocket({
           url:this.$http.wsUrl('websocket?' + this.webSocketId),
           succ: this.getLogList
-        });
+        })
         // 当服务端打开连接
         this.webSocket.connect()
     },
     beforeDestory(){
-      this.webSocket.close();
+      this.webSocket.close()
     },
     watch: {
       dmpImpFlag(val) {
@@ -549,7 +554,17 @@
       },
     },
     methods: {
-       getUuid() {
+      // 检查文件获取表头情况
+      tableRowClassName({row, rowIndex}){
+        if(this.errFiles.length > 0) {
+          let flag = this.errFiles.findIndex(item => item ==  row.name)
+          if(flag != -1) {
+            return 'warning-row'
+          } 
+        }
+        return ''
+      },
+      getUuid() {
         var s = []
         var hexDigits = '0123456789abcdef'
         for (var i = 0; i < 32; i++) {
@@ -692,6 +707,7 @@
       },
       // 检查文件和匹配的表信息
       checkFileTable () {
+        this.errFiles = []
         if (this.selectedFileData.length == 0) {
           this.$message.error("请选择要采集的文件")
           return
@@ -707,6 +723,7 @@
           if(this.checkType(item.fileType) && this.selectedFileData.length ==1) {
             // dmp还原日志
             this.webSocketDataList = []
+            this.webSocketDataList.push('正在还原文件，请耐心等待......')
             this.dmpImpFlag = false
             this.dmpImpFalseFlag = false
             this.dmpLogDialogVisible = true
@@ -820,7 +837,12 @@
             // 打开文件表弹窗
             this.fileTableDialogVisible = true
           } else {
-            this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+            if(data.result != null) {
+              this.errFiles = data.result
+              this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+            } else {
+              this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+            }
           }
         })
       },
@@ -954,4 +976,7 @@
   border-radius: 4px;
   height: 52px;
 }
+/deep/.el-table .warning-row {
+    color: #f56c6c;
+  }
 </style>
