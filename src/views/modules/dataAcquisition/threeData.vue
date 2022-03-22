@@ -20,7 +20,7 @@
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                     <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -49,7 +49,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -77,7 +77,7 @@
                     <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight-40" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                     </template>
@@ -118,28 +118,27 @@
                 layout="total, sizes, prev, pager, next, jumper">
                 </el-pagination>
             <el-dialog title="导入数据" :visible.sync="addUploadVisible">
-                <div style="padding-bottom:10px;">
-                    <span style="font-size:16px;">
-                        是否去重
-                    </span>
-                    <el-checkbox v-model="duplicateRemove"></el-checkbox>
-                    <br>
-                    <span style="font-size:16px;">导入类型</span>
-                    <el-select v-model="importType" placeholder="请选择" style="margin-left:10px;">
-                         <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
-                </div>
-                <el-upload
-                    class="upload-demo"
-                    action=""
-                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                    multiple
-                    :limit="1"
-                    :file-list="fileList"
-                    :http-request="uploadFile" :on-change="handleChange">
-                    <el-button size="small" type="primary" @click="handlePreview">点击上传</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
-                </el-upload>
+                <el-form size="small" :model="dataFormList" :rules="dataRuleList" ref="dataFormList" label-width="80px">
+                    <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="dataFormList.duplicateRemove"></el-checkbox></el-form-item>
+                    <el-form-item label="导入类型" prop="importType">
+                        <el-select v-model="dataFormList.importType" placeholder="请选择">
+                            <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                <el-form-item label="导入文件" prop="ruleFile" style="margin-top:5px;">
+                    <el-upload
+                        class="upload-demo"
+                        action=""
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        multiple
+                        :limit="1"
+                        :file-list="fileList"
+                        :http-request="uploadFile" :on-remove="handleRemove" ref="ruleFileUpload" :on-change="handleChange">
+                        <el-button size="small" type="primary" @click="handlePreview">点击上传</el-button>
+                        <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
+                    </el-upload>
+                 </el-form-item>
+                </el-form>
             </el-dialog>
         </div>
     </div>
@@ -175,8 +174,6 @@ export default {
             output:null,
             show:false,
             isShow:false,
-            importType: '',
-            duplicateRemove:false,
             options: [
                 {
                     value: '0',
@@ -213,7 +210,15 @@ export default {
             fileLists:[],
             token:'',
             dataCount:'',
-            tableColumns:[]
+            tableColumns:[],
+            dataRuleList:{
+                importType:[
+                    { required: true, message: '请选择导入类型', trigger: 'blur' }
+            ]},
+            dataFormList:{
+                duplicateRemove:false,
+                importType:''
+            }
         }
     },
     created(){
@@ -252,6 +257,26 @@ export default {
             this.fileList = fileList
             console.log(this.fileList)
         },
+          
+        //确定
+        onSubmit(formName){
+            if(this.dataFormList.importType.length == 0){
+                this.$message.error("请选择要采集的文件")
+                return;
+            }
+            if (this.fileList.length == 0) {
+                this.$message({
+                    message: "请选择上传文件！",
+                    type: "error",
+                });
+                return;
+            }
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.$refs.ruleFileUpload.submit();
+                }
+            })
+        },
   
         //上传文件 导入
         uploadFile(){
@@ -260,6 +285,13 @@ export default {
                  arrDuplicate = 0
             }else if(this.duplicateRemove == true){
                  arrDuplicate = 1
+            }
+            if(this.dataFormList.importType.length == 0){
+                this.$message({
+                    message: "请选择要采集的文件！",
+                    type: "error",
+                });
+                return;
             }
             let formData = new FormData()
             formData.append('file',this.fileList[0].raw)
@@ -270,7 +302,7 @@ export default {
                 params :this.$http.adornParams({
                     catalogType:this.dataForm.dataType,
                     duplicateRemove:arrDuplicate,
-                    importType:this.importType
+                    importType:this.dataFormList.importType
                 })
             }).then(({data})=>{
                 if(data && data.code === 200){
@@ -287,6 +319,12 @@ export default {
                 }
             })
         },
+        //文件列表移除文件时的钩子
+        handleRemove(file, fileList) {
+            // console.log(file, fileList);
+            this.fileList = []
+        },
+
         //导出
         exportData(){
             let url = this.$http.adornUrl('/threeCatalog/exportExcelFileCommon?catalogType='+this.dataForm.dataType+'&token=') + this.$cookie.get('token')
@@ -295,15 +333,11 @@ export default {
         //导入数据
         ImportData(){
             this.addUploadVisible = true
+            this.fileList = []
+            this.dataFormList = []
         },
         //点击上传
         handlePreview(){
-            // if(this.importType.length == 0){
-            //     this.$message.error("请选择要采集的文件")
-            //     return;
-            // }else{
-            //      this.uploadFile()
-            // }
         },
         //select时间
         changeOption(val){
@@ -376,5 +410,8 @@ export default {
     width: 100%;
     // display: flex;
     // min-width: 800px;
+}
+.el-form-item{
+    margin-bottom: 0;
 }
 </style>

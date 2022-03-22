@@ -87,41 +87,31 @@
                 ></el-pagination> -->
     </div>
     <el-dialog title="导入数据" :visible.sync="importVisible">
-      <div style="padding-bottom:10px;">
-        <span style="font-size:16px;">
-            是否去重
-        </span>
-        <el-checkbox v-model="duplicateRemove"></el-checkbox>
-        <br>
-        <span>导入类型</span>
-        <el-select
-          v-model="importType"
-          placeholder="请选择"
-          style="margin-left:10px;"
+      <el-form size="small" :model="dataFormList" :rules="dataRuleList" ref="dataFormList" label-width="80px">
+        <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="dataFormList.duplicateRemove"></el-checkbox></el-form-item>
+        <el-form-item label="导入类型" prop="importType">
+            <el-select v-model="dataFormList.importType" placeholder="请选择">
+                <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="导入文件" prop="ruleFile" style="margin-top:5px;">
+        <el-upload
+          class="upload-demo"
+          action=""
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          :http-request="uploadFile"
+          multiple
+          :limit="1"
+          :file-list="fileList"
+          :on-change="handleChange" :on-remove="handleRemove" ref="ruleFileUpload"
         >
-          <el-option
-            v-for="item in selectOption"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-      </div>
-      <el-upload
-        class="upload-demo"
-        action=""
-        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-        :http-request="uploadFile"
-        multiple
-        :limit="1"
-        :file-list="fileList"
-        :on-change="handleChange"
-      >
-        <el-button size="small" type="primary" @click="handlePreview"
-          >选择文件</el-button
-        >
+          <el-button size="small" type="primary" @click="handlePreview"
+            >选择文件</el-button
+          >
         <div slot="tip" class="el-upload__tip">只能上传Excel文件</div>
-      </el-upload>
+        </el-upload>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -163,7 +153,6 @@ export default {
         }
       ],
       fileList: [],
-      importType: "",
       selectOption: [
         {
           value: "0",
@@ -176,10 +165,17 @@ export default {
       ],
       catalogType: 10,
       multipleSelection: "",
-      duplicateRemove:false,
       hospitalType: {
         yljgbm: "",
         yljgmc: ""
+      },
+      dataRuleList:{
+          importType:[
+              { required: true, message: '请选择导入类型', trigger: 'blur' }
+      ]},
+      dataFormList:{
+          duplicateRemove:false,
+          importType:''
       }
     };
   },
@@ -240,11 +236,18 @@ export default {
     },
     uploadFile(itme) {
         let arrDuplicate =''
-            if(this.duplicateRemove == false){
-                 arrDuplicate = 0
-            }else if(this.duplicateRemove == true){
-                 arrDuplicate = 1
-            }
+        if(this.duplicateRemove == false){
+              arrDuplicate = 0
+        }else if(this.duplicateRemove == true){
+              arrDuplicate = 1
+        }
+        if(this.dataFormList.importType.length == 0){
+            this.$message({
+                message: "请选择要采集的文件！",
+                type: "error",
+            });
+            return;
+        }
         let formData = new FormData();
         formData.append("file", this.fileList[0].raw);
         this.$http({
@@ -252,9 +255,9 @@ export default {
             method: "post",
             data: formData,
             params: this.$http.adornParams({
-            importType: this.importType,
-             duplicateRemove:arrDuplicate,
-            catalogType: 10
+              importType: this.dataFormList.importType,
+              duplicateRemove:arrDuplicate,
+              catalogType: 10
             })
         }).then(({ data }) => {
             if (data && data.code === 200) {
@@ -271,6 +274,12 @@ export default {
             }
         });
     },
+    //文件列表移除文件时的钩子
+    handleRemove(file, fileList) {
+        // console.log(file, fileList);
+        this.fileList = []
+    },
+
     handlePreview() {
       this.fileList = [];
     },
@@ -291,6 +300,8 @@ export default {
     //导入
     importData() {
       this.importVisible = true;
+      this.fileList = []
+      this.dataFormList = []
     },
     //导出
     exportData() {
