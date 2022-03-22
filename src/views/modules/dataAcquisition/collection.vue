@@ -32,7 +32,7 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="60vh" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
@@ -40,8 +40,8 @@
                     <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
                     <el-table-column label="数据类型" align="center" prop="dataType">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
-                            <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                            <div class="tac" v-if="scope.row.dataType=='1'">医保</div>
+                            <div class="tac" v-if="scope.row.dataType=='2'">医院</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
@@ -91,7 +91,7 @@
                 <div class='listDisplay'>
                     <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
                 </div>
-                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="60vh" v-loading="dataListLoading" @selection-change="handleSelectionChange">
+                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" :height="$tableHeight-75" v-loading="dataListLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
                     <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
@@ -251,7 +251,7 @@ export default {
                     pageNo:this.apComServerData.pageIndex,
                     fileName:this.dataForm.fileName || '',
                     filePath:this.dataForm.filePath || '',
-                    collectStatus:this.dataForm.collectStatus || '',
+                    dataType:1,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''
                 })
@@ -292,7 +292,7 @@ export default {
                     pageSize:this.apComServerData.pageSize,
                     pageNo:this.apComServerData.pageIndex,
                     filePath:this.dataForm.filePath || '',
-                    collectStatus:this.dataForm.collectStatus || '',
+                    dataType:2,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''
                     
