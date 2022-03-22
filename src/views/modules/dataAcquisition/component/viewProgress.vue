@@ -6,8 +6,8 @@
             <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
             <el-table-column label="文件类型" align="center" prop="dataType">
                 <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.dataType=='1'">医保</div>
-                    <div class="tac" v-if="scope.row.dataType=='2'">医院</div>
+                    <div class="tac" v-if="scope.row.dataType=='1'">医院数据</div>
+                    <div class="tac" v-if="scope.row.dataType=='2'">医保数据</div>
                 </template>
             </el-table-column>
             <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
@@ -126,6 +126,7 @@ export default {
                     fileName:this.dataForm.fileName || '',
                     filePath:this.dataForm.filePath || '',
                     collectStatus:this.dataForm.collectStatus || '',
+                    dataType:1,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''
                 })
