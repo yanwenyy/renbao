@@ -73,6 +73,7 @@
           ref="myCm"
           :value="editorValue"
           :options="cmOptions"
+          @cursorActivity="cmCursorActivity"
           @beforeChange="cmBeforChange"
           @changes="onCmCodeChanges"
           @blur="onCmBlur"
@@ -92,13 +93,13 @@
             <i v-if="fullScreen" class="el-icon-minus" @click="setFullScreen(2)"></i>
           </div>
           <div v-if="useChinese" class="inline-block">
-            <el-button type="text"
+            <el-button  v-if="!fullScreen" type="primary"
                        @click="setFullScreen(1)">
-              <span v-if="!fullScreen" title="全屏">全屏</span>
+              <span title="全屏">全屏</span>
             </el-button>
-            <el-button type="text"
+            <el-button v-if="fullScreen" type="primary"
                        @click="setFullScreen(2)">
-              <span v-if="fullScreen" title="退出全屏">退出全屏</span>
+              <span title="退出全屏">退出全屏</span>
             </el-button>
           </div>
         </div>
@@ -255,6 +256,9 @@
   </div>
 </template>
 <script>
+  String.prototype.trim=function(){
+    return this.replace(/(^\s*)|(\s*$)/g, "");
+  }
   import paramsList from './paramsList'
 
   import {codemirror} from "vue-codemirror";
@@ -264,7 +268,9 @@
   import "codemirror/mode/htmlmixed/htmlmixed.js";
   import "codemirror/mode/css/css.js";
   import "codemirror/mode/yaml/yaml.js";
-  import "codemirror/mode/sql/sql.js";
+  // import "codemirror/mode/sql/sql.js";
+  import "./js/sql.js";
+
   import "codemirror/mode/python/python.js";
   import "codemirror/mode/markdown/markdown.js";
   import "codemirror/addon/hint/show-hint.css";
@@ -279,6 +285,7 @@
   import "codemirror/addon/lint/lint.js";
   import "codemirror/addon/lint/json-lint";
   require("script-loader!jsonlint");
+
   // import "codemirror/addon/lint/html-lint.js";
   // import "codemirror/addon/lint/css-lint.js";
   import "codemirror/addon/lint/javascript-lint.js";
@@ -303,7 +310,7 @@
   import "codemirror/addon/display/autorefresh.js";
   import "codemirror/addon/selection/mark-selection.js";
   import "codemirror/addon/search/match-highlighter.js";
-
+  const CodeMirror = require('codemirror');
   export default {
     components: {
       codemirror,
@@ -514,11 +521,12 @@
             val=this.setHintList(val);
             val.forEach(item=>{
               this.hintTable[item.name]=item.childHints||[];
-              this.$refs.myCm.codemirror.options.hintOptions.tables[item.name]=item.childHints||[];
-              this.$refs.myCm.codemirror.options.hintOptions.tablesTitle[item.name]=item.childHints||[];
+              // this.$refs.myCm.codemirror.options.hintOptions.tables[item.name]=item.childHints||[];
+              // this.$refs.myCm.codemirror.options.hintOptions.tablesTitle[item.name]=item.childHints||[];
             });
-            console.log(val,88888);
-            console.log( this.hintTable)
+            this.$refs.myCm.codemirror.options.hintOptions.tables=this.hintTable;
+            this.$refs.myCm.codemirror.options.hintOptions.tablesTitle=this.hintTable;
+
             // this.$refs.myCm.codemirror.setOption('hintOptions', { // 自定义提示选项
             //   completeSingle: false, // 当匹配只有一项的时候是否自动补全
             //   tables: this.hintTable
@@ -703,33 +711,36 @@
     },
     methods: {
           //将参数id转换成按钮显示到页面
-      idToButton(sql){
-        this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
-        this.paramsData.forEach(item=>{
-          if(item.children&&item.children.length>0){
-            item.children.forEach(vtem=>{
-              if(this.editorValue.indexOf("{#"+vtem.id+"#}")!=-1){
-                this.dragParmasList.push(vtem);
-                var line=this.$refs.myCm.codemirror.getCursor().line;
-                var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
-                var id="{#"+vtem.id+"#}";
-                this.editorValue=this.editorValue.replace(id,'');
+      idToButton(sql,to){
+        if(sql){
+          this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
+          this.paramsData.forEach(item=>{
+            if(item.children&&item.children.length>0){
+              item.children.forEach(vtem=>{
+                if(this.editorValue.indexOf("{#"+vtem.id+"#}")!=-1){
+                  this.dragParmasList.push(vtem);
+                  var line=this.$refs.myCm.codemirror.getCursor().line;
+                  var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
+                  var id="{#"+vtem.id+"#}";
+                  this.editorValue=this.editorValue.replace(id,'');
 
-                var dom = document.createElement("button");
-                dom.className = "parmasBtn";
-                dom.innerHTML = vtem.name;
-                dom.id=id;
-                var startCursor = {ch: ch[0], line: line, sticky: null};
-                const endPos = { line: ch[0]+("{#"+vtem.id+"#}").length, ch: line + id.length,sticky:null };
-                this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
-                this.$refs.myCm.codemirror.markText(startCursor, endPos, {
-                  replacedWith: dom,
-                  className:"paramBlock",
-                });
-              }
-            })
-          }
-        })
+                  var dom = document.createElement("button");
+                  dom.className = "parmasBtn";
+                  dom.innerHTML = vtem.name;
+                  dom.id=id;
+                  var startCursor = {ch: to?to.ch:ch[0], line: to?to.line:line, sticky: null};
+                  const endPos = { ch: to?to.ch+("{#"+vtem.id+"#}").length:ch[0]+("{#"+vtem.id+"#}").length, line: to?to.line:line,sticky:null };
+                  this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
+                  this.$refs.myCm.codemirror.markText(startCursor, endPos, {
+                    replacedWith: dom,
+                    className:"paramBlock",
+                  });
+                }
+              })
+            }
+          })
+        }
+
       },
       /**
        * 获取某行内容中字符串出现的位置数组
@@ -740,7 +751,6 @@
        * */
       getIndexArr(text, str, index, indexArr) {
         index = text.indexOf(str, index);
-        console.log(index)
         if (index > -1) {
           indexArr.push(index);
           indexArr = this.getIndexArr(text, str, parseInt(index + 1), indexArr);
@@ -1147,9 +1157,9 @@
         const keyCombination =
           event.ctrlKey || event.altKey || event.metaKey;
 
-        if (!keyCombination && keyCode > 64 && keyCode < 123) {
-          this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
-        }
+        // if (!keyCombination && keyCode > 64 && keyCode < 123) {
+        //   this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
+        // }
       },
       // 按下鼠标时事件处理函数
       onMouseDown(event) {
@@ -1163,8 +1173,10 @@
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
-        console.log(cm, changes);
-        // this.completeIfInTag(cm);
+        if(changes&&changes[0].origin=="paste"){
+          this.idToButton(changes[0].text[0],changes[0].to)
+        }
+        // console.log(cm);
         // if(this.editorValue!=''){
         //   var tok = cm.getTokenAt(cm.getCursor());
         //   if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
@@ -1172,28 +1184,49 @@
         // }
         this.resetLint();
       },
-      completeIfInTag(cm){
-        var that=this;
-        return this.completeAfter(cm, function () {          //智能提示
-          var tok = cm.getTokenAt(cm.getCursor());
-          if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
-          // console.log(that.$refs.myCm.codemirror)
-          var inner = that.$refs.myCm.codemirror.innerMode(cm.getMode(), tok.state).state;
-          console.log(inner.tagName)
-          return inner.tagName;
-        });
+      cmCursorActivity(cm){
+        if (cm.curOp.focus === false) {
+          this.initHint(cm);
+        }
       },
-      completeAfter(cm, pred){
+      initHint(editor){
+        //获取用户当前的编辑器中的编写的代码
+        var cur = editor.getCursor();
+        var words = editor.getTokenAt(cur).string;
+        var shieldString = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", " ", ",", "-", "_", "=", "+", "-", "/", ";"];
+        //如果用户输入空格，则退回
+        if (words.trim() === "") {
+          return;
+        }
+        if (shieldString.indexOf(words) > -1) {
+          return;
+        }
+        //利用正则取出用户输入的所有的英文的字母
+        words = words.replace(/[a-z]+[\-|\']+[a-z]+/ig, '').match(/([a-z]+)/ig);
+        console.log(words)
+        //将获取到的用户的单词传入CodeMirror,并在javascript-hint中做匹配
+        CodeMirror.ukeys = words;
+        //调用显示提示
+        this.completeAfter(editor,null,words);
+      },
+      completeAfter(cm, pred ,words){
         var cur = cm.getCursor();
         if (!pred || pred()) {
           setTimeout(function () {
+            // console.log(cm.state.completionActive)
+            // var tables=cm.state.completionActive&&cm.state.completionActive.options.tables||[];
+            // for(let i in tables){
+            //
+            // }
+            // console.log(cm.state.completionActive&&cm.state.completionActive.options.tables);
             if (!cm.state.completionActive)
               cm.showHint({
-                completeSingle: false
+                completeSingle: false,
+                className:'self-hints'
               });
           }, 100);
         }
-        return this.$refs.myCm.codemirror.Pass;
+        return CodeMirror.Pass;
       },
 
 
