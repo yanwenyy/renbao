@@ -279,7 +279,9 @@
   import "codemirror/addon/hint/xml-hint.js";
   import "codemirror/addon/hint/css-hint.js";
   import "codemirror/addon/hint/html-hint.js";
-  import "codemirror/addon/hint/sql-hint.js";
+  // import "codemirror/addon/hint/sql-hint.js";
+  import "./js/sql-hint.js";
+
   import "codemirror/addon/hint/anyword-hint.js";
   import "codemirror/addon/lint/lint.css";
   import "codemirror/addon/lint/lint.js";
@@ -1201,24 +1203,17 @@
         if (shieldString.indexOf(words) > -1) {
           return;
         }
-        //利用正则取出用户输入的所有的英文的字母
+        // //利用正则取出用户输入的所有的英文的字母
         words = words.replace(/[a-z]+[\-|\']+[a-z]+/ig, '').match(/([a-z]+)/ig);
-        console.log(words)
         //将获取到的用户的单词传入CodeMirror,并在javascript-hint中做匹配
         CodeMirror.ukeys = words;
         //调用显示提示
-        this.completeAfter(editor,null,words);
+        this.completeAfter(editor,null);
       },
-      completeAfter(cm, pred ,words){
+      completeAfter(cm, pred ){
         var cur = cm.getCursor();
         if (!pred || pred()) {
           setTimeout(function () {
-            // console.log(cm.state.completionActive)
-            // var tables=cm.state.completionActive&&cm.state.completionActive.options.tables||[];
-            // for(let i in tables){
-            //
-            // }
-            // console.log(cm.state.completionActive&&cm.state.completionActive.options.tables);
             if (!cm.state.completionActive)
               cm.showHint({
                 completeSingle: false,
