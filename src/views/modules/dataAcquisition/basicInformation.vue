@@ -87,10 +87,10 @@
                 ></el-pagination> -->
     </div>
     <el-dialog title="导入数据" :visible.sync="importVisible">
-      <el-form size="small" :model="dataFormList" :rules="dataRuleList" ref="dataFormList" label-width="80px">
-        <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="dataFormList.duplicateRemove"></el-checkbox></el-form-item>
+      <el-form size="small" label-width="80px">
+        <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="duplicateRemove"></el-checkbox></el-form-item>
         <el-form-item label="导入类型" prop="importType">
-            <el-select v-model="dataFormList.importType" placeholder="请选择">
+            <el-select v-model="importType" placeholder="请选择">
                 <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
         </el-form-item>
@@ -173,10 +173,8 @@ export default {
           importType:[
               { required: true, message: '请选择导入类型', trigger: 'blur' }
       ]},
-      dataFormList:{
-          duplicateRemove:false,
-          importType:''
-      }
+      duplicateRemove:false,
+      importType:''
     };
   },
   created() {
@@ -234,14 +232,14 @@ export default {
       this.fileList = fileList;
       console.log(this.fileList);
     },
-    uploadFile(itme) {
+    uploadFile() {
         let arrDuplicate =''
         if(this.duplicateRemove == false){
               arrDuplicate = 0
         }else if(this.duplicateRemove == true){
               arrDuplicate = 1
         }
-        if(this.dataFormList.importType.length == 0){
+        if(this.importType.length == 0){
             this.$message({
                 message: "请选择要采集的文件！",
                 type: "error",
@@ -255,7 +253,7 @@ export default {
             method: "post",
             data: formData,
             params: this.$http.adornParams({
-              importType: this.dataFormList.importType,
+              importType: this.importType,
               duplicateRemove:arrDuplicate,
               catalogType: 10
             })
@@ -301,7 +299,8 @@ export default {
     importData() {
       this.importVisible = true;
       this.fileList = []
-      this.dataFormList = []
+      this.duplicateRemove = false
+      this.importType = ''
     },
     //导出
     exportData() {
@@ -358,5 +357,8 @@ export default {
 }
 .line {
   text-align: center;
+}
+.el-form-item{
+    margin-bottom: 0;
 }
 </style>

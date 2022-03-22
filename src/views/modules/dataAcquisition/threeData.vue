@@ -118,10 +118,10 @@
                 layout="total, sizes, prev, pager, next, jumper">
                 </el-pagination>
             <el-dialog title="导入数据" :visible.sync="addUploadVisible">
-                <el-form size="small" :model="dataFormList" :rules="dataRuleList" ref="dataFormList" label-width="80px">
-                    <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="dataFormList.duplicateRemove"></el-checkbox></el-form-item>
+                <el-form size="small" label-width="80px">
+                    <el-form-item label="是否去重" prop="duplicateRemove"><el-checkbox v-model="duplicateRemove"></el-checkbox></el-form-item>
                     <el-form-item label="导入类型" prop="importType">
-                        <el-select v-model="dataFormList.importType" placeholder="请选择">
+                        <el-select v-model="importType" placeholder="请选择">
                             <el-option  v-for="item in selectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
                         </el-select>
                     </el-form-item>
@@ -215,10 +215,8 @@ export default {
                 importType:[
                     { required: true, message: '请选择导入类型', trigger: 'blur' }
             ]},
-            dataFormList:{
-                duplicateRemove:false,
-                importType:''
-            }
+            duplicateRemove:false,
+            importType:''
         }
     },
     created(){
@@ -258,25 +256,6 @@ export default {
             console.log(this.fileList)
         },
           
-        //确定
-        onSubmit(formName){
-            if(this.dataFormList.importType.length == 0){
-                this.$message.error("请选择要采集的文件")
-                return;
-            }
-            if (this.fileList.length == 0) {
-                this.$message({
-                    message: "请选择上传文件！",
-                    type: "error",
-                });
-                return;
-            }
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    this.$refs.ruleFileUpload.submit();
-                }
-            })
-        },
   
         //上传文件 导入
         uploadFile(){
@@ -286,7 +265,7 @@ export default {
             }else if(this.duplicateRemove == true){
                  arrDuplicate = 1
             }
-            if(this.dataFormList.importType.length == 0){
+            if(this.importType.length == 0){
                 this.$message({
                     message: "请选择要采集的文件！",
                     type: "error",
@@ -302,7 +281,7 @@ export default {
                 params :this.$http.adornParams({
                     catalogType:this.dataForm.dataType,
                     duplicateRemove:arrDuplicate,
-                    importType:this.dataFormList.importType
+                    importType:this.importType
                 })
             }).then(({data})=>{
                 if(data && data.code === 200){
@@ -334,7 +313,8 @@ export default {
         ImportData(){
             this.addUploadVisible = true
             this.fileList = []
-            this.dataFormList = []
+            this.duplicateRemove = false,
+            this.importType = ''
         },
         //点击上传
         handlePreview(){
