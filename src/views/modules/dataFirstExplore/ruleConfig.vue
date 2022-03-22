@@ -1,59 +1,54 @@
 <!--初探规则配置-->
 <template>
-  <div :style="conheight">
-    <el-row :gutter="20">
-      <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
-          <rule-tree
-            :isShowSearch="true"
-            :isShowCheckBox="false"
-            @getTreeId="getTreeId"
-            :isParent="false"
-            ref="ruleTree"
-            folderSorts="1,2"
-            :height="$tableHeight"
-          ></rule-tree>
-        </el-card>
-      </el-col>
-      <el-col :span="19">
-        <el-card class="box-card" style="height:80vh;overflow-y:auto">
-          <div slot="header" class="clearfix">
-            <el-row>
-              <el-col :span="4">
-                <div class="search-operation">
-                  <el-input
-                    v-model="dataForm.ruleName"
-                    size="small"
-                    placeholder="规则名称"
-                    clearable
-                  ></el-input>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <div class="search-operation">
-                  <el-select
-                    v-model="dataForm.ruleCategory"
-                    filterable
-                    clearable
-                    placeholder="规则类型"
-                    size="small"
-                  >
-                    <el-option
-                      v-for="(item, index) in ruleCategory"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-button @click="getAllSearch()" type="primary">查询</el-button>
-              <el-button @click="reset()">重置</el-button>
-              <el-col :span="4" style="margin-left:10px"> </el-col>
-            </el-row>
-          </div>
-          <div class="content">
-            <!-- <div class="tableTitle">
+  <div>
+    <div class="left">
+      <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+        <rule-tree
+          :isShowSearch="true"
+          :isShowCheckBox="false"
+          @getTreeId="getTreeId"
+          :isParent="false"
+          ref="ruleTree"
+          folderSorts="1,2"
+          :height="$tableHeight"
+        ></rule-tree>
+      </el-card>
+    </div>
+    <div style="width:100%">
+      <el-card class="box-card" style="height:80vh;overflow-y:auto">
+        <div class="search-box">
+          <el-form ref="dataForm" :model="dataForm" :inline="true">
+            <el-form-item>
+              <el-input
+                v-model="dataForm.ruleName"
+                size="small"
+                placeholder="规则名称"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-select
+                v-model="dataForm.ruleCategory"
+                filterable
+                clearable
+                placeholder="规则类型"
+                size="small"
+              >
+                <el-option
+                  v-for="(item, index) in ruleCategory"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-button @click="getAllSearch()" type="primary">查询</el-button>
+            <el-button @click="reset()">重置</el-button>
+          </el-form>
+        </div>
+
+        <div class="content">
+          <!-- <div class="tableTitle">
               <span
                 >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
                 >条</span
@@ -77,126 +72,123 @@
                 >
               </div>
             </div> -->
-            <el-table
-              :data="tableData"
-              border
-              ref="tableData"
-              @selection-change="handleSelectionChange"
-              v-loading="loading"
-              style="width: 100%;margin-top: 20px"
-              :row-key="getRowKeys"
-              :height="$tableHeight - 10"
+          <el-table
+            :data="tableData"
+            border
+            ref="tableData"
+            @selection-change="handleSelectionChange"
+            v-loading="loading"
+            style="width: 100%;margin-top: 20px"
+            :row-key="getRowKeys"
+            :height="$tableHeight - 80"
+          >
+            <el-table-column
+              type="selection"
+              :reserve-selection="true"
+              width="55"
             >
-              <el-table-column
-                type="selection"
-                :reserve-selection="true"
-                width="55"
-              >
-              </el-table-column>
-              <el-table-column
-                prop="ruleName"
-                label="规则名称"
-              ></el-table-column>
-              <el-table-column prop="ruleCategory" label="规则类别">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
-                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="createUserName"
-                label="创建人"
-              ></el-table-column>
-              <el-table-column prop="createTime" label="创建时间">
-              </el-table-column>
-              <!-- <el-table-column prop="hospitalName" label="医院">
+            </el-table-column>
+            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
+            <el-table-column prop="ruleCategory" label="规则类别">
+              <template slot-scope="scope">
+                <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="createUserName"
+              label="创建人"
+            ></el-table-column>
+            <el-table-column prop="createTime" label="创建时间">
+            </el-table-column>
+            <!-- <el-table-column prop="hospitalName" label="医院">
               </el-table-column> -->
-              <el-table-column prop="moblie" label="操作">
-                <template slot-scope="scope">
-                  <el-button type="text" @click="detailHandle(scope.row.ruleId)"
-                    >查看详情</el-button
-                  >
-                </template>
-              </el-table-column>
-            </el-table>
-            <div style="float:left;margin-top:10px">
-              <el-button-group>
-                <el-button
-                  >当前选择规则数量：{{
-                    this.multipleSelection.length
-                  }}</el-button
+            <el-table-column prop="moblie" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" @click="detailHandle(scope.row.ruleId)"
+                  >查看详情</el-button
                 >
-                <el-button
-                  :disabled="this.multipleSelection.length <= 0"
-                  @click="runNow"
-                  >立即运行</el-button
-                >
-                <el-button
-                  :disabled="this.multipleSelection.length <= 0"
-                  @click="timeRun"
-                  >定时运行</el-button
-                >
-                <el-popover
-                  placement="top"
-                  trigger="click"
-                  v-if="this.multipleSelection.length > 0"
-                >
-                  <p v-for="(i, k) in multipleSelection" :key="k">
-                    {{ i.ruleName }}
-                  </p>
-                  <el-button slot="reference">当前所选规则</el-button>
-                </el-popover>
-                <el-button v-else>当前所选规则</el-button>
-              </el-button-group>
-            </div>
-            <div class="pager">
-              <el-pagination
-                @size-change="sizeChangeHandle"
-                @current-change="currentChangeHandle"
-                :current-page="pageIndex"
-                :page-sizes="[10, 20, 50, 100]"
-                :page-size="pageSize"
-                :total="totalPage"
-                layout="total, sizes, prev, pager, next, jumper"
+              </template>
+            </el-table-column>
+          </el-table>
+          <div style="float:left;margin-top:10px">
+            <el-button-group>
+              <el-button
+                >当前选择规则数量：{{
+                  this.multipleSelection.length
+                }}</el-button
               >
-              </el-pagination>
-            </div>
+              <el-button
+                :disabled="this.multipleSelection.length <= 0"
+                @click="runNow"
+                >立即运行</el-button
+              >
+              <el-button
+                :disabled="this.multipleSelection.length <= 0"
+                @click="timeRun"
+                >定时运行</el-button
+              >
+              <el-popover
+                placement="top"
+                trigger="click"
+                v-if="this.multipleSelection.length > 0"
+              >
+                <p v-for="(i, k) in multipleSelection" :key="k">
+                  {{ i.ruleName }}
+                </p>
+                <el-button slot="reference">当前所选规则</el-button>
+              </el-popover>
+              <el-button v-else>当前所选规则</el-button>
+            </el-button-group>
           </div>
-          <!--查看详细弹窗 -->
-          <el-dialog
-            :visible.sync="showDetailDialog"
-            title="初探规则详细"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <detail
-              @close="closeDetail"
-              @ok="editSucceed"
-              :ruleId="ruleId"
-              v-if="showDetailDialog"
-            ></detail>
-          </el-dialog>
-          <el-dialog
-            :visible.sync="showRunDialog"
-            title="规则运行"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <runNow
-              @close="closeRun"
-              @ok="succeedRun"
-              :info="info"
-              :runIds="runIds"
-              :sql="sql"
-              v-if="showRunDialog"
-            ></runNow>
-          </el-dialog>
-          <!-- 弹窗, 新增 / 修改 -->
-          <!--  <el-dialog :title="treeTitle" :visible.sync="treeVisible">
+          <div class="pager">
+            <el-pagination
+              @size-change="sizeChangeHandle"
+              @current-change="currentChangeHandle"
+              :current-page="pageIndex"
+              :page-sizes="[10, 20, 50, 100]"
+              :page-size="pageSize"
+              :total="totalPage"
+              layout="total, sizes, prev, pager, next, jumper"
+            >
+            </el-pagination>
+          </div>
+        </div>
+        <!--查看详细弹窗 -->
+        <el-dialog
+          :visible.sync="showDetailDialog"
+          title="初探规则详细"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="40%"
+          :close-on-press-escape="false"
+        >
+          <detail
+            @close="closeDetail"
+            @ok="editSucceed"
+            :ruleId="ruleId"
+            v-if="showDetailDialog"
+          ></detail>
+        </el-dialog>
+        <el-dialog
+          :visible.sync="showRunDialog"
+          title="规则运行"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="40%"
+          :close-on-press-escape="false"
+        >
+          <runNow
+            @close="closeRun"
+            @ok="succeedRun"
+            :info="info"
+            :runIds="runIds"
+            :sql="sql"
+            v-if="showRunDialog"
+          ></runNow>
+        </el-dialog>
+        <!-- 弹窗, 新增 / 修改 -->
+        <!--  <el-dialog :title="treeTitle" :visible.sync="treeVisible">
             <el-form :model="form">
               <el-form-item label="分类名称">
                 <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -209,15 +201,14 @@
               >
             </div>
           </el-dialog> -->
-          <!-- 弹窗, 新增 / 修改 -->
-          <add-or-update
-            ref="addOrUpdate"
-            @refreshDataList="initData"
-            :ruleData="ruleData"
-          ></add-or-update>
-        </el-card>
-      </el-col>
-    </el-row>
+        <!-- 弹窗, 新增 / 修改 -->
+        <add-or-update
+          ref="addOrUpdate"
+          @refreshDataList="initData"
+          :ruleData="ruleData"
+        ></add-or-update>
+      </el-card>
+    </div>
   </div>
 </template>
 <script>
@@ -296,9 +287,6 @@ export default {
       info: "",
       //规则id
       ruleId: "",
-      conheight: {
-        height: ""
-      },
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
@@ -518,3 +506,18 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+.search-box {
+  display: flex;
+  flex-direction: column;
+  // border-bottom: 1px solid #ddd;
+  // padding-bottom: 20px;
+  padding-left: 20px;
+  // padding-right: 109px;
+}
+.left {
+  width: 300px;
+  float: left;
+  margin-right: 10px;
+}
+</style>

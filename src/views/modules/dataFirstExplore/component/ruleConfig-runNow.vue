@@ -25,7 +25,7 @@
         <el-input
           disabled
           v-model="dataForm.hospitalName"
-          style="width:400px"
+          style="width:80%"
           placeholder="请选择"
         ></el-input>
         <el-button type="primary" @click="chooseHospital">选择</el-button>
@@ -33,7 +33,7 @@
       <el-form-item label="批次名称" prop="batchName">
         <el-input
           v-model="dataForm.batchName"
-          style="width:400px"
+          style="width:80%"
           placeholder="请输入内容"
         ></el-input>
       </el-form-item>
@@ -41,7 +41,7 @@
         <el-input
           type="textarea"
           v-model="dataForm.batchRemark"
-          style="width:400px"
+          style="width:80%"
           placeholder="请输入内容"
         ></el-input>
       </el-form-item>

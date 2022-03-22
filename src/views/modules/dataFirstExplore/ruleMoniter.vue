@@ -1,36 +1,22 @@
 <template>
   <div class="box">
     <el-row :gutter="20">
-      <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
-          <div class="auditRuleMonitoring-left" style="height:800px">
-            <!-- <el-tree
-              :data="batchTreeList"
-              highlight-current
-              :default-expand-all="true"
-              v-loading="treeLoading"
-              node-key="id"
-              ref="treesa"
-              :props="layoutTreeProps"
-            >
-              <span
-                :title="node.label"
-                class="custom-tree-node"
-                slot-scope="{ node, data }"
-                @click="nodeClick(node, data)"
-              >
-                <span>
-                  {{ node.label }}
-                </span>
-              </span>
-            </el-tree> -->
-            <batch-list :batchLoading="treeLoading" :batchTreeList="batchTreeList" @getbatchData="getbatchData" v-on:refreshBitchData="getbatchList" :isParent="false" ></batch-list>
+      <div class="left">
+        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+          <div class="auditRuleMonitoring-left">
+            <batch-list
+              :batchLoading="treeLoading"
+              :batchTreeList="batchTreeList"
+              @getbatchData="getbatchData"
+              v-on:refreshBitchData="getbatchList"
+              :isParent="false"
+            ></batch-list>
           </div>
         </el-card>
-      </el-col>
-      <el-col :span="19">
+      </div>
+      <div style="width:100%">
         <!-- <div class="auditRuleMonitoring-right"> -->
-        <el-card class="box-card" style="height:800px;overflow-y:auto">
+        <el-card class="box-card" style="height:80vh;overflow-y:auto">
           <div class="search-box">
             <el-form ref="searchForm" :model="searchForm" :inline="true">
               <el-form-item>
@@ -90,6 +76,7 @@
               border
               style="width: 100%"
               @selection-change="handleSelectionChange"
+              :height="$tableHeight - 80"
             >
               <el-table-column
                 type="selection"
@@ -176,7 +163,7 @@
             ></detail>
           </el-dialog>
         </el-card>
-      </el-col>
+      </div>
     </el-row>
   </div>
 </template>
@@ -458,5 +445,11 @@ export default {
       }
     }
   }
+}
+.left {
+  width: 300px;
+  float: left;
+  margin-right: 10px;
+  height: 80vh;
 }
 </style>

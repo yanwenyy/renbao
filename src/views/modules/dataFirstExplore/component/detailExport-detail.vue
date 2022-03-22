@@ -1,7 +1,7 @@
 <template>
   <div class="threeData">
     <!-- 列表 -->
-    <div class="listDisplay" style="height:500px;overflow-y:auto;">
+    <div class="listDisplay" style="height:500px">
       <div class="f_right">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button @click="resetForm">重置</el-button>
@@ -31,6 +31,7 @@
         :data="tableList"
         border
         style="100%"
+        max-height="450"
         :header-cell-style="{ textAlign: 'center' }"
         class="demo-ruleForm"
         :v-loading="listLoading"
@@ -100,8 +101,7 @@ export default {
       }
     };
   },
-  created() {},
-  mounted() {
+  created() {
     this.initList();
   },
   methods: {
@@ -230,7 +230,7 @@ export default {
   padding: 5px;
 }
 .mask {
-  width: 95%;
+  width: 85%;
   padding-top: 15px;
   position: fixed;
   z-index: 998;
@@ -238,7 +238,7 @@ export default {
 }
 .sub-comments-leave-active,
 .sub-comments-enter-active {
-  transition: all 1s ease;
+  transition: all 0.5s ease;
 }
 .sub-comments-leave-active,
 .sub-comments-enter {

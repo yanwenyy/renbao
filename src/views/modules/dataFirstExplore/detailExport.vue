@@ -2,29 +2,9 @@
 <template>
   <div class="box">
     <el-row :gutter="20">
-      <el-col :span="5">
-        <el-card v-loading="treeLoading" style="height:800px;overflow-y:auto">
-          <div class="auditRuleMonitoring-left" style="height:800px">
-            <!-- <el-tree
-              :data="batchTreeList"
-              highlight-current
-              :default-expand-all="true"
-              v-loading="treeLoading"
-              node-key="id"
-              ref="treesa"
-              :props="layoutTreeProps"
-            >
-              <span
-                :title="node.label"
-                class="custom-tree-node"
-                slot-scope="{ node, data }"
-                @click="nodeClick(node, data)"
-              >
-                <span>
-                  {{ node.label }}
-                </span>
-              </span>
-            </el-tree> -->
+      <div class="left">
+        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+          <div class="auditRuleMonitoring-left" style="width:100%">
             <batch-list
               :batchLoading="treeLoading"
               :batchTreeList="batchTreeList"
@@ -34,54 +14,42 @@
             ></batch-list>
           </div>
         </el-card>
-      </el-col>
-      <el-col :span="19">
-        <el-card class="box-card" style="height:800px;overflow-y:auto">
-          <div slot="header" class="clearfix">
-            <el-row>
-              <el-col :span="4">
-                <div class="search-operation">
-                  <el-input
-                    v-model="dataForm.ruleName"
-                    size="small"
-                    placeholder="规则名称"
-                    clearable
-                  ></el-input>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
-                <div class="search-operation">
-                  <el-select
-                    v-model="dataForm.ruleCategory"
-                    filterable
-                    clearable
-                    placeholder="规则类别"
-                    size="small"
-                  >
-                    <el-option
-                      v-for="(item, index) in ruleCategory"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="4" style="margin-left:10px">
+      </div>
+      <div style="width:100%">
+        <el-card class="box-card" style="height:80vh;overflow-y:auto">
+          <el-row>
+            <el-form ref="dataForm" :model="dataForm" :inline="true">
+              <el-form-item>
+                <el-input
+                  v-model="dataForm.ruleName"
+                  size="small"
+                  placeholder="规则名称"
+                  clearable
+                ></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-select
+                  v-model="dataForm.ruleCategory"
+                  filterable
+                  clearable
+                  placeholder="规则类别"
+                  size="small"
+                >
+                  <el-option
+                    v-for="(item, index) in ruleCategory"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
                 <el-button @click="getAllSearch()" type="primary"
                   >查询</el-button
                 >
                 <el-button @click="reset()">重置</el-button>
-              </el-col>
-            </el-row>
-          </div>
-          <div class="content">
-            <div class="tableTitle">
-              <!-- <span
-                >查询结果<span style="color:#E6A23C">{{ dataForm.total }}</span
-                >条</span
-              > -->
-              <div style="float:right;margin-bottom:10px">
+              </el-form-item>
+              <el-form-item style="float:right">
                 <el-button @click="detailExport()" type="warning"
                   >结果明细导出</el-button
                 >
@@ -91,8 +59,10 @@
                   :disabled="this.multipleSelection.length <= 0"
                   >删除</el-button
                 >
-              </div>
-            </div>
+              </el-form-item>
+            </el-form>
+          </el-row>
+          <div class="content">
             <el-table
               :data="tableData"
               border
@@ -100,6 +70,7 @@
               @selection-change="handleSelectionChange"
               v-loading="loading"
               style="width: 100%;margin-top: 20px"
+              :height="$tableHeight - 80"
             >
               <el-table-column type="selection" width="55"> </el-table-column>
               <el-table-column
@@ -210,7 +181,7 @@
             <el-button @click="closeExport">取消</el-button>
           </el-dialog>
         </el-card>
-      </el-col>
+      </div>
     </el-row>
   </div>
 </template>
@@ -598,5 +569,11 @@ export default {
       }
     }
   }
+}
+.left {
+  width: 300px;
+  float: left;
+  margin-right: 10px;
+  height: 80vh;
 }
 </style>

@@ -34,7 +34,9 @@
           <el-button
             style="float:right"
             type="primary"
-            :disabled="this.multipleTable.length <= 0"
+            :disabled="
+              this.multipleTable.length <= 0 || this.multipleTable.length > 1
+            "
             @click="editData"
             >编写底稿</el-button
           >
@@ -43,11 +45,12 @@
       <div class="rule-table">
         <div class="table-box">
           <el-table
-            :data="dataList"
+            :data="tableData"
             border
             v-loading="tableLoading"
-            @selection-change="selectionChangeHandle"
+            @selection-change="handleSelectionChange"
             style="width: 100%;"
+            ref="multipleTable"
           >
             <el-table-column
               type="selection"
@@ -57,44 +60,48 @@
             >
             </el-table-column>
             <el-table-column
-              prop="roleNumber"
+              prop="ruleName"
               header-align="center"
               align="center"
-              label="证据名称"
+              label="规则名称"
             >
             </el-table-column>
             <el-table-column
-              prop="roleName"
+              prop="avgRunTime"
               header-align="center"
               align="center"
-              label="证据模板"
-            >
-              <template slot-scope="scope">
-                <el-button type="text" @click="detail(scope.row)">{{
-                  scope.row.roleName
-                }}</el-button>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="roleNumber"
-              header-align="center"
-              align="center"
-              label="创建人"
+              label="平均运行时间"
             >
             </el-table-column>
             <el-table-column
-              prop="roleNumber"
+              prop="createTime"
               header-align="center"
               align="center"
               label="创建时间"
             >
             </el-table-column>
             <el-table-column
-              prop="roleNumber"
+              prop="createUserName"
               header-align="center"
               align="center"
-              label="是否被底稿关联"
+              label="创建人"
             >
+            </el-table-column>
+            <el-table-column
+              prop="ruleType"
+              header-align="center"
+              align="center"
+              label="规则类型"
+            >
+              <template slot-scope="scope">
+                {{
+                  scope.row.ruleType == "1"
+                    ? "sql编辑器"
+                    : scope.row.ruleType == "2"
+                    ? "图形化"
+                    : ""
+                }}
+              </template>
             </el-table-column>
           </el-table>
         </div>
@@ -113,20 +120,18 @@
           <!-- 弹窗, 新增 / 修改 -->
           <el-dialog
             :visible.sync="showEditDialog"
-            :title="title"
             :close-on-click-modal="false"
             :modal-append-to-body="false"
             width="40%"
             :close-on-press-escape="false"
+            title="编写底稿"
           >
-            <addOrUpdate
+            <editDraft
               @close="closeAddDrawer"
               @ok="addSucceed"
               v-if="showEditDialog"
               :id="id"
-              :showBtn="showBtn"
-              :readonly="readonly"
-            ></addOrUpdate>
+            ></editDraft>
           </el-dialog>
         </div>
       </div>
@@ -134,8 +139,8 @@
   </div>
 </template>
 <script>
-import editDraft from "./editDraft.vue"; // 提交至地区个性化规则弹框
-import ruleTree from "../../common/rule-tree.vue";
+import editDraft from "./editDraft.vue"; // 编写底稿弹框
+import ruleTree from "../../common/rule-tree.vue"; //左侧规则树
 export default {
   components: {
     editDraft,
@@ -150,7 +155,7 @@ export default {
         folderPath: "",
         folderId: ""
       },
-      tableData: [],     
+      tableData: [],
       Pager: {
         pageSize: 10,
         pageIndex: 1,
@@ -161,14 +166,11 @@ export default {
       folderSorts: "",
       ruleCheckData: {},
       showEditDialog: false,
-      dataListLoading:false
+      dataListLoading: false
     };
   },
   activated() {
     this.getRuleFolder();
-  },
-  created() {
-    // this.getRuleFolder();
   },
   mounted() {
     this.$bus.$on("updateRuleData", () => {
@@ -268,6 +270,7 @@ export default {
     },
     editData() {
       this.showEditDialog = true;
+      this.id = this.multipleTable[0].ruleId;
     },
     deleteFn() {
       if (this.multipleTable.length === 0)
@@ -297,7 +300,7 @@ export default {
               this.Pager.pageSize = 10;
               this.getSelectPage();
               this.setTableChecked();
-              // this.multipleTable = []
+              this.multipleTable = [];
             } else {
               this.$message.error(data.msg);
             }
@@ -321,29 +324,12 @@ export default {
       this.Pager.pageIndex = val;
       this.getSelectPage();
     },
-    // 提交个性化规则
-    submitgxhgz() {
-      if (this.multipleTable.length != 1)
-        return this.$message({
-          message: "请选择一条数据进行操作",
-          type: "warning"
-        });
-      this.$refs.submitPersonalityRule.showDialog(this.multipleTable);
+    closeAddDrawer() {
+      this.showEditDialog = false;
     },
-    // 立即执行
-    executeImmediatelyClick() {
-      if (this.multipleTable.length === 0)
-        return this.$message({
-          message: "请选择至少一条数据",
-          type: "warning"
-        });
-      this.$refs.ruleOperation.showDialog(
-        this.multipleTable,
-        "immediately",
-        [],
-        {}
-      );
-    },
+    addSucceed() {
+      this.closeAddDrawer();
+    }
   },
   computed: {
     projectId: {

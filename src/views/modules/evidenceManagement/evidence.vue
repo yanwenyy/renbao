@@ -8,14 +8,14 @@
     >
       <el-form-item label="证据名称：">
         <el-input
-          v-model="dataForm.roleNumber"
+          v-model="dataForm.evidenceName"
           placeholder="证据名称"
           clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="创建人:">
         <el-input
-          v-model="dataForm.roleName"
+          v-model="dataForm.createUserName"
           placeholder="创建人"
           clearable
         ></el-input>
@@ -30,14 +30,14 @@
           type="primary"
           @click="editHandle"
           :disabled="
-            dataListSelections.length <= 0 || dataListSelections.length > 1
+            multipleSelection.length <= 0 || multipleSelection.length > 1
           "
           >修改</el-button
         >
         <el-button
           type="danger"
           @click="deleteHandle"
-          :disabled="dataListSelections.length <= 0"
+          :disabled="multipleSelection.length <= 0"
           >删除</el-button
         >
       </el-form-item>
@@ -57,11 +57,16 @@
       >
       </el-table-column>
       <el-table-column
-        prop="roleNumber"
+        prop="evidenceName"
         header-align="center"
         align="center"
         label="证据名称"
       >
+        <template slot-scope="scope">
+          <el-button type="text" @click="detail(scope.row)">{{
+            scope.row.evidenceName
+          }}</el-button>
+        </template>
       </el-table-column>
       <el-table-column
         prop="roleName"
@@ -76,14 +81,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="roleNumber"
+        prop="createUserName"
         header-align="center"
         align="center"
         label="创建人"
       >
       </el-table-column>
       <el-table-column
-        prop="roleNumber"
+        prop="createTime"
         header-align="center"
         align="center"
         label="创建时间"
@@ -121,6 +126,7 @@
         @ok="addSucceed"
         v-if="showAddDialog"
         :id="id"
+        :showFileTable="showFileTable"
         :showBtn="showBtn"
         :readonly="readonly"
       ></addOrUpdate>
@@ -137,8 +143,8 @@ export default {
   data() {
     return {
       dataForm: {
-        roleName: "",
-        roleNumber: ""
+        evidenceName: "",
+        createUserName: ""
       },
       //列表数据
       dataList: [],
@@ -151,34 +157,38 @@ export default {
       //列表加载
       dataListLoading: false,
       //多选数据
-      dataListSelections: [],
+      multipleSelection: [],
       //新增修改弹窗
       showAddDialog: false,
-      //授权用户弹窗
-      // showAuthorityUser: false,
       //传给修改弹窗的子组件id
       id: "",
       //弹窗标题
       title: "",
       //弹窗按钮
-      showBtn: ""
+      showBtn: "",
+      //传给弹窗：是否显示附件列表
+      showFileTable: false,
+      //传给弹窗：是否显示上传按钮
+      showBtn: false,
+      //传给弹窗：是否只读
+      readonly: false
     };
   },
   created() {
-    // this.getDataList();
+    this.getDataList();
   },
   methods: {
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/role/selectPage"),
+        url: this.$http.adornUrl("/evidence/selectPage"),
         method: "get",
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
-          roleNumber: this.dataForm.roleNumber,
-          roleName: this.dataForm.roleName
+          evidenceName: this.dataForm.evidenceName,
+          createUserName: this.dataForm.createUserName
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -204,28 +214,32 @@ export default {
     },
     // 多选
     selectionChangeHandle(val) {
-      this.dataListSelections = val;
+      this.multipleSelection = val;
     },
     //新增
     addHandle() {
       this.showAddDialog = true;
       this.title = "新增证据";
-      this.showBtn = true;
       this.id = "";
+      this.showFileTable = false;
+      this.showBtn = true;
+      this.readonly = false;
     },
     //修改
     editHandle(data) {
       this.showAddDialog = true;
       this.title = "修改证据";
-      this.id = data.roleId;
+      this.id = this.multipleSelection[0].evidenceId;
+      this.showFileTable = true;
       this.showBtn = true;
       this.readonly = false;
     },
     //查看详情
     detail(data) {
       this.showAddDialog = true;
-      this.title = "查看角色";
-      this.id = data.roleId;
+      this.title = "查看详情";
+      this.id = data.evidenceId;
+      this.showFileTable = true;
       this.showBtn = false;
       this.readonly = true;
     },
@@ -234,21 +248,12 @@ export default {
       this.showAddDialog = false;
     },
     addSucceed() {
-      this.closeAddDrawer();
+      this.showAddDialog = false;
       this.getDataList();
     },
-    //关闭授权用户弹窗
-    /* close() {
-      this.showAuthorityUser = false;
-    }, */
-    //授权用户弹窗关闭
     succeed() {
       this.close();
     },
-    //授权用户
-    /* authorizedUser(data) {
-      this.showAuthorityUser = true;
-    }, */
     //重置
     reset() {
       this.dataForm = {
@@ -258,8 +263,11 @@ export default {
       this.getDataList();
     },
     // 删除
-    deleteHandle(data) {
-      var roleId = data.roleId;
+    deleteHandle() {
+      var evidenceIds = [];
+      this.multipleSelection.forEach(item => {
+        evidenceIds.push(item.evidenceId);
+      });
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -267,9 +275,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl("/role/delete/" + roleId),
-            method: "post"
-            // data: this.$http.adornData(userIds, false)
+            url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
+            method: "post",
+            data: this.$http.adornData(evidenceIds, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
