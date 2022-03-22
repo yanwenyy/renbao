@@ -619,7 +619,7 @@
             if (val !== "") {
               this.editorValue=val;
               if(this.$refs.myCm){
-                this.idToButton();
+                this.idToButton(val);
               }
 
             }
@@ -698,14 +698,13 @@
     mounted(){
       this.dragControllerDiv2();
       if(this.sqlData!=''){
-       this.idToButton();
+       this.idToButton(this.sqlData);
       }
     },
     methods: {
           //将参数id转换成按钮显示到页面
-      idToButton(){
-        this.$refs.myCm.codemirror.setCursor({line:1,ch:this.sqlData.length});
-        console.log(this.$refs.myCm.codemirror.getCursor())
+      idToButton(sql){
+        this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
         this.paramsData.forEach(item=>{
           if(item.children&&item.children.length>0){
             item.children.forEach(vtem=>{
@@ -1164,7 +1163,7 @@
       onCmCodeChanges(cm, changes) {
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
-
+        console.log(cm, changes);
         // this.completeIfInTag(cm);
         // if(this.editorValue!=''){
         //   var tok = cm.getTokenAt(cm.getCursor());
@@ -1324,5 +1323,11 @@
   }
   .paramsSel{
     width: 80%;
+  }
+  .box-table{
+    padding-top: 0;
+  }
+  .box-table .el-table__header-wrapper{
+    padding-top: 10px;
   }
 </style>
