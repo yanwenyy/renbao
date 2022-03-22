@@ -35,7 +35,7 @@
                     <myquerybuilder ref="myquerybuilder" :rules="queryRules" class="mask" v-show="show" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
-            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -77,7 +77,7 @@
                 </transition>
             </div>
              <!-- 医保诊疗项目 -->
-            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -119,7 +119,7 @@
                 </transition>
             </div>
             <!-- 医保耗材目录 -->
-            <el-table :data="tableList" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -308,7 +308,7 @@ export default {
                 tableColumns:[]
         }
     },
-     created(){
+    created(){
         // this.getDataList();
         this.token = this.$cookie.get("token");
     },

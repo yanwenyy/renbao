@@ -289,18 +289,18 @@
         }
       },
       init (id, ruleCheckData) {
-        var sql="select * from 医院基本信息 where 医疗机构编码 = '{#yljgbm#}'  or 医疗机构名称 = '{#yljgmc#}'";
-        var list=[
-          {
-            "yljgbm": "医疗机构编码1",
-            "yljgmc": "医疗机构名称1"
-          },
-          {
-            "yljgbm": "医疗机构编码2",
-            "yljgmc": "医疗机构名称2"
-          }
-        ];
-        transSql(sql,list);
+        // var sql="select * from 医院基本信息 where 医疗机构编码 = '{#yljgbm#}'  or 医疗机构名称 = '{#yljgmc#}'";
+        // var list=[
+        //   {
+        //     "yljgbm": "医疗机构编码1",
+        //     "yljgmc": "医疗机构名称1"
+        //   },
+        //   {
+        //     "yljgbm": "医疗机构编码2",
+        //     "yljgmc": "医疗机构名称2"
+        //   }
+        // ];
+        // transSql(sql,list);
         this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则

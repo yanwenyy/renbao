@@ -69,21 +69,8 @@
         paramsData: [
           {
             name:'参数',
-            type:'funFolder',//图标类型 文件夹
-            children:[
-              {
-                id: "yljgbm",
-                name: "医疗机构编码",
-                sql: "select 医疗机构编码 id from 医院基本信息",
-                type:'params',//图标类型 参数
-              },
-              {
-                id: "yljgmc",
-                name: "医疗机构名称",
-                sql: "select 医疗机构名称 id from 医院基本信息",
-                type:'params',//图标类型 参数
-              },
-            ],
+            type:'funFolder',//图标类型 文件夹:funFolder
+            children:[],
           }
         ],//左边树参数初始的数据
         useChinese:true,//是否汉字化
@@ -121,6 +108,7 @@
       this.resultTableTabs=[];
       this.getSjbData();
       this.getSqlList();
+      this.getParmasData();
     },
 
     mounted(){
@@ -135,6 +123,7 @@
 
         this.getSjbData();
         this.getSqlList();
+        this.getParmasData();
       }
       this.resultTableTabs=[];
       this.ws=new PxSocket({
@@ -147,6 +136,26 @@
       this.ws.close();
     },
     methods: {
+      //获取参数树数据
+      getParmasData(){
+        this.$http({
+          url: this.$http.adornUrl('/param/selectAll'),
+          method: 'get',
+          isLoading:false,
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          var datas=data.result;
+          if(datas){
+            datas.forEach(item=>{
+              item.id=item.paramId;//参数树需要的id
+              item.name=item.paramName;//参数树需要的name
+              item.sql=item.paramSql;//参数树需要的sql
+              item.type=item.paramType=='2'?'params':'';//参数树需要的type 图标类型 参数:params
+            });
+            this.paramsData[0].children=datas;
+          }
+        })
+      },
       //参数设置确定事件点击
       paramsSub(sql,paramsList){//sql传过来的替换过的sql
         console.log(paramsList);
