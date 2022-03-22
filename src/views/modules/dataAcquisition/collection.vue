@@ -1,13 +1,13 @@
 <template>
     <div class='collection'>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
-            <el-form-item label="文件名：" v-if="activeName == 'audit'">
+            <el-form-item label="文件名:" v-if="activeName == 'audit'">
                 <el-input v-model="dataForm.fileName" placeholder="请输入文件名"></el-input>
             </el-form-item>
-            <el-form-item label="文件路径：">
+            <el-form-item label="文件路径:">
                 <el-input v-model="dataForm.filePath" placeholder="请输入文件路径"></el-input>
             </el-form-item>
-             <el-form-item label="采集状态：">
+             <el-form-item label="采集状态:">
                 <el-select v-model="dataForm.collectStatus" placeholder="已完成" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
@@ -32,7 +32,7 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" height="60vh" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
@@ -40,8 +40,8 @@
                     <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
                     <el-table-column label="数据类型" align="center" prop="dataType">
                         <template slot-scope="scope">
-                            <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
-                            <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                            <div class="tac" v-if="scope.row.dataType=='1'">医院数据</div>
+                            <div class="tac" v-if="scope.row.dataType=='2'">医保数据</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
@@ -91,16 +91,14 @@
                 <div class='listDisplay'>
                     <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
                 </div>
-                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="60vh" v-loading="dataListLoading" @selection-change="handleSelectionChange">
+                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" :height="$tableHeight-75" v-loading="dataListLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
                     <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
-                    <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
                     <el-table-column label="采集数据文件路径" align="center" prop="collectPath"> </el-table-column>
                     <el-table-column label="数据类型" align="center">
-                            <template slot-scope="scope">
+                        <template slot-scope="scope">
                             <div class="tac">医院数据</div>
-                            <!-- <div class="tac" v-if="scope.row.dataType=='2'">医保</div> -->
                         </template>
                     </el-table-column>
                     <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>
@@ -252,6 +250,7 @@ export default {
                     fileName:this.dataForm.fileName || '',
                     filePath:this.dataForm.filePath || '',
                     collectStatus:this.dataForm.collectStatus || '',
+                    dataType:2,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''
                 })
@@ -292,6 +291,7 @@ export default {
                     pageSize:this.apComServerData.pageSize,
                     pageNo:this.apComServerData.pageIndex,
                     filePath:this.dataForm.filePath || '',
+                    dataType:1,
                     collectStatus:this.dataForm.collectStatus || '',
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''

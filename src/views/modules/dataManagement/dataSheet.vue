@@ -28,7 +28,7 @@
                             <el-button @click="resetForm('dataForm')">重置</el-button>
                         </el-form-item>
                     </el-form>
-                    <el-table :data="dataList" border v-loading="dataListLoading" height="600" style="width: 100%;">
+                    <el-table :data="dataList" border v-loading="dataListLoading" :height="$tableHeight-50" style="width: 100%;">
                         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                         <el-table-column prop="title" align="center" label="表名"></el-table-column>
                         <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
@@ -105,7 +105,7 @@ export default {
             ],
             defaultProps:{ 
                 children: 'children',
-                // label: 'title',
+                // label: 'projectName',
                 isLeaf:'leaf',
                 label(data, node) {
                     const config = data.__config__ || data
@@ -135,8 +135,17 @@ export default {
     methods:{
          // 树形控件input 过滤
         filterNode(value, data) {
+            // let _SearchLists = []
+            // if(value){
+            //      data.children.forEach(i=>{
+            //          if(i.title.toLowerCase().indexOf(value) !== -1){
+            //                _SearchLists.push(i)
+            //          }
+            //      })
+            //      data.children = _SearchLists
+            // }
             // if (!value) return true
-            // return data.title.indexOf(value) !== -1
+            // return data.label.indexOf(value) !== -1
         },
         //初始化tree
         initDataTree(){

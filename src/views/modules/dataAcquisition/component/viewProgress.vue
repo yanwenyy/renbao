@@ -1,12 +1,13 @@
 <template>
     <div class='viewProgress'>
-        <el-table :data="tableList" border height="60vh" :header-cell-style="{textAlign:'center'}" style="width: 100%">
+        <el-table :data="tableList" border :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" style="width: 100%">
             <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
             <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
+            <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
             <el-table-column label="文件类型" align="center" prop="dataType">
                 <template slot-scope="scope">
-                    <div class="tac" v-if="scope.row.dataType=='1'">医院</div>
-                    <div class="tac" v-if="scope.row.dataType=='2'">医保</div>
+                    <div class="tac" v-if="scope.row.dataType=='1'">医院数据</div>
+                    <div class="tac" v-if="scope.row.dataType=='2'">医保数据</div>
                 </template>
             </el-table-column>
             <el-table-column label="采集人" align="center" prop="collectUserName"></el-table-column>
@@ -54,7 +55,7 @@
         <el-dialog title='查看日志' width="50%"  :close-on-click-modal="false" append-to-body :modal-append-to-body="false" :visible.sync="editShowVisible">
             <!-- <editClick v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId"></editClick> -->
             <div class='Edit'>
-                <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%">
+                <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75"  style="width: 100%">
                     <el-table-column label="步骤规则" align="center" prop="stepName"></el-table-column>
                     <el-table-column label="步骤开始时间" align="center">
                         <template slot-scope="scope">{{scope.row.stepStartTime | datetimeformat}}</template>
@@ -125,6 +126,7 @@ export default {
                     fileName:this.dataForm.fileName || '',
                     filePath:this.dataForm.filePath || '',
                     collectStatus:this.dataForm.collectStatus || '',
+                    dataType:1,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
                     startTimeEnd:this.dataForm.startTimeEnd || ''
                 })

@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class='next-content'>
     <el-table
       :data="dataList"
       v-loading="dataListLoading"
       border
-      style="width: 100%;height:45vh;overflow:auto;">
+      style="width: 100%;height:50vh;overflow:auto;" :height="tableMaxHeight">
     <el-table-column
        v-for="(column,index) in columnList"
        :prop="column.columnName"
@@ -35,6 +35,11 @@
     created () {
       this.getDataList();
     },
+    computed:{
+     tableMaxHeight(){
+       return window.innerHeight - 170 + 'px'
+     }
+    },
     watch: {
       tableName: {
         deep: true,
@@ -64,7 +69,18 @@
           }
           this.dataListLoading = false
         })
-      }
+      },
     }
   }
 </script>
+<style lang="scss" scoped>
+.itemBtn{
+    text-align: center;
+}
+.el-table::before {
+  position: relative !important;
+  height: 0;
+}
+
+</style>
+

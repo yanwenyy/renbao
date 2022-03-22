@@ -40,24 +40,27 @@
           ></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="float:right">
         <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button @click="resetForm('dataForm')">重置</el-button>
+        <el-button type="warning" @click="templateExport">下载模板</el-button>
+        <el-button type="warning" @click="exportData">导出数据</el-button>
+        <el-button type="warning" @click="importData">导入数据</el-button>
       </el-form-item>
     </el-form>
     <!-- 列表 -->
     <div class="listDisplay">
-      <div class="f_right">
-        <el-button type="warning" @click="templateExport">下载模板</el-button>
+      <!-- <div class="f_right"> -->
+        <!-- <el-button type="warning" @click="templateExport">下载模板</el-button>
         <el-button type="warning" @click="exportData">导出数据</el-button>
-        <el-button type="warning" @click="importData">导入数据</el-button>
-      </div>
+        <el-button type="warning" @click="importData">导入数据</el-button> -->
+      <!-- </div> -->
       <el-table
         ref="multipleTable"
         :data="tableList"
         border
         style="100%"
-        height="60vh"
+        :height="$tableHeight-75"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange"
@@ -85,6 +88,11 @@
     </div>
     <el-dialog title="导入数据" :visible.sync="importVisible">
       <div style="padding-bottom:10px;">
+        <span style="font-size:16px;">
+            是否去重
+        </span>
+        <el-checkbox v-model="duplicateRemove"></el-checkbox>
+        <br>
         <span>导入类型</span>
         <el-select
           v-model="importType"
@@ -168,6 +176,7 @@ export default {
       ],
       catalogType: 10,
       multipleSelection: "",
+      duplicateRemove:false,
       hospitalType: {
         yljgbm: "",
         yljgmc: ""
@@ -230,30 +239,37 @@ export default {
       console.log(this.fileList);
     },
     uploadFile(itme) {
-      let formData = new FormData();
-      formData.append("file", this.fileList[0].raw);
-      this.$http({
-        url: this.$http.adornUrl("/threeCatalog/dataImportCommonMethod"),
-        method: "post",
-        data: formData,
-        params: this.$http.adornParams({
-          importType: this.importType,
-          catalogType: 10
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.$message({
-            message: "导入成功",
-            type: "success",
-            onClose: () => {
-              this.importVisible = false;
-              this.getInitList();
+        let arrDuplicate =''
+            if(this.duplicateRemove == false){
+                 arrDuplicate = 0
+            }else if(this.duplicateRemove == true){
+                 arrDuplicate = 1
             }
-          });
-        } else {
-          this.$message.error(data.message);
-        }
-      });
+        let formData = new FormData();
+        formData.append("file", this.fileList[0].raw);
+        this.$http({
+            url: this.$http.adornUrl("/threeCatalog/dataImportCommonMethod"),
+            method: "post",
+            data: formData,
+            params: this.$http.adornParams({
+            importType: this.importType,
+             duplicateRemove:arrDuplicate,
+            catalogType: 10
+            })
+        }).then(({ data }) => {
+            if (data && data.code === 200) {
+            this.$message({
+                message: "导入成功",
+                type: "success",
+                onClose: () => {
+                this.importVisible = false;
+                this.getInitList();
+                }
+            });
+            } else {
+            this.$message.error(data.message);
+            }
+        });
     },
     handlePreview() {
       this.fileList = [];
