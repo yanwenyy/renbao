@@ -28,8 +28,8 @@
                             <el-button @click="resetForm('dataForm')">重置</el-button>
                         </el-form-item>
                     </el-form>
-                    <el-table :data="dataList" border v-loading="dataListLoading" :height="$tableHeight-50" style="width: 100%;">
-                        <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                    <el-table :data="dataList" border v-loading="dataListLoading" :height="$tableHeight-70" style="width: 100%;">
+                        <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column> -->
                         <el-table-column prop="title" align="center" label="表名"></el-table-column>
                         <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
                         <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>
@@ -99,14 +99,10 @@ export default {
                 {
                 label: '规划库',
                 type: 'funFolder',
-                children: [{
-                }]
+                children: []
             }
             ],
             defaultProps:{ 
-                children: 'children',
-                // label: 'projectName',
-                isLeaf:'leaf',
                 label(data, node) {
                     const config = data.__config__ || data
                     return  config.label || config.projectName
@@ -129,23 +125,18 @@ export default {
     },
     watch:{
         filterText(val) {
-        // this.$refs.ruleTreeRoot.filter(val);
+        this.$refs.ruleTreeRoot.filter(val.trim());
         },
     },
     methods:{
          // 树形控件input 过滤
         filterNode(value, data) {
-            // let _SearchLists = []
-            // if(value){
-            //      data.children.forEach(i=>{
-            //          if(i.title.toLowerCase().indexOf(value) !== -1){
-            //                _SearchLists.push(i)
-            //          }
-            //      })
-            //      data.children = _SearchLists
-            // }
-            // if (!value) return true
-            // return data.label.indexOf(value) !== -1
+            if (!value) return true
+            if(data.projectName){
+                return data.projectName.indexOf(value) !== -1;
+            }else {
+                return data.label.indexOf(value) !== -1;
+            }  
         },
         //初始化tree
         initDataTree(){

@@ -162,6 +162,16 @@ export default {
                 }
             })
         },
+        handleSizeChange(val){
+            this.apComServerData.pageSize = val;
+            this.apComServerData.pageIndex = 1
+            this.getInitList()
+        },
+         //当前页
+        handleCurrentChange(val){
+            this.apComServerData.pageIndex = val;
+            this.getInitList()
+        },
     }
 }
 </script>

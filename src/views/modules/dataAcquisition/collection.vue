@@ -4,11 +4,14 @@
             <el-form-item label="文件名:" v-if="activeName == 'audit'">
                 <el-input v-model="dataForm.fileName" placeholder="请输入文件名"></el-input>
             </el-form-item>
-            <el-form-item label="文件路径:">
+            <el-form-item label="文件路径:" v-if="activeName == 'audit'">
                 <el-input v-model="dataForm.filePath" placeholder="请输入文件路径"></el-input>
             </el-form-item>
+             <el-form-item label="文件路径:" v-if="activeName == 'pass'">
+                <el-input v-model="dataForm.collectPath" placeholder="请输入文件路径"></el-input>
+            </el-form-item>
              <el-form-item label="采集状态:">
-                <el-select v-model="dataForm.collectStatus" placeholder="已完成" clearable>
+                <el-select v-model="dataForm.collectStatus" placeholder="请选择" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
@@ -182,7 +185,8 @@ export default {
                 filePath:'',
                 collectStatus:'',
                 startTimeEnd:'',
-                startTimeBegin:''
+                startTimeBegin:'',
+                collectPath:''
             },
             options:[{
                 value:'0',
@@ -290,7 +294,7 @@ export default {
                 params: this.$http.adornParams({
                     pageSize:this.apComServerData.pageSize,
                     pageNo:this.apComServerData.pageIndex,
-                    filePath:this.dataForm.filePath || '',
+                    collectPath:this.dataForm.collectPath || '',
                     dataType:1,
                     collectStatus:this.dataForm.collectStatus || '',
                     startTimeBegin:this.dataForm.startTimeBegin || '',
@@ -347,7 +351,7 @@ export default {
         getReset(){
             this.dataForm.fileName = '',
             this.dataForm.filePath = '',
-            this.dataForm.collectionStatus = '',
+            this.dataForm.collectPath = '',
             this.dataForm.startTimeBegin = '',
             this.dataForm.startTimeEnd = ''  
             this.apComServerData.pageIndex = 1

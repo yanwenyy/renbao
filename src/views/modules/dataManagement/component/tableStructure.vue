@@ -11,7 +11,7 @@
                 <el-input type="textarea" v-model="dataForm.explain"></el-input>
             </el-form-item>
             <el-table :data='dataForm.datas' border height='300' :header-cell-style="{textAlign:'center'}" style="100%;">
-                <el-table-column  type="selection" header-align="center" align="center" width="50" />
+                <!-- <el-table-column  type="selection" header-align="center" align="center" width="50" /> -->
                 <el-table-column prop="columnName" align="center" label="字段名"></el-table-column>
                 <el-table-column prop="dataType" align="center" label="类型"></el-table-column>
                 <el-table-column prop="dataLength" align="center" label="长度"></el-table-column>
@@ -64,16 +64,16 @@ export default {
             },
             //表单验证规则
             rules:{
-                tableName:[{
-                    type: "string",
-                    required: true,
-                    trigger: "blur",
-                }],
-                tableLibrary:[{
-                    type: "string",
-                    required: true,
-                    trigger: "blur",
-                }],
+                // tableName:[{
+                //     type: "string",
+                //     required: true,
+                //     trigger: "blur",
+                // }],
+                // tableLibrary:[{
+                //     type: "string",
+                //     required: true,
+                //     trigger: "blur",
+                // }],
             },
             dataListLoading:false
         }
