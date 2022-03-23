@@ -120,17 +120,13 @@ export default {
 .batch-list-box {
     width: 100%;
     height: 100%;
-    overflow: auto;
+    // overflow: auto;
     /deep/ .filter-text {
         width: 80%;
         margin: 10px 0 10px 10px;
     }
     /deep/ .el-tree {
         height: 100%;
-    }
-    /deep/ .is-current {
-        // display: flex;
-        // align-items: center;
     }
     /deep/ .el-tree-node__children .el-tree-node {
         height: 35px;

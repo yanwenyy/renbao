@@ -3,7 +3,7 @@
   <div class="box">
     <div class="left">
       <el-card style="height:80vh;overflow-y:auto">
-        <div class="auditRuleMonitoring-left" style="width:100%">
+        <div class="auditRuleMonitoring-left" style="width:100%;overflow-y:auto">
           <batch-list
             :batchLoading="treeLoading"
             :batchTreeList="batchTreeList"
