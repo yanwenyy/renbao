@@ -168,12 +168,12 @@
         v-model="query.value"
         :fetch-suggestions="querySearch"
         placeholder="请输入内容"
-      >
-        <i
+        style="width:500px" >
+        <!-- <i
           class="el-icon-arrow-down el-input__icon"
           slot="suffix"
           @click="handleIconClick"
-        ></i>
+        ></i> -->
       </el-autocomplete>
 
       <!-- Remove rule button -->

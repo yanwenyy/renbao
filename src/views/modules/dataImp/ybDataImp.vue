@@ -220,6 +220,7 @@
       title="字段匹配"
       :visible.sync="fileTableDialogVisible"
       width="60%"
+      top="5vh"
       :close-on-click-modal="false"
       >
       <el-tabs
@@ -244,7 +245,7 @@
               </el-select>
             </el-col>
           </el-row>
-          <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
+          <el-row style="width: 100%;height:39vh; overflow:auto; margin-top:10px">
             <el-table
               border
               style="width: 73%; overflow: auto; margin-left: 15%;"
@@ -295,6 +296,7 @@
       title="字段匹配预览"
       :visible.sync="columnTableDialogVisible"
       width="60%"
+      top="5vh"
       :close-on-click-modal="false"
       >
       <el-tabs
@@ -317,7 +319,7 @@
               </el-select>
             </el-col>
           </el-row>
-          <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
+          <el-row style="width: 100%;height:39vh; overflow:auto; margin-top:10px">
             <el-table
               border
               style="width: 73%; overflow: auto; margin-left: 15%;"

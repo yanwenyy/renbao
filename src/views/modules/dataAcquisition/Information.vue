@@ -346,7 +346,6 @@ export default {
 }
 .mask{
     width: 90%;
-    padding-top: 15px;
     position: fixed;
     z-index: 2;
     overflow: hidden;

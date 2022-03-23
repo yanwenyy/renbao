@@ -371,7 +371,7 @@ export default {
         nodeClick (data, node) {
             // 调用父组件的获取规则树id的方法
             if (this.isParent) {
-                this.$parent[this.parentGetTreeData](data,node, this.treeData);
+                this.$parent.$parent[this.parentGetTreeData](data,node, this.treeData);
             } else {
                 this.$emit("getTreeId", data,node, this.treeData);
             }
