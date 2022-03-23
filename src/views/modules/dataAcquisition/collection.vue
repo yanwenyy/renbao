@@ -127,7 +127,7 @@
                     </el-table-column>
                     <el-table-column align="center" label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="edit(scope.row.collectPlanMonitorId)" type="text">查看进度</el-button>
+                            <el-button @click="edit(scope.row)" type="text">查看进度</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -146,7 +146,7 @@
                 </el-dialog>
                 <!-- 查看进度弹框-->
                 <el-dialog title='查看进度' :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="showViewVisible">
-                    <ViewProgress v-if="showViewVisible" @close="closeViewDrawer" @ok="viewSucceed"></ViewProgress>
+                    <ViewProgress v-if="showViewVisible" @close="closeViewDrawer" @ok="viewSucceed" :collectPlanMonitorIds='collectPlanMonitorIds'></ViewProgress>
                 </el-dialog>
             </div>
             <!-- <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital' @dataList ="dataForm"></HospitalList></el-tab-pane> -->
@@ -157,7 +157,7 @@
         </el-tab-pane> -->
         </el-tabs>
          <!-- 查看弹框-->
-        <el-dialog title='查看日志' :close-on-click-modal="false" width="50%" :modal-append-to-body="false" :visible.sync="editShowVisible">
+        <el-dialog title='查看日志' :close-on-click-modal="false" width="60%" :modal-append-to-body="false" :visible.sync="editShowVisible">
             <Edit v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId"></Edit>
         </el-dialog>
     </div>
@@ -219,6 +219,7 @@ export default {
             showViewVisible:false,
             multipleSelection:'',
             dataListLoading:false,
+            collectPlanMonitorIds:''
         }
     },
     activated(){
@@ -313,8 +314,9 @@ export default {
             })
         },
         //查看进度
-        edit(){
-            this.showViewVisible = true
+        edit(val){
+            this.showViewVisible = true,
+            this.collectPlanMonitorIds = val.hospitalCollectPlanId
         },
         
         EditSucceed(){this.closeEditDrawer()},

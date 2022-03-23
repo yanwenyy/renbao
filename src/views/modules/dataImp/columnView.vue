@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div style="height:46vh;overflow:auto;">
     <el-table
       :data="dataList"
-      v-loading="dataListLoading"
       border
-      style="width: 100%;height:45vh;overflow:auto;">
+      height="46vh"
+      style="width: 100%;">
       <el-table-column
         label="字段名称"
         align="center"
@@ -27,7 +27,7 @@
     data () {
       return {
         dataList: [],
-        dataListLoading: false
+        //dataListLoading: false
       }
     },
     created () {
@@ -45,7 +45,7 @@
     methods: {
       // 获取数据列表
       getDataList () {
-        this.dataListLoading = true;
+        //this.dataListLoading = true;
         this.$http({
           url: this.$http.adornUrl(`/dataImp/getColumnInfosByTN/${this.tableName}`),
           method: 'get'
@@ -55,7 +55,7 @@
           } else {
             this.dataList = []
           }
-          this.dataListLoading = false
+          //this.dataListLoading = false
         })
         //this.dataList = [{ columnNameCn : this.tableName + 1,columnTypeCn:"字符型"}]
       }

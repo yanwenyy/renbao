@@ -2,7 +2,6 @@
   <div style="height:46vh;overflow:auto;">
     <el-table
       :data="dataList"
-      v-loading="dataListLoading"
       border
       height="46vh"
       style="width: 100%;">
@@ -11,6 +10,7 @@
        :prop="column.columnName"
        :label="column.columnName"
        :key="index"
+       width="200"
         align="center"/>
     </el-table>
   </div>
@@ -24,7 +24,7 @@
     data () {
       return {
         dataList: [],
-        dataListLoading: false,
+        //dataListLoading: false,
         columnList: []
       }
     },
@@ -44,7 +44,7 @@
       // 获取数据列表
       ///${this.tableName}
       getDataList () {
-        this.dataListLoading = true;
+        //this.dataListLoading = true;
         this.$http({
           url: this.$http.adornUrl(`/dataInfoBase/getTableDataList`),
           method: 'get',
@@ -58,7 +58,7 @@
           } else {
             this.dataList = []
           }
-          this.dataListLoading = false
+          //this.dataListLoading = false
         })
         //this.dataList = [{ columnNameCn : this.tableName + 1,columnTypeCn:"字符型"}]
       }

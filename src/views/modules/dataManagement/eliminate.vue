@@ -9,6 +9,9 @@
                 <el-button type="primary" @click="getAllSearch()">查询</el-button>
                 <el-button @click="resetForm()">重置</el-button>
             </el-form-item>
+            <!-- <el-form-item style="float:right">
+                <el-button type="primary" @click="getConfirm()">确认</el-button>
+            </el-form-item> -->
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
@@ -23,13 +26,14 @@
                     <div class="tac" v-if="scope.row.status=='3'">清除失败</div>
                    </template>
                 </el-table-column>
-                <el-table-column prop="status" header-align="center" align="center" label="进度">
-                    <template slot-scope="scope">
+                <el-table-column prop="progress" header-align="center" align="center" label="进度">
+                      <template slot-scope="scope"><el-progress :percentage="parseFloat(scope.row.progress)"></el-progress></template>
+                    <!-- <template slot-scope="scope">
                         <el-progress v-if="scope.row.status=='0'" :percentage="0"></el-progress>
                         <el-progress v-if="scope.row.status=='1'" :percentage="50"></el-progress>
                         <el-progress v-if="scope.row.status=='2'" :percentage="100"></el-progress>
                         <el-progress v-if="scope.row.status=='3'" :percentage="0"></el-progress>
-                    </template>
+                    </template> -->
                 </el-table-column>
                 <el-table-column prop="updateUserName" header-align="center" align="center" label="修改人"></el-table-column>
                 <el-table-column align="center" width="150" label="操作">
@@ -103,17 +107,27 @@ export default {
         },
         //清除事件
         resetClick(id){
-        //    this.showResetVisible = true
-         this.$http({
-                url:this.$http.adornUrl('/projectDump/dumpProjectById'),
-                method: 'get',
-                params: this.$http.adornParams({
-                    projectId: id,
+            this.$confirm('确认要清除此项目！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() =>{
+                this.$http({
+                    url:this.$http.adornUrl('/projectDump/dumpProjectById'),
+                    method: 'get',
+                    params: this.$http.adornParams({
+                        projectId: id,
+                    })
+                }).then(({data}) =>{
+                    if(data && data.code === 200){
+                        this.getDataList()
+                    }
                 })
-            }).then(({data}) =>{
-                if(data && data.code === 200){
-                    this.getDataList()
-                }
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消清除'
+                });
             })
         },
     }
