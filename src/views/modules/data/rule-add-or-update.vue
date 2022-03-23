@@ -391,7 +391,7 @@
         })
       },
       openSql(){
-        this.sqlEditMsg=this.dataForm.ruleSqlValue;
+        // this.sqlEditMsg=this.dataForm.ruleSqlValue;
 
         // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
         console.log(this.sqlEditMsg)
@@ -418,29 +418,31 @@
           this.$message.error("医疗机构编码和医疗机构名称是必填项")
         }else{
           var SqlStr=JSON.parse(JSON.stringify(this.$refs.sqler.sqlMsg));
-          console.log(SqlStr)
-          paramData.forEach(item=>{
-            if(item.children&&item.children.length>0){
-              item.children.forEach(vtem=>{
-                if(SqlStr.indexOf("{#"+vtem.id+"#}")!=-1){
-                  var _reg=new RegExp("{#"+vtem.id+"#}",'g');
-                  var dom = document.createElement("button");
-                  dom.className = "parmasBtn";
-                  dom.innerHTML = vtem.name;
-                  dom.id=vtem.id;
-                  SqlStr=SqlStr.replace(_reg,`<button class="parmasBtn">${vtem.name}</button>`)
-                }
-              })
-            }
-          });
           this.paramsSqlSelf=this.$refs.sqler.sqlMsg;
           this.sqlVisible=false;
-          this.dataForm.ruleSqlValue=SqlStr;
+          this.dataForm.ruleSqlValue=this.stringToBtn(paramData,SqlStr);
           this.dataForm.ruleType='1';
           this.dataForm.folderId = this.ruleCheckData.folderId;
           this.dataForm.folderPath = this.ruleCheckData.folderPath;
         }
 
+      },
+      stringToBtn(list,str){
+        list.forEach(item=>{
+          if(item.children&&item.children.length>0){
+            item.children.forEach(vtem=>{
+              if(str.indexOf("{#"+vtem.id+"#}")!=-1){
+                var _reg=new RegExp("{#"+vtem.id+"#}",'g');
+                var dom = document.createElement("button");
+                dom.className = "parmasBtn";
+                dom.innerHTML = vtem.name;
+                dom.id=vtem.id;
+                str=str.replace(_reg,`<button class="parmasBtn">${vtem.name}</button>`)
+              }
+            })
+          }
+        });
+        return str;
       },
       cleanMsg(){
         this.activeName='1';
@@ -501,10 +503,29 @@
               this.dataForm.folderPath = datas.folderPath;
               this.dataForm.createUserName = datas.createUserName;
               this.dataForm.createTime = datas.createTime;
-              this.dataForm.ruleSqlValue = datas.ruleSqlValue;
               this.sqlEditMsg = datas.ruleSqlValue;
 
               this.dataForm.ruleType = datas.ruleType;
+              var _list=[
+                {
+                  name:'参数',
+                  id:'0',
+                  children:[
+                    {
+                      paramId:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
+                      id:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
+                      name:'医疗机构编码'
+                    },
+                    {
+                      paramId:'945b6f41-3418-4963-8d94-5970d23b35b8',
+                      id:'945b6f41-3418-4963-8d94-5970d23b35b8',
+                      name:'医疗机构名称'
+                    },
+                  ]
+                },
+              ];
+              var str=JSON.parse(JSON.stringify(datas.ruleSqlValue));
+              this.dataForm.ruleSqlValue =this.stringToBtn(_list,datas.ruleSqlValue) ;
               // this.menuListTreeSetCurrentNode();
             }
           })

@@ -961,7 +961,7 @@
         });
         var selectValue = this.$refs.myCm.codemirror.getSelection();
         this.dragParmasList=this.dragParmasList.filter(item=>{return _list.indexOf("{#"+item.id+"#}")!=-1});
-        this.getwsData(selectValue!=''?selectValue:this.$refs.myCm.codemirror.getValue(),selectValue.indexOf("{#")!=-1?_list:[],this.dragParmasList);
+        this.getwsData(selectValue!=''?selectValue:this.$refs.myCm.codemirror.getValue(),selectValue!=''&&selectValue.indexOf("{#")==-1?[]:_list,this.dragParmasList);
       },
       // 打开
       openPython() {
