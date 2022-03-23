@@ -97,7 +97,8 @@ export default {
       sqlData: "",
       columnType: "",
       dataForm1: {
-        resultTableName: ""
+        resultTableName: "",
+        complexWhere: ""
       }
     };
   },
@@ -134,7 +135,7 @@ export default {
     },
     //重置
     resetForm() {
-      this.sqlData = ''
+      this.sqlData = "";
       this.initList();
     },
     //确定
@@ -159,6 +160,7 @@ export default {
     //导出
     reportList() {
       this.dataForm1.resultTableName = this.resultTableName;
+      this.dataForm1.complexWhere = this.sqlData
       this.$http
         .post(this.$http.adornUrl("ruleResult/viewExport"), this.dataForm1, {
           responseType: "blob",
