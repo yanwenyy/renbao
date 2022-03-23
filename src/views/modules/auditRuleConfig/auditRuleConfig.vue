@@ -300,8 +300,8 @@ export default {
       this.searchForm.ruleName = "";
       this.searchForm.ruleCategory = "";
       this.Pager.pageIndex = 1;
+      this.setTableChecked()
       // 调用规则树的重置方法
-      // this.$refs.ruleTree.clearCheckedKeys();
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
     },

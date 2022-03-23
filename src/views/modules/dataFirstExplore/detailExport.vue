@@ -3,7 +3,10 @@
   <div class="box">
     <div class="left">
       <el-card style="height:80vh;overflow-y:auto">
-        <div class="auditRuleMonitoring-left" style="width:100%;overflow-y:auto">
+        <div
+          class="auditRuleMonitoring-left"
+          style="width:100%;overflow-y:auto"
+        >
           <batch-list
             :batchLoading="treeLoading"
             :batchTreeList="batchTreeList"
@@ -156,9 +159,9 @@
               >
                 <el-option
                   v-for="item in hospitals"
-                  :key="item['医疗机构编码']"
-                  :label="item['医疗机构名称']"
-                  :value="item['医疗机构编码']"
+                  :key="item.hospitalCode"
+                  :label="item.hospitalName"
+                  :value="item.hospitalCode"
                 >
                 </el-option>
               </el-select>
@@ -202,7 +205,7 @@ export default {
       },
       //必填校验
       rules: {
-        hospId: [{ required: true, message: "请选择", trigger: "blur" }]
+        hospitalCode: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       batchTreeList: [
         {
@@ -256,7 +259,6 @@ export default {
   },
   created() {
     this.initData();
-    this.initHospital();
   },
   methods: {
     //初始化列表数据
@@ -314,19 +316,20 @@ export default {
     //选择医院下拉列表数据
     initHospital() {
       this.$http({
-        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+        url: this.$http.adornUrl("batch/getHospitals"),
         method: "get",
         params: this.$http.adornParams(
           {
-            pageCount: "1",
-            pageSize: "10000"
+            batchId: this.batchId
+            // pageCount: "1",
+            // pageSize: "10000"
           },
           false
         )
       })
         .then(({ data }) => {
           if (data.code == 200) {
-            this.hospitals = data.result.result;
+            this.hospitals = data.result;
           }
         })
         .catch(() => {});
@@ -339,6 +342,7 @@ export default {
         this.dataForm1.hospId = [];
         this.dataForm1.hospName = [];
         this.checked = false;
+        this.initHospital();
         this.detailExportDialog = true;
       }
     },
@@ -484,28 +488,20 @@ export default {
       for (let i = 0; i <= val.length - 1; i++) {
         this.hospitals.find(item => {
           //这里的options就是数据源
-          if (item["医疗机构编码"] == val[i]) {
-            this.dataForm1.hospName.push(item["医疗机构名称"]);
+          if (item.hospitalCode == val[i]) {
+            this.dataForm1.hospName.push(item.hospitalName);
           }
         });
       }
     },
     //医院全选
     selectAll() {
-      /* this.dataForm1.hospital = [];
-      if (this.checked) {
-        this.hospitals.map(item => {
-          this.dataForm1.hospital.push(item);
-        });
-      } else {
-        this.dataForm1.hospital = [];
-      } */
-      // this.dataForm1.hospId = [];
-      // this.dataForm1.hospName = [];
+      this.dataForm1.hospId = [];
+      this.dataForm1.hospName = [];
       if (this.checked) {
         this.hospitals.map(i => {
-          this.dataForm1.hospId.push(i["医疗机构编码"]);
-          this.dataForm1.hospName.push(i["医疗机构名称"]);
+          this.dataForm1.hospId.push(i.hospitalCode);
+          this.dataForm1.hospName.push(i.hospitalName);
         });
       } else {
         this.dataForm1.hospId = [];

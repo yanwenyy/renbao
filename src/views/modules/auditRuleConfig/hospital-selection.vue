@@ -174,6 +174,7 @@ export default {
       );
       //转换sql处理
       var resultSqlValue = [];
+      console.log('医院',this.checkHospitalList)
       if (this.checkRuleData.length > 0) {
         for (var i = 0; i < this.checkRuleData.length; i++) {
           resultSqlValue.push(
@@ -181,6 +182,8 @@ export default {
           );
         }
       }
+      // console.log('穿',this.checkRuleData)
+      // console.log('返',resultSqlValue)
       this.$parent.setHospital(this.checkHospitalList, resultSqlValue); // 回显医院名称
     },
     onQuery() {
