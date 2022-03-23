@@ -625,6 +625,7 @@
       getHosBatch() {
         this.hosBatchFlag = true
         this.hosBatchId = ''
+        this.hospitalName = ''
         this.$http({
           url: this.$http.adornUrl(`hospitalCollectPlan/selectList`),
           method: 'get'
@@ -638,6 +639,7 @@
       getHospital(){
         this.hosBatchFlag = false
         this.hospitalName = ''
+        this.hosBatchId = ''
         this.$http({
           url: this.$http.adornUrl(`hospitalBasicInfo/getPageList`),
           method: 'get',
