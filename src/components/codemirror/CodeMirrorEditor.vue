@@ -635,7 +635,6 @@
           if (val != "") {
             if (val != "") {
               this.editorValue=val;
-              console.log(2222,editorValue,777)
               if(this.$refs.myCm){
                 this.idToButton(val);
               }
