@@ -247,7 +247,7 @@
           <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
             <el-table
               border
-              style="width: 70%; overflow: auto; margin-left: 15%;"
+              style="width: 73%; overflow: auto; margin-left: 15%;"
               :data="item.fileColumnMaps[selectTableNames[index]]">
               <el-table-column
                 prop="fileColumnName"
@@ -320,7 +320,7 @@
           <el-row style="width: 100%;height:29vh; overflow:auto; margin-top:10px">
             <el-table
               border
-              style="width: 70%; overflow: auto; margin-left: 15%;"
+              style="width: 73%; overflow: auto; margin-left: 15%;"
               :data="item.fileColumnMaps[selectTableViewNames[index]]">
               <el-table-column
                 prop="fileColumnName"
@@ -352,6 +352,7 @@
     <el-dialog
       :title="checkTableName"
       :visible.sync="tableColumnViewDialogVisible"
+      v-if="tableColumnViewDialogVisible"
       width="50%"
       :close-on-click-modal="false">
       <column-view :table-name="checkTableName"/>
@@ -363,6 +364,7 @@
     <el-dialog
       :title="checkTableName"
       :visible.sync="tableDataViewDialogVisible"
+      v-if="tableDataViewDialogVisible"
       width="70%"
       :close-on-click-modal="false">
       <data-view :table-name="checkTableName"/>
