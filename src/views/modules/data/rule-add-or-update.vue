@@ -77,6 +77,29 @@
           </el-form-item>
 
         </el-tab-pane>
+          <el-tab-pane name="3" label="统计sql编写">
+            <div class="tabs-div">
+              <div class="tabs3-left inline-block">
+                <el-tree
+                  :data="data"
+                  node-key="id"
+                  default-expand-all
+                  @node-drag-start="handleDragStart"
+                  @node-drag-enter="handleDragEnter"
+                  @node-drag-leave="handleDragLeave"
+                  @node-drag-over="handleDragOver"
+                  @node-drag-end="handleDragEnd"
+                  @node-drop="handleDrop"
+                  draggable
+                  :allow-drop="allowDrop"
+                  :allow-drag="allowDrag">
+                </el-tree>
+              </div>
+              <div class="tabs3-right inline-block">
+                <el-input class="self-input" type="textarea" :rows="4" id="selfInput" v-model="inputValue"></el-input>
+              </div>
+            </div>
+          </el-tab-pane>
       </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -113,6 +136,9 @@
       ruleData: {
         default: [],
       },
+    },
+    mounted(){
+
     },
     data () {
       var validateInteger = (rule, value, callback) => {
@@ -159,8 +185,63 @@
           ruleSqlValue: '',
           ruleType: '',
           folderPath: '',
-          ruleId:''
+          ruleId:'',
+          paramRule:[],
         },
+
+
+        data: [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2',
+            children: [{
+              id: 11,
+              label: '三级 3-2-1'
+            }, {
+              id: 12,
+              label: '三级 3-2-2'
+            }, {
+              id: 13,
+              label: '三级 3-2-3'
+            }]
+          }]
+        }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
+        inputValue:'',
+
+
         dataRule: {
           ruleName: [
             { required: true, message: '规则名称不能为空', trigger: 'blur' }
@@ -191,6 +272,94 @@
       }
     },
     methods: {
+      handleDragStart(node, ev) {
+        // console.log('drag start', node);
+      },
+      handleDragEnter(draggingNode, dropNode, ev) {
+        // console.log(draggingNode, dropNode, ev,4444);
+      },
+      handleDragLeave(draggingNode, dropNode, ev) {
+        // console.log('tree drag leave: ', dropNode.label);
+      },
+      handleDragOver(draggingNode, dropNode, ev) {
+        var elInput = document.getElementById('selfInput');
+        // elInput.addEventListener("dragenter", function(e){
+        //   console.log(e,444444)
+        // }, false);
+      },
+      handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        console.log(ev);
+        var elInput = document.getElementById('selfInput');
+        var _str=JSON.parse(JSON.stringify(draggingNode.data.label));
+        this.insertText(elInput,_str);
+
+      },
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+        console.log('tree drop: ', dropNode.label, dropType);
+      },
+      allowDrop(draggingNode, dropNode, type) {
+        // console.log(draggingNode, dropNode, type,6767)
+       return false;
+      },
+      allowDrag(draggingNode) {
+        return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+      },
+
+      changeCursor(input, position) {
+
+        var range = input.createTextRange();
+
+        range.collapse(true);
+
+        range.moveStart('character',position);
+
+        range.select();
+
+      },
+      getCursortPosition (ctrl) {//获取光标位置函数
+        var CaretPos = 0;	// IE Support
+        if (document.selection) {
+          ctrl.focus ();
+          var Sel = document.selection.createRange ();
+          Sel.moveStart('character', -ctrl.value.length);
+          CaretPos = Sel.text.length;
+        }
+        // Firefox support
+        else if (ctrl.selectionStart || ctrl.selectionStart == '0')
+          CaretPos = ctrl.selectionStart;
+        return (CaretPos);
+      },
+      setCaretPosition(ctrl, pos){//设置光标位置函数
+        if(ctrl.setSelectionRange)
+        {
+          ctrl.focus();
+          ctrl.setSelectionRange(pos,pos);
+        }
+        else if (ctrl.createTextRange) {
+          var range = ctrl.createTextRange();
+          range.collapse(true);
+          range.moveEnd('character', pos);
+          range.moveStart('character', pos);
+          range.select();
+        }
+      },
+      insertText(obj,str) {
+        if (document.selection) {
+          var sel = document.selection.createRange();
+          sel.text = str;
+        } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') {
+          var startPos = obj.selectionStart,
+            endPos = obj.selectionEnd,
+            cursorPos = startPos,
+            tmpStr = obj.value;
+          obj.value = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);
+          cursorPos += str.length;
+          obj.selectionStart = obj.selectionEnd = cursorPos;
+        } else {
+          obj.value += str;
+        }
+      },
+
       //获取当前日期，格式YYYY-MM-DD
       getNowFormatDay() {
         var nowDate=new Date();
@@ -222,7 +391,7 @@
         })
       },
       openSql(){
-        this.sqlEditMsg=this.dataForm.ruleSqlValue;
+        // this.sqlEditMsg=this.dataForm.ruleSqlValue;
 
         // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
         console.log(this.sqlEditMsg)
@@ -249,29 +418,31 @@
           this.$message.error("医疗机构编码和医疗机构名称是必填项")
         }else{
           var SqlStr=JSON.parse(JSON.stringify(this.$refs.sqler.sqlMsg));
-          console.log(SqlStr)
-          paramData.forEach(item=>{
-            if(item.children&&item.children.length>0){
-              item.children.forEach(vtem=>{
-                if(SqlStr.indexOf("{#"+vtem.id+"#}")!=-1){
-                  var _reg=new RegExp("{#"+vtem.id+"#}",'g');
-                  var dom = document.createElement("button");
-                  dom.className = "parmasBtn";
-                  dom.innerHTML = vtem.name;
-                  dom.id=vtem.id;
-                  SqlStr=SqlStr.replace(_reg,`<button class="parmasBtn">${vtem.name}</button>`)
-                }
-              })
-            }
-          });
-          this.paramsSqlSelf=this.$refs.sqler.paramsSqlMsg;
+          this.paramsSqlSelf=this.$refs.sqler.sqlMsg;
           this.sqlVisible=false;
-          this.dataForm.ruleSqlValue=SqlStr;
+          this.dataForm.ruleSqlValue=this.stringToBtn(paramData,SqlStr);
           this.dataForm.ruleType='1';
           this.dataForm.folderId = this.ruleCheckData.folderId;
           this.dataForm.folderPath = this.ruleCheckData.folderPath;
         }
 
+      },
+      stringToBtn(list,str){
+        list.forEach(item=>{
+          if(item.children&&item.children.length>0){
+            item.children.forEach(vtem=>{
+              if(str.indexOf("{#"+vtem.id+"#}")!=-1){
+                var _reg=new RegExp("{#"+vtem.id+"#}",'g');
+                var dom = document.createElement("button");
+                dom.className = "parmasBtn";
+                dom.innerHTML = vtem.name;
+                dom.id=vtem.id;
+                str=str.replace(_reg,`<button class="parmasBtn">${vtem.name}</button>`)
+              }
+            })
+          }
+        });
+        return str;
       },
       cleanMsg(){
         this.activeName='1';
@@ -332,10 +503,29 @@
               this.dataForm.folderPath = datas.folderPath;
               this.dataForm.createUserName = datas.createUserName;
               this.dataForm.createTime = datas.createTime;
-              this.dataForm.ruleSqlValue = datas.ruleSqlValue;
               this.sqlEditMsg = datas.ruleSqlValue;
 
               this.dataForm.ruleType = datas.ruleType;
+              var _list=[
+                {
+                  name:'参数',
+                  id:'0',
+                  children:[
+                    {
+                      paramId:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
+                      id:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
+                      name:'医疗机构编码'
+                    },
+                    {
+                      paramId:'945b6f41-3418-4963-8d94-5970d23b35b8',
+                      id:'945b6f41-3418-4963-8d94-5970d23b35b8',
+                      name:'医疗机构名称'
+                    },
+                  ]
+                },
+              ];
+              var str=JSON.parse(JSON.stringify(datas.ruleSqlValue));
+              this.dataForm.ruleSqlValue =this.stringToBtn(_list,datas.ruleSqlValue) ;
               // this.menuListTreeSetCurrentNode();
             }
           })
@@ -408,6 +598,7 @@
                 'ruleSqlValue': this.paramsSqlSelf,
                 'ruleType': this.dataForm.ruleType,
                 'folderPath': this.dataForm.folderPath,
+                'paramRule': this.dataForm.paramRule,
               })
             }).then(({data}) => {
               if (data && data.code ===200) {
@@ -517,6 +708,22 @@
     border-radius: 4px;
     min-height: 150px;
     height: auto;
+  }
+  .inline-block{
+    display: inline-block;
+  }
+  .tabs-div{
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+  .tabs3-left{
+    width: 40%;
+    height: 30vh;
+    overflow-y: auto;
+  }
+  .tabs3-right{
+    width: 60%;
   }
 </style>
 

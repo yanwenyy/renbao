@@ -148,15 +148,9 @@ export default {
               break;
             }
           }
-          if (
-            dataTypeObj.columnType.toUpperCase() == "TIMESTAMP" ||
-            dataTypeObj.columnType.toUpperCase().indexOf("VARCHAR") > -1 ||
-            dataTypeObj.columnType.toUpperCase() == "CLOB"
-          ) {
-            if (
-              child.query.operator == "like" ||
-              child.query.operator == "not like"
-            ) {
+          if ( dataTypeObj.columnType.toUpperCase() == "TIMESTAMP" || dataTypeObj.columnType.toUpperCase().indexOf("VARCHAR2") > -1 || dataTypeObj.columnType.toUpperCase() == "CLOB") {
+            debugger
+            if ( child.query.operator == "like" || child.query.operator == "not like" ) {
               sql.push(child.query.rule);
               sql.push(child.query.operator);
               sql.push("'%" + child.query.value + "%'");
@@ -190,5 +184,6 @@ export default {
    overflow-x:hidden;
    position: absolute;
    max-height: 60vh;
+   margin-top:20px;
  }
 </style>

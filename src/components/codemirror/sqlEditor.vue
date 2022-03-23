@@ -1005,7 +1005,7 @@
       },
       // 拖拽成功完成时
       handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log(draggingNode.label);
+        // console.log(draggingNode, dropNode, dropType, ev);
       },
       // 切换编辑模式事件处理函数
       onEditorModeChange(value) {

@@ -52,7 +52,7 @@
             <el-button @click="close">关闭</el-button>
         </div>
         <!-- 查看弹框-->
-        <el-dialog title='查看日志' width="50%"  :close-on-click-modal="false" append-to-body :modal-append-to-body="false" :visible.sync="editShowVisible">
+        <el-dialog title='查看日志' width="70%"  :close-on-click-modal="false" append-to-body :modal-append-to-body="false" :visible.sync="editShowVisible">
             <!-- <editClick v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId"></editClick> -->
             <div class='Edit'>
                 <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75"  style="width: 100%">
@@ -71,7 +71,7 @@
                             <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="步骤结果" align="center" prop="stepResult">
+                    <el-table-column label="步骤结果" min-width="130" align="center" prop="stepResult">
                     </el-table-column>
                 </el-table>
                 <div class="itemBtn">
@@ -84,6 +84,7 @@
 <script>
 export default {
     name:"viewProgress",
+    props: { collectPlanMonitorIds: { type: String } },
     data(){
         return{
             tableList:[],
@@ -128,7 +129,8 @@ export default {
                     collectStatus:this.dataForm.collectStatus || '',
                     dataType:1,
                     startTimeBegin:this.dataForm.startTimeBegin || '',
-                    startTimeEnd:this.dataForm.startTimeEnd || ''
+                    startTimeEnd:this.dataForm.startTimeEnd || '',
+                    hospitalCollectPlanId:this.collectPlanMonitorIds
                 })
             }).then(({ data }) => {
                 if (data && data.code === 200) {

@@ -6,7 +6,7 @@
                     <el-option  v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item style="float:right">
+            <el-form-item style="float:right;padding:5px" >
                 <el-button type="warning" v-show="isShow" @click="exportData">下载模板</el-button> 
                 <el-button type="warning"  @click="ImportData">导入数据</el-button>
             </el-form-item>
@@ -17,90 +17,26 @@
                 <el-button size="mini" type="warning" v-show="isShow" @click="exportData">下载模板</el-button>       
                 <el-button size="mini" type="warning"  @click="ImportData">导入数据</el-button>
             </div> -->
-                <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                     <template v-for="(item,index) in tableColumns">
-                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
-                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                    <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                    <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                    <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                    <el-table-column prop="剂型" header-align="center" align="center" label="剂型"></el-table-column>
-                    <el-table-column prop="医保药品名称" header-align="center" align="center" label="医保药品名称"></el-table-column>
-                    <el-table-column prop="医保药品编码" header-align="center" align="center" label="医保药品编码"></el-table-column>
-                    <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                    <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                    <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                    <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                    <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                    <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                    <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                    <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
-                    <el-table-column prop="用量" header-align="center" align="center" label="用量"></el-table-column>
-                    <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                    <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                    <el-table-column prop="门诊住院用药标识" header-align="center" align="center" label="门诊住院用药标识"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
+
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
-                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
-                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                    <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                    <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                    <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                    <el-table-column prop="医保目录除外内容" header-align="center" align="center" label="医保目录除外内容"></el-table-column>
-                    <el-table-column prop="医保项目内涵" header-align="center" align="center" label="医保项目内涵"></el-table-column>
-                    <el-table-column prop="医保药品名称" header-align="center" align="center" label="医保药品名称"></el-table-column>
-                    <el-table-column prop="医保药品编码" header-align="center" align="center" label="医保药品编码"> </el-table-column>
-                    <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                    <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                    <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                    <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                    <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                    <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                    <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                    <el-table-column prop="用法" header-align="center" align="center" label="用法"></el-table-column>
-                    <el-table-column prop="离休价格" header-align="center" align="center" label="离休价格"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                    <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
-                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
+                        <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
-                    <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column prop="一级医院最高价格" header-align="center" align="center" label="一级医院最高价格"></el-table-column>
-                    <el-table-column prop="三级医院最高价格" header-align="center" align="center" label="三级医院最高价格"></el-table-column>
-                    <el-table-column prop="二级医院最高价格" header-align="center" align="center" label="二级医院最高价格"> </el-table-column>
-                    <el-table-column prop="住院自付比例" header-align="center" align="center" label="住院自付比例"></el-table-column>
-                    <el-table-column prop="医保目录除外内容" header-align="center" align="center" label="医保目录除外内容"></el-table-column>
-                    <el-table-column prop="医保项目内涵" header-align="center" align="center" label="医保项目内涵"></el-table-column>
-                    <el-table-column prop="医保项目名称" header-align="center" align="center" label="医保项目名称"></el-table-column>
-                    <el-table-column prop="医保项目编码" header-align="center" align="center" label="医保项目编码"> </el-table-column>
-                    <el-table-column prop="国家医保贯标目录编码" header-align="center" align="center" label="国家医保贯标目录编码"> </el-table-column>
-                    <el-table-column prop="备注" header-align="center" align="center" label="备注"></el-table-column>
-                    <el-table-column prop="工伤自付比例" header-align="center" align="center" label="工伤自付比例"></el-table-column>
-                    <el-table-column prop="支付单位" header-align="center" align="center" label="支付单位"></el-table-column>
-                    <el-table-column prop="支付类别" header-align="center" align="center" label="支付类别"> </el-table-column>
-                    <el-table-column prop="最高限价" header-align="center" align="center" label="最高限价"></el-table-column>
-                    <el-table-column prop="生效日期" header-align="center" align="center" label="生效日期"></el-table-column>
-                    <el-table-column prop="生育自付比例" header-align="center" align="center" label="生育自付比例"></el-table-column>
-                    <el-table-column prop="终止日期" header-align="center" align="center" label="终止日期"></el-table-column>
-                    <el-table-column prop="规格" header-align="center" align="center" label="规格"></el-table-column>
-                    <el-table-column prop="门诊自付比例" header-align="center" align="center" label="门诊自付比例"></el-table-column> -->
                 </el-table>
                 <!-- 病种目录 -->
                 <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
