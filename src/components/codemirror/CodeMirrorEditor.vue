@@ -543,9 +543,15 @@
         immediate: true,
         deep: true,
         handler(val) {
-          if (val) {
-            if (val) {
+          if (val!='') {
+            if(val!=''){
               this.paramsNode=val;
+              var that=this,str=this.sqlData;
+              setTimeout(function(){
+                if(str!=''){
+                  that.idToButton(str);
+                }
+              },300);
             }
           }
         },
@@ -625,13 +631,14 @@
         immediate: true,
         deep: true,
         handler(val) {
+          console.log(1111)
           if (val != "") {
-            if (val !== "") {
+            if (val != "") {
               this.editorValue=val;
+              console.log(2222,editorValue,777)
               if(this.$refs.myCm){
                 this.idToButton(val);
               }
-
             }
           }
         },
@@ -707,9 +714,12 @@
     },
     mounted(){
       this.dragControllerDiv2();
-      if(this.sqlData!=''){
-       this.idToButton(this.sqlData);
-      }
+      var that=this,str=this.sqlData;
+      setTimeout(function(){
+        if(str!=''){
+          that.idToButton(str);
+        }
+      },300);
     },
     methods: {
           //将参数id转换成按钮显示到页面
