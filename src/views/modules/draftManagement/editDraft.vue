@@ -108,13 +108,30 @@ export default {
         ruleId: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       loading: false,
-      showHospitalDialog: false
+      showHospitalDialog: false,
+      isHaveData:""
     };
   },
   created() {
     this.dataForm.ruleId = this.id;
+    this.init()
   },
   methods: {
+    init() {
+      this.$http({
+        url: this.$http.adornUrl(`/manuscript/editManuscript`),
+        method: "get",
+        data: this.$http.adornData({
+          ruleId: this.id,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          console.log(data)
+        } else {
+          
+        }
+      });
+    },
     //确定
     submit() {
       this.$refs["dataForm"].validate(valid => {
@@ -124,12 +141,12 @@ export default {
             method: "post",
             data: this.$http.adornData({
               ruleId: this.id,
-              evidenceId: "",//逗号拼接字符串
+              evidenceId: "", //逗号拼接字符串
               manuscriptName: this.dataForm.manuscriptName,
               manuscriptCode: this.dataForm.manuscriptCode,
               manuscriptRemark: this.dataForm.manuscriptRemark,
-              hospitalCode: "",//逗号拼接字符串
-              hospitalName: ""//逗号拼接字符串
+              hospitalCode: "", //逗号拼接字符串
+              hospitalName: "" //逗号拼接字符串
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {

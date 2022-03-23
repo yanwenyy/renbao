@@ -356,7 +356,6 @@ export default {
         this.multipleSelection[0].ruleId,
         this.ruleCheckData
       );
-      console.log(this.multipleSelection[0].ruleId);
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
       this.ruleData = this.$refs.ruleTree.treeData;
@@ -493,6 +492,7 @@ export default {
       //   this.folderId = "";
       // }
       this.initData();
+      this.clearTableChecked()
     },
     //获取每行数据id
     getRowKeys(row) {
