@@ -416,6 +416,10 @@ img {
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 10px;
+  padding-top:0;
+  .el-table__header-wrapper{
+    padding-top: 10px;
+  }
   thead tr,thead th{
     background:#F5F5F7!important;
     border-radius: 4px;

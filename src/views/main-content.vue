@@ -54,6 +54,9 @@
       documentClientHeight: {
         get () { return this.$store.state.common.documentClientHeight }
       },
+      projectId: {
+        get () { return this.$store.state.common.projectId}
+      },
       menuActiveName: {
         get () { return this.$store.state.common.menuActiveName },
         set (val) { this.$store.commit('common/updateMenuActiveName', val) }
@@ -73,6 +76,14 @@
           return isURL(this.$route.meta.iframeUrl) ? { height: height + 'px' } : { minHeight: height + 'px' }
         }
         return { minHeight: height + 'px' }
+      }
+    },
+    watch: {
+      projectId(newVal,oldVal) {
+        console.log(newVal,oldVal);
+        if(newVal!=oldVal){
+          this.tabsCloseAllHandle();
+        }
       }
     },
     methods: {

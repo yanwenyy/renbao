@@ -816,7 +816,7 @@
           resize.style.cursor = 'n-resize';
           var startY = e.clientY;
           resize.top = resize.offsetTop-_topBtn[0].offsetHeight-_box.offsetTop;
-          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].offsetHeight)
+          console.log(resize.offsetTop,_box.clientHeight,_box.offsetTop,_topBtn[0].clientHeight)
           // 鼠标拖动事件
           document.onmousemove = function (e) {
 
@@ -959,8 +959,9 @@
             _list.push(item.replacedWith.id)
           }
         });
+        var selectValue = this.$refs.myCm.codemirror.getSelection();
         this.dragParmasList=this.dragParmasList.filter(item=>{return _list.indexOf("{#"+item.id+"#}")!=-1});
-        this.getwsData(this.$refs.myCm.codemirror.getValue(),_list,this.dragParmasList);
+        this.getwsData(selectValue!=''?selectValue:this.$refs.myCm.codemirror.getValue(),selectValue.indexOf("{#")!=-1?_list:[],this.dragParmasList);
       },
       // 打开
       openPython() {
