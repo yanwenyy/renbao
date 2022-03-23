@@ -86,13 +86,13 @@ export default {
       ) {
         // operators = ['=',"<>", "like", "not like"];
         // operators = ['id',"=", "label", "等于"];
-          operators = [{'id':"=", "label":"等于"},{'id':"!=", "label":"不等于"},{'id':"like", "label":"包含以下内容"},{'id':"not like", "label":"不包含以下内容"},{'id':"like", "label":"以...结束"},{'id':"not like", "label":"不以...结束"},{'id':"is null", "label":"为空"},{'id':"is not null", "label":"不为空"},{'id':"is null", "label":"为null"},{'id':"is not null", "label":"不为null"},];
+          operators = [{'id':"=", "label":"等于"},{'id':"!=", "label":"不等于"},{'id':"like", "label":"包含以下内容"},{'id':"not like", "label":"不包含以下内容"},{'id':"is null", "label":"为null"},{'id':"is not null", "label":"不为null"},];
       } else if (
         columnObj.columnType.toUpperCase().indexOf("INT") != -1 ||
         columnObj.columnType.toUpperCase().indexOf("NUMBER") != -1||
         columnObj.columnType.toUpperCase().indexOf("DECIMAL") != -1
       ) {
-        operators = ["=","!=","like","not like","likes","is not like","null","not null","is null","is not null"];
+        operators = ["=","!=","like","not like","is null","is not null"];
       }
       return operators;
     },
@@ -154,12 +154,6 @@ export default {
               sql.push(child.query.operator);
               sql.push("'%" + child.query.value + "%'");
             }else if( child.query.operator == "is null" || child.query.operator == "is not null"){
-              let arr = ''
-              child.query.value = arr
-              sql.push(child.query.rule);
-              sql.push(child.query.operator);
-              sql.push("" + child.query.value + "");
-            }else if(child.query.operator == "null" || child.query.operator == "is not null"){
               let arr = ''
               child.query.value = arr
               sql.push(child.query.rule);

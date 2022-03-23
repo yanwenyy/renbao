@@ -43,6 +43,15 @@
                 </el-table-column>
             </el-table>
         </div>
+         <el-pagination 
+                :page-size="apComServerData.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="apComServerData.total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="apComServerData.pageIndex"
+                :page-sizes="[10, 20, 50, 100]"
+                ></el-pagination>
         <!-- <el-dialog title="数据清除" :visible.sync="showResetVisible">
             <div class='content'>
                 <span>清除列表:</span>
@@ -69,7 +78,13 @@ export default {
             checkedCities:[],
             cities:cityOptions,
             tableData:[],
-            showResetVisible:false
+            showResetVisible:false,
+            apComServerData:{
+                current: 1,
+                pageSize: 10,
+                pageIndex:1,
+                total:0,
+            },
         }
     },
     mounted() {
@@ -84,12 +99,13 @@ export default {
                 method: 'get',
                 params: this.$http.adornParams({
                     projectName: this.dataForm.projectName,
+                    pageSize:this.apComServerData.pageSize,
+                    pageNo:this.apComServerData.pageIndex,
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableData = data.result.records
-                    // this.tableColumns = data.result.columns
-                    // this.apComServerData.total = data.result.pagination.dataCount
+                    this.apComServerData.total = data.result.total
                 }else{
                     this.tableData = []
                     // this.apComServerData.total = 0
@@ -129,6 +145,17 @@ export default {
                     message: '已取消清除'
                 });
             })
+        },
+        // 页数
+        handleSizeChange(val){
+            this.apComServerData.pageSize = val;
+            this.apComServerData.pageIndex = 1
+            this.getDataList()
+        },
+        //当前页
+        handleCurrentChange(val){
+            this.apComServerData.pageIndex = val;
+            this.getDataList()
         },
     }
 }
