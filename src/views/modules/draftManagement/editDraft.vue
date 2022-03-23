@@ -125,11 +125,10 @@ export default {
             data: this.$http.adornData({
               ruleId: this.id,
               evidenceId: "",//逗号拼接字符串
-              evidenceName: "",
               manuscriptName: this.dataForm.manuscriptName,
               manuscriptCode: this.dataForm.manuscriptCode,
               manuscriptRemark: this.dataForm.manuscriptRemark,
-              // hospitalCode: "",
+              hospitalCode: "",//逗号拼接字符串
               hospitalName: ""//逗号拼接字符串
             })
           }).then(({ data }) => {

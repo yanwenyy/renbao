@@ -69,16 +69,16 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="roleName"
+        prop="fileNames"
         header-align="center"
         align="center"
         label="证据模板"
       >
-        <template slot-scope="scope">
+        <!-- <template slot-scope="scope">
           <el-button type="text" @click="detail(scope.row)">{{
-            scope.row.roleName
+            scope.row.fileNames
           }}</el-button>
-        </template>
+        </template> -->
       </el-table-column>
       <el-table-column
         prop="createUserName"

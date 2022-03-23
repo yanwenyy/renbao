@@ -18,7 +18,7 @@
       <el-card class="box-card" style="height:80vh;overflow-y:auto">
         <div class="search-box">
           <el-form ref="dataForm" :model="dataForm" :inline="true">
-            <el-form-item>
+            <el-form-item label="规则名称：">
               <el-input
                 v-model="dataForm.ruleName"
                 size="small"
@@ -26,7 +26,7 @@
                 clearable
               ></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label="规则类型：">
               <el-select
                 v-model="dataForm.ruleCategory"
                 filterable
@@ -78,7 +78,7 @@
             ref="tableData"
             @selection-change="handleSelectionChange"
             v-loading="loading"
-            style="width: 100%;margin-top: 20px"
+            style="width: 100%"
             :row-key="getRowKeys"
             :height="$tableHeight - 80"
           >
@@ -141,7 +141,7 @@
               <el-button v-else>当前所选规则</el-button>
             </el-button-group>
           </div>
-          <div class="pager">
+          <div>
             <el-pagination
               @size-change="sizeChangeHandle"
               @current-change="currentChangeHandle"
