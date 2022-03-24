@@ -53,6 +53,7 @@
           :on-success="handleChange"
           :on-error="handleChange"
           :show-file-list="false"
+          multiple=""
           style="float:right;margin-left:13px"
         >
           <el-button type="warning">导入</el-button>

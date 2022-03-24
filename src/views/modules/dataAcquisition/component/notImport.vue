@@ -1,7 +1,9 @@
 <template>
     <div class='notImport'>
-        <el-table :data="tableList" border height="60vh" :header-cell-style="{textAlign:'center'}" style="width: 100%">
-        <el-table-column v-for="(column,index) in columnList" :prop="column.columnName" :label="column.columnName" :key="index" align="center"/>
+        <el-table :data="tableList" border :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" style="width: 100%">
+             <template v-for="(item,index) in columnList">
+                    <el-table-column :prop="item" :label="item" :key="index"  width show-overflow-tooltip/>
+             </template>
         </el-table>
         <el-pagination 
                 :page-size="apComServerData.pageSize"
@@ -48,8 +50,9 @@ export default {
                 })
             }).then(({ data }) => {
                 if (data && data.code === 200) {
-                    this.tableList = data.result.records
-                    this.columnList = data.result.columnInfo.columnList
+                    debugger
+                    this.tableList = data.result.result
+                    this.columnList = data.result.columns
                     this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.tableList = []

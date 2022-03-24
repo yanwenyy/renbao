@@ -153,6 +153,7 @@
               item.type=item.paramType=='2'?'params':'';//参数树需要的type 图标类型 参数:params
             });
             this.paramsData[0].children=datas;
+            this.$set(this.paramsData,this.paramsData)
           }
         })
       },
@@ -219,14 +220,16 @@
               list:datas.data.result||[],
               columnList:datas.data.columnList,
               msg:datas.message,
-              codeName:datas.codeName
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
             };
           }else{
             v={
               list:[],
               columnList:datas.data.columnList,
               msg:datas.message,
-              codeName:datas.codeName
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
             };
           }
           this.resultTableTabs.push(v);

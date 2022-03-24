@@ -7,8 +7,9 @@
         :isShowSearch="true"
         :isShowCheckBox="false"
         :isShowEdit="true"
-        parentGetTreeData="getTreeData"
         :folderSorts="folderSorts"
+        @getTreeId="getTreeId"
+        :isParent="false"
       ></rule-tree>
     </div>
     <div class="auditRuleConfig-right">
@@ -238,7 +239,7 @@ export default {
         })
         .catch(() => {});
     },
-    getTreeData(data) {
+    getTreeId(data) {
       if (data && data.folderId) {
         this.ruleCheckData = data;
         this.$refs.multipleTable.clearSelection(this.multipleTable);

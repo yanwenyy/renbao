@@ -103,7 +103,7 @@
       </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="visible = false,cleanMsg()">取消</el-button>
+        <el-button @click="sqlEditMsg='',visible = false,cleanMsg()">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
@@ -137,9 +137,6 @@
         default: [],
       },
     },
-    mounted(){
-
-    },
     data () {
       var validateInteger = (rule, value, callback) => {
         if(value===''){
@@ -160,6 +157,7 @@
         }
       };
       return {
+        mustList:{},//sql编译器必填的项
         paramsSqlSelf:'',//选择参数后返回的转义的sql
         slqTabelEdt:[],//sql执行结果
         sqlEditMsg:'',//回显时候的sql语句
@@ -391,33 +389,59 @@
         })
       },
       openSql(){
-        // this.sqlEditMsg=this.dataForm.ruleSqlValue;
+        this.sqlEditMsg=this.sqlEditMsg;
+
+        console.log(this.sqlEditMsg);
 
         // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
-        console.log(this.sqlEditMsg)
         this.slqTabelEdt=[];
         this.sqlVisible=true;
       },
       //sql编译器点击保存
       sqlSave(){
         var paramData=this.$refs.sqler.paramsData;
+        console.log(this.$refs.sqler)
+
         var resultTableTabs=this.$refs.sqler.resultTableTabs;
         if(resultTableTabs.length==0){
           this.$message.error("请先执行sql");
           return false;
         }
-        var canSave=true;
+        var hasBm=false,hasJg=false;
         resultTableTabs.forEach(item=>{
-          if(item.codeName=='error'){
-            canSave=false;
-            return false;
+          if(item.isLast=='Y'){
+            item.columnList.forEach((vtem)=>{
+              if(vtem.columnName==(this.mustList['yljgbm'])){
+                hasBm=true;
+              }
+              if(vtem.columnName==this.mustList['yljgmc']){
+                hasJg=true;
+              }
+            })
           }
         });
-        // if(this.$refs.sqler.sqlMsg.indexOf("医疗机构编码")==-1||this.$refs.sqler.sqlMsg.indexOf("医疗机构名称")==-1){
-        if(!canSave){
+        if(!hasBm||!hasJg){
           this.$message.error("医疗机构编码和医疗机构名称是必填项")
         }else{
           var SqlStr=JSON.parse(JSON.stringify(this.$refs.sqler.sqlMsg));
+          var paramsList=[];
+          paramData.forEach((item)=>{
+            if(item.children&&item.children.length>0){
+
+              item.children.forEach(vtem=>{
+                if(SqlStr.indexOf("{#"+vtem.id+"#}")!=-1){
+                  var v={
+                    paramId:vtem.id,
+                    name:vtem.paramName,
+                  };
+                  paramsList.push(v);
+                }
+              })
+            }
+            item.paramId=item.id;
+            item.name=item.paramName;
+          });
+          this.dataForm.paramRule=paramsList;
           this.paramsSqlSelf=this.$refs.sqler.sqlMsg;
           this.sqlVisible=false;
           this.dataForm.ruleSqlValue=this.stringToBtn(paramData,SqlStr);
@@ -459,6 +483,17 @@
           this.$refs['dataForm'].clearValidate()
         }
       },
+      getMustList(){
+        this.$http({
+          url: this.$http.adornUrl('/batch/getMedicalInformation'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.mustList=data.result;
+          }
+        })
+      },
       init (id, ruleCheckData) {
         // var sql="select * from 医院基本信息 where 医疗机构编码 = '{#yljgbm#}'  or 医疗机构名称 = '{#yljgmc#}'";
         // var list=[
@@ -472,6 +507,7 @@
         //   }
         // ];
         // transSql(sql,list);
+        this.getMustList();
         this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
@@ -506,24 +542,20 @@
               this.sqlEditMsg = datas.ruleSqlValue;
 
               this.dataForm.ruleType = datas.ruleType;
+              if(datas.params){
+                datas.params.forEach(item=>{
+                  item.id=item.paramId;
+                  item.name=item.paramName;
+                });
+              }
               var _list=[
                 {
                   name:'参数',
                   id:'0',
-                  children:[
-                    {
-                      paramId:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
-                      id:'47cfb6eb-68ff-4660-8a47-95ebf9166f34',
-                      name:'医疗机构编码'
-                    },
-                    {
-                      paramId:'945b6f41-3418-4963-8d94-5970d23b35b8',
-                      id:'945b6f41-3418-4963-8d94-5970d23b35b8',
-                      name:'医疗机构名称'
-                    },
-                  ]
+                  children:datas.params
                 },
               ];
+              this.dataForm.paramRules = datas.params;
               var str=JSON.parse(JSON.stringify(datas.ruleSqlValue));
               this.dataForm.ruleSqlValue =this.stringToBtn(_list,datas.ruleSqlValue) ;
               // this.menuListTreeSetCurrentNode();
@@ -598,7 +630,7 @@
                 'ruleSqlValue': this.paramsSqlSelf,
                 'ruleType': this.dataForm.ruleType,
                 'folderPath': this.dataForm.folderPath,
-                'paramRule': this.dataForm.paramRule,
+                'paramRules': this.dataForm.paramRule,
               })
             }).then(({data}) => {
               if (data && data.code ===200) {

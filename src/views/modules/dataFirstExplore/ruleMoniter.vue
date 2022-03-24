@@ -1,170 +1,164 @@
 <template>
   <div class="box">
-    <el-row :gutter="20">
-      <div class="left">
-        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
-          <div class="auditRuleMonitoring-left">
-            <batch-list
-              :batchLoading="treeLoading"
-              :batchTreeList="batchTreeList"
-              @getbatchData="getbatchData"
-              v-on:refreshBitchData="getbatchList"
-              :isParent="false"
-            ></batch-list>
-          </div>
-        </el-card>
-      </div>
-      <div style="width:100%">
-        <!-- <div class="auditRuleMonitoring-right"> -->
-        <el-card class="box-card" style="height:80vh;overflow-y:auto">
-          <div class="search-box">
-            <el-form ref="searchForm" :model="searchForm" :inline="true">
-              <el-form-item>
-                <el-input
-                  v-model="searchForm.ruleName"
-                  size="small"
-                  placeholder="规则名称"
-                  clearable
-                ></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-select
-                  v-model="searchForm.ruleCategory"
-                  placeholder="规则类型"
-                  clearable
-                >
-                  <el-option
-                    v-for="(item, index) in ruleCategory"
-                    :key="index"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item>
-                <el-select
-                  v-model="searchForm.runStatus"
-                  placeholder="运行状态"
-                  clearable
-                >
-                  <el-option
-                    v-for="(item, index) in runStatus"
-                    :key="index"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-button type="primary" @click="onQuery">查询</el-button>
-              <el-button @click="onReset">重置</el-button>
-              <el-button
-                style="float:right"
-                @click="deleteData"
-                type="danger"
-                :disabled="this.multipleTable.length <= 0"
-                >删除</el-button
+    <div class="left">
+      <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+        <div class="auditRuleMonitoring-left">
+          <batch-list
+            :batchLoading="treeLoading"
+            :batchTreeList="batchTreeList"
+            @getbatchData="getbatchData"
+            v-on:refreshBitchData="getbatchList"
+            :isParent="false"
+          ></batch-list>
+        </div>
+      </el-card>
+    </div>
+    <div style="width:100%">
+      <el-card style="height:80vh;overflow-y:auto">
+        <div class="search-box">
+          <el-form ref="searchForm" :model="searchForm" :inline="true">
+            <el-form-item label="规则名称：">
+              <el-input
+                v-model="searchForm.ruleName"
+                size="small"
+                placeholder="规则名称"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="规则类型：">
+              <el-select
+                v-model="searchForm.ruleCategory"
+                placeholder="规则类型"
+                clearable
               >
-            </el-form>
-          </div>
-
-          <div class="table-box">
-            <el-table
-              v-loading="tableLoading"
-              ref="multipleTable"
-              :data="tableData"
-              tooltip-effect="dark"
-              border
-              style="width: 100%"
-              @selection-change="handleSelectionChange"
-              :height="$tableHeight - 80"
+                <el-option
+                  v-for="(item, index) in ruleCategory"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="运行状态：">
+              <el-select
+                v-model="searchForm.runStatus"
+                placeholder="运行状态"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in runStatus"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-button type="primary" @click="onQuery">查询</el-button>
+            <el-button @click="onReset">重置</el-button>
+            <el-button
+              style="float:right"
+              @click="deleteData"
+              type="danger"
+              :disabled="this.multipleTable.length <= 0"
+              >删除</el-button
             >
-              <el-table-column
-                type="selection"
-                :reserve-selection="true"
-                width="55"
-              ></el-table-column>
-              <el-table-column
-                prop="ruleName"
-                label="规则名称"
-              ></el-table-column>
-              <el-table-column prop="ruleCategory" label="规则类别">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
-                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="expectedBeginTime" label="预计开始时间">
-                <template slot-scope="scope">{{
-                  scope.row.expectedBeginTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="actualBeginTime" label="实际开始时间">
-                <template slot-scope="scope">{{
-                  scope.row.actualBeginTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="expectedEndTime" label="预计结束时间">
-                <template slot-scope="scope">{{
-                  scope.row.expectedEndTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="actualEndTime" label="实际结束时间">
-                <template slot-scope="scope">{{
-                  scope.row.actualEndTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="runStatus" label="运行状态">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.runStatus == 1">待执行</div>
-                  <div v-if="scope.row.runStatus == 2">执行中</div>
-                  <div v-if="scope.row.runStatus == 3">执行失败</div>
-                  <div v-if="scope.row.runStatus == 4">已完成</div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="moblie" label="操作">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.runStatus == 4">运行成功</div>
-                  <el-button
-                    type="text"
-                    v-if="scope.row.runStatus == 3"
-                    @click="resultViewClick(scope.row)"
-                    >结果查看</el-button
-                  >
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <el-pagination
-            v-if="Pager.total >= 1"
-            @size-change="sizeChangeHandle"
-            @current-change="currentChangeHandle"
-            :current-page="Pager.pageIndex"
-            :page-sizes="[10, 20, 50, 100]"
-            :page-size="Pager.pageSize"
-            :total="Pager.total"
-            layout="total, sizes, prev, pager, next, jumper"
+          </el-form>
+        </div>
+
+        <div class="table-box">
+          <el-table
+            v-loading="tableLoading"
+            ref="multipleTable"
+            :data="tableData"
+            tooltip-effect="dark"
+            border
+            style="width: 100%"
+            @selection-change="handleSelectionChange"
+            :height="$tableHeight - 80"
+            :row-key="getRowKeys"
           >
-          </el-pagination>
-          <!-- </div> -->
-          <!--查看详细弹窗 -->
-          <el-dialog
-            :visible.sync="showDetailDialog"
-            title="监控报告详情"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="40%"
-            :close-on-press-escape="false"
-          >
-            <detail
-              @close="closeDetail"
-              :id="id"
-              :name="name"
-              v-if="showDetailDialog"
-            ></detail>
-          </el-dialog>
-        </el-card>
-      </div>
-    </el-row>
+            <el-table-column
+              type="selection"
+              :reserve-selection="true"
+              width="55"
+            ></el-table-column>
+            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
+            <el-table-column prop="ruleCategory" label="规则类别">
+              <template slot-scope="scope">
+                <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="expectedBeginTime" label="预计开始时间">
+              <template slot-scope="scope">{{
+                scope.row.expectedBeginTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="actualBeginTime" label="实际开始时间">
+              <template slot-scope="scope">{{
+                scope.row.actualBeginTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="expectedEndTime" label="预计结束时间">
+              <template slot-scope="scope">{{
+                scope.row.expectedEndTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="actualEndTime" label="实际结束时间">
+              <template slot-scope="scope">{{
+                scope.row.actualEndTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="runStatus" label="运行状态">
+              <template slot-scope="scope">
+                <div v-if="scope.row.runStatus == 1">待执行</div>
+                <div v-if="scope.row.runStatus == 2">执行中</div>
+                <div v-if="scope.row.runStatus == 3">执行失败</div>
+                <div v-if="scope.row.runStatus == 4">已完成</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="moblie" label="操作">
+              <template slot-scope="scope">
+                <div v-if="scope.row.runStatus == 4">运行成功</div>
+                <el-button
+                  type="text"
+                  v-if="scope.row.runStatus == 3"
+                  @click="resultViewClick(scope.row)"
+                  >结果查看</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <el-pagination
+          @size-change="sizeChangeHandle"
+          @current-change="currentChangeHandle"
+          :current-page="Pager.pageIndex"
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size="Pager.pageSize"
+          :total="Pager.total"
+          layout="total, sizes, prev, pager, next, jumper"
+        >
+        </el-pagination>
+
+        <!--查看详细弹窗 -->
+        <el-dialog
+          :visible.sync="showDetailDialog"
+          title="监控报告详情"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="40%"
+          :close-on-press-escape="false"
+        >
+          <detail
+            @close="closeDetail"
+            :id="id"
+            :name="name"
+            v-if="showDetailDialog"
+          ></detail>
+        </el-dialog>
+      </el-card>
+    </div>
   </div>
 </template>
 <script>
@@ -373,6 +367,10 @@ export default {
     closeDetail() {
       this.showDetailDialog = false;
     },
+    //获取每行数据id
+    getRowKeys(row) {
+      // return row.ruleId;
+    },
     deleteData() {
       console.log("删除");
       var uuids = [];
@@ -421,7 +419,7 @@ export default {
     min-height: calc(100vh - 165px);
     // margin-right: 20px;
     // border: 1px solid #ddd;
-    overflow: auto;
+    // overflow: auto;
     min-width: 300px;
   }
   .auditRuleMonitoring-right {

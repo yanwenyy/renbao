@@ -17,11 +17,11 @@
             </el-form-item>
             <el-form-item label="开始时间:">
                 <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeBegin" style="width: 100%;"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" format="yyyy-MM-dd" v-model="dataForm.startTimeBegin" style="width: 100%;"></el-date-picker>
                 </el-col>
                 <el-col class="line" :span="2">-</el-col>
                 <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeEnd" style="width: 100%;"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="dataForm.startTimeEnd" value-format="yyyy-MM-dd" format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
                 </el-col>
             </el-form-item>
             <el-form-item>
@@ -256,8 +256,8 @@ export default {
                     filePath:this.dataForm.filePath || '',
                     collectStatus:this.dataForm.collectStatus || '',
                     dataType:2,
-                    startTimeBegin:this.dataForm.startTimeBegin || '',
-                    startTimeEnd:this.dataForm.startTimeEnd || ''
+                    startTimeBegin:this.dataForm.startTimeBegin,
+                    startTimeEnd:this.dataForm.startTimeEnd
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
@@ -298,9 +298,9 @@ export default {
                     collectPath:this.dataForm.collectPath || '',
                     dataType:1,
                     collectStatus:this.dataForm.collectStatus || '',
-                    startTimeBegin:this.dataForm.startTimeBegin || '',
-                    startTimeEnd:this.dataForm.startTimeEnd || ''
-                    
+                    startTimeBegin:this.dataForm.startTimeBegin,
+                    startTimeEnd:this.dataForm.startTimeEnd
+                
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){

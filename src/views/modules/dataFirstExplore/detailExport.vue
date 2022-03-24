@@ -1,188 +1,182 @@
 <!--结果明细导出-->
 <template>
   <div class="box">
-    <el-row :gutter="20">
-      <div class="left">
-        <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
-          <div class="auditRuleMonitoring-left" style="width:100%">
-            <batch-list
-              :batchLoading="treeLoading"
-              :batchTreeList="batchTreeList"
-              @getbatchData="getbatchData"
-              v-on:refreshBitchData="initTree"
-              :isParent="false"
-            ></batch-list>
-          </div>
-        </el-card>
-      </div>
-      <div style="width:100%">
-        <el-card class="box-card" style="height:80vh;overflow-y:auto">
-          <el-row>
-            <el-form ref="dataForm" :model="dataForm" :inline="true">
-              <el-form-item>
-                <el-input
-                  v-model="dataForm.ruleName"
-                  size="small"
-                  placeholder="规则名称"
-                  clearable
-                ></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-select
-                  v-model="dataForm.ruleCategory"
-                  filterable
-                  clearable
-                  placeholder="规则类别"
-                  size="small"
-                >
-                  <el-option
-                    v-for="(item, index) in ruleCategory"
-                    :key="index"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item>
-                <el-button @click="getAllSearch()" type="primary"
-                  >查询</el-button
-                >
-                <el-button @click="reset()">重置</el-button>
-              </el-form-item>
-              <el-form-item style="float:right">
-                <el-button @click="detailExport()" type="warning"
-                  >结果明细导出</el-button
-                >
-                <el-button
-                  @click="deleteData"
-                  type="danger"
-                  :disabled="this.multipleSelection.length <= 0"
-                  >删除</el-button
-                >
-              </el-form-item>
-            </el-form>
-          </el-row>
-          <div class="content">
-            <el-table
-              :data="tableData"
-              border
-              ref="tableData"
-              @selection-change="handleSelectionChange"
-              v-loading="loading"
-              style="width: 100%;margin-top: 20px"
-              :height="$tableHeight - 80"
+    <div class="left">
+      <el-card style="height:80vh;overflow-y:auto">
+        <div
+          class="auditRuleMonitoring-left"
+          style="width:100%;overflow-y:auto"
+        >
+          <batch-list
+            :batchLoading="treeLoading"
+            :batchTreeList="batchTreeList"
+            @getbatchData="getbatchData"
+            v-on:refreshBitchData="initTree"
+            :isParent="false"
+          ></batch-list>
+        </div>
+      </el-card>
+    </div>
+    <div style="width:100%">
+      <el-card style="height:80vh;overflow-y:auto">
+        <el-form ref="dataForm" :model="dataForm" :inline="true">
+          <el-form-item>
+            <el-input
+              v-model="dataForm.ruleName"
+              size="small"
+              placeholder="规则名称"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select
+              v-model="dataForm.ruleCategory"
+              filterable
+              clearable
+              placeholder="规则类别"
+              size="small"
             >
-              <el-table-column type="selection" width="55"> </el-table-column>
-              <el-table-column
-                prop="ruleName"
-                label="规则名称"
-              ></el-table-column>
-              <el-table-column prop="rule.ruleCategory" label="规则类别">
-                <template slot-scope="scope">
-                  <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
-                  <div v-if="scope.row.ruleCategory == 2">住院规则</div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="actualBeginTime" label="开始时间">
-                <template slot-scope="scope">{{
-                  scope.row.actualBeginTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="actualEndTime" label="结束时间">
-                <template slot-scope="scope">{{
-                  scope.row.actualEndTime
-                }}</template>
-              </el-table-column>
-              <el-table-column prop="resultCount" label="结果条数">
-              </el-table-column>
-              <el-table-column prop="createUserName" label="执行人">
-              </el-table-column>
-              <el-table-column prop="moblie" label="操作">
-                <template slot-scope="scope">
-                  <el-button type="text" @click="detailHandle(scope.row)"
-                    >查看明细</el-button
-                  >
-                </template>
-              </el-table-column>
-            </el-table>
-            <div class="pager">
-              <el-pagination
-                @size-change="sizeChangeHandle"
-                @current-change="currentChangeHandle"
-                :current-page="Pager.pageIndex"
-                :page-sizes="[10, 20, 50, 100]"
-                :page-size="Pager.pageSize"
-                :total="Pager.total"
-                layout="total, sizes, prev, pager, next, jumper"
+              <el-option
+                v-for="(item, index) in ruleCategory"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getAllSearch()" type="primary">查询</el-button>
+            <el-button @click="reset()">重置</el-button>
+          </el-form-item>
+          <el-form-item style="float:right">
+            <el-button @click="detailExport()" type="warning"
+              >结果明细导出</el-button
+            >
+            <el-button
+              @click="deleteData"
+              type="danger"
+              :disabled="this.multipleSelection.length <= 0"
+              >删除</el-button
+            >
+          </el-form-item>
+        </el-form>
+        <div>
+          <el-table
+            :data="tableData"
+            border
+            ref="tableData"
+            @selection-change="handleSelectionChange"
+            v-loading="loading"
+            style="width: 100%"
+            :height="$tableHeight - 80"
+          >
+            <el-table-column type="selection" width="55"> </el-table-column>
+            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
+            <el-table-column prop="rule.ruleCategory" label="规则类别">
+              <template slot-scope="scope">
+                <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
+                <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="actualBeginTime" label="开始时间">
+              <template slot-scope="scope">{{
+                scope.row.actualBeginTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="actualEndTime" label="结束时间">
+              <template slot-scope="scope">{{
+                scope.row.actualEndTime
+              }}</template>
+            </el-table-column>
+            <el-table-column prop="resultCount" label="结果条数">
+            </el-table-column>
+            <el-table-column prop="createUserName" label="执行人">
+            </el-table-column>
+            <el-table-column prop="moblie" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" @click="detailHandle(scope.row)"
+                  >查看明细</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <div>
+            <el-pagination
+              @size-change="sizeChangeHandle"
+              @current-change="currentChangeHandle"
+              :current-page="Pager.pageIndex"
+              :page-sizes="[10, 20, 50, 100]"
+              :page-size="Pager.pageSize"
+              :total="Pager.total"
+              layout="total, sizes, prev, pager, next, jumper"
+            >
+            </el-pagination>
+          </div>
+        </div>
+        <!--查看详细弹窗 -->
+        <el-dialog
+          :visible.sync="showDetailDialog"
+          title="查看结果明细"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="90%"
+          :close-on-press-escape="false"
+        >
+          <detail
+            @close="closeDetail"
+            @ok="editSucceed"
+            :info="info"
+            :resultTableName="resultTableName"
+            v-if="showDetailDialog"
+          ></detail>
+        </el-dialog>
+        <!--结果明细导出弹窗 -->
+        <el-dialog
+          :visible.sync="detailExportDialog"
+          title="结果明细导出"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="30%"
+          height="60%"
+          :close-on-press-escape="false"
+          v-if="detailExportDialog"
+        >
+          <el-form
+            style="height:200px;overflow-y:auto"
+            :model="dataForm1"
+            ref="dataForm1"
+            label-width="120px"
+            :rules="rules"
+          >
+            <el-form-item prop="hospId" label="请选择医院：">
+              <el-select
+                v-model="dataForm1.hospId"
+                filterable
+                clearable
+                placeholder="请选择医院"
+                multiple
+                @change="val => checkChange(val)"
               >
-              </el-pagination>
-            </div>
-          </div>
-          <!--查看详细弹窗 -->
-          <el-dialog
-            :visible.sync="showDetailDialog"
-            title="查看结果明细"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="90%"
-            :close-on-press-escape="false"
-          >
-            <detail
-              @close="closeDetail"
-              @ok="editSucceed"
-              :info="info"
-              :resultTableName="resultTableName"
-              v-if="showDetailDialog"
-            ></detail>
-          </el-dialog>
-          <!--结果明细导出弹窗 -->
-          <el-dialog
-            :visible.sync="detailExportDialog"
-            title="结果明细导出"
-            :close-on-click-modal="false"
-            :modal-append-to-body="false"
-            width="30%"
-            height="60%"
-            :close-on-press-escape="false"
-            v-if="detailExportDialog"
-          >
-            <el-form
-              style="height:200px;overflow-y:auto"
-              :model="dataForm1"
-              ref="dataForm1"
-              label-width="120px"
-              :rules="rules"
-            >
-              <el-form-item prop="hospId" label="请选择医院：">
-                <el-select
-                  v-model="dataForm1.hospId"
-                  filterable
-                  clearable
-                  placeholder="请选择医院"
-                  multiple
-                  @change="val => checkChange(val)"
+                <el-option
+                  v-for="item in hospitals"
+                  :key="item.hospitalCode"
+                  :label="item.hospitalName"
+                  :value="item.hospitalCode"
                 >
-                  <el-option
-                    v-for="item in hospitals"
-                    :key="item['医疗机构编码']"
-                    :label="item['医疗机构名称']"
-                    :value="item['医疗机构编码']"
-                  >
-                  </el-option>
-                </el-select>
-                <el-checkbox v-model="checked" @change="selectAll"
-                  >全选</el-checkbox
-                >
-              </el-form-item>
-            </el-form>
-            <el-button type="primary" @click="exportExcel('dataForm1')"
-              >导出</el-button
-            >
-            <el-button @click="closeExport">取消</el-button>
-          </el-dialog>
-        </el-card>
-      </div>
-    </el-row>
+                </el-option>
+              </el-select>
+              <el-checkbox v-model="checked" @change="selectAll"
+                >全选</el-checkbox
+              >
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="exportExcel('dataForm1')"
+            >导出</el-button
+          >
+          <el-button @click="closeExport">取消</el-button>
+        </el-dialog>
+      </el-card>
+    </div>
   </div>
 </template>
 <script>
@@ -211,7 +205,7 @@ export default {
       },
       //必填校验
       rules: {
-        hospId: [{ required: true, message: "请选择", trigger: "blur" }]
+        hospitalCode: [{ required: true, message: "请选择", trigger: "blur" }]
       },
       batchTreeList: [
         {
@@ -265,7 +259,6 @@ export default {
   },
   created() {
     this.initData();
-    this.initHospital();
   },
   methods: {
     //初始化列表数据
@@ -323,19 +316,20 @@ export default {
     //选择医院下拉列表数据
     initHospital() {
       this.$http({
-        url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
+        url: this.$http.adornUrl("batch/getHospitals"),
         method: "get",
         params: this.$http.adornParams(
           {
-            pageCount: "1",
-            pageSize: "10000"
+            batchId: this.batchId
+            // pageCount: "1",
+            // pageSize: "10000"
           },
           false
         )
       })
         .then(({ data }) => {
           if (data.code == 200) {
-            this.hospitals = data.result.result;
+            this.hospitals = data.result;
           }
         })
         .catch(() => {});
@@ -348,6 +342,7 @@ export default {
         this.dataForm1.hospId = [];
         this.dataForm1.hospName = [];
         this.checked = false;
+        this.initHospital();
         this.detailExportDialog = true;
       }
     },
@@ -493,28 +488,20 @@ export default {
       for (let i = 0; i <= val.length - 1; i++) {
         this.hospitals.find(item => {
           //这里的options就是数据源
-          if (item["医疗机构编码"] == val[i]) {
-            this.dataForm1.hospName.push(item["医疗机构名称"]);
+          if (item.hospitalCode == val[i]) {
+            this.dataForm1.hospName.push(item.hospitalName);
           }
         });
       }
     },
     //医院全选
     selectAll() {
-      /* this.dataForm1.hospital = [];
-      if (this.checked) {
-        this.hospitals.map(item => {
-          this.dataForm1.hospital.push(item);
-        });
-      } else {
-        this.dataForm1.hospital = [];
-      } */
-      // this.dataForm1.hospId = [];
-      // this.dataForm1.hospName = [];
+      this.dataForm1.hospId = [];
+      this.dataForm1.hospName = [];
       if (this.checked) {
         this.hospitals.map(i => {
-          this.dataForm1.hospId.push(i["医疗机构编码"]);
-          this.dataForm1.hospName.push(i["医疗机构名称"]);
+          this.dataForm1.hospId.push(i.hospitalCode);
+          this.dataForm1.hospName.push(i.hospitalName);
         });
       } else {
         this.dataForm1.hospId = [];
@@ -545,7 +532,7 @@ export default {
     min-height: calc(100vh - 165px);
     // margin-right: 20px;
     // border: 1px solid #ddd;
-    overflow: auto;
+    // overflow: auto;
     min-width: 300px;
   }
   .auditRuleMonitoring-right {

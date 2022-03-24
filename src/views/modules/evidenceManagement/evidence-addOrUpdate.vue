@@ -32,11 +32,8 @@
             class="upload-demo"
             multiple
             :on-remove="handleRemove"
-            :on-success="handleExceed"
-            :on-change="handleChange"
-            :http-request="uploadData"
-            :auto-upload="false"
             :file-list="fileList"
+            :http-request="uploadData"
           >
             <el-button size="small" type="primary" v-if="showBtn"
               >点击上传</el-button
@@ -88,10 +85,10 @@
         </el-table>
       </el-form-item>
     </el-form>
+    <div class="itemBtn"></div>
     <el-button type="primary" @click="submitForm('dataForm')" v-if="showBtn"
       >确定</el-button
     >
-    <el-button @click="reset()" v-if="showBtn">重置</el-button>
     <el-button @click="closeDialog('dataForm')" v-if="showBtn">取消</el-button>
   </div>
 </template>
@@ -129,6 +126,7 @@ export default {
     }
   },
   methods: {
+    //初始化表单
     init() {
       this.loading = true;
       this.$nextTick(() => {
@@ -147,14 +145,25 @@ export default {
         }
       });
     },
+    //获取上传的附件
     uploadData(fileData) {
-      var list = [];
-      list.push(fileData.file);
-      let data = new FormData();
-      data.append("evidenceId", this.id || undefined); //传文件
-      data.append("evidenceName", this.dataForm.evidenceName); //传文件
-      data.append("evidenceRemark", this.dataForm.evidenceRemark); //传文件
-      data.append("multipartFiles", list); //传文件
+      this.multipartFiles.push(fileData.file);
+    },
+    // 表单提交
+    submitForm(dataForm) {
+      if (this.multipartFiles.length == 0) {
+        this.$message({
+          message: "请选择上传文件！",
+          type: "error"
+        });
+        return;
+      }
+      // console.log(this.multipartFiles);
+      let evidence = new FormData();
+      evidence.append("evidenceId", this.id || undefined); //传文件
+      evidence.append("evidenceName", this.dataForm.evidenceName); //传文件
+      evidence.append("evidenceRemark", this.dataForm.evidenceRemark); //传文件
+      evidence.append("multipartFiles", this.multipartFiles[0]); //传文件
       this.$http({
         url: this.$http.adornUrl(
           `/evidence/${!this.id ? "add" : "updateByUuId"}`
@@ -163,7 +172,13 @@ export default {
           "Content-Type": "multipart/form-data"
         },
         method: "post",
-        data: data
+        data: evidence
+        /* data: this.$http.adornData({
+          evidenceId: this.id || undefined,
+          evidenceName: this.dataForm.evidenceName,
+          evidenceRemark: this.dataForm.evidenceRemark,
+          multipartFiles: this.multipartFiles
+        }) */
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.$message({
@@ -178,21 +193,12 @@ export default {
           this.$message.error("操作失败");
         }
       });
-    },
-    // 表单提交
-    submitForm(dataForm) {
-      /* if (this.fileList.length == 0) {
-        this.$message({
-          message: "请选择上传文件！",
-          type: "error"
-        });
-        return;
-      } */
-      this.$refs[dataForm].validate(valid => {
+
+      /* this.$refs[dataForm].validate(valid => {
         if (valid) {
           this.$refs.ruleFileUpload.submit();
         }
-      });
+      }); */
     },
     // 重置
     resetForm(formName) {
@@ -213,27 +219,27 @@ export default {
       this.dataListSelections = val;
     },
     handleRemove(file, fileList) {
-      // console.log(file, fileList);
+      console.log(file, fileList);
     },
     handlePreview(file) {
       // console.log(file);
     },
     handleExceed(files, fileList) {
-      // console.log(fileList);
+      console.log(files, fileList);
     },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
+      console.log(file, fileList);
     },
     handleChange(response, file, fileList) {},
-    //重置
-    reset() {
-      this.dataForm = {
-        evidenceName: "",
-        evidenceRemark: ""
-      };
-    },
     //删除附件
     deleteData() {}
   }
 };
 </script>
+<style lang="scss" scoped>
+.itemBtn {
+  text-align: center;
+  margin-top: 10px;
+}
+</style>

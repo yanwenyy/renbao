@@ -96,7 +96,6 @@ export default {
         hospitalName: [{ required: true, message: "请选择", trigger: "blur" }],
         batchName: [{ required: true, message: "请输入", trigger: "blur" }]
       },
-      showHospitalDialog: false,
       pickerOptions: {
         disabledDate(time) {
           const date = new Date();
@@ -111,8 +110,8 @@ export default {
           return [`${hour}:${minute}:${second} - 23:59:59`];
         })()
       },
-      showHospitalDialog: false,
-      resultSqlValue: []
+      resultSqlValue: [],
+      showHospitalDialog: false
     };
   },
   methods: {
@@ -219,6 +218,7 @@ export default {
     },
     //选择医院确定
     getData() {
+      this.resultSqlValue = [];
       //获取已选医院数据
       let data = this.$refs.hospital.multipleSelection;
       //转换sql处理
