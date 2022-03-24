@@ -46,7 +46,7 @@ export default {
     setQueryBuilderColumn() {
       const queryRules = [];
       for (var i = 0; i < this.columns.columnList.length; i++) {
-        
+
         const operators = this.getQueryBuilderOperators(
           this.columns.columnList[i]
         );
@@ -86,7 +86,7 @@ export default {
       ) {
         // operators = ['=',"<>", "like", "not like"];
         // operators = ['id',"=", "label", "等于"];
-          operators = [{'id':"=", "label":"等于"},{'id':"!=", "label":"不等于"},{'id':"like", "label":"包含以下内容"},{'id':"not like", "label":"不包含以下内容"},{'id':"is null", "label":"为null"},{'id':"is not null", "label":"不为null"},];
+          operators = [{'id':"=", "label":"等于"},{'id':"!=", "label":"不等于"},{'id':"like", "label":"包含以下内容"},{'id':"not like", "label":"不包含以下内容"},{'id':"is null", "label":"为空值"},{'id':"is not null", "label":"不为空值"},];
       } else if (
         columnObj.columnType.toUpperCase().indexOf("INT") != -1 ||
         columnObj.columnType.toUpperCase().indexOf("NUMBER") != -1||
@@ -164,7 +164,7 @@ export default {
               sql.push(child.query.operator);
               sql.push("'" + child.query.value + "'");
             }
-      
+
           } else {
             sql.push(child.query.rule);
             sql.push(child.query.operator);
