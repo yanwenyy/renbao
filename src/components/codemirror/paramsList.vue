@@ -1,6 +1,6 @@
 <template>
     <div>
-      <el-dialog :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
+      <el-dialog :close-on-click-modal="false" :append-to-body='true' custom-class="self-dialog" title="参数设置" :visible.sync="SlefparamsListVisible">
         <el-form>
           <el-form-item :label="item.label" v-for="(item,index) in paramsList" :key="index">
             <el-select class="paramsSel" v-model="item.paramsValue" multiple placeholder="请选择">
@@ -60,6 +60,8 @@
             if (val) {
               if (val.length>0) {
                 this.SelfparamsList=val;
+              }else{
+                this.SelfparamsList=[];
               }
             }
           },
