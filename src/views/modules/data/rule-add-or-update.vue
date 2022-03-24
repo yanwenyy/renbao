@@ -81,6 +81,7 @@
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
                 <el-tree
+                  :props="defaultProps"
                   :data="treedata"
                   node-key="id"
                   default-expand-all
@@ -193,6 +194,7 @@
         treedata: [{
           id: 1,
           columnName: '结果表',
+          type:'funFolder',
           children: []
         }],
         defaultProps: {
@@ -250,19 +252,19 @@
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
         console.log(ev);
         var elInput = document.getElementById('selfInput');
-        var _str=JSON.parse(JSON.stringify(draggingNode.data.label));
+        var _str=JSON.parse(JSON.stringify(draggingNode.data.columnName));
         this.insertText(elInput,_str);
 
       },
       handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drop: ', dropNode.label, dropType);
+        console.log('tree drop: ', dropNode.columnName, dropType);
       },
       allowDrop(draggingNode, dropNode, type) {
         // console.log(draggingNode, dropNode, type,6767)
        return false;
       },
       allowDrag(draggingNode) {
-        return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+        return draggingNode.data.type!='funFolder';
       },
 
       changeCursor(input, position) {
@@ -372,7 +374,8 @@
         var hasBm=false,hasJg=false;
         resultTableTabs.forEach(item=>{
           if(item.isLast=='Y'){
-            this.treedata.children.push(item.columnList);
+            this.treedata[0].children=item.columnList;
+            console.log(this.treedata)
             item.columnList.forEach((vtem)=>{
               if(vtem.columnName==(this.mustList['yljgbm'])){
                 hasBm=true;
