@@ -174,13 +174,13 @@ export default {
     submitForm(dataForm) {
       this.$refs[dataForm].validate(valid => {
         if (valid) {
-          if (this.multipartFiles.length == 0) {
+          /* if (this.multipartFiles.length == 0) {
             this.$message({
               message: "请选择上传文件！",
               type: "error"
             });
             return;
-          }
+          } */
           // console.log(this.multipartFiles);
           let evidence = new FormData();
           evidence.append("evidenceId", this.id || undefined);
@@ -193,7 +193,6 @@ export default {
           if (this.removeFileIdList.length != 0) {
             evidence.append("fileInfoIds", this.removeFileIdList);
           }
-          console.log(JSON.stringify(evidence));
           this.$http({
             url: this.$http.adornUrl(
               `/evidence/${!this.id ? "add" : "updateByUuId"}`

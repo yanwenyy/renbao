@@ -151,6 +151,7 @@ export default {
   },
   created() {
     this.init();
+    this.dataForm.ruleName = this.data.ruleName;
   },
   methods: {
     init() {

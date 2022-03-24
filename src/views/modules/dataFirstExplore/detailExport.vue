@@ -20,7 +20,7 @@
     <div style="width:100%">
       <el-card style="height:80vh;overflow-y:auto">
         <el-form ref="dataForm" :model="dataForm" :inline="true">
-          <el-form-item>
+          <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
               size="small"
@@ -28,7 +28,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item label="规则类别：">
             <el-select
               v-model="dataForm.ruleCategory"
               filterable
@@ -137,12 +137,11 @@
           :close-on-click-modal="false"
           :modal-append-to-body="false"
           width="30%"
-          height="60%"
           :close-on-press-escape="false"
           v-if="detailExportDialog"
         >
           <el-form
-            style="height:200px;overflow-y:auto"
+            style="height:100px;overflow-y:auto"
             :model="dataForm1"
             ref="dataForm1"
             label-width="120px"

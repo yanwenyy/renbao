@@ -14,7 +14,11 @@
       <el-card style="height:80vh;overflow-y:auto">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
           <el-form-item label="规则名称：">
-            <el-input v-model="searchForm.ruleName" clearable></el-input>
+            <el-input
+              v-model="searchForm.ruleName"
+              clearable
+              placeholder="规则名称"
+            ></el-input>
           </el-form-item>
           <el-form-item label="规则类型：">
             <el-select

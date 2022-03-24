@@ -9,7 +9,7 @@
       :close-on-press-escape="false"
       :before-close="handleClose"
     >
-      <div class="result-detail-out">
+      <div>
         <el-form
           ref="exportForm"
           :model="exportForm"
@@ -23,12 +23,6 @@
               multiple
               @change="val => checkChange(val)"
             >
-              <el-checkbox
-                v-model="checked"
-                @change="selectAll"
-                style="padding-left: 20px;"
-                >全选</el-checkbox
-              >
               <el-option
                 v-for="item in hospitalTableData"
                 :key="item.hospitalCode"
@@ -37,19 +31,21 @@
               >
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="warning"
-              @click="exportClick('exportForm')"
-              :loading="loading"
-              >导出</el-button
+            <el-checkbox
+              v-model="checked"
+              @change="selectAll"
+              >全选</el-checkbox
             >
           </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
-        <!-- <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button> -->
+        <el-button
+          type="warning"
+          @click="exportClick('exportForm')"
+          :loading="loading"
+          >导出</el-button
+        >
         <el-button @click="cancel" size="small">取 消</el-button>
       </span>
     </el-dialog>
@@ -194,7 +190,7 @@ export default {
 <style scoped lang="scss">
 .detail-box {
   /deep/ .el-dialog__header {
-    border-bottom: 1px solid #ddd;
+    // border-bottom: 1px solid #ddd;
     text-align: left;
   }
   /deep/ .el-dialog__footer {
@@ -206,11 +202,6 @@ export default {
   }
   >>> .el-cascader-menu__wrap {
     overflow: unset !important;
-  }
-  .result-detail-out {
-    /deep/ .el-input {
-      min-width: 315px;
-    }
   }
 }
 </style>

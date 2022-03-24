@@ -1,7 +1,7 @@
 <template>
   <div class="threeData">
     <!-- 列表 -->
-    <div class="listDisplay" style="height:500px">
+    <div class="listDisplay" style="height:500px" ref="box">
       <div class="f_right">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button @click="resetForm">重置</el-button>
@@ -105,6 +105,16 @@ export default {
   },
   created() {
     this.initList();
+  },
+  mounted() {
+    //点击空白处隐藏复杂条件查询
+    let that = this;
+    document.addEventListener("click", e => {
+      if (!that.$refs.box.contains(e.target)) {
+        that.show = false;
+      }
+    });
+    //    this.getDataList()
   },
   methods: {
     //初始化数据列表

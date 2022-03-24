@@ -42,13 +42,12 @@
               @click="submitgxhgz"
               >提交至地区个性化规则</el-button
             >
-            <el-button type="primary" @click="addFun"
-              >新增</el-button
-            >
-            <el-button type="primary" @click="editorFun"
-              >编辑</el-button
-            >
-            <el-button type="danger" @click="deleteFn"
+            <el-button type="primary" @click="addFun">新增</el-button>
+            <el-button type="primary" @click="editorFun">编辑</el-button>
+            <el-button
+              type="danger"
+              @click="deleteFn"
+              :disabled="this.multipleTable.length < 0"
               >删除</el-button
             >
           </el-form-item>
@@ -300,7 +299,7 @@ export default {
       this.searchForm.ruleName = "";
       this.searchForm.ruleCategory = "";
       this.Pager.pageIndex = 1;
-      this.setTableChecked()
+      this.setTableChecked();
       // 调用规则树的重置方法
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
