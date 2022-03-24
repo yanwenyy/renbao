@@ -40,10 +40,9 @@
             >
           </el-upload>
         </div>
-
         <el-table
           v-if="showFileTable"
-          :data="multipartFiles"
+          :data="fileData"
           border
           v-loading="loading"
           @selection-change="selectionChangeHandle"
@@ -57,14 +56,14 @@
           >
           </el-table-column>
           <el-table-column
-            prop="roleNumber"
+            prop="fileName"
             header-align="center"
             align="center"
             label="附件名称"
           >
           </el-table-column>
           <el-table-column
-            prop="creatUserName"
+            prop="uploaderName"
             header-align="center"
             align="center"
             label="上传人"
@@ -77,19 +76,34 @@
             label="操作"
           >
             <template slot-scope="scope">
-              <el-button type="text" @click="deleteData(scope.row)"
+              <el-button
+                type="text"
+                @click="deleteData(scope.$index, fileData, scope.row)"
+                v-if="!readonly"
                 >删除</el-button
+              >
+              <el-button
+                type="text"
+                @click="downLoad(scope.row)"
+                v-if="readonly"
+                >下载</el-button
               >
             </template>
           </el-table-column>
         </el-table>
       </el-form-item>
     </el-form>
-    <div class="itemBtn"></div>
-    <el-button type="primary" @click="submitForm('dataForm')" v-if="showBtn"
-      >确定</el-button
-    >
-    <el-button @click="closeDialog('dataForm')" v-if="showBtn">取消</el-button>
+    <div align="center">
+      <el-button type="primary" @click="submitForm('dataForm')" v-if="showBtn"
+        >确定</el-button
+      >
+      <el-button @click="closeDialog('dataForm')" v-if="showBtn"
+        >取消</el-button
+      >
+      <el-button @click="closeDialog('dataForm')" v-if="readonly"
+        >关闭</el-button
+      >
+    </div>
   </div>
 </template>
 <script>
@@ -116,8 +130,14 @@ export default {
       loading: false,
       //单位选择页是否显示
       showDetailDialog: false,
+      //附件集合
       multipartFiles: [],
-      fileList: []
+      //上传的附件
+      fileList: [],
+      //附件列表数据
+      fileData: [],
+      //移除的附件id
+      removeFileIdList: []
     };
   },
   created() {
@@ -138,9 +158,10 @@ export default {
         params: this.$http.adornParams()
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          var role = data.result;
-          this.dataForm.evidenceName = role.evidenceName;
-          this.dataForm.evidenceRemark = role.evidenceRemark;
+          var data = data.result;
+          this.dataForm.evidenceName = data.evidenceName;
+          this.dataForm.evidenceRemark = data.evidenceRemark;
+          this.fileData = data.fileInfos;
           this.loading = false;
         }
       });
@@ -151,54 +172,53 @@ export default {
     },
     // 表单提交
     submitForm(dataForm) {
-      if (this.multipartFiles.length == 0) {
-        this.$message({
-          message: "请选择上传文件！",
-          type: "error"
-        });
-        return;
-      }
-      // console.log(this.multipartFiles);
-      let evidence = new FormData();
-      evidence.append("evidenceId", this.id || undefined); //传文件
-      evidence.append("evidenceName", this.dataForm.evidenceName); //传文件
-      evidence.append("evidenceRemark", this.dataForm.evidenceRemark); //传文件
-      evidence.append("multipartFiles", this.multipartFiles[0]); //传文件
-      this.$http({
-        url: this.$http.adornUrl(
-          `/evidence/${!this.id ? "add" : "updateByUuId"}`
-        ),
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        method: "post",
-        data: evidence
-        /* data: this.$http.adornData({
-          evidenceId: this.id || undefined,
-          evidenceName: this.dataForm.evidenceName,
-          evidenceRemark: this.dataForm.evidenceRemark,
-          multipartFiles: this.multipartFiles
-        }) */
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.$message({
-            message: "操作成功",
-            type: "success",
-            duration: 1500,
-            onClose: () => {
-              this.$emit("ok");
+      this.$refs[dataForm].validate(valid => {
+        if (valid) {
+          if (this.multipartFiles.length == 0) {
+            this.$message({
+              message: "请选择上传文件！",
+              type: "error"
+            });
+            return;
+          }
+          // console.log(this.multipartFiles);
+          let evidence = new FormData();
+          evidence.append("evidenceId", this.id || undefined);
+          evidence.append("evidenceName", this.dataForm.evidenceName);
+          evidence.append("evidenceRemark", this.dataForm.evidenceRemark);
+          // evidence.append("multipartFiles", this.multipartFiles[0]);
+          for (var i = 0; i < this.multipartFiles.length; i++) {
+            evidence.append("multipartFiles", this.multipartFiles[i]);
+          }
+          if (this.removeFileIdList.length != 0) {
+            evidence.append("fileInfoIds", this.removeFileIdList);
+          }
+          console.log(JSON.stringify(evidence));
+          this.$http({
+            url: this.$http.adornUrl(
+              `/evidence/${!this.id ? "add" : "updateByUuId"}`
+            ),
+            headers: {
+              "Content-Type": "multipart/form-data"
+            },
+            method: "post",
+            data: evidence
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.$emit("ok");
+                }
+              });
+            } else {
+              this.$message.error("操作失败");
             }
           });
-        } else {
-          this.$message.error("操作失败");
         }
       });
-
-      /* this.$refs[dataForm].validate(valid => {
-        if (valid) {
-          this.$refs.ruleFileUpload.submit();
-        }
-      }); */
     },
     // 重置
     resetForm(formName) {
@@ -218,28 +238,48 @@ export default {
     selectionChangeHandle(val) {
       this.dataListSelections = val;
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      // console.log(file);
-    },
-    handleExceed(files, fileList) {
-      console.log(files, fileList);
-    },
+    //移除附件提示
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
-      console.log(file, fileList);
     },
-    handleChange(response, file, fileList) {},
+    //移除已上传的附件
+    handleRemove(file, fileList) {},
     //删除附件
-    deleteData() {}
+    deleteData(index, data, row) {
+      this.$confirm(`确定删除${row.fileName}?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        data.splice(index, 1);
+        this.removeFileIdList.push(row.fileInfoId);
+      });
+    },
+    //下载附件
+    downLoad(data) {
+      /*  var fileInfoIds = "";
+      for (var i = 0; i < this.length; i++) {
+        fileInfoIds += this.removeFileIdList[i] + ",";
+      }
+      if (fileInfoIds.length > 0) {
+        fileInfoIds = fileInfoIds.substr(0, fileInfoIds.length - 1);
+      } */
+
+      let url =
+        this.$http.adornUrl(
+          "/evidence/downloadAttachments?fileInfoIds=" +
+            data.fileInfoId +
+            "&token="
+        ) + this.$cookie.get("token");
+      window.open(url);
+    }
   }
 };
 </script>
 <style lang="scss" scoped>
 .itemBtn {
   text-align: center;
+  margin-left: 40px;
   margin-top: 10px;
 }
 </style>

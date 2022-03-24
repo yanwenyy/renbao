@@ -15,18 +15,19 @@
     <div class="auditRuleConfig-right">
       <div class="search-box">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
-          <el-form-item label="审核规则名称：">
-            <el-input v-model="searchForm.ruleName" clearable></el-input>
-          </el-form-item>
-          <el-form-item label="审核规则类别：">
-            <el-select
-              v-model="searchForm.ruleCategory"
-              placeholder="请选择"
+          <el-form-item label="规则名称：">
+            <el-input
+              v-model="searchForm.ruleName"
+              placeholder="规则名称"
               clearable
-            >
-              <el-option label="门诊规则" value="1"></el-option>
-              <el-option label="住院规则" value="2"></el-option>
-            </el-select>
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="创建人">
+            <el-input
+              v-model="searchForm.createUserName"
+              clearable
+              placeholder="创建人"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="queryClick">查询</el-button>
@@ -52,6 +53,7 @@
             @selection-change="handleSelectionChange"
             style="width: 100%;"
             ref="multipleTable"
+            :height="$tableHeight - 80"
           >
             <el-table-column
               type="selection"
@@ -66,6 +68,11 @@
               align="center"
               label="规则名称"
             >
+              <template slot-scope="scope">
+                <el-button type="text" @click="detail(scope.row)">{{
+                  scope.row.ruleName
+                }}</el-button>
+              </template>
             </el-table-column>
             <el-table-column
               prop="avgRunTime"
@@ -125,13 +132,14 @@
             :modal-append-to-body="false"
             width="40%"
             :close-on-press-escape="false"
-            title="编写底稿"
+            :title="title"
           >
             <editDraft
               @close="closeAddDrawer"
               @ok="addSucceed"
               v-if="showEditDialog"
-              :id="id"
+              :data="data"
+              :readonly="readonly"
             ></editDraft>
           </el-dialog>
         </div>
@@ -152,7 +160,7 @@ export default {
       tableLoading: false,
       searchForm: {
         ruleName: "",
-        ruleCategory: "",
+        createUserName: "",
         folderPath: "",
         folderId: ""
       },
@@ -167,7 +175,10 @@ export default {
       folderSorts: "",
       ruleCheckData: {},
       showEditDialog: false,
-      dataListLoading: false
+      dataListLoading: false,
+      title: "",
+      readonly: false,
+      data: ""
     };
   },
   activated() {
@@ -230,7 +241,6 @@ export default {
           { folderSorts: this.folderSorts, projectId: this.projectId },
           false
         )
-        // params:  this.$http.adornParams({}, false)
       })
         .then(({ data }) => {
           if (data.code == 200) {
@@ -256,22 +266,37 @@ export default {
         // this.getSelectPage();
       }
     },
+    //查询
     queryClick() {
       this.Pager.pageIndex = 1;
       this.getSelectPage();
     },
+    //重置
     onReset() {
-      this.searchForm.ruleName = "";
-      this.searchForm.ruleCategory = "";
+      this.searchForm = {
+        ruleName: "",
+        createUserName: ""
+      };
       this.Pager.pageIndex = 1;
+      this.getSelectPage();
       // 调用规则树的重置方法
       // this.$refs.ruleTree.clearCheckedKeys();
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
     },
+    //编写底稿弹窗
     editData() {
+      this.title = "编写底稿";
       this.showEditDialog = true;
-      this.id = this.multipleTable[0].ruleId;
+      this.data = this.multipleTable[0];
+      this.readonly = false;
+    },
+    //查看底稿弹窗
+    detail(data) {
+      this.title = "查看底稿";
+      this.showEditDialog = true;
+      this.data = data;
+      this.readonly = true;
     },
     deleteFn() {
       if (this.multipleTable.length === 0)
@@ -390,8 +415,8 @@ export default {
     .search-box {
       display: flex;
       flex-direction: column;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 20px;
+      // border-bottom: 1px solid #ddd;
+      // padding-bottom: 20px;
       padding-left: 20px;
       // padding-right: 109px;
     }
@@ -401,7 +426,7 @@ export default {
       // align-self: flex-end;
     }
     .rule-table {
-      padding: 20px 20px 0 20px;
+      padding: 0px 0px 0 20px;
     }
     .table-box {
       margin-top: 10px;

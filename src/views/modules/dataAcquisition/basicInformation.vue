@@ -86,7 +86,7 @@
                 :page-sizes="[10, 20, 50, 100]"
                 ></el-pagination> -->
     </div>
-    <el-dialog title="导入数据" :visible.sync="importVisible">
+    <el-dialog title="导入数据" :visible.sync="importVisible" append-to-body>
       <el-form size="small" label-width="80px">
         <el-form-item label="是否去重" prop="duplicateRemove"
           ><el-checkbox v-model="duplicateRemove"></el-checkbox

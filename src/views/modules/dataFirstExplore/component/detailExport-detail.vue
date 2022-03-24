@@ -58,8 +58,9 @@
         :page-size="apComServerData.size"
       ></el-pagination>
     </div>
-    <!-- <el-button type="primary" @click="ok">确定</el-button> -->
-    <el-button @click="close">关闭</el-button>
+    <div align="center">
+      <el-button @click="close">关闭</el-button>
+    </div>
   </div>
 </template>
 <script>
@@ -160,7 +161,7 @@ export default {
     //导出
     reportList() {
       this.dataForm1.resultTableName = this.resultTableName;
-      this.dataForm1.complexWhere = this.sqlData
+      this.dataForm1.complexWhere = this.sqlData;
       this.$http
         .post(this.$http.adornUrl("ruleResult/viewExport"), this.dataForm1, {
           responseType: "blob",
