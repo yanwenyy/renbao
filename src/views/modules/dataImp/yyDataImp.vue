@@ -17,7 +17,7 @@
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button @click="resetSelect()">重置</el-button>
-        <span style="margin-left:30px">数据采集完成需要收集表信息，数据会造成时间差。</span>
+        <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
@@ -451,7 +451,7 @@
       width="60%"
       :before-close="dmpLoghandleClose"
       :close-on-click-modal="false">
-      <el-row style="color:red">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
+      <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
       <el-row style="width: 100%;height:42vh; overflow:auto;">
         <el-row  
           v-for="(log,index) in webSocketDataList" 
@@ -592,7 +592,7 @@
     methods: {
       // dmp日志关闭
       dmpLoghandleClose(done){
-         this.$confirm('<span style="color:red">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
+         this.$confirm('<span style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
          ,{dangerouslyUseHTMLString: true,
           confirmButtonText: '仍要关闭'})
           .then(_ => {
@@ -1011,6 +1011,6 @@
 </script>
 <style scoped lang="scss">
 /deep/.el-table .warning-row {
-    color: #f56c6c;
+    color: #af0f16;
   }
 </style>
