@@ -42,6 +42,11 @@
         type: String,
         default: null,
       },
+      //当前页面自己的属性,用来区分websocket连接
+      modelName: {
+        type: String,
+        default: null,
+      },
       //当前页面自己的属性,sql执行的列表数据
       slqTabelEdt: {
         type: Array,
@@ -74,7 +79,8 @@
           }
         ],//左边树参数初始的数据
         useChinese:true,//是否汉字化
-        userId:sessionStorage.getItem("userId"),
+        userId:sessionStorage.getItem("userId")+"-"+(this.modelName!=null&&this.modelName!=''?this.modelName:'sqlEditor'),
+        // userId:sessionStorage.getItem("userId"),
       }
     },
     watch: {
@@ -83,10 +89,11 @@
         immediate: true,
         deep: true,
         handler(val) {
-          if(val!=''){
-            this.sqlData=val;
-
-          }
+          this.sqlData=val;
+          // if(val!=''){
+          //   this.sqlData=val;
+          //
+          // }
         }
       },
       slqTabelEdt(val) {
@@ -166,7 +173,8 @@
           var params={
             sqlScript:sql,
             loadOnce:false,
-            dataSize:"500"
+            dataSize:"500",
+            webSocketId:this.userId,
           };
           this.$http({
             url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
@@ -378,6 +386,7 @@
                 sqlScript:item.sql,
                 paramName:item.name,
                 id:item.id,
+                webSocketId:this.userId,
               }
               _dataList.push(v)
             });
@@ -402,7 +411,8 @@
             var params={
               sqlScript:sql,
               loadOnce:false,
-              dataSize:"500"
+              dataSize:"500",
+              webSocketId:this.userId,
             };
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),

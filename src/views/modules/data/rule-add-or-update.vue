@@ -81,7 +81,7 @@
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
                 <el-tree
-                  :data="data"
+                  :data="treedata"
                   node-key="id"
                   default-expand-all
                   @node-drag-start="handleDragStart"
@@ -103,7 +103,7 @@
       </el-tabs>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="sqlEditMsg='',visible = false,cleanMsg()">取消</el-button>
+        <el-button @click="sqlEditMsg.msg='',visible = false,cleanMsg()">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
@@ -116,10 +116,10 @@
       :show-close="false"
       :visible.sync="sqlVisible">
       <div class="sqlDialog-btn">
-        <el-button @click="sqlVisible = false">取消</el-button>
+        <el-button @click="sqlEditMsg.msg='',sqlVisible = false">取消</el-button>
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
-      <sql-element ref="sqler" :sqlEditMsg="sqlEditMsg" :slqTabelEdt="slqTabelEdt"></sql-element>
+      <sql-element :key="sqlKey" ref="sqler" :sqlEditMsg="sqlEditMsg.msg" :slqTabelEdt="slqTabelEdt" :modelName="'ruleManager'"></sql-element>
     </el-dialog>
   </div>
 </template>
@@ -157,10 +157,12 @@
         }
       };
       return {
+        sqlKey:0,
         mustList:{},//sql编译器必填的项
         paramsSqlSelf:'',//选择参数后返回的转义的sql
         slqTabelEdt:[],//sql执行结果
-        sqlEditMsg:'',//回显时候的sql语句
+        sqlEditMsg:{msg:''},//回显时候的sql语句
+        sqlMsgCopy:'',
         activeName:'1',//tab页切换时的状态值
         sqlVisible:false,//sql编译器显示状态
         treeVisible:false,//规则分类显示名称
@@ -188,54 +190,14 @@
         },
 
 
-        data: [{
+        treedata: [{
           id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2',
-            children: [{
-              id: 11,
-              label: '三级 3-2-1'
-            }, {
-              id: 12,
-              label: '三级 3-2-2'
-            }, {
-              id: 13,
-              label: '三级 3-2-3'
-            }]
-          }]
+          columnName: '结果表',
+          children: []
         }],
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'columnName'
         },
         inputValue:'',
 
@@ -389,9 +351,9 @@
         })
       },
       openSql(){
-        this.sqlEditMsg=this.sqlEditMsg;
-
-        console.log(this.sqlEditMsg);
+        this.sqlKey=Math.random();
+        this.sqlEditMsg.msg=JSON.parse(JSON.stringify(this.sqlMsgCopy));
+        this.$set(this.sqlEditMsg,'msg',this.sqlMsgCopy);
 
         // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
         this.slqTabelEdt=[];
@@ -400,8 +362,8 @@
       //sql编译器点击保存
       sqlSave(){
         var paramData=this.$refs.sqler.paramsData;
-        console.log(this.$refs.sqler)
 
+        console.log(this.$refs.sqler);
         var resultTableTabs=this.$refs.sqler.resultTableTabs;
         if(resultTableTabs.length==0){
           this.$message.error("请先执行sql");
@@ -410,6 +372,7 @@
         var hasBm=false,hasJg=false;
         resultTableTabs.forEach(item=>{
           if(item.isLast=='Y'){
+            this.treedata.children.push(item.columnList);
             item.columnList.forEach((vtem)=>{
               if(vtem.columnName==(this.mustList['yljgbm'])){
                 hasBm=true;
@@ -469,6 +432,7 @@
         return str;
       },
       cleanMsg(){
+
         this.activeName='1';
         this.dataForm.id = 0;
         this.dataForm.ruleName = '';
@@ -479,6 +443,9 @@
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
+        if(this.$refs.sqler){
+          this.$refs.sqler.sqlMsg='';
+        }
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
@@ -495,18 +462,7 @@
         })
       },
       init (id, ruleCheckData) {
-        // var sql="select * from 医院基本信息 where 医疗机构编码 = '{#yljgbm#}'  or 医疗机构名称 = '{#yljgmc#}'";
-        // var list=[
-        //   {
-        //     "yljgbm": "医疗机构编码1",
-        //     "yljgmc": "医疗机构名称1"
-        //   },
-        //   {
-        //     "yljgbm": "医疗机构编码2",
-        //     "yljgmc": "医疗机构名称2"
-        //   }
-        // ];
-        // transSql(sql,list);
+
         this.getMustList();
         this.cleanMsg();
         this.visible = true;
@@ -514,7 +470,7 @@
         this.dataForm.ruleId = id;
         this.dataForm.folderId = this.ruleCheckData.folderId;
         this.dataForm.folderPath = this.ruleCheckData.folderPath;
-
+        this.sqlMsgCopy='';
         this.getUserInfo();
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();
@@ -522,7 +478,7 @@
           // 初始化规则树
           this.$refs.menuListTree.setCheckedKeys([]);
           this.$refs.menuListTree.setCurrentKey(null);
-        })
+        });
 
         if (this.dataForm.ruleId) {
           this.$http({
@@ -539,7 +495,8 @@
               this.dataForm.folderPath = datas.folderPath;
               this.dataForm.createUserName = datas.createUserName;
               this.dataForm.createTime = datas.createTime;
-              this.sqlEditMsg = datas.ruleSqlValue;
+              this.sqlEditMsg.msg = datas.ruleSqlValue;
+              this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
 
               this.dataForm.ruleType = datas.ruleType;
               if(datas.params){
@@ -661,13 +618,16 @@
         this.dialogVisible = true;
       }
     },
-    watch : {
-      'visible'(nval, oval) {
-          // if (nval ) {
-          //   this.cleanMsg();
-          // }
-      },
-    }
+    // watch : {
+    //   'sqlEditMsg.msg':{
+    //     immediate: true,
+    //     deep: true,
+    //     handler(val) {
+    //       console.log(val, 4444)
+    //       this.$set(this.sqlEditMsg,'msg',val)
+    //     }
+    //   }
+    // }
   }
 </script>
 <style scoped>

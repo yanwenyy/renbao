@@ -6,7 +6,7 @@ export function transSql (str,list) {
       for(let i in item){
         if(_str.indexOf("{#"+i+"#}")!=-1){
           var _reg=new RegExp("{#"+i+"#}",'g');
-          _str=_str.replace(_reg,item[i])
+          _str=_str.replace(_reg,","+item[i]+",")
         }
       }
     })

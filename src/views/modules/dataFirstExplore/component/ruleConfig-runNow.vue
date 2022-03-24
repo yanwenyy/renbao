@@ -225,6 +225,7 @@ export default {
       for (var i = 0; i < this.sql.length; i++) {
         this.resultSqlValue.push(transSql(this.sql[i], data));
       }
+      console.log(this.resultSqlValue)
       //处理医院数据并反显
       var hospitalCodes = "";
       var hospitalNames = "";

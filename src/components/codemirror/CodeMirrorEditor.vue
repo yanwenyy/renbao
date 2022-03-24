@@ -465,7 +465,7 @@
           mode:'text/x-mysql',
           lineWrapping: true,
           lineNumbers: true,
-          autofocus: true,
+          autofocus: false,
           smartIndent: false,
           autocorrect: true,
           spellcheck: true,
@@ -546,7 +546,7 @@
           if (val!='') {
             if(val!=''){
               this.paramsNode=val;
-              var that=this,str=this.sqlData;
+              var that=this,str=JSON.parse(JSON.stringify(this.sqlData));
               setTimeout(function(){
                 if(str!=''){
                   that.idToButton(str);
@@ -631,15 +631,13 @@
         immediate: true,
         deep: true,
         handler(val) {
-          console.log(1111)
-          if (val != "") {
-            if (val != "") {
-              this.editorValue=val;
-              if(this.$refs.myCm){
-                this.idToButton(val);
-              }
+          if(val!=''){
+            this.editorValue=val;
+            if(this.$refs.myCm){
+              this.idToButton(val);
             }
           }
+
         },
       },
       // paramsListVisible: {
@@ -711,8 +709,10 @@
 
       }
     },
+
     mounted(){
       this.dragControllerDiv2();
+
       var that=this,str=this.sqlData;
       setTimeout(function(){
         if(str!=''){
@@ -1188,17 +1188,12 @@
         if(changes&&changes[0].origin=="paste"){
           this.idToButton(changes[0].text[0],changes[0].to)
         }
-        // console.log(cm);
-        // if(this.editorValue!=''){
-        //   var tok = cm.getTokenAt(cm.getCursor());
-        //   if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
-        //   this.$refs.myCm.codemirror.showHint({completeSingle: false,className:'self-hints'});
-        // }
         this.resetLint();
       },
       cmCursorActivity(cm){
         if (cm.curOp.focus === false) {
           this.initHint(cm);
+
         }
       },
       initHint(editor){
@@ -1227,7 +1222,8 @@
             if (!cm.state.completionActive)
               cm.showHint({
                 completeSingle: false,
-                className:'self-hints'
+                className:'self-hints',
+                closeOnUnfocus:true
               });
           }, 100);
         }

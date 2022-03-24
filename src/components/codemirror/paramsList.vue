@@ -92,7 +92,7 @@
                 _s="'"+_s+"'";
 
               }else{
-                _s=String(item.paramsValue)
+                _s=String("'"+item.paramsValue+"'")
               }
               _str=_str.replace(_reg, _s);
             }
