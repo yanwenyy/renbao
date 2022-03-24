@@ -320,6 +320,10 @@
     },
     // props: ["cmTheme", "cmMode", "autoFormatJson", "jsonIndentation",'treeLable','tableData'],
     props: {
+      from: {
+        type: String,
+        default: null,
+      },
       hintShowName: {
         type: String,
         default: null,
@@ -632,6 +636,7 @@
         deep: true,
         handler(val) {
           if(val!=''){
+            this.sqlData=val;
             this.editorValue=val;
             if(this.$refs.myCm){
               this.idToButton(val);
@@ -723,6 +728,7 @@
     methods: {
           //将参数id转换成按钮显示到页面
       idToButton(sql,to){
+        this.dragParmasList=[];
         if(sql){
           this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
           this.paramsData.forEach(item=>{
@@ -969,7 +975,10 @@
           }
         });
         var selectValue = this.$refs.myCm.codemirror.getSelection();
-        this.dragParmasList=this.dragParmasList.filter(item=>{return _list.indexOf("{#"+item.id+"#}")!=-1});
+        this.dragParmasList=this.dragParmasList.filter(item=>{
+          console.log(_list.indexOf("{#"+item.id+"#}"),item.id)
+          return _list.indexOf("{#"+item.id+"#}")!=-1
+        });
         this.getwsData(selectValue!=''?selectValue:this.$refs.myCm.codemirror.getValue(),selectValue!=''&&selectValue.indexOf("{#")==-1?[]:_list,this.dragParmasList);
       },
       // 打开
@@ -1175,6 +1184,10 @@
       },
       // 按下鼠标时事件处理函数
       onMouseDown(event) {
+        if(this.selfFrom!=''){
+          this.selfFrom='';
+        }
+
         this.$refs.myCm.codemirror.closeHint();
 
       },
@@ -1191,9 +1204,10 @@
         this.resetLint();
       },
       cmCursorActivity(cm){
-        if (cm.curOp.focus === false) {
+        // console.log(cm,555,cm.curOp,this.selfFrom)
+        // if (cm.curOp.focus === false) {
+        if (cm.curOp.focus === false&&this.selfFrom=='') {
           this.initHint(cm);
-
         }
       },
       initHint(editor){

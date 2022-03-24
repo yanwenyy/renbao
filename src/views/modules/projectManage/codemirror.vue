@@ -23,6 +23,7 @@
       :exportSql="exportSql"
       :paramsList="paramsList"
       :paramsSub="paramsSub"
+      :from="from"
     ></sql-edit>
   </div>
 
@@ -55,6 +56,7 @@
     },
     data() {
       return {
+        from:'',
         paramsSqlMsg:'',//当前页面自己的属性 参数点确定之后返回的转义的sql
         paramsList:[],//后台返回的参数列表
         ws:{},//websoket对象
@@ -89,6 +91,7 @@
         immediate: true,
         deep: true,
         handler(val) {
+          this.from='edit'
           this.sqlData=val;
           // if(val!=''){
           //   this.sqlData=val;
@@ -366,6 +369,8 @@
       },
       //点击运行获取websoket数据
       getwsData(sql,marks,nodeList) {
+        this.paramsList=[];
+
         console.log(sql,marks,nodeList);
         if(sql!=''){
           if(marks.length>0){
@@ -379,7 +384,7 @@
             //     }
             //   ],//参数下拉列表
             // }];
-            this.paramsList=[];
+
             var _dataList=[];
             nodeList.forEach(item=>{
               var v={
@@ -402,6 +407,7 @@
                   item.list=item.jsonObject.data;
                 });
                 this.paramsList=datas;
+                console.log(this.paramsList,7878)
               }else{
                 this.$message.error(data.message);
               }

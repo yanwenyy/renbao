@@ -38,7 +38,9 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <el-button @click="close">关闭</el-button>
+    <div align="center">
+      <el-button @click="close">关闭</el-button>
+    </div>
   </div>
 </template>
 <script>
@@ -46,7 +48,7 @@ export default {
   name: "detail",
   props: {
     id: String,
-    name:String
+    name: String
   },
   data() {
     return {
@@ -72,8 +74,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.dataForm.ruleName = this.name;
-          this.dataForm.actualBeginTime = data.result.actualBeginTime
-          this.dataForm.actualEndTime = data.result.actualEndTime
+          this.dataForm.actualBeginTime = data.result.actualBeginTime;
+          this.dataForm.actualEndTime = data.result.actualEndTime;
           var runStatus = data.result.runStatus;
           if (runStatus == 1) {
             this.dataForm.runStatus = "待执行";

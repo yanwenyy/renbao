@@ -170,10 +170,12 @@
               >
             </el-form-item>
           </el-form>
-          <el-button type="primary" @click="exportExcel('dataForm1')"
-            >导出</el-button
-          >
-          <el-button @click="closeExport">取消</el-button>
+          <div align="center">
+            <el-button type="primary" @click="exportExcel('dataForm1')"
+              >导出</el-button
+            >
+            <el-button @click="closeExport">取消</el-button>
+          </div>
         </el-dialog>
       </el-card>
     </div>

@@ -60,7 +60,9 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <el-button @click="close">关闭</el-button>
+    <div align="center">
+      <el-button @click="close">关闭</el-button>
+    </div>
     <!-- sql编辑弹窗 -->
     <el-dialog
       title="sql编辑"
@@ -77,7 +79,7 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div align="center">
         <el-button type="primary" @click="submitSql">确定</el-button>
         <el-button @click="showSqlEditorDialog = false">取消</el-button>
       </div>

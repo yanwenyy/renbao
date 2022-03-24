@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-dialog
+      @close="deletCm"
       custom-class="rule-dialog"
       width="80%"
       :title="!dataForm.ruleId ? '新增' : '修改'"
@@ -117,7 +118,7 @@
       :show-close="false"
       :visible.sync="sqlVisible">
       <div class="sqlDialog-btn">
-        <el-button @click="sqlEditMsg.msg='',sqlVisible = false">取消</el-button>
+        <el-button @click="deletCm(),sqlEditMsg.msg='',sqlVisible = false">取消</el-button>
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
       <sql-element :key="sqlKey" ref="sqler" :sqlEditMsg="sqlEditMsg.msg" :slqTabelEdt="slqTabelEdt" :modelName="'ruleManager'"></sql-element>
@@ -245,15 +246,18 @@
       },
       handleDragOver(draggingNode, dropNode, ev) {
         var elInput = document.getElementById('selfInput');
+        // var pos=this.getCursortPosition(elInput);
+        // this.setCaretPosition(elInput,pos)
         // elInput.addEventListener("dragenter", function(e){
         //   console.log(e,444444)
         // }, false);
       },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log(ev);
+        console.log(draggingNode);
         var elInput = document.getElementById('selfInput');
+
         var _str=JSON.parse(JSON.stringify(draggingNode.data.columnName));
-        this.insertText(elInput,_str);
+        this.insertText(elInput,_str,draggingNode);
 
       },
       handleDrop(draggingNode, dropNode, dropType, ev) {
@@ -305,8 +309,9 @@
           range.select();
         }
       },
-      insertText(obj,str) {
+      insertText(obj,str,node) {
         if (document.selection) {
+
           var sel = document.selection.createRange();
           sel.text = str;
         } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') {
@@ -363,6 +368,7 @@
       },
       //sql编译器点击保存
       sqlSave(){
+        this.deletCm();
         var paramData=this.$refs.sqler.paramsData;
 
         console.log(this.$refs.sqler);
@@ -464,8 +470,15 @@
           }
         })
       },
+      //删除智能提示框
+      deletCm(){
+        var cm_complete=document.getElementsByClassName("CodeMirror-hints");
+        if(cm_complete[0]){
+          cm_complete[0].parentNode.removeChild(cm_complete[0])
+        }
+      },
       init (id, ruleCheckData) {
-
+        this.deletCm();
         this.getMustList();
         this.cleanMsg();
         this.visible = true;

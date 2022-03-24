@@ -61,10 +61,11 @@
               <template slot-scope="scope">
                 <div v-if="items.type == 'option'">
                   <div class="operation-box">
-                    <span
+                    <el-button
+                      type="text"
                       class="result-view-text"
                       @click="resultViewClick(scope.row)"
-                      >查看明细</span
+                      >查看明细</el-button
                     >
                   </div>
                 </div>
@@ -333,6 +334,7 @@ export default {
     editSucceed() {
       this.closeDetail();
     },
+    //结果明细导出弹窗
     resultDetailsExportClick() {
       if (!this.batchItem.batchId)
         return this.$message({ message: "请选择对应的批次", type: "warning" });

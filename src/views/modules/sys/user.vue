@@ -66,7 +66,7 @@
       <el-button @click="reset()">重置</el-button>
     </el-form>
     <el-table
-      :height="$tableHeight-58"
+      :height="$tableHeight - 10"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -85,8 +85,11 @@
         align="center"
         width="80"
         label="ID"
+        :index="indexMethod"
       >
-        <!--prop="userId"-->
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>
+        </template> -->
       </el-table-column>
       <el-table-column
         prop="userName"
@@ -234,30 +237,6 @@ export default {
         this.$http.adornUrl("/user/exportTemplate?token=") +
         this.$cookie.get("token");
       window.open(url);
-      /*  this.$http({
-        method: "get",
-        url: this.$http.adornUrl("/user/exportTemplate"),
-        // data: this.query.data,
-        responseType: "blob"
-      })
-        .then(res => {
-          // console.log(decodeURI(res.headers['filename']));
-          const link = document.createElement("a");
-          let blob = new Blob([res.data], { type: "application/vnd.ms-excel" });
-          link.style.display = "none";
-          link.href = URL.createObjectURL(blob);
-          link.setAttribute("download", decodeURI(res.headers["filename"]));
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        })
-        .catch(error => {
-          this.$Notice.error({
-            title: "错误",
-            desc: "系统数据错误"
-          });
-          console.log(error);
-        }); */
     },
     // 获取数据列表
     getDataList() {
@@ -350,6 +329,13 @@ export default {
       };
       this.pageIndex = 1;
       this.getDataList();
+    },
+    // 序号翻页递增
+    indexMethod(index) {
+      console.log("索引数下标", index);
+      let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
     }
   }
 };

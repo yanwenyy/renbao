@@ -156,6 +156,7 @@
         :hintShowName="defaultProps.label"
         :paramsList="paramsList"
         :paramsSub="paramsSub"
+        :from="from"
       ></code-mirror-editor>
 
     </div>
@@ -251,9 +252,14 @@
         type: Object,
         default: null,
       },
+      from: {
+        type: String,
+        default: null,
+      },
     },
     data() {
       return {
+        selfFrom:'',
         paramsNode:{},//参数数拖拽的节点
         treeDataToHint:[],//tree数据给sql编译器提示
         resultTableTabsList:[],//拖拽条显示高度判断
@@ -834,6 +840,12 @@
         deep: true,
         handler(val) {
           // console.log(val,3333)
+        }
+      },
+      from:{
+        deep: true,
+        handler(val) {
+          this.selfFrom=val;
         }
       },
       treeDataToHint:{

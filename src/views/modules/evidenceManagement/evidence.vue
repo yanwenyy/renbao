@@ -25,6 +25,12 @@
         <el-button @click="reset">重置</el-button>
       </el-form-item>
       <el-form-item style="float:right">
+        <el-button
+          type="primary"
+          :disabled="multipleSelection.length <= 0"
+          @click="downLoadFile()"
+          >导出附件</el-button
+        >
         <el-button type="primary" @click="addHandle()">新增</el-button>
         <el-button
           type="primary"
@@ -48,6 +54,7 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
+      :height="$tableHeight - 10"
     >
       <el-table-column
         type="selection"
@@ -102,16 +109,18 @@
       >
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper"
-    >
-    </el-pagination>
+    <div style="float:right">
+      <el-pagination
+        @size-change="sizeChangeHandle"
+        @current-change="currentChangeHandle"
+        :current-page="pageIndex"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pageSize"
+        :total="totalPage"
+        layout="total, sizes, prev, pager, next, jumper"
+      >
+      </el-pagination>
+    </div>
     <!-- 弹窗, 新增 / 修改 -->
     <el-dialog
       :visible.sync="showAddDialog"
@@ -120,6 +129,7 @@
       :modal-append-to-body="false"
       width="40%"
       :close-on-press-escape="false"
+      append-to-body
     >
       <addOrUpdate
         @close="closeAddDrawer"
@@ -139,6 +149,9 @@ import addOrUpdate from "./evidence-addOrUpdate.vue";
 export default {
   components: {
     addOrUpdate
+  },
+  props: {
+    showBtn: { type: Boolean }
   },
   data() {
     return {
@@ -164,14 +177,12 @@ export default {
       id: "",
       //弹窗标题
       title: "",
-      //弹窗按钮
-      showBtn: "",
       //传给弹窗：是否显示附件列表
       showFileTable: false,
       //传给弹窗：是否显示上传按钮
       showBtn: false,
       //传给弹窗：是否只读
-      readonly: false
+      readonly: ''
     };
   },
   created() {
@@ -180,7 +191,7 @@ export default {
   methods: {
     // 获取数据列表
     getDataList() {
-      this.dataListLoading = true;
+      // this.dataListLoading = true;
       this.$http({
         url: this.$http.adornUrl("/evidence/selectPage"),
         method: "get",
@@ -198,7 +209,7 @@ export default {
           this.dataList = [];
           this.totalPage = 0;
         }
-        this.dataListLoading = false;
+        // this.dataListLoading = false;
       });
     },
     // 每页数
@@ -294,6 +305,20 @@ export default {
           });
         })
         .catch(() => {});
+    },
+    downLoadFile() {
+      var evidenceIds = "";
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        evidenceIds += this.multipleSelection[i].evidenceId + ",";
+      }
+      if (evidenceIds.length > 0) {
+        evidenceIds = evidenceIds.substr(0, evidenceIds.length - 1);
+      }
+      let url =
+        this.$http.adornUrl(
+          "/evidence/downloadAttachments?evidenceIds=" + evidenceIds + "&token="
+        ) + this.$cookie.get("token");
+      window.open(url);
     }
   }
 };
