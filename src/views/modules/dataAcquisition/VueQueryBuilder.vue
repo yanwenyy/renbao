@@ -17,8 +17,8 @@ import deepClone from '../../../utilities';
 var defaultLabels = {
   matchType: "类型",
   matchTypes: [
-    {"id": "all", "label": "并"},
-    {"id": "any", "label": "或"},
+    {"id": "and", "label": "并"},
+    {"id": "or", "label": "或"},
   ],
   addRule: "添加规则",
   removeRule: "&times;",
@@ -189,6 +189,6 @@ export default {
           return sql.join(' ');
       }
   }
-      
+
 }
 </script>
