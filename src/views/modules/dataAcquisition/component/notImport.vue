@@ -50,7 +50,6 @@ export default {
                 })
             }).then(({ data }) => {
                 if (data && data.code === 200) {
-                    debugger
                     this.tableList = data.result.result
                     this.columnList = data.result.columns
                     this.apComServerData.total = data.result.pagination.dataCount

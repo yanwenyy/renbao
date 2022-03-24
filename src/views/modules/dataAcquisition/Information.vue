@@ -1,5 +1,5 @@
 <template>
-    <div class="Information">
+    <div class="Information" ref="box">
         <el-form :inline="true" :model="ruleForm">
             <el-form-item label="选择目录:">
                 <el-select v-model="ruleForm.catalogType" placeholder="请选择" @change='changeOption($event)'>
@@ -82,7 +82,9 @@
     </div>
 </template>
 <script>
+
 import myquerybuilder from './myquerybuilder.vue'
+
 export default {
     name:'Information',
     components:{
@@ -168,14 +170,22 @@ export default {
                 tableList:[],
                 tableList0:[],
                 sqlData:'',
-                tableColumns:[]
+                tableColumns:[],
         }
     },
     mounted(){
-       this.getDataList()
+        //点击空白处隐藏复杂条件查询
+        let that=this;
+        document.addEventListener('click',(e) =>{
+             if(!that.$refs.box.contains(e.target)){
+            that.show = false;           
+        }
+        })
+    //    this.getDataList()
     },
+    
     created(){
-        // this.getDataList();
+        this.getDataList();
         this.token = this.$cookie.get("token");
     },
     methods:{
