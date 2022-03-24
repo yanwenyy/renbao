@@ -1,7 +1,7 @@
 <template>
-  <div class="threeData">
+  <div class="threeData" ref="box">
     <!-- 列表 -->
-    <div class="listDisplay" style="height:500px" ref="box">
+    <div class="listDisplay" style="height:500px">
       <div class="f_right">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button @click="resetForm">重置</el-button>
