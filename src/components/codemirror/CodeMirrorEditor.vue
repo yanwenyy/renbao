@@ -642,8 +642,10 @@
           if(val!=''){
             this.sqlData=val;
             this.editorValue=val;
+            this.getSqlMsg(val);
             if(this.$refs.myCm){
               this.idToButton(val);
+
             }
           }
 

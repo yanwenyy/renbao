@@ -467,9 +467,6 @@
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
-        if(this.$refs.sqler){
-          this.$refs.sqler.sqlMsg='';
-        }
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
