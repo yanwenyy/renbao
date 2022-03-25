@@ -41,7 +41,12 @@
               <el-button @click="onReset">重置</el-button>
             </el-form-item>
             <el-form-item style="float:right">
-              <el-button type="danger" @click="deleteFn">删除</el-button>
+              <el-button
+                type="danger"
+                @click="deleteFn"
+                :disabled="this.multipleTable.length <= 0"
+                >删除</el-button
+              >
             </el-form-item>
           </el-form>
         </div>
@@ -353,6 +358,7 @@ export default {
       this.searchForm.ruleCategory = "";
       this.searchForm.runStatus = "";
       this.Pager.pageIndex = 1;
+      this.getTableData()
       // this.$refs.treesa.setCheckedKeys([]);
       // this.$refs.treesa.setCurrentKey(null);
       // this.batchItem = {}

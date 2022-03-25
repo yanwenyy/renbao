@@ -74,7 +74,6 @@
 </template>
 <script>
 import { transSql } from "@/utils/publicFun.js";
-import choose from "./ruleConfig-chooseHospital.vue";
 import basicInformation from "@/views/modules/dataAcquisition/basicInformation.vue";
 export default {
   props: {
@@ -83,7 +82,6 @@ export default {
     sql: { type: Array }
   },
   components: {
-    choose,
     basicInformation
   },
   data() {
@@ -229,7 +227,7 @@ export default {
       for (var i = 0; i < this.sql.length; i++) {
         this.resultSqlValue.push(transSql(this.sql[i], data));
       }
-      console.log(this.resultSqlValue)
+      // console.log(this.resultSqlValue);
       //处理医院数据并反显
       var hospitalCodes = "";
       var hospitalNames = "";

@@ -47,7 +47,7 @@
             <el-button
               type="danger"
               @click="deleteFn"
-              :disabled="this.multipleTable.length < 0"
+              :disabled="this.multipleTable.length <= 0"
               >删除</el-button
             >
           </el-form-item>
@@ -299,7 +299,7 @@ export default {
       this.searchForm.ruleName = "";
       this.searchForm.ruleCategory = "";
       this.Pager.pageIndex = 1;
-      this.setTableChecked();
+      this.getSelectPage()
       // 调用规则树的重置方法
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
