@@ -170,7 +170,9 @@ export default {
             this.dataForm.manuscriptName = data.result.manuscriptName;
             this.dataForm.manuscriptCode = data.result.manuscriptCode;
             this.dataForm.manuscriptRemark = data.result.manuscriptRemark;
+            this.dataForm.evidenceId = data.result.evidenceId;
             this.dataForm.evidenceName = data.result.evidenceName;
+            this.dataForm.hospitalCode = data.result.hospitalCode;
             this.dataForm.hospitalName = data.result.hospitalName;
           } else {
             this.dataForm.ruleId = this.id;

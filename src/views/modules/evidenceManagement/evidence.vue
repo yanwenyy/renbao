@@ -102,7 +102,7 @@
       >
       </el-table-column>
       <el-table-column
-        prop="roleNumber"
+        prop="relation"
         header-align="center"
         align="center"
         label="是否被底稿关联"
