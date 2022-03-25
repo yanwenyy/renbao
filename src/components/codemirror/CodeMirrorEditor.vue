@@ -567,9 +567,10 @@
         immediate: true,
         deep: true,
         handler(val) {
-          if (val !== "") {
+          if (val != "") {
+            val=val.split("@Math")[0];
             this.treeValve = val;
-            if (val !== "") {
+            if (val != "") {
 
               if( Object.keys(this.paramsNode).length>0){
                 this.dragParmasList.push(this.paramsNode);
@@ -592,7 +593,7 @@
                 let pos2 = {};
                 pos2.line = pos1.line;
                 pos2.ch = pos1.ch;
-                this.$refs.myCm.codemirror.replaceRange(val, pos2);
+                this.$refs.myCm.codemirror.replaceRange(val, pos2,);
               }
             } else {
               let dimId =
@@ -1204,7 +1205,7 @@
 
       },
       //codemirror 改变之前的事件
-      cmBeforChange(){
+      cmBeforChange(cm, changes){
 
       },
       onCmCodeChanges(cm, changes) {

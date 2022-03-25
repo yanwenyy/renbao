@@ -259,8 +259,8 @@
         var elInput = document.getElementById('selfInput');
         // var pos=this.getCursortPosition(elInput);
         // this.setCaretPosition(elInput,pos)
-        // elInput.addEventListener("dragenter", function(e){
-        //   console.log(e,444444)
+        // elInput.addEventListener("mousemove", function(e){
+        //   console.log(e)
         // }, false);
       },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {

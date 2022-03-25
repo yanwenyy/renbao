@@ -1042,14 +1042,20 @@
         //除了第一层都可以拖拽  dataType是层级分类
         if (draggingNode.data.dataType>1) {
           this.treeLable = this.treeDefaultProps.label?draggingNode.data[this.treeDefaultProps.label]:draggingNode.data.label;
+          //解决不实时更新问题
+          this.treeLable=this.treeLable+"@Math"+Math.random();
         }
         if (
           draggingNode.data.type === "funNode"
         ) {
           this.treeLable = draggingNode.data.name;
+          //解决不实时更新问题
+          this.treeLable=this.treeLable+"@Math"+Math.random();
         }
         if (draggingNode.data.type === "params") {
           this.treeLable = draggingNode.data.name;
+          //解决不实时更新问题
+          this.treeLable=this.treeLable+"@Math"+Math.random();
           this.paramsNode=draggingNode.data;
         }
       },
