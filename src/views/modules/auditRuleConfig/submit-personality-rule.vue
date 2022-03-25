@@ -74,9 +74,11 @@ export default {
                 folderName: this.folderData.folderName,
                 folderPath: this.folderData.folderPath,
                 createUserName: this.multipleTable[0].createUserName,
+                ruleType: this.multipleTable[0].ruleType,
                 ruleStatisticsColumns: this.multipleTable[0].ruleStatisticsColumns||[],
                 ruleSqlStatisticsValue: this.multipleTable[0].ruleSqlStatisticsValue||'',
                 ruleRemark: this.multipleTable[0].ruleRemark||'',
+                ruleSqlValue: this.multipleTable[0].ruleSqlValue||'',
                 paramRules: this.multipleTable[0].paramRules||[],
             }
             this.loading = true

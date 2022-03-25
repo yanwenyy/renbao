@@ -26,7 +26,7 @@
     <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      :height="$tableHeight + 32"
+      :height="'calc(56vh + 32px)'"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
@@ -152,11 +152,11 @@
         <el-button type="primary" @click="checkFileTable">下一步</el-button>
       </span>
     </el-dialog>
-    <el-dialog 
-      title="数据表匹配" 
-      :visible.sync="checkFileTableDialogVisible" 
+    <el-dialog
+      title="数据表匹配"
+      :visible.sync="checkFileTableDialogVisible"
       v-if="checkFileTableDialogVisible"
-      width="60%" 
+      width="60%"
       :close-on-click-modal="false">
       <el-table
         border
@@ -283,7 +283,7 @@
                 </el-table-column>
             </el-table>
           </el-row>
-          
+
         </el-tab-pane>
       </el-tabs>
 
@@ -376,10 +376,10 @@
       </span>
     </el-dialog>
     <!-- dmp数据表匹配 -->
-    <el-dialog 
-      title="数据表匹配" 
-      :visible.sync="checkDmpFileTableDialogVisible" 
-      width="60%" 
+    <el-dialog
+      title="数据表匹配"
+      :visible.sync="checkDmpFileTableDialogVisible"
+      width="60%"
       :close-on-click-modal="false">
       <el-table
         border
@@ -432,7 +432,7 @@
         <el-button type="primary" @click="findFileTableDmp">下一步</el-button>
       </span>
     </el-dialog>
-    <el-dialog 
+    <el-dialog
       title="dmp还原日志"
       :visible.sync="dmpLogDialogVisible"
       width="60%"
@@ -440,8 +440,8 @@
       :close-on-click-modal="false">
       <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
       <el-row style="width: 100%;height:42vh; overflow:auto;">
-        <el-row  
-          v-for="(log,index) in webSocketDataList" 
+        <el-row
+          v-for="(log,index) in webSocketDataList"
           :key="index">
           {{log}}
         </el-row>
@@ -577,7 +577,7 @@
           let flag = this.errFiles.findIndex(item => item ==  row.name)
           if(flag != -1) {
             return 'warning-row'
-          } 
+          }
         }
         return ''
       },
@@ -802,7 +802,7 @@
           })
         }
       },
-      
+
       // dmp文件匹配
       findFileTableDmp(){
         //const map = new Map();
@@ -832,7 +832,7 @@
             this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
           }
         })
-        
+
       },
       // 获取文件中涉及到的表名
       findFileTable () {
