@@ -152,7 +152,7 @@
               <el-table-column prop="numRows" show-overflow-tooltip align="center" label="数据量" width="65"/>
               <el-table-column prop="lastUpdate" show-overflow-tooltip align="center" label="更新时间" />
               <el-table-column  prop="tableSize" align="center" show-overflow-tooltip  label="大小"/> 
-              <el-table-column header-align="center" align="center" label="操作" width="143">
+              <el-table-column header-align="center" align="center" label="操作" min-width="143">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="tableDataView(scope.row.tableName)">查看数据</el-button>
                   <el-button type="text" size="small" @click="tableColumnView(scope.row.tableName)">查看字段</el-button>

@@ -150,9 +150,6 @@ export default {
   components: {
     addOrUpdate
   },
-  props: {
-    showBtn: { type: Boolean }
-  },
   data() {
     return {
       dataForm: {

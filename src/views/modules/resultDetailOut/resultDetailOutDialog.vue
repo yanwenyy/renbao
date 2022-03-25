@@ -31,9 +31,7 @@
               >
               </el-option>
             </el-select>
-            <el-checkbox
-              v-model="checked"
-              @change="selectAll"
+            <el-checkbox v-model="checked" @change="selectAll"
               >全选</el-checkbox
             >
           </el-form-item>
@@ -58,17 +56,23 @@ export default {
   data() {
     return {
       loading: false,
-      checked: false, // 全选状态
+      // 全选状态
+      checked: false,
+      //是否显示弹窗
       dialogVisible: false,
+      //导出传参
       exportForm: {
         hospId: [],
         hospName: [],
         batchId: ""
       },
+      //医院列表数据
       hospitalTableData: [],
+      //必填校验
       exportFormRules: {
         hospId: [{ required: true, message: "请选择医院" }]
       },
+      //从父组件获取的批次数据
       batchItem: {},
       searchHospitalForm: {
         hospitalName: "",
@@ -88,6 +92,7 @@ export default {
       this.exportForm.batchId = batchItem.batchId;
       // this.exportForm.batchId = '6998b4b9-f2ef-4b7f-b945-3f353e773655'
     },
+    //全选
     checkChange(val) {
       this.exportForm.hospName = [];
       // 判断是否为全选状态
@@ -105,7 +110,7 @@ export default {
         });
       }
     },
-    // 全选
+    // 全选数据
     selectAll() {
       this.exportForm.hospId = [];
       this.exportForm.hospName = [];
@@ -165,14 +170,17 @@ export default {
         }
       });
     },
+    //关闭
     handleClose() {
       this.dialogVisible = false;
       this.reSet();
     },
+    //取消
     cancel() {
       this.dialogVisible = false;
       this.reSet();
     },
+    //重置
     reSet() {
       this.exportForm = {
         hospId: [],

@@ -162,7 +162,7 @@ export default {
     }
     
     .batch-label {
-        max-width: 190px;
+        max-width: 180px;
         display: inline-block;
         overflow:hidden;
         white-space: nowrap;

@@ -1,272 +1,352 @@
-<!--初探报告导出-->
+<!--结果明细导出-->
 <template>
-  <div class="threeData">
-    <el-form
-      :inline="true"
-      :model="dataForm"
-      @keyup.enter.native="getDataList()"
-    >
-      <el-form-item>
-        <el-input
-          v-model="dataForm.reportName"
-          placeholder="报告名称"
-          clearable
-        ></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="dataForm.status" placeholder="报告状态" clearable>
-          <el-option
-            v-for="item in status"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="search()">查询</el-button>
-        <el-button @click="resetForm()">重置</el-button>
-      </el-form-item>
-      <el-form-item style="float:right">
-        <el-button type="primary" @click="addOrEditData(0)">新增</el-button>
-        <el-button
-          type="primary"
-          :disabled="
-            this.multipleSelection.length <= 0 ||
-              this.multipleSelection.length > 1
-          "
-          @click="addOrEditData(1)"
-          >修改</el-button
+  <div class="box">
+    <div class="left">
+      <el-card style="height:80vh;overflow-y:auto">
+        <div
+          class="auditRuleMonitoring-left"
+          style="width:100%;overflow-y:auto"
         >
-        <el-button
-          type="danger"
-          :disabled="this.multipleSelection.length <= 0"
-          @click="deleteData()"
-          >删除</el-button
-        >
-      </el-form-item>
-    </el-form>
-    <!-- 列表 -->
-    <div class="listDisplay">
-      <el-table
-        :data="tableList"
-        border
-        style="100%"
-        overflow-y:auto
-        height="400px"
-        :header-cell-style="{ textAlign: 'center' }"
-        class="demo-ruleForm"
-        v-loading="listLoading"
-        ref="multipleTable"
-        @selection-change="handleSelectionChange"
-      >
-        >
-        <el-table-column
-          type="selection"
-          header-align="center"
-          align="center"
-          width="50"
-        ></el-table-column>
-        <el-table-column
-          prop="basicName"
-          header-align="center"
-          align="center"
-          label="报告名称"
-        ></el-table-column>
-        <el-table-column
-          prop="basicCode"
-          header-align="center"
-          align="center"
-          label="报告模板"
-        ></el-table-column>
-        <el-table-column
-          prop="administration"
-          header-align="center"
-          align="center"
-          label="开始时间"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="basicType"
-          header-align="center"
-          align="center"
-          label="结束时间"
-        ></el-table-column>
-        <el-table-column
-          prop="basicType"
-          header-align="center"
-          align="center"
-          label="状态"
-        >
-          <template slot-scope="scope">
-            <div type="primary" v-if="scope.row.status == 1">执行中</div>
-            <div type="primary" v-if="scope.row.status == 2">执行失败</div>
-            <div type="primary">已完成</div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="mobile"
-          header-align="center"
-          align="center"
-          label="操作"
-        >
-          <template slot-scope="scope">
-            <el-button type="warning" @click="downLoad(scope.row.id)"
-              >下载</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
+          <batch-list
+            :batchLoading="treeLoading"
+            :batchTreeList="batchTreeList"
+            @getbatchData="getbatchData"
+            v-on:refreshBitchData="initTree"
+            :isParent="false"
+          ></batch-list>
+        </div>
+      </el-card>
     </div>
-    <!--新增/修改弹窗 -->
-    <el-dialog
-      :visible.sync="showAddOrEditDialog"
-      :title="title"
-      :close-on-click-modal="false"
-      :modal-append-to-body="false"
-      width="30%"
-      :close-on-press-escape="false"
-    >
-      <addOrEdit
-        @close="close"
-        @ok="succeed"
-        v-if="showAddOrEditDialog"
-        :info="info"
-      ></addOrEdit>
-    </el-dialog>
+    <div style="width:100%">
+      <el-card style="height:80vh;overflow-y:auto">
+        <el-form ref="dataForm" :model="dataForm" :inline="true">
+          <el-form-item label="运行状态：">
+            <el-select
+              v-model="dataForm.batchResultExportStatus"
+              placeholder="运行状态"
+              clearable
+            >
+              <el-option
+                v-for="(item, index) in batchResultExportStatus"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getAllSearch()" type="primary">查询</el-button>
+            <el-button @click="reset()">重置</el-button>
+          </el-form-item>
+          <el-form-item style="float:right">
+            <el-button @click="toReport()" type="warning">生成报告</el-button>
+            <el-button @click="reportExport()" type="warning"
+              >导出报告</el-button
+            >
+          </el-form-item>
+        </el-form>
+        <div>
+          <el-table
+            :data="tableData"
+            border
+            ref="tableData"
+            @selection-change="handleSelectionChange"
+            v-loading="loading"
+            style="width: 100%"
+            :height="$tableHeight - 80"
+          >
+            <el-table-column type="selection" width="55"> </el-table-column>
+            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
+            <el-table-column prop="batchResultExportBeginTime" label="开始时间">
+            </el-table-column>
+            <el-table-column prop="batchResultExportEndTime" label="结束时间">
+            </el-table-column>
+            <el-table-column prop="batchResultExportStatus" label="状态">
+              <template slot-scope="scope">
+                <div v-if="scope.row.batchResultExportStatus == 1">待执行</div>
+                <div v-if="scope.row.batchResultExportStatus == 2">执行中</div>
+                <div v-if="scope.row.batchResultExportStatus == 3">
+                  执行失败
+                </div>
+                <div v-if="scope.row.batchResultExportStatus == 4">已完成</div>
+              </template>
+            </el-table-column>
+            <!--  <el-table-column prop="moblie" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" @click="detailHandle(scope.row)"
+                  >查看明细</el-button
+                >
+              </template>
+            </el-table-column> -->
+          </el-table>
+          <div>
+            <el-pagination
+              @size-change="sizeChangeHandle"
+              @current-change="currentChangeHandle"
+              :current-page="Pager.pageIndex"
+              :page-sizes="[10, 20, 50, 100]"
+              :page-size="Pager.pageSize"
+              :total="Pager.total"
+              layout="total, sizes, prev, pager, next, jumper"
+            >
+            </el-pagination>
+          </div>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 <script>
-import addOrEdit from "./component/reportExport-addOrEdit.vue";
+import batchList from "../../common/batch-list.vue";
+import { exportZip } from "@/utils";
 export default {
   components: {
-    addOrEdit
+    batchList,
+    exportZip
   },
   data() {
     return {
       //条件查询
       dataForm: {
-        basicName: "",
-        basicType: ""
+        batchResultExportStatus: "",
+        total: ""
       },
-      //新增、修改弹窗是否显示
-      showAddOrEditDialog: false,
+      batchTreeList: [
+        {
+          label: "批次名称",
+          children: []
+        }
+      ],
+      //运行状态
+      batchResultExportStatus: [
+        { id: 1, name: "待执行" },
+        { id: 2, name: "执行中" },
+        { id: 3, name: "执行失败" },
+        { id: 4, name: "已完成" }
+      ],
       //loading
-      listLoading: false,
-      //弹窗标题
-      title: "",
-      //多选
+      treeLoading: false,
+      layoutTreeProps: {
+        label(data, node) {
+          const config = data.__config__ || data;
+          return config.label || config.batchName;
+        }
+      },
+      ruleCategory: [
+        { id: 1, name: "门诊规则" },
+        { id: 2, name: "住院规则" }
+      ],
+      defaultProps: {
+        children: "children",
+        label: "name"
+      },
+      tableData: [],
       multipleSelection: [],
-      //table表格数据
-      tableList: [],
-      //动态表格列
-      tableColumns: [],
-      //新增、弹窗传参
-      info: "",
-      //状态
-      status: [
-       /*  {
-          value: "0",
-          label: "三级甲等"
-        },
-        {
-          value: "1",
-          label: "三级乙等"
-        },
-        {
-          value: "2",
-          label: "三级丙等"
-        } */
-      ]
+      loading: false,
+      treeLoading: false,
+      formLoading: false,
+      rows: [],
+      batchId: "",
+      batchName: "",
+      batchType: 1,
+      Pager: {
+        pageSize: 10,
+        pageIndex: 1,
+        total: 0
+      }
     };
   },
+  activated() {
+    this.initTree();
+  },
   created() {
-    this.initList();
+    this.initData();
   },
   methods: {
-    //初始化数据列表
-    initList() {
+    //初始化列表数据
+    initData() {
+      this.loading = true;
       this.$http({
-        url: this.$http.adornUrl("/ruleReport/selectPage"),
+        url: this.$http.adornUrl("batchResultExport/selectPage"),
         method: "get",
         params: this.$http.adornParams({
-          pageNo: this.pageIndex,
-          pageSize: this.pageSize
-        },false)
+          batchId: this.batchId,
+          batchResultExportStatus: this.dataForm.batchResultExportStatus,
+          pageNo: this.Pager.pageIndex,
+          pageSize: this.Pager.pageSize
+        })
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          // this.tableData = data.result.records;
-          this.totalPage = data.result.total;
+          this.tableData = data.result.records;
+          this.Pager.total = data.result.total;
           this.dataForm.total = data.result.total;
+          this.loading = false;
         } else {
-          this.dataForm.total = 0;
           this.tableData = [];
-          this.totalPage = 0;
+          this.Pager.total = 0;
+          this.dataForm.total = 0;
+          this.loading = false;
         }
       });
     },
-    //新增、修改弹窗
-    addOrEditData(val) {
-      this.showAddOrEditDialog = true;
-      if (val == 0) {
-        this.title = "新增报告";
-        this.info = "";
-      } else {
-        this.title = "修改报告";
-        this.info = this.multipleSelection[0].reportId;
-      }
-    },
-    //删除
-    deleteData() {},
-    //重置
-    resetForm() {},
-    //查询
-    search() {
-      this.initList();
-    },
-    // 页数
-    handleSizeChange(val) {
-      this.apComServerData.size = val;
-      this.initList();
-    },
-    //当前页
-    handleCurrentChange(val) {
-      this.apComServerData.pageNum = val;
-      this.initList();
-    },
-    //下载
-    downLoad() {},
-    //确定
-    succeed() {
-      this.close();
-      this.initList();
-    },
-    //取消
-    close() {
-      this.showAddOrEditDialog = false;
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
+    //初始化批次树数据
+    initTree() {
+      this.treeLoading = true;
+      this.$http({
+        isLoading: false,
+        url: this.$http.adornUrl("batch/selectBatchSuccessful"),
+        method: "get"
+      })
+        .then(({ data }) => {
+          this.treeLoading = false;
+          if (data.code == 200) {
+            this.batchTreeList[0].children = data.result;
+          }
+        })
+        .catch(() => {
+          this.treeLoading = false;
         });
+    },
+    //生成报告
+    toReport() {
+      if (this.batchId == "" || this.batchId == null) {
+        this.$message.warning("请先选择批次");
+      }
+      this.$http({
+        url: this.$http.adornUrl("batchResultExport/generateBatchReport"),
+        method: "post",
+        data: this.$http.adornData({
+          batchId: this.batchId,
+          batchName: this.batchName,
+          batchType: 1
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.$message.success("生成报告成功");
+          this.initData();
+        } else {
+          this.$message.error("生成报告失败");
+        }
+      });
+    },
+    //导出报告
+    reportExport() {
+      if (this.batchId == "" || this.batchId == null) {
+        this.$message.warning("请先选择批次");
       } else {
-        this.$refs.multipleTable.clearSelection();
+        let url =
+          this.$http.adornUrl(
+            "/batchResultExport/download?dataId=" + this.batchId + "&token="
+          ) + this.$cookie.get("token");
+        window.open(url);
       }
     },
-    //多选
+    // 关闭详细弹窗
+    closeDetail() {
+      this.showDetailDialog = false;
+    },
+    // 关闭弹窗确认
+    editSucceed() {
+      this.closeDetail();
+    },
+    //列表多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
+    },
+    //重置表单
+    resetForm(formName) {
+      this.submitData = {};
+      this.$refs[formName].resetFields();
+    },
+    //分页
+    sizeChangeHandle(val) {
+      this.Pager.pageSize = val;
+      this.initData();
+    },
+    //分页
+    currentChangeHandle(val) {
+      this.Pager.pageIndex = val;
+      this.initData();
+    },
+    //查询
+    getAllSearch() {
+      this.Pager.pageIndex = 1;
+      this.initData();
+    },
+    //重置搜索
+    reset() {
+      this.dataForm = {
+        ruleName: "",
+        ruleCategory: ""
+      };
+      this.Pager.pageIndex = 1;
+      this.initData();
+    },
+    //左点右显
+    getbatchData(data, node) {
+      this.batchId = data.batchId;
+      this.batchName = data.batchName;
+      this.initData();
+    },
+
+    //关闭结果明细导出弹窗
+    closeExport() {
+      this.detailExportDialog = false;
+    },
+
+    //重置已选
+    reSet() {
+      this.dataForm1 = {
+        hospId: [],
+        hospName: [],
+        batchId: ""
+      };
+      this.checked = false;
     }
   }
 };
 </script>
-<style lang="scss" scoped>
-.f_right {
-  float: right;
-  padding: 5px;
+<style scoped lang="scss">
+.box {
+  width: 100%;
+  // display: flex;
+  min-width: 800px;
+  // overflow-x: auto;
+  .auditRuleMonitoring-left {
+    width: 300px;
+    // min-height: 100vh;
+    min-height: calc(100vh - 165px);
+    // margin-right: 20px;
+    // border: 1px solid #ddd;
+    // overflow: auto;
+    min-width: 300px;
+  }
+  .auditRuleMonitoring-right {
+    flex: 1;
+    border: none;
+    // padding-left: 20px;
+    //
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      // padding-right: 109px;
+    }
+    .table-box {
+      margin-top: 10px;
+      // padding-left: 20px;
+      .result-view-text {
+        color: #0cbde5;
+      }
+    }
+  }
 }
-.line {
-  text-align: center;
+.left {
+  width: 300px;
+  float: left;
+  margin-right: 10px;
+  height: 80vh;
 }
 </style>

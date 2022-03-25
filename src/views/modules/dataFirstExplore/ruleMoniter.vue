@@ -327,6 +327,7 @@ export default {
     //左点右显
     getbatchData(data, node) {
       this.batchId = data.batchId;
+      this.clearChcked();
       this.getTableData();
     },
     // 列表查询
@@ -341,7 +342,13 @@ export default {
         runStatus: ""
       };
       this.Pager.pageIndex = 1;
+      this.clearChcked();
       this.getTableData();
+    },
+    //清除已选
+    clearChcked() {
+      this.$refs.multipleTable.clearSelection(this.multipleTable);
+      this.multipleTable = [];
     },
     //分页
     currentChangeHandle(val) {
