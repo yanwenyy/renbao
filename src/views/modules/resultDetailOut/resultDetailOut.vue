@@ -38,7 +38,12 @@
             <el-button type="primary" @click="resultDetailsExportClick"
               >结果明细导出</el-button
             >
-            <el-button type="danger" @click="deleteFn">删除</el-button>
+            <el-button
+              type="danger"
+              :disabled="this.multipleTable.length <= 0"
+              @click="deleteFn"
+              >删除</el-button
+            >
           </el-form-item>
         </el-form>
         <div>
@@ -131,19 +136,25 @@ import batchList from "../../common/batch-list.vue";
 export default {
   data() {
     return {
+      //批次树loading
       batchLoading: false,
+      //表格loading
       tableLoading: false,
+      //批次树父节点定义
       batchTreeList: [
         {
           label: "批次名称",
           children: []
         }
       ],
+      //条件查询
       searchForm: {
         ruleCategory: "",
         ruleName: ""
       },
+      //表数据
       tableData: [],
+      //列数据
       tablePositionKey: [
         {
           dataname: "ruleName",
@@ -192,11 +203,13 @@ export default {
           minWidth: 120
         }
       ],
+      //多选
       Pager: {
         pageSize: 10,
         pageIndex: 1,
         total: 0
       },
+      //多选
       multipleTable: [],
       layoutTreeProps: {
         label(data, node) {
@@ -207,7 +220,9 @@ export default {
       batchItem: {},
       // 查看明细相关
       info: "",
+      //返回的表名
       resultTableName: "",
+      //是否显示结果明细
       showDetailDialog: false
     };
   },
@@ -216,33 +231,41 @@ export default {
     // this.getTableData()
   },
   methods: {
+    //左点右显
     getbatchData(data, node) {
       this.batchItem = data;
       this.getTableData();
     },
+    //查询
     onQuery() {
       this.Pager.pageIndex = 1;
       this.getTableData();
     },
+    //重置
     onReset() {
       this.searchForm.ruleCategory = "";
       this.searchForm.ruleName = "";
       this.Pager.pageIndex = 1;
+      this.getTableData();
       // this.$refs.treesa.setCheckedKeys([]);
       // this.$refs.treesa.setCurrentKey(null);
       // this.batchItem = {}
     },
+    //分页
     currentChangeHandle(val) {
       this.Pager.pageIndex = val;
       this.getTableData();
     },
+    //多选
     handleSelectionChange(val) {
       this.multipleTable = val;
     },
+    //分页
     sizeChangeHandle(val) {
       this.Pager.pageSize = val;
       this.getTableData();
     },
+    //运行状态
     dealRunStatus(type) {
       if (type == 1) {
         return "待执行";
@@ -254,6 +277,7 @@ export default {
         return "已完成";
       }
     },
+    //规则类别
     dealRuleType(ruleCategory) {
       if (ruleCategory == 1) {
         return "门诊规则";
@@ -263,6 +287,7 @@ export default {
         return "";
       }
     },
+    //获取列表数据
     getTableData() {
       this.tableLoading = true;
       this.$http({
@@ -344,7 +369,7 @@ export default {
         return this.$message({ message: "请选择对应的批次", type: "warning" });
       this.$refs.resultDetailOutDialog.showDialog(this.batchItem);
     },
-
+    //删除
     deleteFn() {
       if (this.multipleTable.length === 0)
         return this.$message({
@@ -380,6 +405,7 @@ export default {
         })
         .catch(() => {});
     },
+    //获取批次数据
     getbatchList() {
       this.batchLoading = true;
       this.$http({
@@ -398,6 +424,7 @@ export default {
           this.batchLoading = false;
         });
     },
+    //重置已选
     setTableChecked() {
       this.multipleTable = [];
       this.$refs.multipleTable.clearSelection(this.multipleTable);

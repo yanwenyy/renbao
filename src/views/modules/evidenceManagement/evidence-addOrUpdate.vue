@@ -20,7 +20,7 @@
           type="textarea"
           v-model="dataForm.evidenceRemark"
           placeholder="证据描述"
-          :autosize="{ minRows: 10, maxRows: 10 }"
+          :autosize="{ minRows: 6, maxRows: 6 }"
           :readonly="readonly"
         ></el-input>
       </el-form-item>
@@ -34,10 +34,18 @@
             :on-remove="handleRemove"
             :file-list="fileList"
             :http-request="uploadData"
+            :before-remove="beforeRemove"
+            :on-progress="handleProgress"
           >
             <el-button size="small" type="primary" v-if="showBtn"
               >点击上传</el-button
             >
+            <!--  <el-progress
+              style="width: 200px;margin-top: 8px"
+              :text-inside="true"
+              :stroke-width="20"
+              :percentage="progressPercent"
+            /> -->
           </el-upload>
         </div>
         <el-table
@@ -47,9 +55,10 @@
           v-loading="loading"
           @selection-change="selectionChangeHandle"
           style="width: 100%;"
+          height="300px"
         >
           <el-table-column
-            type="selection"
+            type="index"
             header-align="center"
             align="center"
             width="50"
@@ -137,7 +146,9 @@ export default {
       //附件列表数据
       fileData: [],
       //移除的附件id
-      removeFileIdList: []
+      removeFileIdList: [],
+      //上传时移除的附件
+      removeFileList: []
     };
   },
   created() {
@@ -148,7 +159,6 @@ export default {
   methods: {
     //初始化表单
     init() {
-      this.loading = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
       });
@@ -162,11 +172,10 @@ export default {
           this.dataForm.evidenceName = data.evidenceName;
           this.dataForm.evidenceRemark = data.evidenceRemark;
           this.fileData = data.fileInfos;
-          this.loading = false;
         }
       });
     },
-    //获取上传的附件
+    //获取上传的文件
     uploadData(fileData) {
       this.multipartFiles.push(fileData.file);
     },
@@ -174,6 +183,20 @@ export default {
     submitForm(dataForm) {
       this.$refs[dataForm].validate(valid => {
         if (valid) {
+          // console.log("总共上传的文件", this.multipartFiles);
+          // console.log("移除的文件", this.removeFileList);
+          //过滤在上传时移除的文件
+          if (this.removeFileList.length > 0) {
+            this.multipartFiles.forEach(item => {
+              this.removeFileList.forEach(it => {
+                if (item.uid == it.uid) {
+                  this.multipartFiles.remove(item);
+                }
+              });
+            });
+          }
+          // console.log("剩余的文件", this.multipartFiles);
+          //是否上传附件校验
           /* if (this.multipartFiles.length == 0) {
             this.$message({
               message: "请选择上传文件！",
@@ -181,7 +204,6 @@ export default {
             });
             return;
           } */
-          // console.log(this.multipartFiles);
           let evidence = new FormData();
           evidence.append("evidenceId", this.id || undefined);
           evidence.append("evidenceName", this.dataForm.evidenceName);
@@ -190,7 +212,7 @@ export default {
           for (var i = 0; i < this.multipartFiles.length; i++) {
             evidence.append("multipartFiles", this.multipartFiles[i]);
           }
-          if (this.removeFileIdList.length != 0) {
+          if (this.removeFileIdList.length > 0) {
             evidence.append("fileInfoIds", this.removeFileIdList);
           }
           this.$http({
@@ -242,7 +264,11 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     //移除已上传的附件
-    handleRemove(file, fileList) {},
+    handleRemove(file, fileList) {
+      this.removeFileList.push(file);
+    },
+    //文件上传时
+    handleProgress(event, file, fileList) {},
     //删除附件
     deleteData(index, data, row) {
       this.$confirm(`确定删除${row.fileName}?`, "提示", {
@@ -263,7 +289,6 @@ export default {
       if (fileInfoIds.length > 0) {
         fileInfoIds = fileInfoIds.substr(0, fileInfoIds.length - 1);
       } */
-
       let url =
         this.$http.adornUrl(
           "/evidence/downloadAttachments?fileInfoIds=" +
