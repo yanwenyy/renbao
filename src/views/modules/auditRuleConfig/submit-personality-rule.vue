@@ -41,13 +41,13 @@ export default {
             this.multipleTable = multipleTable
         },
         handleCheckChange (data, checked, treeData) {
-            if (checked) { 
-                this.bitchCheckData = data; 
+            if (checked) {
+                this.bitchCheckData = data;
                 this.folderData.folderName = data.folderName;
                 this.folderData.folderId =  data.folderId;
                 this.folderData.folderPath =  data.folderPath;
             } else {
-                this.bitchCheckData = {}; 
+                this.bitchCheckData = {};
                 this.folderData.folderName = [];
                 this.folderData.folderId =  '';
                 this.folderData.folderPath =  ''
@@ -60,7 +60,7 @@ export default {
             // this.folderData.folderId =  data.folderId;
             // this.folderData.folderPath =  this.getParentByData(treeData,data.folderId )
         },
-       
+
         handleClose () {
             this.dialogVisible = false
         },
@@ -74,7 +74,10 @@ export default {
                 folderName: this.folderData.folderName,
                 folderPath: this.folderData.folderPath,
                 createUserName: this.multipleTable[0].createUserName,
-                createTime: this.multipleTable[0].createTime
+                ruleStatisticsColumns: this.multipleTable[0].ruleStatisticsColumns||[],
+                ruleSqlStatisticsValue: this.multipleTable[0].ruleSqlStatisticsValue||'',
+                ruleRemark: this.multipleTable[0].ruleRemark||'',
+                paramRules: this.multipleTable[0].paramRules||[],
             }
             this.loading = true
             this.$http({
@@ -105,7 +108,7 @@ export default {
                 }
             }).catch(() => {
                 this.loading = false
-            })   
+            })
         },
         cancel () {
             this.dialogVisible = false;
@@ -122,7 +125,7 @@ export default {
     },
     watch : {
         'dialogVisible'(nval, oval) {
-            if (nval ) {   
+            if (nval ) {
                this.reset()
             }
         },
