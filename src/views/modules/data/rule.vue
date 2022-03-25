@@ -106,7 +106,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
-          :height="$tableHeight - 75"
+          :height="'calc(56vh - 75px)'"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"

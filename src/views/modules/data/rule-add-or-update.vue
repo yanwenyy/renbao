@@ -12,59 +12,61 @@
                label-width="80px">
         <el-tabs type="border-card" class="self-tabs" v-model="activeName">
         <el-tab-pane name="1" label="基本信息">
-
-            <el-form-item label="规则名称" prop="ruleName">
-              <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
-            </el-form-item>
-            <el-form-item label="规则类别" prop="ruleCategory">
-              <el-select v-model="dataForm.ruleCategory">
-                <el-option label="请选择" value=""></el-option>
-                <el-option label="门诊规则" :value="1"></el-option>
-                <el-option label="住院规则" :value="2"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="规则分类"  prop="folderId">
-              <el-popover
-                ref="menuListPopover"
-                placement="bottom-start"
-                trigger="click"
-                v-model="treeVisible">
-                <el-tree
-                  class="rule-tree"
-                  :data="ruleData"
-                  :props="menuListTreeProps"
-                  node-key="folderId"
-                  ref="menuListTree"
-                  @current-change="menuListTreeCurrentChangeHandle"
-                  :default-expand-all="false"
-                  :highlight-current="true"
-                  :expand-on-click-node="false">
+            <div class="tabs1-div">
+              <el-form-item label="规则名称" prop="ruleName">
+                <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
+              </el-form-item>
+              <el-form-item label="规则类别" prop="ruleCategory">
+                <el-select v-model="dataForm.ruleCategory">
+                  <el-option label="请选择" value=""></el-option>
+                  <el-option label="门诊规则" :value="1"></el-option>
+                  <el-option label="住院规则" :value="2"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="规则分类"  prop="folderId">
+                <el-popover
+                  ref="menuListPopover"
+                  placement="bottom-start"
+                  trigger="click"
+                  v-model="treeVisible">
+                  <el-tree
+                    class="rule-tree"
+                    :data="ruleData"
+                    :props="menuListTreeProps"
+                    node-key="folderId"
+                    ref="menuListTree"
+                    @current-change="menuListTreeCurrentChangeHandle"
+                    :default-expand-all="false"
+                    :highlight-current="true"
+                    :expand-on-click-node="false">
                    <span  slot-scope="{ node }">
                       <span class="tree-label">
                           <span class="folder-icon"></span>
                           <span :title="node.label" > {{node.label}}</span>
                       </span>
                   </span>
-                </el-tree>
-              </el-popover>
-              <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
-                        placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
-            </el-form-item>
-            <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
-              <el-input type="textarea" :rows="3" v-model="dataForm.ruleRemark" placeholder="规则备注"></el-input>
-            </el-form-item>
-            <el-form-item label="创建人">
-              <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
-            </el-form-item>
-            <el-form-item label="创建时间">
-              <el-date-picker
-                readonly
-                v-model="dataForm.createTime"
-                type="datetime"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                placeholder="请选择时间">
-              </el-date-picker>
-            </el-form-item>
+                  </el-tree>
+                </el-popover>
+                <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
+                          placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
+              </el-form-item>
+              <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
+                <el-input type="textarea" :rows="6" v-model="dataForm.ruleRemark" placeholder="规则备注"></el-input>
+              </el-form-item>
+              <el-form-item label="创建人">
+                <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
+              </el-form-item>
+              <el-form-item label="创建时间">
+                <el-date-picker
+                  readonly
+                  v-model="dataForm.createTime"
+                  type="datetime"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  placeholder="请选择时间">
+                </el-date-picker>
+              </el-form-item>
+            </div>
+
         </el-tab-pane>
         <el-tab-pane name="2" label="sql编写">
           <el-button type="primary" @click="openSql()">sql编译器</el-button>
@@ -465,9 +467,6 @@
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
-        if(this.$refs.sqler){
-          this.$refs.sqler.sqlMsg='';
-        }
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
@@ -708,7 +707,19 @@
     width: 13px;
     height: 16px;
   }
-  .infoForm .el-input,.infoForm .el-select,.markItem .el-textarea{
+  .tabs1-div{
+    position: relative;
+  }
+  .markItem{
+    width: 50%;
+    position: absolute;
+    top:0;
+    right:0;
+  }
+  .markItem .el-textarea{
+    width: 80%;
+  }
+  .infoForm .el-input,.infoForm .el-select{
     width: 30%;
   }
   .infoForm .el-select >>>.el-input{
