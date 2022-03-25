@@ -38,7 +38,16 @@ export default {
         //默认打开页面
         showDialog(multipleTable, d) {
             this.dialogVisible = true;
-            this.multipleTable = multipleTable
+          this.$http({
+            url: this.$http.adornUrl(`/rule/selectByUuid/${multipleTable[0].ruleId}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+              if (data && data.code === 200) {
+                this.multipleTable = [data.result]
+              }
+          });
+
         },
         handleCheckChange (data, checked, treeData) {
             if (checked) {
