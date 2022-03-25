@@ -12,7 +12,7 @@
         <el-form-item label="项目名称" prop="project.projectName">
           <el-input @blur="verification(dataForm.project.projectName,'项目名称不能重复','projectName')" v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
-        <el-form-item label="项目周期">
+        <el-form-item label="项目周期" class="imitate-red">
           <!--<el-date-picker-->
             <!--v-model="dataForm.project.dataTime"-->
             <!--type="daterange"-->
@@ -692,6 +692,11 @@
   }
   .time-two-nolabel{
     margin-left: 0!important;
+  }
+  >>>.imitate-red>.el-form-item__label:before{
+    content: '*';
+    color: #F56C6C;
+    margin-right: 4px;
   }
 </style>
 

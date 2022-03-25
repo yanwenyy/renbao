@@ -24,6 +24,7 @@
       :paramsList="paramsList"
       :paramsSub="paramsSub"
       :from="from"
+      :treeTableClick="treeTableClick"
     ></sql-edit>
   </div>
 
@@ -120,7 +121,11 @@
       this.getSqlList();
       this.getParmasData();
     },
-
+    computed:{
+      projectId: {
+        get () { return this.$store.state.common.projectId}
+      },
+    },
     mounted(){
       if(this.treeData==[]||this.treeData.length==0){
         this.$refs.sqlEdits.dragControllerDiv()
@@ -146,6 +151,24 @@
       this.ws.close();
     },
     methods: {
+      //右侧数据树表右击事件 data传过来的node节点
+      treeTableClick(data){
+        var params={
+          projectId:this.projectId,
+          tableName:data.data.name,
+        };
+        this.$http({
+          url: this.$http.adornUrl('/sqlScript/buildSelectSql'),
+          method: 'get',
+          params: this.$http.adornParams(params)
+        }).then(({data}) => {
+          if(data.code==200){
+            this.sqlData=data.result.sql;
+          }else{
+            this.$message.error(data.message);
+          }
+        })
+      },
       //获取参数树数据
       getParmasData(){
         this.$http({

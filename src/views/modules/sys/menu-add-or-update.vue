@@ -111,8 +111,14 @@
           iconList: []
         },
         dataRule: {
-          name: [
+          menuName: [
             { required: true, message: '菜单名称不能为空', trigger: 'blur' }
+          ],
+          type: [
+            { required: true, message: '类型不能为空', trigger: 'blur' }
+          ],
+          menuUrl: [
+            { required: true, message: '菜单路由不能为空', trigger: 'blur' }
           ],
           parentName: [
             { required: true, message: '上级菜单不能为空', trigger: 'change' }

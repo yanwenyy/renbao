@@ -5,6 +5,7 @@
       custom-class="rule-dialog"
       width="80%"
       :title="!dataForm.ruleId ? '新增' : '修改'"
+      :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
@@ -49,6 +50,9 @@
               <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
                         placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
             </el-form-item>
+            <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
+              <el-input type="textarea" :rows="3" v-model="dataForm.ruleRemark" placeholder="规则备注"></el-input>
+            </el-form-item>
             <el-form-item label="创建人">
               <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
             </el-form-item>
@@ -79,6 +83,7 @@
 
         </el-tab-pane>
           <el-tab-pane name="3" label="统计sql编写">
+            <div class="tabs3-notice">此结果来自sql编译器</div>
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
                 <el-tree
@@ -98,7 +103,7 @@
                 </el-tree>
               </div>
               <div class="tabs3-right inline-block">
-                <el-input class="self-input" type="textarea" :rows="4" id="selfInput" v-model="inputValue"></el-input>
+                <el-input class="self-input" type="textarea" :rows="4" id="selfInput" v-model="dataForm.ruleSqlStatisticsValue"></el-input>
               </div>
             </div>
           </el-tab-pane>
@@ -114,6 +119,7 @@
       width="100%"
       style="height:100vh;overflow: hidden;box-sizing: border-box"
       title="sql编译器"
+      :close-on-press-escape="false"
       :close-on-click-modal="false"
       :show-close="false"
       :visible.sync="sqlVisible">
@@ -121,7 +127,7 @@
         <el-button @click="deletCm(),sqlEditMsg.msg='',sqlVisible = false">取消</el-button>
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
-      <sql-element :key="sqlKey" ref="sqler" :sqlEditMsg="sqlEditMsg.msg" :slqTabelEdt="slqTabelEdt" :modelName="'ruleManager'"></sql-element>
+      <sql-element style="margin-top: 5px" :key="sqlKey" ref="sqler" :sqlEditMsg="sqlEditMsg.msg" :slqTabelEdt="slqTabelEdt" :modelName="'ruleManager'"></sql-element>
     </el-dialog>
   </div>
 </template>
@@ -189,6 +195,8 @@
           folderPath: '',
           ruleId:'',
           paramRule:[],
+          ruleRemark:'',
+          ruleSqlStatisticsValue:'',
         },
 
 
@@ -211,6 +219,9 @@
           ],
           ruleCategory: [
             { required: true, message: '规则类别不能为空', trigger: ['blur',"change"] }
+          ],
+          ruleRemark: [
+            { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
           ],
           folderId: [
             { required: true, message: '规则分类不能为空', trigger: 'change' }
@@ -319,11 +330,11 @@
             endPos = obj.selectionEnd,
             cursorPos = startPos,
             tmpStr = obj.value;
-          obj.value = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);
+          this.dataForm.ruleSqlStatisticsValue = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);
           cursorPos += str.length;
           obj.selectionStart = obj.selectionEnd = cursorPos;
         } else {
-          obj.value += str;
+          this.dataForm.ruleSqlStatisticsValue += str;
         }
       },
 
@@ -381,7 +392,6 @@
         resultTableTabs.forEach(item=>{
           if(item.isLast=='Y'){
             this.treedata[0].children=item.columnList;
-            console.log(this.treedata)
             item.columnList.forEach((vtem)=>{
               if(vtem.columnName==(this.mustList['yljgbm'])){
                 hasBm=true;
@@ -446,6 +456,9 @@
         this.dataForm.id = 0;
         this.dataForm.ruleName = '';
         this.dataForm.ruleCategory = '';
+        this.treedata[0].children =[];
+        this.dataForm.ruleSqlStatisticsValue = '';
+        this.dataForm.ruleRemark = '';
         this.dataForm.folderId = '';
         this.dataForm.parentName = '';
         this.dataForm.ruleSqlValue = '';
@@ -507,6 +520,8 @@
               this.dataForm.ruleId = datas.ruleId;
               this.dataForm.ruleName = datas.ruleName;
               this.dataForm.ruleCategory = datas.ruleCategory;
+              this.dataForm.ruleSqlStatisticsValue = datas.ruleSqlStatisticsValue;
+              this.dataForm.ruleRemark = datas.ruleRemark;
               this.dataForm.folderId = datas.folderId;
               this.dataForm.folderPath = datas.folderPath;
               this.dataForm.createUserName = datas.createUserName;
@@ -514,6 +529,14 @@
               this.sqlEditMsg.msg = datas.ruleSqlValue;
               this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
 
+              if(datas.ruleStatisticsColumns){
+                var list=[];
+                datas.ruleStatisticsColumns.forEach((item)=>{
+                  var v={columnName:item.ruleStatisticsColumnName};
+                  list.push(v);
+                })
+                this.treedata[0].children=list;
+              }
               this.dataForm.ruleType = datas.ruleType;
               if(datas.params){
                 datas.params.forEach(item=>{
@@ -588,6 +611,11 @@
       },
       // 表单提交
       dataFormSubmit () {
+        var ruleStatisticsColumns=[];
+        this.treedata[0].children.forEach(item=>{
+          var v={ruleStatisticsColumnName:item.columnName};
+          ruleStatisticsColumns.push(v);
+        });
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -597,6 +625,9 @@
                 'ruleId': this.dataForm.ruleId || undefined,
                 'ruleName': this.dataForm.ruleName,
                 'ruleCategory': this.dataForm.ruleCategory,
+                'ruleStatisticsColumns': ruleStatisticsColumns,
+                'ruleSqlStatisticsValue': this.dataForm.ruleSqlStatisticsValue,
+                'ruleRemark': this.dataForm.ruleRemark,
                 'folderId': this.dataForm.folderId,
                 'createUserName': this.dataForm.createUserName,
                 'createTime': this.dataForm.createTime,
@@ -677,7 +708,7 @@
     width: 13px;
     height: 16px;
   }
-  .infoForm .el-input,.infoForm .el-select{
+  .infoForm .el-input,.infoForm .el-select,.markItem .el-textarea{
     width: 30%;
   }
   .infoForm .el-select >>>.el-input{
@@ -726,12 +757,16 @@
     box-sizing: border-box;
   }
   .tabs3-left{
-    width: 40%;
+    width: 30%;
     height: 30vh;
     overflow-y: auto;
   }
   .tabs3-right{
-    width: 60%;
+    width: 70%;
+  }
+  .tabs3-notice{
+    color: red;
+    margin-bottom: 5px;
   }
 </style>
 

@@ -253,6 +253,7 @@
       <!--</span>-->
     <!--</el-dialog>-->
     <params-list :paramsList="paramsList" :paramsSub="paramsSub" :paramsSql="editorValue"></params-list>
+
   </div>
 </template>
 <script>
@@ -417,6 +418,7 @@
     },
     data() {
       return {
+
         boxHeight:0,
         dragParmasList:[],//拖拽进来的参数数组
         // SelfparamsList:[],//参数设置列表
@@ -583,6 +585,7 @@
                 this.$refs.myCm.codemirror.markText(_cursor, endPos, {
                   replacedWith: dom,
                   className:"paramBlock",
+                  clearWhenEmpty:true,
                 });
               }else{
                 let pos1 = this.$refs.myCm.codemirror.getCursor();
@@ -726,8 +729,10 @@
       },300);
     },
     methods: {
-          //将参数id转换成按钮显示到页面
+
+      //将参数id转换成按钮显示到页面
       idToButton(sql,to){
+
         this.dragParmasList=[];
         if(sql){
           this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
@@ -738,6 +743,7 @@
                   this.dragParmasList.push(vtem);
                   var line=this.$refs.myCm.codemirror.getCursor().line;
                   var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
+                  var sliceString=sql.slice(0,ch[0]);
                   var id="{#"+vtem.id+"#}";
                   this.editorValue=this.editorValue.replace(id,'');
 
@@ -745,17 +751,23 @@
                   dom.className = "parmasBtn";
                   dom.innerHTML = vtem.name;
                   dom.id=id;
-                  var startCursor = {ch: to?to.ch:ch[0], line: to?to.line:line, sticky: null};
-                  const endPos = { ch: to?to.ch+("{#"+vtem.id+"#}").length:ch[0]+("{#"+vtem.id+"#}").length, line: to?to.line:line,sticky:null };
+                  var startCursor = {ch: to?to.ch+sliceString.length:ch[0], line: to?to.line:line, sticky: null};
+                  const endPos = { ch: to?to.ch+sliceString.length+("{#"+vtem.id+"#}").length:ch[0]+("{#"+vtem.id+"#}").length, line: to?to.line:line,sticky:null };
+
                   this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
                   this.$refs.myCm.codemirror.markText(startCursor, endPos, {
                     replacedWith: dom,
                     className:"paramBlock",
                   });
+
                 }
               })
             }
           })
+          if(to){
+            var _cursor=to;
+            this.$refs.myCm.codemirror.setCursor({ line: _cursor.line, ch: _cursor.ch + sql.length,sticky:null });
+          }
         }
 
       },
@@ -1199,7 +1211,7 @@
         this.editorValue = cm.getValue();
         this.getSqlMsg(this.editorValue);
         if(changes&&changes[0].origin=="paste"){
-          this.idToButton(changes[0].text[0],changes[0].to)
+          this.idToButton(changes[0].text[0],changes[0].to);
         }
         this.resetLint();
       },
@@ -1378,4 +1390,5 @@
   .box-table .el-table__header-wrapper{
     padding-top: 10px;
   }
+
 </style>

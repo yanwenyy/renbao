@@ -23,6 +23,7 @@
               node-key="id"
               :props="defaultProps"
               :default-expand-all="false"
+              @node-contextmenu="rightClick"
               @node-expand="handleNodeClick"
               @node-drag-start="handleDragStart"
               @node-drag-enter="handleDragEnter"
@@ -40,6 +41,7 @@
                          <img v-if="node.data.dataType=='3'" class="tree-icon" src="./icons/column.png" alt="">
                         {{ node.label }}
                     </span>
+
                 </span>
             </el-tree>
           </div>
@@ -97,7 +99,17 @@
                 </span>
             </el-tree>
           </div>
-
+          <div class="dev-type-main-left">
+            <!--鼠标右键菜单栏 -->
+            <div v-show="showRightMenu">
+              <ul id="menu"
+                  class="right-menu">
+                <li class="menu-item" @click="treeTableClick(treeTabelNode)">
+                  生成select语句
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -172,6 +184,11 @@
     props:{
       //参数设置确定点击事件
       paramsSub: {
+        type: Function,
+        default: null,
+      },
+      //右侧数据树表点击
+      treeTableClick: {
         type: Function,
         default: null,
       },
@@ -259,6 +276,8 @@
     },
     data() {
       return {
+        treeTabelNode:'',
+        showRightMenu:false,//左侧数据表右击弹出框状态
         selfFrom:'',
         paramsNode:{},//参数数拖拽的节点
         treeDataToHint:[],//tree数据给sql编译器提示
@@ -872,6 +891,25 @@
 
     },
     methods: {
+      //左侧右击事件
+      rightClick(event, data, node, obj) {
+        //只有表可以点击
+        if(data.dataType==2){
+          this.showRightMenu = false; // 先把模态框关死，目的是：第二次或者第n次右键鼠标的时候 它默认的是true
+          this.showRightMenu = true;
+          let menu = document.querySelector('#menu');
+          menu.style.left = event.clientX + 'px';
+          menu.style.top = event.clientY+5 + 'px';
+          // 给整个document添加监听鼠标事件，点击任何位置执行closeRightMenu方法，及时将菜单关闭
+          document.addEventListener('click', this.closeRightMenu);
+          this.treeTabelNode=node;
+        }
+      },
+      closeRightMenu() {
+        this.showRightMenu = false;
+        // 及时关掉鼠标监听事件
+        document.removeEventListener('click', this.closeRightMenu);
+      },
       //sql执行结果tab切换事件
       resultTabClick(list){
         this.resultTableTabsList=list;
@@ -1258,5 +1296,32 @@
     overflow-y: hidden;
     overflow-x: auto;
     width:100%;
+  }
+  .dev-type-main-left {
+    overflow: auto;
+    padding: 10px;
+
+  }
+  .dev-type-main-left .right-menu {
+    width: 150px;
+    z-index: 1;
+    position: fixed;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    list-style: none;
+    padding: 0;
+  }
+  .right-menu .menu-item {
+    line-height: 20px;
+    text-align: left;
+    font-size: 14px;
+    color: #606266;
+    padding: 5px;
+    cursor: pointer;
+  }
+  .right-menu li:hover {
+    background-color: #edf6ff;
+    color: #606266;
   }
 </style>

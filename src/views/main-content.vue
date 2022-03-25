@@ -80,7 +80,6 @@
     },
     watch: {
       projectId(newVal,oldVal) {
-        console.log(newVal,oldVal);
         if(newVal!=oldVal){
           this.tabsCloseAllHandle();
         }
