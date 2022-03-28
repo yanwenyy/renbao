@@ -308,9 +308,6 @@
       this.getProjectTable(2)
       this.getProjectMsg()
     },
-    created(){
-      this.getProjectMsg()
-    },
     methods: {
       // 获取项目信息
       getProjectMsg(){
@@ -447,6 +444,7 @@
   border: 1px solid #eaedf1;
   border-radius: 20px;
   padding: 10px;
+  overflow: hidden;
   /*模块标题 */
   .cardTitle{
     border-left: 5px solid #aa0f17;
