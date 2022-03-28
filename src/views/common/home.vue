@@ -509,6 +509,12 @@
   /deep/ .el-table .el-table__header-wrapper {
 	  padding-top: 0px;
   }
+  /deep/ .el-tabs__item {
+    padding: 0 10px;
+    height: 30px;
+    line-height: 25px;
+    font-size: 12px;
+  }
 }
 /* 采集监控样式*/
 .collectionList,.dataList{
