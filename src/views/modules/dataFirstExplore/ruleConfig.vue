@@ -288,7 +288,7 @@ export default {
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
-      sql: ""
+      sql: []
     };
   },
   created() {
@@ -412,6 +412,7 @@ export default {
     //搜索
     getAllSearch() {
       // this.folderId = 1;
+      this.pageIndex = "";
       this.initData();
     },
     //重置搜索
@@ -490,7 +491,7 @@ export default {
       //   this.folderId = "";
       // }
       this.initData();
-      this.clearTableChecked()
+      this.clearTableChecked();
     },
     //获取每行数据id
     getRowKeys(row) {
