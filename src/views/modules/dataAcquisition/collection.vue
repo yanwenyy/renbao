@@ -341,20 +341,12 @@ export default {
         },
         //重置
         getReset(){
-            if(this.activeName === 'audit'){
-                this.dataForm.fileName = '',
-                this.dataForm.filePath = '',
-                this.dataForm.collectStatus = '',
-                this.dataForm.startTimeBegin = '',
-                this.dataForm.startTimeEnd = ''  
-                this.apComServerData.pageIndex = 1
-            }else if(this.activeName === 'pass'){
-                this.dataForm.filePath = '',
-                this.dataForm.collectPath = '',
-                this.dataForm.startTimeBegin = '',
-                this.dataForm.startTimeEnd = ''  
-                this.apComServerData.pageIndex = 1
-            }
+            this.dataForm.fileName = '',
+            this.dataForm.filePath = '',
+            this.dataForm.collectPath = '',
+            this.dataForm.startTimeBegin = '',
+            this.dataForm.startTimeEnd = ''
+            this.apComServerData.pageIndex = 1
 
         },
         //查询

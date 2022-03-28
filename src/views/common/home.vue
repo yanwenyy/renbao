@@ -147,7 +147,7 @@
             </el-row>
           </div>
           <el-row>
-            <el-table :data="projectTable" style="width: 100%;">
+            <el-table :data="projectTable" style="width: 100%;" class="projectTable">
               <el-table-column prop="tableName" show-overflow-tooltip label="表名" />
               <el-table-column prop="numRows" show-overflow-tooltip align="center" label="数据量" width="65"/>
               <el-table-column prop="lastUpdate" show-overflow-tooltip align="center" label="更新时间" />
@@ -518,6 +518,11 @@
     padding: 5px 6px;
     border: 0;
     margin: 0;
+  }
+  .projectTable {
+    .el-button--text {
+      padding: 5px 2px;
+    }
   }
   .el-button--text,.el-button--text:focus, .el-button--text:hover {
     color: #aa0f17;

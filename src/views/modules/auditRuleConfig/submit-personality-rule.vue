@@ -78,7 +78,7 @@ export default {
             let submitPersonalityRuleData = {
                 ruleId: this.multipleTable[0].ruleId,
                 ruleName: this.multipleTable[0].ruleName,
-                ruleCategory:this.multipleTable[0].ruleCategory == '住院规则'?2 : this.multipleTable[0].ruleCategory == '门诊规则' ? 1 : '',
+                ruleCategory:this.multipleTable[0].ruleCategory ||'',
                 folderId: this.folderData.folderId,
                 folderName: this.folderData.folderName,
                 folderPath: this.folderData.folderPath,
@@ -87,6 +87,7 @@ export default {
                 ruleStatisticsColumns: this.multipleTable[0].ruleStatisticsColumns||[],
                 ruleSqlStatisticsValue: this.multipleTable[0].ruleSqlStatisticsValue||'',
                 ruleRemark: this.multipleTable[0].ruleRemark||'',
+
                 ruleSqlValue: this.multipleTable[0].ruleSqlValue||'',
                 paramRules: this.multipleTable[0].paramRules||[],
             }

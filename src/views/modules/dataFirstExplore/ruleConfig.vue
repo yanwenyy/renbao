@@ -288,7 +288,7 @@ export default {
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
-      sql: ""
+      sql: []
     };
   },
   created() {
@@ -412,6 +412,7 @@ export default {
     //搜索
     getAllSearch() {
       // this.folderId = 1;
+      this.pageIndex = "";
       this.initData();
     },
     //重置搜索
@@ -446,13 +447,18 @@ export default {
     //定时运行
     timeRun() {
       var arrIds = "";
+      var sql = [];
       for (var j = 0; j < this.multipleSelection.length; j++) {
         arrIds += this.multipleSelection[j].ruleId + ",";
       }
       if (arrIds != null && arrIds != "" && arrIds != undefined) {
         arrIds = arrIds.substr(0, arrIds.length - 1);
       }
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        sql.push(this.multipleSelection[i].ruleSqlValue);
+      }
       this.runIds = arrIds;
+      this.sql = sql;
       this.showRunDialog = true;
       this.info = true;
     },
@@ -490,7 +496,7 @@ export default {
       //   this.folderId = "";
       // }
       this.initData();
-      this.clearTableChecked()
+      this.clearTableChecked();
     },
     //获取每行数据id
     getRowKeys(row) {

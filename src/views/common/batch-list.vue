@@ -88,7 +88,7 @@ export default {
                             // 更新批次列表
                             this.$emit('refreshBitchData');
                         } else {
-                            this.$message.error('删除失败')
+                            this.$message.error(data.message)
                         }
                     }).catch(() => {
                     })
