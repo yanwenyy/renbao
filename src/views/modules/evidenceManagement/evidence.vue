@@ -21,7 +21,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="search()">查询</el-button>
         <el-button @click="reset">重置</el-button>
       </el-form-item>
       <el-form-item style="float:right">
@@ -179,7 +179,7 @@ export default {
       //传给弹窗：是否显示上传按钮
       showBtn: false,
       //传给弹窗：是否只读
-      readonly: ''
+      readonly: ""
     };
   },
   created() {
@@ -261,6 +261,11 @@ export default {
     },
     succeed() {
       this.close();
+    },
+    //查询
+    search() {
+      this.pageIndex = "";
+      this.getDataList();
     },
     //重置
     reset() {
