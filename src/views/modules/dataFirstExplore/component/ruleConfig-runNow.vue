@@ -119,7 +119,6 @@ export default {
   methods: {
     //运行确定
     submitForm(dataForm) {
-      console.log(this.sql)
       if (this.info == false) {
         //立即运行
         this.$refs["dataForm"].validate(valid => {

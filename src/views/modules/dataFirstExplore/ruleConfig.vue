@@ -447,13 +447,18 @@ export default {
     //定时运行
     timeRun() {
       var arrIds = "";
+      var sql = [];
       for (var j = 0; j < this.multipleSelection.length; j++) {
         arrIds += this.multipleSelection[j].ruleId + ",";
       }
       if (arrIds != null && arrIds != "" && arrIds != undefined) {
         arrIds = arrIds.substr(0, arrIds.length - 1);
       }
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        sql.push(this.multipleSelection[i].ruleSqlValue);
+      }
       this.runIds = arrIds;
+      this.sql = sql;
       this.showRunDialog = true;
       this.info = true;
     },
