@@ -24,27 +24,33 @@ export default {
     name:"Detail",
     data(){
         return{
-            tableList:[
-                // {
-            //     'id':'0',
-            //     'ValidateRules':'1.根据导出模板，检查必录字段是否为空。',
-            //     'ValidateStatus':'0',
-            //     'ValidateResult':'通过'
-            // },{
-            //     'id':'0',
-            //     'ValidateRules':'2.查询数据结算时间范围是否是要提取的数据时间范围。',
-            //     'ValidateStatus':'1',
-            //     'ValidateResult':'通过'
-            // },{
-            //     'id':'0',
-            //     'ValidateRules':'3. 通过对比医院数据和医院数据使用基金总金额、主单中使用基金人次，定位医院和医院数据相差情况。。',
-            //     'ValidateStatus':'2',
-            //     'ValidateResult':'通过'
-            // }
-            ]
+            tableList:[],
+            pageIndex:1,
+            pageSize:10
         }
     },
+    mounted(){
+        this.getInitList()
+    },
     methods:{
+        getInitList(){
+             this.$http({
+                url:this.$http.adornUrl('/dataQualityReport/dataQualityReportList'),
+                method: 'get',
+                params: this.$http.adornParams({
+                    pageSize:this.pageSize,
+                    pageNo:this.pageIndex
+                })
+            }).then(({data}) =>{
+                if(data && data.code === 200){
+                    this.tableList = data.result.records
+                    // this.apComServerData.total = data.result.total                   
+                }else{
+                    this.tableList = []
+                    // this.apComServerData.total = 0
+                }
+            })
+        },
         //关闭
         downloadClick(){
           

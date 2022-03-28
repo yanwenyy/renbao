@@ -157,7 +157,7 @@
         </el-tab-pane> -->
         </el-tabs>
          <!-- 查看弹框-->
-        <el-dialog title='查看日志' :close-on-click-modal="false" width="60%" :modal-append-to-body="false" :visible.sync="editShowVisible">
+        <el-dialog title='查看日志' :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="editShowVisible">
             <Edit v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId"></Edit>
         </el-dialog>
     </div>

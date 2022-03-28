@@ -4,12 +4,15 @@
         <el-row :gutter="20">
             <el-col :span="5">
                 <el-card style="height:600px;overflow-y:auto">
+
                     <div style='padding:5px'><el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input></div>
                     <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading" :filter-node-method="filterNode">
                          <span class="custom-tree-node" slot-scope="{ node, data }"> 
+                             <span class="tree-label" :title="node.label">
                             <img v-if="node.data.type =='funFolder'" class="tree-icon" src="./icon/folder.png" alt="">
                             <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt=""> 
                             {{ node.label }}
+                            </span>
                         </span>
                     </el-tree>
                 </el-card>
@@ -34,10 +37,11 @@
                         <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
                         <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>
                         <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
-                        <el-table-column align="center" label="操作">
+                        <el-table-column align="center" label="操作" min-width='120px'>
                             <template slot-scope="scope">
                                 <el-button size="small" type="text" @click="getTableStructure(scope.row)">查看表结构</el-button>
                                 <el-button size="small" type="text" @click="getTableData(scope.row)">查看表数据</el-button>
+                                <el-button size="small" type="text" @click="getTableClear(scope.row)">数据清除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -60,7 +64,7 @@
                 <el-button @click="StructureDialog = false">关 闭</el-button>
             </span>
         </el-dialog>
-         <el-dialog :title="Title" :visible.sync="tableDataVisible" width="80%" :close-on-click-modal="false">
+         <el-dialog :title="Title" :visible.sync="tableDataVisible" width="80%" :close-on-click-modal="false" v-if="tableDataVisible">
             <TableColumn :table-name="structureName" :structureList="structureList"/>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="tableDataVisible = false">关 闭</el-button>
@@ -240,6 +244,39 @@ export default {
         resetForm(){
             this.dataForm.title = '';
             this.apComServerData.pageIndex = 1
+        },
+        //数据清除
+        getTableClear(row){
+            this.$confirm('确认要清除此项目！', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+            }).then(() =>{
+                this.$http({
+                    url:this.$http.adornUrl('/prjBusDatabaseRelation/deleteTableData'),
+                    method: 'get',
+                    params: this.$http.adornParams({
+                        projectId: this.projectList.projectId,
+                        tableName:row.title
+                    })
+                }).then(({data}) =>{
+                    if(data && data.code === 200){
+                        this.$message({
+                            message: '删除成功',
+                            type: 'success',
+                        })
+                        // 更新批次列表
+                        this.$emit('refreshBitchData');
+                    }else{
+                        this.$message.error(data.message)
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消清除'
+                });
+            })
         }
     }
 }
@@ -248,4 +285,18 @@ export default {
 .itemBtn{
     text-align: center;
 }
+.custom-tree-node{
+    width: 100%;
+    display: flex;
+    // display: inline-block;
+    align-items: center;
+}
+    .tree-label {
+        max-width: 180px;
+        display: inline-block;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow:ellipsis;
+    }
 </style>

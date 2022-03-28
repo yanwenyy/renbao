@@ -55,7 +55,7 @@
         <el-dialog title='查看日志' width="70%"  :close-on-click-modal="false" append-to-body :modal-append-to-body="false" :visible.sync="editShowVisible">
             <!-- <editClick v-if="editShowVisible" @close="closeEditDrawer" @ok="EditSucceed" :collectPlanMonitorId="collectPlanMonitorId"></editClick> -->
             <div class='Edit'>
-                <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75"  style="width: 100%">
+                <el-table :data="tableData" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75">
                     <el-table-column label="步骤规则" align="center" prop="stepName"></el-table-column>
                     <el-table-column label="步骤开始时间" align="center">
                         <template slot-scope="scope">{{scope.row.stepStartTime | datetimeformat}}</template>
@@ -63,7 +63,7 @@
                     <el-table-column label="步骤结束时间" align="center">
                         <template slot-scope="scope">{{scope.row.stepEndTime | datetimeformat}}</template>
                     </el-table-column>
-                    <el-table-column label="步骤状态" align="center" prop="stepStatus">
+                    <el-table-column label="步骤状态" align="center" min-width="50" prop="stepStatus">
                         <template slot-scope="scope">
                             <div class="tac" v-if="scope.row.stepStatus=='0'">待采集</div>
                             <div class="tac" v-if="scope.row.stepStatus=='1'">进行中</div>
@@ -71,7 +71,7 @@
                             <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="步骤结果" min-width="130" align="center" prop="stepResult">
+                    <el-table-column label="步骤结果" align="center" prop="stepResult">
                     </el-table-column>
                 </el-table>
                 <div class="itemBtn">
@@ -182,5 +182,10 @@ export default {
 .itemBtn{
     text-align: center;
     margin-top: 10px;
+}
+.Edit{
+/deep/.el-table{
+padding:0;
+}
 }
 </style>
