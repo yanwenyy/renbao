@@ -72,7 +72,7 @@
                     </el-table-column>
                     <el-table-column align="center" label="日志">
                         <template slot-scope="scope">
-                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text" size="small">查看</el-button>
+                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -270,17 +270,7 @@ export default {
                 this.dataLoading = false;
             })
         },
-        //停止采集
-        getStopCollection(){
-            if(this.multipleSelection.length == 0 || this.multipleSelection.length > 1){
-                this.$confirm('请勾选一条数据','信息',{ 
-                confirmButtonText:'关闭',
-                type: 'warning',
-                })
-            }else{
 
-            }
-        },
         //查看
         editClick(id){
             this.editShowVisible = true
@@ -351,12 +341,20 @@ export default {
         },
         //重置
         getReset(){
-            this.dataForm.fileName = '',
-            this.dataForm.filePath = '',
-            this.dataForm.collectPath = '',
-            this.dataForm.startTimeBegin = '',
-            this.dataForm.startTimeEnd = ''  
-            this.apComServerData.pageIndex = 1
+            if(this.activeName === 'audit'){
+                this.dataForm.fileName = '',
+                this.dataForm.filePath = '',
+                this.dataForm.collectStatus = '',
+                this.dataForm.startTimeBegin = '',
+                this.dataForm.startTimeEnd = ''  
+                this.apComServerData.pageIndex = 1
+            }else if(this.activeName === 'pass'){
+                this.dataForm.filePath = '',
+                this.dataForm.collectPath = '',
+                this.dataForm.startTimeBegin = '',
+                this.dataForm.startTimeEnd = ''  
+                this.apComServerData.pageIndex = 1
+            }
         },
         //查询
         getSearch(){

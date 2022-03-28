@@ -40,9 +40,9 @@
           ></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item style="float:right">
+      <el-form-item style="float:right;padding:5px;">
         <el-button type="primary" @click="getDataList()">查询</el-button>
-        <el-button @click="resetForm('dataForm')">重置</el-button>
+        <el-button @click="resetForm()">重置</el-button>
         <el-button type="warning" @click="templateExport">下载模板</el-button>
         <el-button type="warning" @click="exportData">导出数据</el-button>
         <el-button type="warning" @click="importData">导入数据</el-button>
@@ -292,14 +292,12 @@ export default {
       this.fileList = [];
     },
     //重置
-    resetForm(formName) {
-      this.dataForm = {
-        hospitalName: "",
-        hospitalType: "",
-        moneyEnd: "",
-        moneyStart: ""
-      };
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.dataForm.hospitalName = '',
+      this.dataForm.hospitalType = '',
+      this.dataForm.moneyEnd = '',
+      this.dataForm.moneyStart = ''
+      this.apComServerData.pageIndex = 1
     },
     //查询
     getDataList() {
