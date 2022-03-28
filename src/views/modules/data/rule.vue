@@ -106,7 +106,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
-          :height="'calc(56vh - 75px)'"
+          :height="$tableHeight - 75"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -366,6 +366,7 @@ export default {
     // 批量导出
     ruleExport(isAll) {
       var exportList = [];
+      let ruleIds = "";
       // 判断是否为全部导出，全部导出的话exportList为空列表
       if (isAll == "one") {
         // 单个导出
@@ -377,31 +378,18 @@ export default {
         this.dataListSelections.forEach(item => {
           exportList.push(item.ruleId);
         });
-        this.ruleExportLoading = true;
+        // this.ruleExportLoading = true
+        ruleIds = exportList.join(",");
       } else {
         // 全部导出
-        this.ruleExportAllLoading = true;
+        // this.ruleExportAllLoading = true;
+        ruleIds = "";
       }
-
-      this.$http({
-        isLoading: false,
-        url: this.$http.adornUrl("/rule/setSessionRule"),
-        method: "post",
-        data: this.$http.adornData(exportList, false)
-      }).then(({ data }) => {
-        this.ruleExportLoading = false;
-        this.ruleExportAllLoading = false;
-        if (data && data.code === 200) {
-          let url =
-            this.$http.adornUrl("/rule/ruleExport?token=") +
-            this.$cookie.get("token");
-          window.open(url);
-          this.$message({ message: "导出成功", type: "success" });
-          // this.getDataList();
-        } else {
-          this.$message({ message: data.message, type: "error" });
-        }
-      });
+      window.location.href =
+        this.$http.adornUrl("/rule/ruleExport?token=") +
+        this.$cookie.get("token") +
+        "&ruleIds=" +
+        ruleIds;
     },
     // 导入
     ruleImport() {
