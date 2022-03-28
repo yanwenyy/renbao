@@ -36,7 +36,7 @@
     },
     mounted(){
       if(this.menu.name=='现场作业管理'||this.menu.name=='政策及方案管理'){
-        console.log(this.menu)
+        // console.log(this.menu)
       }
     },
     components: {

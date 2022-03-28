@@ -428,39 +428,52 @@ export default {
     },
     //立即运行
     runNow() {
-      var arrIds = "";
       var sql = [];
-      for (var j = 0; j < this.multipleSelection.length; j++) {
-        arrIds += this.multipleSelection[j].ruleId + ",";
-      }
-      if (arrIds != null && arrIds != "" && arrIds != undefined) {
-        arrIds = arrIds.substr(0, arrIds.length - 1);
-      }
       for (var i = 0; i < this.multipleSelection.length; i++) {
-        sql.push(this.multipleSelection[i].ruleSqlValue);
+        if (this.multipleSelection[i].ruleSqlValue != null) {
+          sql.push(this.multipleSelection[i].ruleSqlValue);
+        }
       }
-      this.runIds = arrIds;
-      this.sql = sql;
-      this.showRunDialog = true;
-      this.info = false;
+      if (sql.length == 0) {
+        this.$message.error("选择的规则下没有sql，无法运行");
+      } else {
+        var arrIds = "";
+        for (var j = 0; j < this.multipleSelection.length; j++) {
+          arrIds += this.multipleSelection[j].ruleId + ",";
+        }
+        if (arrIds != null && arrIds != "" && arrIds != undefined) {
+          arrIds = arrIds.substr(0, arrIds.length - 1);
+        }
+
+        this.runIds = arrIds;
+        this.sql = sql;
+        this.showRunDialog = true;
+        this.info = false;
+      }
     },
     //定时运行
     timeRun() {
-      var arrIds = "";
       var sql = [];
-      for (var j = 0; j < this.multipleSelection.length; j++) {
-        arrIds += this.multipleSelection[j].ruleId + ",";
-      }
-      if (arrIds != null && arrIds != "" && arrIds != undefined) {
-        arrIds = arrIds.substr(0, arrIds.length - 1);
-      }
       for (var i = 0; i < this.multipleSelection.length; i++) {
-        sql.push(this.multipleSelection[i].ruleSqlValue);
+        if (this.multipleSelection[i].ruleSqlValue != null) {
+          sql.push(this.multipleSelection[i].ruleSqlValue);
+        }
       }
-      this.runIds = arrIds;
-      this.sql = sql;
-      this.showRunDialog = true;
-      this.info = true;
+      if (sql.length == 0) {
+        this.$message.error("选择的规则下没有sql，无法运行");
+      } else {
+        var arrIds = "";
+        for (var j = 0; j < this.multipleSelection.length; j++) {
+          arrIds += this.multipleSelection[j].ruleId + ",";
+        }
+        if (arrIds != null && arrIds != "" && arrIds != undefined) {
+          arrIds = arrIds.substr(0, arrIds.length - 1);
+        }
+        this.runIds = arrIds;
+        this.sql = sql;
+        this.showRunDialog = true;
+        this.info = true;
+      }
     },
     //关闭规则运行弹窗
     closeRun() {

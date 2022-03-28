@@ -235,7 +235,7 @@ export default {
                 }
               });
             } else {
-              this.$message.error("操作失败");
+              this.$message.error(data.message);
             }
           });
         }

@@ -71,7 +71,7 @@
     data () {
       return {
         updatePassowrdVisible: false,
-        projectCode: '',
+        // projectCode: '',
         userId:sessionStorage.getItem("userId"),//当前用户id
       }
     },
@@ -79,6 +79,12 @@
       UpdatePassword
     },
     computed: {
+      projectCode:{
+        get () {
+          return this.$store.state.common.projectId||''
+        },
+        set (val) { this.$store.commit('common/updateProjectId', val) }
+      },
       navbarLayoutType: {
         get () { return this.$store.state.common.navbarLayoutType }
       },
@@ -106,8 +112,10 @@
         params: this.$http.adornParams()
       }).then(({ data }) => {
         if (data && data.code === 200) {
-          this.projectCode=data.result.projectId;
-          this.$store.commit('common/updateProjectId', this.projectCode)
+          if(data.result){
+            this.projectCode=data.result.projectId;
+            this.$store.commit('common/updateProjectId', this.projectCode)
+          }
           // this.$store.dispatch('common/changeProjectId', this.projectCode)
         }
       });
