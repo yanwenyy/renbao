@@ -52,6 +52,8 @@
           ref="tree"
           highlight-current
           :props="defaultProps"
+          :check-strictly="isCheck"
+          @node-click="isCheck=true"
         >
         </el-tree>
       </div>
@@ -64,6 +66,7 @@ import { treeDataTranslate } from "@/utils";
 export default {
   data() {
     return {
+      isCheck:true,
       checkboxTree: 0,
       selTree: [],
       userIdList: [],
@@ -233,6 +236,7 @@ export default {
         params: this.$http.adornParams({ userId: id })
       }).then(({ data }) => {
         var datas = data.result;
+
         datas.forEach(item => {
           this.selTree.push(item.menuId);
         });
@@ -246,6 +250,11 @@ export default {
             "menuId",
             "menuParentId"
           );
+          this.$nextTick(() => {
+            //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
+            this.$refs.tree.setCheckedKeys(this.selTree);//给树节点赋值
+            this.isCheck= false //重点： 赋值完成后 设置为false
+          })
         });
       });
     },

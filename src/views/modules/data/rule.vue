@@ -287,6 +287,9 @@ export default {
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);
+    },
+    tableMinus(val){
+      this.tableMinus=val;
     }
   },
   components: {
@@ -304,7 +307,8 @@ export default {
     });
     window.onresize = () => {
       // console.log(document.documentElement['clientHeight'])
-      // this.documentClientHeight = document.documentElement['clientHeight']
+      // var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
+      // this.tableMinus = _num*0.125;
     }
   },
   methods: {
