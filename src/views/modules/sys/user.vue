@@ -66,7 +66,7 @@
       <el-button @click="reset()">重置</el-button>
     </el-form>
     <el-table
-      :height="'calc(56vh - 60px)'"
+      :height="tableHeight-60"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -207,6 +207,11 @@ export default {
       fileList: [],
       token: this.$cookie.get("token")
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   components: {
     AddOrUpdate

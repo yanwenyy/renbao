@@ -2,6 +2,8 @@ import httpRequest from '@/utils/httpRequest'
 export default {
   namespaced: true,
   state: {
+    //table高度
+    tableHeight:0,
     // 页面文档可视高度(随窗口改变大小)
     documentClientHeight: 0,
     // 导航条, 布局风格, defalut(默认) / inverse(反向)
@@ -24,6 +26,7 @@ export default {
   mutations: {
     updateDocumentClientHeight (state, height) {
       state.documentClientHeight = height
+      state.tableHeight = height-270;
     },
     updateNavbarLayoutType (state, type) {
       state.navbarLayoutType = type

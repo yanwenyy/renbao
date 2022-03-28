@@ -44,7 +44,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      :height="'calc(56vh)'"
+      :height="tableHeight"
       :data="dataList"
       border
       v-loading="dataListLoading"
@@ -180,6 +180,11 @@ export default {
       //弹窗按钮
       showBtn: ""
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   components: {
     addOrUpdate,

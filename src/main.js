@@ -41,9 +41,10 @@ Vue.prototype.$tableHeight = document.documentElement.clientHeight-270;
 
 // Vue.prototype.$tableHeight = window.innerHeight-270;
 
-window.addEventListener('resize', () => {
-  // console.log(window.innerHeight)
-}, false);
+// window.addEventListener('resize', () => {
+//   Vue.prototype.$tableHeight = window.innerHeight-270;
+//   console.log(Vue.prototype.$tableHeight)
+// }, false);
 Vue.prototype.$moment = moment
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法

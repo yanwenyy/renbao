@@ -44,7 +44,6 @@
       </div>
       <div style="margin-top: 5%">
         <el-tree
-          :check-strictly="true"
           :default-checked-keys="selTree"
           :data="dataRight"
           show-checkbox
@@ -256,7 +255,7 @@ export default {
     },
     getCheckedNodes() {
       // console.log(this.$refs.tree.getCheckedNodes());
-      var list = this.$refs.tree.getCheckedNodes(),
+      var list = this.$refs.tree.getCheckedNodes().concat(this.$refs.tree.getHalfCheckedNodes()),
         dataList = [];
       if (this.userIdList.length > 0) {
         list.forEach(item => {

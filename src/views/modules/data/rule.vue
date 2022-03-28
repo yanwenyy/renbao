@@ -106,7 +106,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
-          :height="'calc(56vh - 75px)'"
+          :height="tableHeight-tableMinus"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -220,6 +220,7 @@ import ImportFile from "./Import-file.vue";
 export default {
   data() {
     return {
+      tableMinus:75,
       ruleData: {}, //组件规则数数据
       form: {
         name: ""
@@ -278,6 +279,11 @@ export default {
       ruleCheckData: {}
     };
   },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);
@@ -296,6 +302,10 @@ export default {
     this.$bus.$on("updateRuleData", () => {
       this.getRuleFolder();
     });
+    window.onresize = () => {
+      // console.log(document.documentElement['clientHeight'])
+      // this.documentClientHeight = document.documentElement['clientHeight']
+    }
   },
   methods: {
     // 新增 / 修改
