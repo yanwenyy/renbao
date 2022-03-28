@@ -1,4 +1,3 @@
-<!--证据管理-->
 <template>
   <div class="mod-role">
     <el-form
@@ -6,17 +5,10 @@
       :model="dataForm"
       @keyup.enter.native="getDataList()"
     >
-      <el-form-item label="证据名称：">
+      <el-form-item label="疑点报告名称：">
         <el-input
-          v-model="dataForm.evidenceName"
-          placeholder="证据名称"
-          clearable
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="创建人:">
-        <el-input
-          v-model="dataForm.createUserName"
-          placeholder="创建人"
+          v-model="dataForm.roleNumber"
+          placeholder="疑点报告名称"
           clearable
         ></el-input>
       </el-form-item>
@@ -24,68 +16,40 @@
         <el-button type="primary" @click="search()">查询</el-button>
         <el-button @click="reset">重置</el-button>
       </el-form-item>
-      <el-form-item style="float:right">
-        <el-button
-          type="primary"
-          :disabled="multipleSelection.length <= 0"
-          @click="downLoadFile()"
-          >导出附件</el-button
-        >
-        <el-button type="primary" @click="addHandle()">新增</el-button>
-        <el-button
-          type="primary"
-          @click="editHandle"
-          :disabled="
-            multipleSelection.length <= 0 || multipleSelection.length > 1
-          "
-          >修改</el-button
-        >
-        <el-button
-          type="danger"
-          @click="deleteHandle"
-          :disabled="multipleSelection.length <= 0"
-          >删除</el-button
-        >
-      </el-form-item>
     </el-form>
     <el-table
+      :height="'calc(56vh)'"
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
-      :height="$tableHeight - 10"
     >
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50"
       >
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
-        prop="evidenceName"
+        prop="draftName"
         header-align="center"
         align="center"
-        label="证据名称"
+        label="疑点报告名称"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="roleName"
+        header-align="center"
+        align="center"
+        label="报告规则"
       >
         <template slot-scope="scope">
           <el-button type="text" @click="detail(scope.row)">{{
-            scope.row.evidenceName
+            scope.row.roleName
           }}</el-button>
         </template>
-      </el-table-column>
-      <el-table-column
-        prop="fileNames"
-        header-align="center"
-        align="center"
-        label="附件"
-      >
-        <!-- <template slot-scope="scope">
-          <el-button type="text" @click="detail(scope.row)">{{
-            scope.row.fileNames
-          }}</el-button>
-        </template> -->
       </el-table-column>
       <el-table-column
         prop="createUserName"
@@ -101,26 +65,28 @@
         label="创建时间"
       >
       </el-table-column>
-      <el-table-column
-        prop="relation"
-        header-align="center"
-        align="center"
-        label="是否被底稿关联"
-      >
+      <el-table-column header-align="center" align="center" label="操作">
+        <!-- <template slot-scope="scope">
+          <el-button type="text" @click="editHandle(scope.row)">修改</el-button>
+          <el-button type="text" @click="deleteHandle(scope.row)"
+            >删除</el-button
+          >
+        </template> -->
+        <template slot-scope="scope">
+          <el-button type="text" @click="downLoad(scope.row)">下载</el-button>
+        </template>
       </el-table-column>
     </el-table>
-    <div style="float:right">
-      <el-pagination
-        @size-change="sizeChangeHandle"
-        @current-change="currentChangeHandle"
-        :current-page="pageIndex"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="pageSize"
-        :total="totalPage"
-        layout="total, sizes, prev, pager, next, jumper"
-      >
-      </el-pagination>
-    </div>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"
+    >
+    </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <el-dialog
       :visible.sync="showAddDialog"
@@ -129,32 +95,42 @@
       :modal-append-to-body="false"
       width="40%"
       :close-on-press-escape="false"
-      append-to-body
     >
       <addOrUpdate
         @close="closeAddDrawer"
         @ok="addSucceed"
         v-if="showAddDialog"
         :id="id"
-        :showFileTable="showFileTable"
         :showBtn="showBtn"
         :readonly="readonly"
       ></addOrUpdate>
     </el-dialog>
+    <!-- 弹窗, 授权用户 -->
+    <!-- <el-dialog
+      :visible.sync="showAuthorityUser"
+      title="授权用户"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      width="60%"
+      :close-on-press-escape="false"
+    >
+      <authorityUser
+        @close="close"
+        @ok="succeed"
+        v-if="showAuthorityUser"
+      ></authorityUser>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
-import addOrUpdate from "./evidence-addOrUpdate.vue";
+// import authorityUser from "./authorityUser.vue";
+// import addOrUpdate from "./role-add-or-update.vue";
 export default {
-  components: {
-    addOrUpdate
-  },
   data() {
     return {
       dataForm: {
-        evidenceName: "",
-        createUserName: ""
+        draftName: ""
       },
       //列表数据
       dataList: [],
@@ -167,20 +143,22 @@ export default {
       //列表加载
       dataListLoading: false,
       //多选数据
-      multipleSelection: [],
+      dataListSelections: [],
       //新增修改弹窗
       showAddDialog: false,
+      //授权用户弹窗
+      // showAuthorityUser: false,
       //传给修改弹窗的子组件id
       id: "",
       //弹窗标题
       title: "",
-      //传给弹窗：是否显示附件列表
-      showFileTable: false,
-      //传给弹窗：是否显示上传按钮
-      showBtn: false,
-      //传给弹窗：是否只读
-      readonly: ""
+      //弹窗按钮
+      showBtn: ""
     };
+  },
+  components: {
+    // addOrUpdate,
+    // authorityUser
   },
   created() {
     this.getDataList();
@@ -188,15 +166,15 @@ export default {
   methods: {
     // 获取数据列表
     getDataList() {
-      // this.dataListLoading = true;
+      this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/evidence/selectPage"),
+        url: this.$http.adornUrl("/draft/selectDraftPage"),
         method: "get",
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
-          evidenceName: this.dataForm.evidenceName,
-          createUserName: this.dataForm.createUserName
+          roleNumber: this.dataForm.roleNumber,
+          roleName: this.dataForm.roleName
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -206,7 +184,7 @@ export default {
           this.dataList = [];
           this.totalPage = 0;
         }
-        // this.dataListLoading = false;
+        this.dataListLoading = false;
       });
     },
     // 每页数
@@ -222,32 +200,28 @@ export default {
     },
     // 多选
     selectionChangeHandle(val) {
-      this.multipleSelection = val;
+      this.dataListSelections = val;
     },
     //新增
     addHandle() {
       this.showAddDialog = true;
-      this.title = "新增证据";
-      this.id = "";
-      this.showFileTable = false;
+      this.title = "新增角色";
       this.showBtn = true;
-      this.readonly = false;
+      this.id = "";
     },
     //修改
     editHandle(data) {
       this.showAddDialog = true;
-      this.title = "修改证据";
-      this.id = this.multipleSelection[0].evidenceId;
-      this.showFileTable = true;
+      this.title = "修改角色";
+      this.id = data.roleId;
       this.showBtn = true;
       this.readonly = false;
     },
     //查看详情
     detail(data) {
       this.showAddDialog = true;
-      this.title = "查看详情";
-      this.id = data.evidenceId;
-      this.showFileTable = true;
+      this.title = "查看角色";
+      this.id = data.roleId;
       this.showBtn = false;
       this.readonly = true;
     },
@@ -256,31 +230,31 @@ export default {
       this.showAddDialog = false;
     },
     addSucceed() {
-      this.showAddDialog = false;
+      this.closeAddDrawer();
       this.getDataList();
     },
+    //关闭授权用户弹窗
+    /* close() {
+      this.showAuthorityUser = false;
+    }, */
+    //授权用户弹窗关闭
     succeed() {
       this.close();
     },
-    //查询
-    search() {
-      this.pageIndex = "";
-      this.getDataList();
+    //授权用户
+    downLoad(data) {
+      //   this.showAuthorityUser = true;
     },
     //重置
     reset() {
       this.dataForm = {
-        roleName: "",
-        roleNumber: ""
+        draftName: ""
       };
       this.getDataList();
     },
     // 删除
-    deleteHandle() {
-      var evidenceIds = [];
-      this.multipleSelection.forEach(item => {
-        evidenceIds.push(item.evidenceId);
-      });
+    deleteHandle(data) {
+      var roleId = data.roleId;
       this.$confirm(`确定进行删除操作?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -288,9 +262,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
-            method: "post",
-            data: this.$http.adornData(evidenceIds, false)
+            url: this.$http.adornUrl("/role/delete/" + roleId),
+            method: "post"
+            // data: this.$http.adornData(userIds, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
@@ -307,20 +281,6 @@ export default {
           });
         })
         .catch(() => {});
-    },
-    downLoadFile() {
-      var evidenceIds = "";
-      for (var i = 0; i < this.multipleSelection.length; i++) {
-        evidenceIds += this.multipleSelection[i].evidenceId + ",";
-      }
-      if (evidenceIds.length > 0) {
-        evidenceIds = evidenceIds.substr(0, evidenceIds.length - 1);
-      }
-      let url =
-        this.$http.adornUrl(
-          "/evidence/downloadAttachments?evidenceIds=" + evidenceIds + "&token="
-        ) + this.$cookie.get("token");
-      window.open(url);
     }
   }
 };

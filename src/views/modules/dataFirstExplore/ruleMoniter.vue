@@ -457,4 +457,8 @@ export default {
   margin-right: 10px;
   height: 80vh;
 }
+.result-view-text {
+   color: #0cbde5;
+   cursor: pointer;
+}
 </style>
