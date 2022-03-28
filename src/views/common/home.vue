@@ -38,7 +38,7 @@
           <div class="cardTitle"><el-row style="margin-left:10px">流程中心<div class="cardMore" @click="toDetailPage()">查看更多</div></el-row></div>
           <div>
              <el-tabs v-model="activeName" @tab-click="handleClick">
-              <el-tab-pane label="我的代办" name="todo">
+              <el-tab-pane label="我的待办" name="todo">
                 <div> 
                   <el-table :data="todoList" width="85%">
                       <el-table-column prop="title" label="需求标题" show-overflow-tooltip></el-table-column>
@@ -216,7 +216,7 @@
     },
     data(){
       return{
-        // 代办列表
+        // 待办列表
         todoList:[
           {
             'title': '吸痰护理每日收费违规',
@@ -252,7 +252,7 @@
             'createTime': '2022-03-24'
           }
         ],
-        // 代办页签
+        // 待办页签
         activeName: 'todo',
         // 按钮样式
         buttonClass: 'el-button--danger',
@@ -329,7 +329,7 @@
           }
         })
       },
-      // 代办页签切换
+      // 待办页签切换
       handleClick(tab, event) {
 
       },
@@ -504,7 +504,7 @@
     padding: 3px;
   }
 }
-/*代办样式 */
+/*待办样式 */
 .todoList{
   /deep/ .el-table .el-table__header-wrapper {
 	  padding-top: 0px;
