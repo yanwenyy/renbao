@@ -38,12 +38,12 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 Vue.prototype.$tableHeight = document.documentElement.clientHeight-270;
+
 // Vue.prototype.$tableHeight = window.innerHeight-270;
 
-// window.addEventListener('resize', () => {
-//   Vue.prototype.$tableHeight = window.innerHeight-270;
-//   console.log(window.innerHeight,Vue.prototype.$tableHeight);
-// }, false);
+window.addEventListener('resize', () => {
+  // console.log(window.innerHeight)
+}, false);
 Vue.prototype.$moment = moment
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法

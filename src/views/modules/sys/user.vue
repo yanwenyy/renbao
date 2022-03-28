@@ -332,7 +332,7 @@ export default {
     },
     // 序号翻页递增
     indexMethod(index) {
-      console.log("索引数下标", index);
+      // console.log("索引数下标", index);
       let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
       let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
       return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
