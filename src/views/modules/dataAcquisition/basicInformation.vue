@@ -60,7 +60,7 @@
         :data="tableList"
         border
         style="100%"
-        :height="$tableHeight - 75"
+        :height="'calc(56vh - 10px)'"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange"
@@ -76,7 +76,7 @@
           ></el-table-column>
         </template>
       </el-table>
-      <!-- <el-pagination 
+      <!-- <el-pagination
                 :page-size="apComServerData.size"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="apComServerData.total"

@@ -35,7 +35,7 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" :height="'calc(56vh - 100px)'" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
@@ -77,7 +77,7 @@
                     </el-table-column>
                 </el-table>
             </div>
-            <el-pagination 
+            <el-pagination
                 :page-size="apComServerData.pageSize"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="apComServerData.total"
@@ -131,7 +131,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-pagination 
+                <el-pagination
                     :page-size="apComServerData.pageSize"
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="apComServerData.total"
@@ -150,7 +150,7 @@
                 </el-dialog>
             </div>
             <!-- <HospitalList v-if="activeName == 'pass'" ref="pass" @satDataHospital='satDataHospital' @dataList ="dataForm"></HospitalList></el-tab-pane> -->
-        </el-tab-pane> 
+        </el-tab-pane>
         <!--医院基本信息 暂时注释-->
         <!-- <el-tab-pane label="医院基本信息" name="noPass">
             <InformationList v-if="activeName == 'noPass'" @satDatalist='satDatalist' ref="noPass" @dataList ="dataForm"></InformationList>
@@ -230,7 +230,7 @@ export default {
         handleSelectionChange(val){
              this.multipleSelection = val
         },
-        
+
         //tab事件
         handleClick(tab,event){
             if(tab.name == 'audit'){
@@ -240,7 +240,7 @@ export default {
                 this.activeName = tab.name;
                 this.getDataList()
             }
-          
+
 
         },
         //初始化数据
@@ -262,7 +262,7 @@ export default {
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableList = data.result.records
-                    this.apComServerData.total = data.result.total                   
+                    this.apComServerData.total = data.result.total
                 }else{
                     this.tableList = []
                     this.apComServerData.total = 0
@@ -290,7 +290,7 @@ export default {
                     collectStatus:this.dataForm.collectStatus || '',
                     startTimeBegin:this.dataForm.startTimeBegin,
                     startTimeEnd:this.dataForm.startTimeEnd
-                
+
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
@@ -308,7 +308,7 @@ export default {
             this.showViewVisible = true,
             this.collectPlanMonitorIds = val.hospitalCollectPlanId
         },
-        
+
         EditSucceed(){this.closeEditDrawer()},
         closeEditDrawer(){ this.editShowVisible = false},
         //关闭弹框
@@ -355,6 +355,7 @@ export default {
                 this.dataForm.startTimeEnd = ''  
                 this.apComServerData.pageIndex = 1
             }
+
         },
         //查询
         getSearch(){
