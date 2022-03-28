@@ -44,6 +44,7 @@
       </div>
       <div style="margin-top: 5%">
         <el-tree
+          :check-strictly="true"
           :default-checked-keys="selTree"
           :data="dataRight"
           show-checkbox
