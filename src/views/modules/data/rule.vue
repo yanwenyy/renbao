@@ -106,7 +106,7 @@
           <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
         </div>
         <el-table
-          :height="$tableHeight - 75"
+          :height="'calc(56vh - 75px)'"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -507,9 +507,10 @@ export default {
   margin-left: 0 !important;
 }
 .custom-tree-container {
-  overflow-y: hidden;
+  /*overflow-y: hidden;*/
   overflow-x: auto;
   width: 100%;
+  height: 100%;
 }
 .el-tree {
   min-width: 100%;

@@ -33,7 +33,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      :height="$tableHeight-75"
+      :height="'calc(56vh - 75px)'"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -163,7 +163,13 @@
         addOrUpdateVisible: false,
         value: '',
         value1: '',
+        userId:sessionStorage.getItem("userId"),//当前用户id
       }
+    },
+    computed: {
+      projectId: {
+        get () { return this.$store.state.common.projectId}
+      },
     },
     components: {
       AddOrUpdate
@@ -184,7 +190,6 @@
       },
       // 获取数据列表
       getDataList () {
-        console.log(this.value1)
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/xmProject/selectPage'),
@@ -251,7 +256,22 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.getDataList();
+                  if(this.projectId==id){
+                    this.$store.commit('common/updateProjectId', '');
+                    this.$http({
+                      isLoading:false,
+                      url: this.$http.adornUrl('/nowProject/saveOrUpdateByCreateUserId'),
+                      method: 'post',
+                      data:  this.$http.adornData({projectId: '',createUserId:this.userId})
+                    }).then(({data}) => {
+                      if (data.code == 200) {
+
+                      }
+                    })
+
+                  }
+                  this.$store.dispatch('common/changeProjectList',this.userId);
                 }
               })
             } else {
