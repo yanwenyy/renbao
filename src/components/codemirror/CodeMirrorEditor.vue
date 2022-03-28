@@ -119,7 +119,8 @@
                 </el-table-column>
               </el-table>
             </div>
-            <el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">
+            <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
+            <el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
               <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
                 <template slot-scope="scope">
                   <div>
@@ -128,6 +129,16 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination
+              @size-change="(val)=>{sizeChangeTable(val,item,index)}"
+              @current-change="(val)=>{currentChangeTable(val,item,index)}"
+              :current-page="item.pageIndex"
+              :page-sizes="[10, 20, 50, 100]"
+              :page-size="item.pageSize"
+              :total="item.totalPage"
+              layout="total, sizes, prev, pager, next, jumper"
+            >
+            </el-pagination>
           </el-tab-pane>
         </el-tabs>
 
@@ -689,6 +700,10 @@
               this.resultTableTabsValue=this.resultTableTabs.length>0?String(this.resultTableTabs.length-1):'0';
               this.resultTableTabs=val;
               this.resultTableTabs.forEach(item=>{
+                item.totalPage=item.list.length;
+                item.pageIndex=1;
+                item.pageSize=10;
+                item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
                 if(item.columnList){
                   var v={};
                   item.columnList.forEach(vtem=>{
@@ -732,7 +747,21 @@
       },300);
     },
     methods: {
-
+      //执行结果页码点击
+      currentChangeTable(val,item,index){
+        item.pageIndex=val;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
+      //执行结果页数改变
+      sizeChangeTable(val,item){
+        item.pageSize=val;
+        item.pageIndex = 1;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
       //将参数id转换成按钮显示到页面
       idToButton(sql,to){
 
