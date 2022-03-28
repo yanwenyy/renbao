@@ -7,10 +7,10 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :before-close="handleClose"
+      width="35%"
     >
       <div class="rule-operation">
         <el-form
-          size="small"
           ref="ruleOperationForm"
           :model="ruleOperationForm"
           :rules="ruleOperationFormRules"
@@ -65,10 +65,9 @@
           type="primary"
           @click="onSubmit('ruleOperationForm')"
           :loading="loading"
-          size="small"
           >确 定</el-button
         >
-        <el-button @click="cancel" size="small">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
       </span>
     </el-dialog>
     <hospital-selection ref="hospitalSelection"></hospital-selection>

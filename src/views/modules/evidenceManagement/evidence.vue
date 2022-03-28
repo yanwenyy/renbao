@@ -29,7 +29,7 @@
           type="primary"
           :disabled="multipleSelection.length <= 0"
           @click="downLoadFile()"
-          >导出附件</el-button
+          >附件下载</el-button
         >
         <el-button type="primary" @click="addHandle()">新增</el-button>
         <el-button

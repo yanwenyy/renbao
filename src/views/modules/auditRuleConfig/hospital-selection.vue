@@ -5,7 +5,7 @@
       title="选择医院"
       :visible.sync="innerVisible"
       :close-on-click-modal="false"
-      width="1200px"
+      width="90%"
       :close-on-press-escape="false"
       :before-close="handleClose"
     >
@@ -53,14 +53,10 @@
             </div> -->
       <basicInformation ref="hospital"></basicInformation>
       <span slot="footer" class="dialog-footer">
-        <el-button
-          type="primary"
-          @click="onSubmit('form')"
-          :loading="loading"
-          size="small"
+        <el-button type="primary" @click="onSubmit('form')" :loading="loading"
           >确 定</el-button
         >
-        <el-button @click="cancel" size="small">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
       </span>
     </el-dialog>
   </div>
