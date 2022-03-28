@@ -165,7 +165,7 @@ export default {
   methods: {
     //初始化列表数据
     initData() {
-      this.loading = true;
+      // this.loading = true;
       this.$http({
         url: this.$http.adornUrl("batchResultExport/selectPage"),
         method: "get",
@@ -185,7 +185,7 @@ export default {
           this.tableData = [];
           this.Pager.total = 0;
           this.dataForm.total = 0;
-          this.loading = false;
+          // this.loading = false;
         }
       });
     },

@@ -22,17 +22,6 @@
           :readonly="readonly"
         ></el-input>
       </el-form-item>
-      <el-form-item prop="evidenceName" label="证据：">
-        <el-input
-          style="width:80%"
-          v-model="dataForm.evidenceName"
-          placeholder="请选择"
-          disabled
-        ></el-input>
-        <el-button v-if="!readonly" type="primary" @click="chooseEvidence"
-          >选择</el-button
-        >
-      </el-form-item>
       <el-form-item prop="hospitalName" label="医院：">
         <el-input
           style="width:80%"
@@ -41,6 +30,17 @@
           disabled
         ></el-input>
         <el-button v-if="!readonly" type="primary" @click="chooseHospital"
+          >选择</el-button
+        >
+      </el-form-item>
+      <el-form-item prop="evidenceName" label="证据：">
+        <el-input
+          style="width:80%"
+          v-model="dataForm.evidenceName"
+          placeholder="请选择"
+          disabled
+        ></el-input>
+        <el-button v-if="!readonly" type="primary" @click="chooseEvidence"
           >选择</el-button
         >
       </el-form-item>
@@ -93,7 +93,6 @@
       :close-on-click-modal="false"
       :modal-append-to-body="false"
       width="80%"
-      height="200px"
       :close-on-press-escape="false"
       append-to-body
     >
