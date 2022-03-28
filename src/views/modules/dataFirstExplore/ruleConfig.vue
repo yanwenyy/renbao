@@ -111,37 +111,39 @@
               </template>
             </el-table-column>
           </el-table>
-          <div style="float:left;margin-top:10px">
-            <el-button-group>
-              <el-button
-                >当前选择规则数量：{{
-                  this.multipleSelection.length
-                }}</el-button
-              >
-              <el-button
-                :disabled="this.multipleSelection.length <= 0"
-                @click="runNow"
-                >立即运行</el-button
-              >
-              <el-button
-                :disabled="this.multipleSelection.length <= 0"
-                @click="timeRun"
-                >定时运行</el-button
-              >
-              <el-popover
-                placement="top"
-                trigger="click"
-                v-if="this.multipleSelection.length > 0"
-              >
-                <p v-for="(i, k) in multipleSelection" :key="k">
-                  {{ i.ruleName }}
-                </p>
-                <el-button slot="reference">当前所选规则</el-button>
-              </el-popover>
-              <el-button v-else>当前所选规则</el-button>
-            </el-button-group>
-          </div>
-          <div>
+          <el-row>
+            <div style="float:left;margin-top:10px">
+              <el-button-group>
+                <el-button
+                  >当前选择规则数量：{{
+                    this.multipleSelection.length
+                  }}</el-button
+                >
+                <el-button
+                  :disabled="this.multipleSelection.length <= 0"
+                  @click="runNow"
+                  >立即运行</el-button
+                >
+                <el-button
+                  :disabled="this.multipleSelection.length <= 0"
+                  @click="timeRun"
+                  >定时运行</el-button
+                >
+                <el-popover
+                  placement="top"
+                  trigger="click"
+                  v-if="this.multipleSelection.length > 0"
+                >
+                  <p v-for="(i, k) in multipleSelection" :key="k">
+                    {{ i.ruleName }}
+                  </p>
+                  <el-button slot="reference">当前所选规则</el-button>
+                </el-popover>
+                <el-button v-else>当前所选规则</el-button>
+              </el-button-group>
+            </div>
+          </el-row>
+          <el-row>
             <el-pagination
               @size-change="sizeChangeHandle"
               @current-change="currentChangeHandle"
@@ -152,7 +154,7 @@
               layout="total, sizes, prev, pager, next, jumper"
             >
             </el-pagination>
-          </div>
+          </el-row>
         </div>
         <!--查看详细弹窗 -->
         <el-dialog

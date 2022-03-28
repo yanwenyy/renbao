@@ -66,9 +66,9 @@
                 <div v-if="scope.row.batchResultExportStatus == 1">待执行</div>
                 <div v-if="scope.row.batchResultExportStatus == 2">执行中</div>
                 <div v-if="scope.row.batchResultExportStatus == 3">
-                  执行失败
+                  已完成
                 </div>
-                <div v-if="scope.row.batchResultExportStatus == 4">已完成</div>
+                <div v-if="scope.row.batchResultExportStatus == 4">执行失败</div>
               </template>
             </el-table-column>
             <!--  <el-table-column prop="moblie" label="操作">
@@ -121,8 +121,8 @@ export default {
       batchResultExportStatus: [
         { id: 1, name: "待执行" },
         { id: 2, name: "执行中" },
-        { id: 3, name: "执行失败" },
-        { id: 4, name: "已完成" }
+        { id: 3, name: "已完成" },
+        { id: 4, name: "执行失败" }
       ],
       //loading
       treeLoading: false,

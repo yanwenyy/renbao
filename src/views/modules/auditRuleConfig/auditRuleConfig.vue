@@ -81,36 +81,39 @@
             >
             </el-table-column>
           </el-table>
-          <div style="float:left;margin-top:10px">
-            <el-button-group>
-              <el-button
-                >当前选择规则数量：{{ multipleTable.length }}</el-button
-              >
-              <el-button
-                :disabled="this.multipleTable.length <= 0"
-                @click="executeImmediatelyClick"
-                >立即执行</el-button
-              >
-              <el-button
-                :disabled="this.multipleTable.length <= 0"
-                @click="timedExecutionClick"
-                >定时执行</el-button
-              >
-              <el-popover
-                placement="top"
-                width="400"
-                v-if="multipleTable.length > 0"
-                trigger="click"
-              >
-                <p v-for="(i, k) in multipleTable" :key="k">
-                  {{ i.ruleName }}
-                </p>
-                <el-button slot="reference">当前所选规则</el-button>
-              </el-popover>
-              <el-button v-else>当前所选规则</el-button>
-            </el-button-group>
-          </div>
-          <div>
+          <el-row>
+            <div style="float:left;margin-top:10px">
+              <el-button-group>
+                <el-button
+                  >当前选择规则数量：{{ multipleTable.length }}</el-button
+                >
+                <el-button
+                  :disabled="this.multipleTable.length <= 0"
+                  @click="executeImmediatelyClick"
+                  >立即执行</el-button
+                >
+                <el-button
+                  :disabled="this.multipleTable.length <= 0"
+                  @click="timedExecutionClick"
+                  >定时执行</el-button
+                >
+                <el-popover
+                  placement="top"
+                  width="400"
+                  v-if="multipleTable.length > 0"
+                  trigger="click"
+                >
+                  <p v-for="(i, k) in multipleTable" :key="k">
+                    {{ i.ruleName }}
+                  </p>
+                  <el-button slot="reference">当前所选规则</el-button>
+                </el-popover>
+                <el-button v-else>当前所选规则</el-button>
+              </el-button-group>
+            </div>
+          </el-row>
+
+          <el-row>
             <el-pagination
               @size-change="sizeChangeHandle"
               @current-change="currentChangeHandle"
@@ -121,7 +124,7 @@
               layout="total, sizes, prev, pager, next, jumper"
             >
             </el-pagination>
-          </div>
+          </el-row>
         </div>
       </el-card>
     </div>
@@ -299,7 +302,7 @@ export default {
       this.searchForm.ruleName = "";
       this.searchForm.ruleCategory = "";
       this.Pager.pageIndex = 1;
-      this.getSelectPage()
+      this.getSelectPage();
       // 调用规则树的重置方法
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
@@ -388,12 +391,23 @@ export default {
           message: "请选择至少一条数据",
           type: "warning"
         });
-      this.$refs.ruleOperation.showDialog(
-        this.multipleTable,
-        "immediately",
-        [],
-        {}
-      );
+
+      var sql = [];
+      for (var i = 0; i < this.multipleTable.length; i++) {
+        if (this.multipleTable[i].ruleSqlValue != null) {
+          sql.push(this.multipleTable[i].ruleSqlValue);
+        }
+      }
+      if (sql.length == 0) {
+        this.$message.error("选择的规则下没有sql，无法运行");
+      } else {
+        this.$refs.ruleOperation.showDialog(
+          this.multipleTable,
+          "immediately",
+          [],
+          {}
+        );
+      }
     },
     // 定时执行
     timedExecutionClick() {
@@ -402,7 +416,23 @@ export default {
           message: "请选择至少一条数据",
           type: "warning"
         });
-      this.$refs.ruleOperation.showDialog(this.multipleTable, "timing", [], {});
+
+      var sql = [];
+      for (var i = 0; i < this.multipleTable.length; i++) {
+        if (this.multipleTable[i].ruleSqlValue != null) {
+          sql.push(this.multipleTable[i].ruleSqlValue);
+        }
+      }
+      if (sql.length == 0) {
+        this.$message.error("选择的规则下没有sql，无法运行");
+      } else {
+        this.$refs.ruleOperation.showDialog(
+          this.multipleTable,
+          "timing",
+          [],
+          {}
+        );
+      }
     }
   },
   computed: {
