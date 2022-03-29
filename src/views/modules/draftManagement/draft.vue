@@ -75,10 +75,10 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="avgRunTime"
+              prop="ruleCategory"
               header-align="center"
               align="center"
-              label="平均运行时间"
+              label="规则类别"
             >
             </el-table-column>
             <el-table-column
@@ -125,7 +125,7 @@
             layout="total, sizes, prev, pager, next, jumper"
           >
           </el-pagination>
-          <!-- 弹窗, 新增 / 修改 -->
+          <!-- 编写底稿弹窗 -->
           <el-dialog
             :visible.sync="showEditDialog"
             :close-on-click-modal="false"

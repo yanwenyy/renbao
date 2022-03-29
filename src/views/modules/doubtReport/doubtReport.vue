@@ -1,20 +1,35 @@
 <template>
-  <div class="mod-role">
+  <div>
     <el-form
       :inline="true"
       :model="dataForm"
       @keyup.enter.native="getDataList()"
     >
-      <el-form-item label="疑点报告名称：">
+      <el-form-item label="底稿名称：">
         <el-input
           v-model="dataForm.roleNumber"
-          placeholder="疑点报告名称"
+          placeholder="底稿名称"
+          clearable
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="关联规则名称：">
+        <el-input
+          v-model="dataForm.ruleName"
+          placeholder="关联规则名称"
           clearable
         ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="search()">查询</el-button>
         <el-button @click="reset">重置</el-button>
+      </el-form-item>
+      <el-form-item style="float:right">
+        <el-button
+          :disabled="this.multipleSelection.length <= 0"
+          type="primary"
+          @click="downLoad"
+          >导出报告</el-button
+        >
       </el-form-item>
     </el-form>
     <el-table
@@ -25,31 +40,33 @@
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
     >
-      <!-- <el-table-column
+      <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50"
       >
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column
-        prop="draftName"
+        prop="manuscriptCode"
         header-align="center"
         align="center"
-        label="疑点报告名称"
+        label="底稿编码"
       >
       </el-table-column>
       <el-table-column
-        prop="roleName"
+        prop="manuscriptName"
         header-align="center"
         align="center"
-        label="报告规则"
+        label="底稿名称"
       >
-        <template slot-scope="scope">
-          <el-button type="text" @click="detail(scope.row)">{{
-            scope.row.roleName
-          }}</el-button>
-        </template>
+      </el-table-column>
+      <el-table-column
+        prop="ruleName"
+        header-align="center"
+        align="center"
+        label="关联规则名称"
+      >
       </el-table-column>
       <el-table-column
         prop="createUserName"
@@ -65,17 +82,11 @@
         label="创建时间"
       >
       </el-table-column>
-      <el-table-column header-align="center" align="center" label="操作">
-        <!-- <template slot-scope="scope">
-          <el-button type="text" @click="editHandle(scope.row)">修改</el-button>
-          <el-button type="text" @click="deleteHandle(scope.row)"
-            >删除</el-button
-          >
-        </template> -->
+      <!-- <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="downLoad(scope.row)">下载</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -87,50 +98,16 @@
       layout="total, sizes, prev, pager, next, jumper"
     >
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
-    <el-dialog
-      :visible.sync="showAddDialog"
-      :title="title"
-      :close-on-click-modal="false"
-      :modal-append-to-body="false"
-      width="40%"
-      :close-on-press-escape="false"
-    >
-      <addOrUpdate
-        @close="closeAddDrawer"
-        @ok="addSucceed"
-        v-if="showAddDialog"
-        :id="id"
-        :showBtn="showBtn"
-        :readonly="readonly"
-      ></addOrUpdate>
-    </el-dialog>
-    <!-- 弹窗, 授权用户 -->
-    <!-- <el-dialog
-      :visible.sync="showAuthorityUser"
-      title="授权用户"
-      :close-on-click-modal="false"
-      :modal-append-to-body="false"
-      width="60%"
-      :close-on-press-escape="false"
-    >
-      <authorityUser
-        @close="close"
-        @ok="succeed"
-        v-if="showAuthorityUser"
-      ></authorityUser>
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
-// import authorityUser from "./authorityUser.vue";
-// import addOrUpdate from "./role-add-or-update.vue";
 export default {
   data() {
     return {
       dataForm: {
-        draftName: ""
+        ruleName: "",
+        manuscriptName: ""
       },
       //列表数据
       dataList: [],
@@ -143,7 +120,7 @@ export default {
       //列表加载
       dataListLoading: false,
       //多选数据
-      dataListSelections: [],
+      multipleSelection: [],
       //新增修改弹窗
       showAddDialog: false,
       //授权用户弹窗
@@ -156,10 +133,12 @@ export default {
       showBtn: ""
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   components: {
     // addOrUpdate,
@@ -173,13 +152,13 @@ export default {
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/draft/selectDraftPage"),
+        url: this.$http.adornUrl("/manuscript/selectManuscriptPage"),
         method: "get",
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
-          roleNumber: this.dataForm.roleNumber,
-          roleName: this.dataForm.roleName
+          manuscriptName: this.dataForm.manuscriptName,
+          ruleName: this.dataForm.ruleName
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -205,7 +184,7 @@ export default {
     },
     // 多选
     selectionChangeHandle(val) {
-      this.dataListSelections = val;
+      this.multipleSelection = val;
     },
     //新增
     addHandle() {
@@ -246,14 +225,30 @@ export default {
     succeed() {
       this.close();
     },
-    //授权用户
-    downLoad(data) {
-      //   this.showAuthorityUser = true;
+    //导出报告
+    downLoad() {
+      var ids = "";
+      this.multipleSelection.forEach(item => {
+        ids += item.manuscriptId + ",";
+      });
+      if (ids.length > 0) {
+        ids = ids.substr(0, ids.length - 1);
+      }
+      let url =
+        this.$http.adornUrl(
+          "/manuscript/reportExport?manuscriptIds=" + ids + "&token="
+        ) + this.$cookie.get("token");
+      window.open(url);
+    },
+    //查询
+    search() {
+      this.getDataList();
     },
     //重置
     reset() {
       this.dataForm = {
-        draftName: ""
+        ruleName: "",
+        manuscriptName: ""
       };
       this.getDataList();
     },

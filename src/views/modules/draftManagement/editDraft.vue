@@ -96,7 +96,11 @@
       :close-on-press-escape="false"
       append-to-body
     >
-      <evidence ref="evidence" v-if="showEvidenceDialog"></evidence>
+      <evidence
+        ref="evidence"
+        v-if="showEvidenceDialog"
+        :isShow="isShow"
+      ></evidence>
       <div>
         <el-button type="primary" @click="getEvidenceData">确定</el-button>
         <el-button @click="closeEvidence">取消</el-button>
@@ -145,7 +149,8 @@ export default {
       },
       loading: false,
       showHospitalDialog: false,
-      showEvidenceDialog: false
+      showEvidenceDialog: false,
+      isShow: ""
     };
   },
   created() {
@@ -256,6 +261,7 @@ export default {
     //选择证据弹窗
     chooseEvidence() {
       this.showEvidenceDialog = true;
+      this.isShow = true;
     },
     //获取已选证据数据
     getEvidenceData() {

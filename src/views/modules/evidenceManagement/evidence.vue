@@ -1,6 +1,6 @@
 <!--证据管理-->
 <template>
-  <div class="mod-role">
+  <div>
     <el-form
       :inline="true"
       :model="dataForm"
@@ -24,7 +24,7 @@
         <el-button type="primary" @click="search()">查询</el-button>
         <el-button @click="reset">重置</el-button>
       </el-form-item>
-      <el-form-item style="float:right">
+      <el-form-item style="float:right" v-if="!isShow">
         <el-button
           type="primary"
           :disabled="multipleSelection.length <= 0"
@@ -49,13 +49,12 @@
       </el-form-item>
     </el-form>
     <el-table
-      :height="tableHeight-60"
+      :height="tableHeight - 60"
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
-
     >
       <el-table-column
         type="selection"
@@ -148,6 +147,9 @@
 <script>
 import addOrUpdate from "./evidence-addOrUpdate.vue";
 export default {
+  props: {
+    isShow: Boolean
+  },
   components: {
     addOrUpdate
   },
@@ -183,10 +185,12 @@ export default {
       readonly: ""
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   created() {
     this.getDataList();
@@ -314,6 +318,7 @@ export default {
         })
         .catch(() => {});
     },
+    //附件下载
     downLoadFile() {
       var evidenceIds = "";
       for (var i = 0; i < this.multipleSelection.length; i++) {
@@ -327,6 +332,10 @@ export default {
           "/evidence/downloadAttachments?evidenceIds=" + evidenceIds + "&token="
         ) + this.$cookie.get("token");
       window.open(url);
+    },
+    //是否显示按钮
+    showFunction() {
+      return false;
     }
   }
 };

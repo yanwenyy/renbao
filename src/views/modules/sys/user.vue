@@ -54,11 +54,15 @@
           :on-error="handleChange"
           :show-file-list="false"
           multiple=""
-          style="float:right;margin-left:13px"
         >
           <el-button type="warning">导入</el-button>
         </el-upload>
-        <!--<el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+        <el-button
+          type="danger"
+          @click="deleteBatch()"
+          :disabled="this.dataListSelections.length <= 0"
+          >删除</el-button
+        >
       </el-form-item>
       <el-button type="primary" @click="(pageIndex = 1), getDataList()"
         >查询</el-button
@@ -66,7 +70,7 @@
       <el-button @click="reset()">重置</el-button>
     </el-form>
     <el-table
-      :height="tableHeight-60"
+      :height="tableHeight - 60"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -208,10 +212,12 @@ export default {
       token: this.$cookie.get("token")
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   components: {
     AddOrUpdate
@@ -307,6 +313,40 @@ export default {
             url: this.$http.adornUrl("/user/delete/" + id),
             method: "post"
             // data: this.$http.adornData(userIds, false)
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList();
+                }
+              });
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        })
+        .catch(() => {});
+    },
+    //批量删除
+    deleteBatch() {
+      var userIds = [];
+      this.dataListSelections.forEach(item => {
+        userIds.push(item.userId);
+      });
+
+      this.$confirm(`确定进行删除操作?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/user/deleteByIds/"),
+            method: "delete",
+            data: this.$http.adornData(userIds, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
