@@ -205,17 +205,22 @@ export default {
           }
           //附件去重
           this.multipartFiles = this.distinct(this.multipartFiles);
+          //是否上传了重复文件
+          var ishave = false;
           //处理重复上传
-          /*  if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
+          if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
             this.multipartFiles.forEach(item => {
               this.fileData.forEach(it => {
                 if (item.name == it.fileName) {
                   this.$message.error(item.name + "已存在");
+                  ishave = true;
+                } else {
+                  ishave = false;
                 }
               });
             });
-          } */
-          //是否上传附件校验
+          }
+          //上传附件必要校验
           /* if (this.multipartFiles.length == 0) {
             this.$message({
               message: "请选择上传文件！",
@@ -223,39 +228,41 @@ export default {
             });
             return;
           } */
-          let evidence = new FormData();
-          evidence.append("evidenceId", this.id || undefined);
-          evidence.append("evidenceName", this.dataForm.evidenceName);
-          evidence.append("evidenceRemark", this.dataForm.evidenceRemark);
-          for (var i = 0; i < this.multipartFiles.length; i++) {
-            evidence.append("multipartFiles", this.multipartFiles[i]);
-          }
-          if (this.removeFileIdList.length > 0) {
-            evidence.append("fileInfoIds", this.removeFileIdList);
-          }
-          this.$http({
-            url: this.$http.adornUrl(
-              `/evidence/${!this.id ? "add" : "updateByUuId"}`
-            ),
-            headers: {
-              "Content-Type": "multipart/form-data"
-            },
-            method: "post",
-            data: evidence
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.$emit("ok");
-                }
-              });
-            } else {
-              this.$message.error(data.message);
+          if (ishave == false) {
+            let evidence = new FormData();
+            evidence.append("evidenceId", this.id || undefined);
+            evidence.append("evidenceName", this.dataForm.evidenceName);
+            evidence.append("evidenceRemark", this.dataForm.evidenceRemark);
+            for (var i = 0; i < this.multipartFiles.length; i++) {
+              evidence.append("multipartFiles", this.multipartFiles[i]);
             }
-          });
+            if (this.removeFileIdList.length > 0) {
+              evidence.append("fileInfoIds", this.removeFileIdList);
+            }
+            this.$http({
+              url: this.$http.adornUrl(
+                `/evidence/${!this.id ? "add" : "updateByUuId"}`
+              ),
+              headers: {
+                "Content-Type": "multipart/form-data"
+              },
+              method: "post",
+              data: evidence
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.$emit("ok");
+                  }
+                });
+              } else {
+                this.$message.error(data.message);
+              }
+            });
+          }
         }
       });
     },
@@ -331,8 +338,16 @@ export default {
     },
     //附件去重
     distinct(arr) {
-      const res = new Map();
-      return arr.filter(a => !res.has(a.from) && res.set(a.from, 1));
+      for (var i = 0; i < arr.length - 1; i++) {
+        for (var j = i + 1; j < arr.length; j++) {
+          if (arr[i].name == arr[j].name) {
+            arr.splice(j, 1);
+            //因为数组长度减小1，所以直接 j++ 会漏掉一个元素，所以要 j--
+            j--;
+          }
+        }
+      }
+      return arr;
     }
   }
 };
