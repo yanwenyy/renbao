@@ -615,6 +615,12 @@
           var v={ruleStatisticsColumnName:item.columnName};
           ruleStatisticsColumns.push(v);
         });
+        if(this.dataForm.ruleSqlStatisticsValue!=''){
+          if(this.dataForm.ruleSqlStatisticsValue.indexOf("总人次")==-1||this.dataForm.ruleSqlStatisticsValue.indexOf("总金额")==-1){
+            this.$message.error('统计sql编写的总人次和总金额是必填');
+            return false;
+          }
+        }
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
