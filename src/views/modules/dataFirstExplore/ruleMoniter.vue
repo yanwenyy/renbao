@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <div class="left">
-      <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+      <el-card v-loading="treeLoading" :style="{height:(tableHeight+120)+'px'}">
         <div class="auditRuleMonitoring-left">
           <batch-list
             :batchLoading="treeLoading"
@@ -14,7 +14,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card style="height:80vh;overflow-y:auto">
+      <el-card :style="{height:(tableHeight+120)+'px'}">
         <div class="search-box">
           <el-form ref="searchForm" :model="searchForm" :inline="true">
             <el-form-item label="规则名称：">
@@ -74,7 +74,7 @@
             border
             style="width: 100%"
             @selection-change="handleSelectionChange"
-            :height="$tableHeight - 80"
+            :height="tableHeight - 80"
             :row-key="getRowKeys"
           >
             <el-table-column
@@ -226,6 +226,11 @@ export default {
         }
       }
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   activated() {
     this.getbatchList();

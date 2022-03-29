@@ -1,7 +1,7 @@
 <!--底稿管理-->
 <template>
   <div class="box">
-    <div class="auditRuleConfig-left">
+    <div class="auditRuleConfig-left" :style="{height:(tableHeight+120)+'px'}">
       <rule-tree
         ref="ruleTree"
         :isShowSearch="true"
@@ -12,7 +12,7 @@
         :isParent="false"
       ></rule-tree>
     </div>
-    <div class="auditRuleConfig-right">
+    <div class="auditRuleConfig-right" :style="{height:(tableHeight+120)+'px'}">
       <div class="search-box">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
           <el-form-item label="规则名称：">
@@ -53,7 +53,7 @@
             @selection-change="handleSelectionChange"
             style="width: 100%;"
             ref="multipleTable"
-            :height="$tableHeight - 80"
+            :height="tableHeight - 80"
           >
             <el-table-column
               type="selection"
@@ -358,6 +358,9 @@ export default {
     }
   },
   computed: {
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
     projectId: {
       get() {
         if (this.$store.state.common.projectId) {
@@ -397,7 +400,7 @@ export default {
     // min-height: 100vh;
     // min-height: calc(100vh - 165px);
     // margin-right: 20px;
-    height: 75vh;
+    /*height: 75vh;*/
     border: 1px solid #ddd;
     overflow: auto;
     min-width: 300px;
@@ -409,7 +412,7 @@ export default {
   .auditRuleConfig-right {
     flex: 1;
     border: none;
-    height: 75vh;
+    /*height: 75vh;*/
     overflow: auto;
     //
     .search-box {

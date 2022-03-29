@@ -2,7 +2,7 @@
 <template>
   <div>
     <div class="left">
-      <el-card v-loading="treeLoading" style="height:80vh;overflow-y:auto">
+      <el-card v-loading="treeLoading" :style="{height:(tableHeight+120)+'px'}">
         <rule-tree
           :isShowSearch="true"
           :isShowCheckBox="false"
@@ -15,7 +15,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card class="box-card" style="height:80vh;overflow-y:auto">
+      <el-card class="box-card" :style="{height:(tableHeight+120)+'px'}">
         <div class="search-box">
           <el-form ref="dataForm" :model="dataForm" :inline="true">
             <el-form-item label="规则名称：">
@@ -227,7 +227,7 @@ export default {
   },
   data() {
     return {
-      tableMinus:100,
+      tableMinus:120,
       //条件查询数据定义
       dataForm: {
         ruleName: "",
@@ -302,16 +302,7 @@ export default {
   created() {
     //获取列表
     // this.initData();
-    window.onresize = () => {
-      var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
-      // this.tableMinus = _num*0.125;
-      if(_num>600){
-        this.tableMinus =0;
-      }else{
-        this.tableMinus = _num*0.125;
-      }
-      console.log(_num)
-    }
+
   },
   methods: {
     //获取列表数据

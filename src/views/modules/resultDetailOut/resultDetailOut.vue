@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="left">
-      <el-card style="height:80vh;overflow-y:auto">
+      <el-card :style="{height:(tableHeight+120)+'px'}">
         <batch-list
           :batchLoading="batchLoading"
           :batchTreeList="batchTreeList"
@@ -11,7 +11,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card style="height:80vh;overflow-y:auto">
+      <el-card :style="{height:(tableHeight+120)+'px'}">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
           <el-form-item label="规则名称：">
             <el-input
@@ -53,7 +53,7 @@
             :data="tableData"
             tooltip-effect="dark"
             style="width: 100%"
-            :height="$tableHeight - 80"
+            :height="tableHeight - 80"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"></el-table-column>
@@ -225,6 +225,11 @@ export default {
       //是否显示结果明细
       showDetailDialog: false
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   activated() {
     this.getbatchList();

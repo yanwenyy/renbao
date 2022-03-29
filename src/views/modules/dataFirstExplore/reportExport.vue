@@ -2,7 +2,7 @@
 <template>
   <div class="box">
     <div class="left">
-      <el-card style="height:80vh;overflow-y:auto">
+      <el-card :style="{height:(tableHeight+120)+'px'}">
         <div
           class="auditRuleMonitoring-left"
           style="width:100%;overflow-y:auto"
@@ -18,7 +18,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card style="height:80vh;overflow-y:auto">
+      <el-card :style="{height:(tableHeight+120)+'px'}">
         <el-form ref="dataForm" :model="dataForm" :inline="true">
           <el-form-item label="运行状态：">
             <el-select
@@ -53,7 +53,7 @@
             @selection-change="handleSelectionChange"
             v-loading="loading"
             style="width: 100%"
-            :height="$tableHeight - 80"
+            :height="tableHeight - 30"
           >
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column prop="ruleName" label="规则名称"></el-table-column>
@@ -155,6 +155,11 @@ export default {
         total: 0
       }
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   activated() {
     this.initTree();

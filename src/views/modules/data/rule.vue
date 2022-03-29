@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="box">
-      <div class="left list-left-tree">
+    <div class="box" >
+      <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
         <div class="custom-tree-container">
           <!-- <el-input
             placeholder="输入关键字进行过滤"
@@ -48,7 +48,7 @@
           ></ruleTree>
         </div>
       </div>
-      <div class="right">
+      <div class="right" :style="{height:(tableHeight+120)+'px'}">
         <el-form
           :inline="true"
           :model="dataForm"
@@ -283,6 +283,10 @@ export default {
     tableHeight: {
       get () { return this.$store.state.common.tableHeight}
     },
+    documentClientHeight: {
+      get () { return this.$store.state.common.documentClientHeight },
+
+    },
   },
   watch: {
     filterText(val) {
@@ -305,11 +309,6 @@ export default {
     this.$bus.$on("updateRuleData", () => {
       this.getRuleFolder();
     });
-    window.onresize = () => {
-      var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
-      // this.tableMinus = _num*0.125;
-      console.log(_num)
-    }
   },
   methods: {
     // 新增 / 修改
@@ -531,11 +530,13 @@ export default {
   display: inline-block !important;
 }
 .box {
+  width:100%;
+  height:100%;
   display: flex;
   justify-content: space-between;
 }
 .box > div {
-  height: 73vh;
+  /*height: 73vh;*/
   /*border: 1px solid #ddd;*/
   padding: 1%;
   overflow: auto;

@@ -3,14 +3,14 @@
     <div class='dataSheet'>
         <el-row :gutter="20">
             <el-col :span="5">
-                <el-card style="height:600px;overflow-y:auto">
+                <el-card :style="{height:(tableHeight+120)+'px',overflow:'auto'}">
 
                     <div style='padding:5px'><el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input></div>
                     <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading" :filter-node-method="filterNode">
-                         <span class="custom-tree-node" slot-scope="{ node, data }"> 
+                         <span class="custom-tree-node" slot-scope="{ node, data }">
                              <span class="tree-label" :title="node.label">
                             <img v-if="node.data.type =='funFolder'" class="tree-icon" src="./icon/folder.png" alt="">
-                            <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt=""> 
+                            <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt="">
                             {{ node.label }}
                             </span>
                         </span>
@@ -31,7 +31,7 @@
                             <el-button @click="resetForm('dataForm')">重置</el-button>
                         </el-form-item>
                     </el-form>
-                    <el-table :data="dataList" border v-loading="dataListLoading" :height="$tableHeight-70" style="width: 100%;">
+                    <el-table :data="dataList" border v-loading="dataListLoading" :height="tableHeight+32" style="width: 100%;">
                         <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column> -->
                         <el-table-column prop="title" align="center" label="表名"></el-table-column>
                         <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
@@ -106,7 +106,7 @@ export default {
                 children: []
             }
             ],
-            defaultProps:{ 
+            defaultProps:{
                 label(data, node) {
                     const config = data.__config__ || data
                     return  config.label || config.projectName
@@ -124,6 +124,11 @@ export default {
             treeDataToHint:[]
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     mounted() {
         this.initDataTree()
     },
@@ -140,7 +145,7 @@ export default {
                 return data.projectName.indexOf(value) !== -1;
             }else {
                 return data.label.indexOf(value) !== -1;
-            }  
+            }
         },
         //初始化tree
         initDataTree(){
@@ -222,7 +227,7 @@ export default {
             this.apComServerData.size = val
             this.apComServerData.pageIndex = 1
             this.getAllList()
-         
+
         },
         // 当前页
         handleCurrentChange (val) {
