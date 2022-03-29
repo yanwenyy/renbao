@@ -203,10 +203,8 @@ export default {
               });
             });
           }
-          //附件去重
-          this.multipartFiles = this.distinct(this.multipartFiles);
           //是否上传了重复文件
-          var ishave = false;
+          let ishave = "";
           //处理重复上传
           if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
             this.multipartFiles.forEach(item => {
@@ -220,6 +218,8 @@ export default {
               });
             });
           }
+          //附件去重
+          this.multipartFiles = this.distinct(this.multipartFiles);
           //上传附件必要校验
           /* if (this.multipartFiles.length == 0) {
             this.$message({
@@ -299,11 +299,19 @@ export default {
     //文件状态改变时
     fileChange(file, fileList) {
       // 该上传文件是否已经存在上传列表中
-      let isTrue = this.fileList.some(f => f.name === file.name);
-      if (isTrue) {
+      let isTrue = "";
+      for (var i = 0; i < fileList.length - 1; i++) {
+        for (var j = i + 1; j < fileList.length; j++) {
+          if (fileList[i].name == fileList[j].name) {
+            isTrue = true;
+            fileList.remove(fileList[i]);
+            //因为数组长度减小1，所以直接 j++ 会漏掉一个元素，所以要 j--
+            j--;
+          }
+        }
+      }
+      if (isTrue == true) {
         this.$message.warning("请勿重复上传文件！");
-        // 文件展示列表是将新添加的文件放在数组末尾
-        fileList.pop();
         return;
       }
       this.fileList = fileList;
