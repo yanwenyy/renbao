@@ -174,13 +174,13 @@ export default {
                 params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
-                this.treeLoading = false
+                this.treeLoading = false;
+
                 if (data.code == 200) {
-                    this.treeData = data.result;
-                    if(from=='self'){
+                    this.$nextTick(() => {
+                      this.treeData = data.result;
                       this.ifExpand=false;
-                    }
-                    console.log(from,this.ifExpand)
+                    });
                     if (callBack) {
                         callBack(this.treeData)
                     }
