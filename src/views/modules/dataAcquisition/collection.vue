@@ -35,7 +35,7 @@
         <!--医保数据-->
             <el-tab-pane label="医保数据" name="audit" >
             <div v-if="activeName == 'audit'">
-               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" :height="'calc(56vh - 100px)'" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
+               <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}"  :height="tableHeight-120" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
@@ -94,7 +94,7 @@
                 <div class='listDisplay'>
                     <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
                 </div>
-                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" :height="$tableHeight-75" v-loading="dataListLoading" @selection-change="handleSelectionChange">
+                <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%"  :height="tableHeight-150" v-loading="dataListLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                     <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
                     <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
@@ -222,6 +222,11 @@ export default {
             collectPlanMonitorIds:''
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     activated(){
         this.getInitList()
     },

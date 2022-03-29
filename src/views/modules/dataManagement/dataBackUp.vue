@@ -15,11 +15,11 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <div class='f_right'>                    
+            <div class='f_right'>
                 <el-button size="mini" type="primary" @click="backupsClick">备份</el-button>
                 <el-button size="mini" type="primary" @click="reductionClick">还原</el-button>
             </div>
-            <el-table :data="tableList" border style="100%" height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
+            <el-table :data="tableList" border  :height="tableHeight-45" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="fileName" header-align="center" align="center" label="文件名称"></el-table-column>
                 <el-table-column prop="formDate" header-align="center" align="center" label="时间"></el-table-column>
@@ -53,7 +53,7 @@
             </el-pagination>
         </div>
         <el-dialog title="日志" :visible.sync="showDetailVisible">
-            <el-table :data="tableData" border style="100%" height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableData" border :height="tableHeight-45" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <el-table-column prop="verSteps" min-width='150px' align="center" label="校验步骤"></el-table-column>
                 <el-table-column prop="verStatus" align="center" label="校验状态">
                     <template slot-scope="scope">
@@ -161,6 +161,11 @@ export default {
             }]
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     mounted() {
         this.initDataList()
     },
@@ -190,7 +195,7 @@ export default {
             this.pageSize = val
             this.currentPage = 1
             this.getAllList()
-        }, 
+        },
         // 当前页
         handleCurrentChange (val) {
             this.currentPage = val

@@ -26,7 +26,7 @@
     <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      :height="'calc(56vh + 32px)'"
+      :height="tableHeight+32"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
@@ -533,6 +533,11 @@
         // 出错的文件
         errFiles: []
       }
+    },
+    computed:{
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
     },
     components: {
       ColumnView,DataView

@@ -24,11 +24,11 @@
         <el-tabs type="border-card" v-model="activeName" @tab-click="handleClick">
             <!--医保数据-->
             <el-tab-pane label="医保数据" name="insurance">
-                <div v-if="activeName == 'insurance'"> 
+                <div v-if="activeName == 'insurance'">
                 <div class='listDisplay'>
                     <el-button type="primary" @click="downloadClick">下载报告</el-button>
                 </div>
-                <el-table :data="tableList" border stripe style="width: 100%" :height="$tableHeight-85" v-loading="dataLoading" >
+                <el-table :data="tableList" border stripe style="width: 100%"  :height="tableHeight-85" v-loading="dataLoading" >
                     <el-table-column label="校验规则" align="center" prop="ValidateRules"></el-table-column>
                     <el-table-column label="校验状态" align="center" prop="ValidateStatus">
                         <template slot-scope="scope">
@@ -52,7 +52,7 @@
                     <div class='listDisplay'>
                         <el-button type="primary" @click="addClick()">新增校验</el-button>
                     </div>
-                    <el-table :data="tableData" border stripe style="width: 100%" :height="$tableHeight-85" v-loading='dataLoading'>
+                    <el-table :data="tableData" border stripe style="width: 100%"  :height="tableHeight-85" v-loading='dataLoading'>
                         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                         <el-table-column label="医院名称" align="center" prop="hospitalName"> </el-table-column>
                         <el-table-column label="校验进度" align="center" prop="schedule">
@@ -88,7 +88,7 @@
                             <el-table-column prop="checkStatus" align="center" label="采集状态">
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.checkStatus == '2'">已完成</div>
-                                </template> 
+                                </template>
                             </el-table-column>
                         </el-table>
                         <div class="itemBtn" slot="footer">
@@ -156,6 +156,11 @@ export default {
 
         }
     },
+    computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     created(){
         this.token = this.$cookie.get("token");
     },
@@ -184,7 +189,7 @@ export default {
             // }).then(({data}) =>{
             //     if(data && data.code === 200){
             //         this.tableList = data.result.records
-            //         // this.apComServerData.total = data.result.total                   
+            //         // this.apComServerData.total = data.result.total
             //     }else{
             //         this.tableList = []
             //         // this.apComServerData.total = 0
@@ -205,7 +210,7 @@ export default {
             // }).then(({data}) =>{
             //     if(data && data.code === 200){
             //         this.tableData = data.result.records
-            //         // this.apComServerData.total = data.result.total                   
+            //         // this.apComServerData.total = data.result.total
             //     }else{
             //         this.tableList = []
             //         // this.apComServerData.total = 0
@@ -238,9 +243,9 @@ export default {
         },
         // 下载报告
         downloadClick(){
-          
+
         },
-            
+
          //新增校验
         addClick(){
             this.ShowAddVisible = true;
@@ -264,14 +269,14 @@ export default {
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.addTableList = data.result
-                    // this.apComServerData.total = data.result.total                   
+                    // this.apComServerData.total = data.result.total
                 }else{
                     this.addTableList = []
                     // this.apComServerData.total = 0
                 }
             })
         },
-        
+
         //医院数据开始校验事件
         startsClick(){
             if(this.multipleSelection.length == 0 || this.multipleSelection.length > 1){
@@ -279,7 +284,7 @@ export default {
                     confirmButtonText:'关闭',
                     cancelButtonText: '取消',
                     type: 'warning',
-                }).then(() => { 
+                }).then(() => {
                     // this.$message({
                     //     type: 'success',
                     //     message: '校验成功!'
@@ -312,7 +317,7 @@ export default {
                     })
                         // this.exportList = data.result
                         // this.$emit('exportList', this.exportList)
-                        // this.apComServerData.total = data.result.total                   
+                        // this.apComServerData.total = data.result.total
                     }else{
                         this.addTableList = []
                         // this.apComServerData.total = 0

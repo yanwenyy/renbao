@@ -15,7 +15,7 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <el-table :data="tableData" border style="100%" :height="$tableHeight-50" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
+            <el-table :data="tableData" border style="100%" :height="tableHeight-10" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="projectName" header-align="center" align="center" label="项目名称"></el-table-column>
                 <el-table-column prop="status" header-align="center" align="center" width="150" label="状态">
@@ -43,7 +43,7 @@
                 </el-table-column>
             </el-table>
         </div>
-         <el-pagination 
+         <el-pagination
                 :page-size="apComServerData.pageSize"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="apComServerData.total"
@@ -87,6 +87,11 @@ export default {
             },
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     mounted() {
         this.getDataList()
     },

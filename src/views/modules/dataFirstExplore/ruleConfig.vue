@@ -10,7 +10,7 @@
           :isParent="false"
           ref="ruleTree"
           folderSorts="1,2"
-          :height="$tableHeight"
+          :height="tableHeight"
         ></rule-tree>
       </el-card>
     </div>
@@ -80,7 +80,7 @@
             v-loading="loading"
             style="width: 100%"
             :row-key="getRowKeys"
-            :height="$tableHeight - 80"
+            :height="tableHeight-tableMinus"
           >
             <el-table-column
               type="selection"
@@ -227,6 +227,7 @@ export default {
   },
   data() {
     return {
+      tableMinus:100,
       //条件查询数据定义
       dataForm: {
         ruleName: "",
@@ -293,9 +294,24 @@ export default {
       sql: []
     };
   },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
   created() {
     //获取列表
     // this.initData();
+    window.onresize = () => {
+      var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
+      // this.tableMinus = _num*0.125;
+      if(_num>600){
+        this.tableMinus =0;
+      }else{
+        this.tableMinus = _num*0.125;
+      }
+      console.log(_num)
+    }
   },
   methods: {
     //获取列表数据

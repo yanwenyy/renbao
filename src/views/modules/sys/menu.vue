@@ -7,6 +7,7 @@
     </el-form>
 
     <el-table
+      :height="tableHeight+30"
       :data="dataList"
       row-key="menuId"
       style="width: 100%; ">
@@ -82,6 +83,11 @@
         dataListLoading: false,
         addOrUpdateVisible: false
       }
+    },
+    computed:{
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
     },
     components: {
       AddOrUpdate

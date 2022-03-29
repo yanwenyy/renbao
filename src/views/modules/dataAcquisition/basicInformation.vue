@@ -60,7 +60,7 @@
         :data="tableList"
         border
         style="100%"
-        :height="'calc(56vh - 10px)'"
+        :height="tableHeight-10"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange"
@@ -186,6 +186,11 @@ export default {
       duplicateRemove: false,
       importType: ""
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   created() {
     this.token = this.$cookie.get("token");

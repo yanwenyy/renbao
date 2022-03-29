@@ -33,7 +33,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      :height="'calc(56vh - 75px)'"
+      :height="tableHeight-75"
       :data="dataList"
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -169,6 +169,9 @@
     computed: {
       projectId: {
         get () { return this.$store.state.common.projectId}
+      },
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
       },
     },
     components: {

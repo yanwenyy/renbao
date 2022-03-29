@@ -49,12 +49,13 @@
       </el-form-item>
     </el-form>
     <el-table
+      :height="tableHeight-60"
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;"
-      :height="$tableHeight - 10"
+
     >
       <el-table-column
         type="selection"
@@ -181,6 +182,11 @@ export default {
       //传给弹窗：是否只读
       readonly: ""
     };
+  },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
   },
   created() {
     this.getDataList();

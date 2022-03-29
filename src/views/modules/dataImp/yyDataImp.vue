@@ -26,7 +26,7 @@
     <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      :height="$tableHeight + 32"
+      :height="tableHeight+30"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
@@ -96,7 +96,7 @@
         </el-select>
         <el-button type="primary" @click="getHospital">选择医院</el-button>
       </el-row>
-      <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row> 
+      <el-row style="font-weight:700">数据文件路径：<span style="color:red">{{sysPath}}</span></el-row>
       <!-- 文件树 -->
       <el-row :gutter="6">
         <el-col :span="12" style="height:36vh; overflow:auto;">
@@ -168,9 +168,9 @@
         <el-button type="primary" @click="checkFileTable">下一步</el-button>
       </span>
     </el-dialog>
-    <el-dialog 
-      title="数据表匹配" 
-      :visible.sync="checkFileTableDialogVisible" 
+    <el-dialog
+      title="数据表匹配"
+      :visible.sync="checkFileTableDialogVisible"
       v-if="checkFileTableDialogVisible"
       width="60%"
       :close-on-click-modal="false">
@@ -365,10 +365,10 @@
       </span>
     </el-dialog>
      <!-- dmp数据表匹配 -->
-    <el-dialog 
-      title="数据表匹配" 
-      :visible.sync="checkDmpFileTableDialogVisible" 
-      width="60%" 
+    <el-dialog
+      title="数据表匹配"
+      :visible.sync="checkDmpFileTableDialogVisible"
+      width="60%"
       :close-on-click-modal="false">
       <el-table
         border
@@ -445,7 +445,7 @@
         <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
-    <el-dialog 
+    <el-dialog
       title="dmp还原日志"
       :visible.sync="dmpLogDialogVisible"
       width="60%"
@@ -453,8 +453,8 @@
       :close-on-click-modal="false">
       <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
       <el-row style="width: 100%;height:42vh; overflow:auto;">
-        <el-row  
-          v-for="(log,index) in webSocketDataList" 
+        <el-row
+          v-for="(log,index) in webSocketDataList"
           :key="index">
           {{log}}
         </el-row>
@@ -494,7 +494,7 @@
         // 查看字段弹窗
         tableColumnViewDialogVisible: false,
         // 查看数据弹窗
-        tableDataViewDialogVisible: false, 
+        tableDataViewDialogVisible: false,
         // 匹配表弹窗
         checkFileTableDialogVisible: false,
         // dmp文件匹配表弹窗
@@ -563,6 +563,11 @@
         errFiles: []
       }
     },
+    computed:{
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
+    },
     components: {
       ColumnView,DataView
     },
@@ -606,7 +611,7 @@
           let flag = this.errFiles.findIndex(item => item ==  row.name)
           if(flag != -1) {
             return 'warning-row'
-          } 
+          }
         }
         return ''
       },
@@ -692,7 +697,7 @@
         }
       },
       // 获取医保数据文件树
-      getFileTree () { 
+      getFileTree () {
         this.fileTreeData = []
         this.selectedFileData = []
         this.fileTreeDialogVisible = true
@@ -720,7 +725,7 @@
         this.hospitalName= e.target.value
       },
       // 检查文件和匹配的表信息
-      checkFileTable () {        
+      checkFileTable () {
         this.errFiles = []
         if (this.selectedFileData.length == 0) {
           this.$message.error("请选择要采集的文件")
@@ -839,7 +844,7 @@
             this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
           }
         })
-        
+
       },
       // 获取文件中涉及到的表名
       findFileTable () {

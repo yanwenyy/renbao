@@ -9,11 +9,11 @@
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay"  v-if="selectNum == 0">
-            <div class='f_right'>                    
+            <div class='f_right'>
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
-            <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" height="600" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList0" v-if="selectNum == 0" border  :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
             </el-table>
             <!-- 病种目录 -->
             <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
@@ -24,7 +24,7 @@
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
         <div class="listDisplay"  v-if="selectNum == 1">
-             <div class='f_right'>                    
+             <div class='f_right'>
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
@@ -34,7 +34,7 @@
                     <myquerybuilder ref="myquerybuilder" :rules="queryRules" v-show="show" class="mask" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
-            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border   :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -42,7 +42,7 @@
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
         <div class="listDisplay" v-if="selectNum == 2">
-            <div class='f_right'>                    
+            <div class='f_right'>
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
@@ -53,7 +53,7 @@
                 </transition>
             </div>
              <!-- 医保诊疗项目 -->
-            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border  :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -61,7 +61,7 @@
             <el-pagination layout="total, sizes, prev, pager, next, jumper" :total="apComServerData.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="apComServerData.pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="apComServerData.size"></el-pagination>
         </div>
         <div class="listDisplay"  v-if="selectNum == 3">
-            <div class='f_right'>                    
+            <div class='f_right'>
                 <el-button size="mini" type="primary" @click="searchList">查询</el-button>
                 <el-button size="mini" type="warning" @click="reportList">导出</el-button>
             </div>
@@ -72,7 +72,7 @@
                 </transition>
             </div>
             <!-- 医保耗材目录 -->
-            <el-table :data="tableList" border style="100%" :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -104,7 +104,7 @@ export default {
                 pageNum:1,
                 total:0,
                 pageIndex:1
-            }, 
+            },
             dataListLoading: false,
             output:{},
             queryRules: [], // querybuilder的规则数据
@@ -129,7 +129,7 @@ export default {
                 //     value: '5',
                 //     label: '服务价格目录'
                 // }
-            ],  
+            ],
             fileName: "",
             data:[],
             columns1:[],
@@ -173,17 +173,22 @@ export default {
                 tableColumns:[],
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     mounted(){
         //点击空白处隐藏复杂条件查询
         let that=this;
         document.addEventListener('click',(e) =>{
              if(!that.$refs.box.contains(e.target)){
-            that.show = false;           
+            that.show = false;
         }
         })
     //    this.getDataList()
     },
-    
+
     created(){
         this.getDataList();
         this.token = this.$cookie.get("token");
@@ -200,7 +205,7 @@ export default {
                 }else{
                     this.show = !this.show
                 }
-                this.getDataList(val)       
+                this.getDataList(val)
             }else if(val == 2){
                 this.selectNum = val
                 this.fileName = '医保诊疗项目目录'
@@ -228,7 +233,7 @@ export default {
             //     this.getDataList(val)
             }else if(val == 0){
                 this.selectNum = val
-                this.apComServerData.total = 0; 
+                this.apComServerData.total = 0;
             }
         },
         //初始化数据
@@ -253,7 +258,7 @@ export default {
                     this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.dataList = [];
-                    this.apComServerData.total = 0; 
+                    this.apComServerData.total = 0;
                 }
                 this.dataListLoading = false;
             })
@@ -277,10 +282,10 @@ export default {
                     this.tableList = data.result.records
                     this.apComServerData.total = data.result.total
                     this.getDataList()
-                    
+
                 }else{
                     this.dataList = [];
-                    this.apComServerData.total = 0; 
+                    this.apComServerData.total = 0;
                 }
                 this.dataListLoading = false;
             })
@@ -322,14 +327,14 @@ export default {
             }
         },
         handleChanges(){
-            if(this.selectNum = 2){ 
+            if(this.selectNum = 2){
                 this.show = !this.show
                 this.columns = this.columns1
                 this.data = this.output
             }
         },
         handleChange3(){
-            if(this.selectNum = 3){ 
+            if(this.selectNum = 3){
                 this.show = !this.show
                 this.columns = this.columns1
                 this.data = this.output

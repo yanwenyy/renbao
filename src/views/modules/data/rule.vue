@@ -306,9 +306,9 @@ export default {
       this.getRuleFolder();
     });
     window.onresize = () => {
-      // console.log(document.documentElement['clientHeight'])
-      // var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
+      var _num=JSON.parse(JSON.stringify(document.documentElement['clientHeight']))
       // this.tableMinus = _num*0.125;
+      console.log(_num)
     }
   },
   methods: {
@@ -546,6 +546,7 @@ export default {
 }
 .right {
   width: 75%;
+  height: 100%!important;
 }
 
 .inline-block {

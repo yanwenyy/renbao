@@ -7,33 +7,33 @@
                 </el-select>
             </el-form-item>
             <el-form-item style="float:right;padding:5px" >
-                <el-button type="warning" v-show="isShow" @click="exportData">下载模板</el-button> 
+                <el-button type="warning" v-show="isShow" @click="exportData">下载模板</el-button>
                 <el-button type="warning"  @click="ImportData">导入数据</el-button>
             </el-form-item>
         </el-form>
         <!-- 列表 -->
         <div class="listDisplay">
-            <!-- <div class='f_right'>             
-                <el-button size="mini" type="warning" v-show="isShow" @click="exportData">下载模板</el-button>       
+            <!-- <div class='f_right'>
+                <el-button size="mini" type="warning" v-show="isShow" @click="exportData">下载模板</el-button>
                 <el-button size="mini" type="warning"  @click="ImportData">导入数据</el-button>
             </div> -->
-                <el-table :data="tableList0" v-if="selectNum == 0" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList0" v-if="selectNum == 0" border style="100%"  :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                     <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
 
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
-                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
                 </el-table>
                 <!-- 医保耗材目录 -->
-                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="$tableHeight - 70" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                      <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
@@ -90,7 +90,7 @@ export default {
         return{
             dataForm:{
                 dataType:'',
-            }, 
+            },
             selectNum:0,
             //列表加载
             dataLoading: false,
@@ -155,6 +155,11 @@ export default {
             importType:''
         }
     },
+    computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     created(){
         // this.getDataList();
         this.token = this.$cookie.get("token");
@@ -181,7 +186,7 @@ export default {
                     this.apComServerData.total = data.result.pagination.dataCount
                 }else{
                     this.dataList = [];
-                    this.apComServerData.total = 0; 
+                    this.apComServerData.total = 0;
                 }
                 this.dataLoading = false;
             })
@@ -191,8 +196,8 @@ export default {
             this.fileList = fileList
             console.log(this.fileList)
         },
-          
-  
+
+
         //上传文件 导入
         uploadFile(){
             let arrDuplicate =''
@@ -283,10 +288,10 @@ export default {
             else if(val == 0){
                 this.isShow = false
                 this.selectNum = val
-                this.apComServerData.total = 0; 
+                this.apComServerData.total = 0;
             }
         },
-       
+
          // 页数
         handleSizeChange(val){
             this.apComServerData.size = val;

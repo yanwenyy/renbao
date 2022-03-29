@@ -1,7 +1,7 @@
 <!-- 采集模板导出 -->
 <template>
     <div class='template'>
-        <el-table :data="tableData" border style="100%" :header-cell-style="{textAlign:'center'}" :height="$tableHeight-75" class="demo-ruleForm" v-loading="listLoading">
+        <el-table :data="tableData" border style="100%" :header-cell-style="{textAlign:'center'}" :height="tableHeight+60" class="demo-ruleForm" v-loading="listLoading">
             <el-table-column prop="templateName" align="center" label="模板名称"></el-table-column>
             <el-table-column align="center" label="上传时间">
                  <template slot-scope="scope">{{scope.row.uploadTime | datetimeformat}}</template>
@@ -62,6 +62,11 @@ export default {
             importId:''
         }
     },
+  computed:{
+    tableHeight: {
+      get () { return this.$store.state.common.tableHeight}
+    },
+  },
     created(){
         this.token = this.$cookie.get("token");
     },
@@ -89,7 +94,7 @@ export default {
                     this.apComServerData.total = data.result.total
                 }else{
                     this.tableData = [];
-                    this.apComServerData.total = 0; 
+                    this.apComServerData.total = 0;
                 }
                 this.listLoading = false;
             })
@@ -116,7 +121,7 @@ export default {
                             onClose: () => {
                                 this.showImportVisible=false;
                                 this.initDataList()
-                  
+
                             }
                         })
                         // this.initData()
@@ -142,7 +147,7 @@ export default {
                             onClose: () => {
                                 // this.showImportVisible=false;
                                 this.initData()
-                  
+
                             }
                         })
                         // this.initData()
@@ -166,7 +171,7 @@ export default {
             this.apComServerData.pageSize = val
             this.apComServerData.pageIndex = 1
             this.initData()
-        }, 
+        },
         // 当前页
         handleCurrentChange (val) {
             this.apComServerData.pageIndex = val
