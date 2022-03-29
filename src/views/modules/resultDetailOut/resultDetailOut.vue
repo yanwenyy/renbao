@@ -491,6 +491,8 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  height: 80vh;
+  .el-card{
+    overflow: auto;
+  }
 }
 </style>

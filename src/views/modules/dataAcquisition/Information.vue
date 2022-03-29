@@ -10,10 +10,10 @@
         <!-- 列表 -->
         <div class="listDisplay"  v-if="selectNum == 0">
             <div class='f_right'>
-                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+                <el-button type="primary" @click="searchList">查询</el-button>
+                <el-button type="warning" @click="reportList">导出</el-button>
             </div>
-            <el-table :data="tableList0" v-if="selectNum == 0" border  :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList0" v-if="selectNum == 0" border  :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
             </el-table>
             <!-- 病种目录 -->
             <!-- <el-table :data="tableList" v-if="selectNum == 4" border style="100%" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
@@ -25,8 +25,8 @@
         </div>
         <div class="listDisplay"  v-if="selectNum == 1">
              <div class='f_right'>
-                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+                <el-button type="primary" @click="searchList">查询</el-button>
+                <el-button type="warning" @click="reportList">导出</el-button>
             </div>
             <div class='ax_default'>
                 <div @click="handleChange">查询条件<i v-if="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
@@ -34,7 +34,7 @@
                     <myquerybuilder ref="myquerybuilder" :rules="queryRules" v-show="show" class="mask" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
-            <el-table :data="tableList" border   :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border   :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -43,8 +43,8 @@
         </div>
         <div class="listDisplay" v-if="selectNum == 2">
             <div class='f_right'>
-                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+                <el-button type="primary" @click="searchList">查询</el-button>
+                <el-button type="warning" @click="reportList">导出</el-button>
             </div>
             <div class='ax_default'>
                 <div @click="handleChanges">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
@@ -53,7 +53,7 @@
                 </transition>
             </div>
              <!-- 医保诊疗项目 -->
-            <el-table :data="tableList" border  :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border  :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -62,8 +62,8 @@
         </div>
         <div class="listDisplay"  v-if="selectNum == 3">
             <div class='f_right'>
-                <el-button size="mini" type="primary" @click="searchList">查询</el-button>
-                <el-button size="mini" type="warning" @click="reportList">导出</el-button>
+                <el-button type="primary" @click="searchList">查询</el-button>
+                <el-button type="warning" @click="reportList">导出</el-button>
             </div>
             <div class='ax_default'>
                 <div @click="handleChange3">查询条件<i v-show="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
@@ -72,7 +72,7 @@
                 </transition>
             </div>
             <!-- 医保耗材目录 -->
-            <el-table :data="tableList" border :height="tableHeight-30" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+            <el-table :data="tableList" border :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>

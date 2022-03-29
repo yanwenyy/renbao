@@ -67,7 +67,7 @@ export default {
                 this.$emit("getbatchData", data,node);
             }
 
-        }, 
+        },
         remove (node, data) {
             this.$confirm(`确认要该条批次吗?`, '提示', {
                 confirmButtonText: '确定',
@@ -105,7 +105,7 @@ export default {
                 return data.batchName.indexOf(value) !== -1;
             } else {
                 return data.label.indexOf(value) !== -1;
-            }  
+            }
         }
     },
     watch: {
@@ -120,7 +120,7 @@ export default {
 .batch-list-box {
     width: 100%;
     height: 100%;
-    // overflow: auto;
+    overflow: auto;
     /deep/ .filter-text {
         width: 80%;
         margin: 10px 0 10px 10px;
@@ -145,14 +145,14 @@ export default {
         height: 25px;
         display: inline-block;
         background: #AF0F16;
-        
-        margin-left: 3px; 
+
+        margin-left: 3px;
     }
 
     /deep/ .el-tree-node__children .custom-tree-node{
         display: flex;
     }
-   
+
     /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
         color: #AF0F16 !important;
         background: #fff !important;
@@ -160,7 +160,7 @@ export default {
     /deep/ .el-tree-node__content:hover{
         background: #fff;
     }
-    
+
     .batch-label {
         max-width: 180px;
         display: inline-block;

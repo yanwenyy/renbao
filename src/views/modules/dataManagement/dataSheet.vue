@@ -1,63 +1,62 @@
 <!-- 数据表管理 -->
 <template>
     <div class='dataSheet'>
-        <el-row :gutter="20">
-            <el-col :span="5">
-                <el-card :style="{height:(tableHeight+120)+'px',overflow:'auto'}">
-
-                    <div style='padding:5px'><el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input></div>
-                    <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading" :filter-node-method="filterNode">
-                         <span class="custom-tree-node" slot-scope="{ node, data }">
-                             <span class="tree-label" :title="node.label">
-                            <img v-if="node.data.type =='funFolder'" class="tree-icon" src="./icon/folder.png" alt="">
-                            <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt="">
-                            {{ node.label }}
-                            </span>
-                        </span>
-                    </el-tree>
-                </el-card>
-            </el-col>
-            <el-col :span="19">
-                <div>
-                    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-                        <el-form-item label="表名:">
-                            <el-input v-model="dataForm.title" placeholder="请输入搜索内容" clearable></el-input>
-                        </el-form-item>
-                        <!-- <el-form-item label="数据库:">
-                            <el-input v-model="dataForm.database" placeholder="请输入搜索内容" clearable></el-input>
-                        </el-form-item> -->
-                        <el-form-item>
-                            <el-button type="primary" @click="getSearchList()">查询</el-button>
-                            <el-button @click="resetForm()">重置</el-button>
-                        </el-form-item>
-                    </el-form>
-                    <el-table :data="dataList" border v-loading="dataListLoading" :height="tableHeight+32" style="width: 100%;">
-                        <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column> -->
-                        <el-table-column prop="title" align="center" label="表名"></el-table-column>
-                        <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
-                        <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>
-                        <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
-                        <el-table-column align="center" label="操作" min-width='120px'>
-                            <template slot-scope="scope">
-                                <el-button size="small" type="text" @click="getTableStructure(scope.row)">查看表结构</el-button>
-                                <el-button size="small" type="text" @click="getTableData(scope.row)">查看表数据</el-button>
-                                <el-button size="small" type="text" @click="getTableClear(scope.row)">数据清除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                     <!-- 分页
-                   <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="apComServerData.pageIndex"
-                    :page-sizes="[10, 20, 50, 100]"
-                    :page-size="apComServerData.size"
-                    :total="apComServerData.total"
-                    layout="total, sizes, prev, pager, next, jumper">
-                    </el-pagination> -->
-                </div>
-            </el-col>
-        </el-row>
+        <div class="box" >
+          <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
+            <div class="custom-tree-container">
+              <el-input placeholder="请输入内容" v-model="filterText" class="input-with-select" icon="el-icon-search"></el-input>
+              <el-tree :data="dataTree" ref="ruleTreeRoot" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick" v-loading="treeLoading" :filter-node-method="filterNode">
+                 <span class="custom-tree-node" slot-scope="{ node, data }">
+                     <span class="tree-label" :title="node.label">
+                    <img v-if="node.data.type =='funFolder'" class="tree-icon" src="./icon/folder.png" alt="">
+                    <img v-if="node.data.databaseType =='oracle'" class="tree-icon" src="./icon/data.png" alt="">
+                    {{ node.label }}
+                    </span>
+                </span>
+              </el-tree>
+            </div>
+          </div>
+          <div class="right" :style="{height:(tableHeight+120)+'px'}">
+            <div>
+              <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+                <el-form-item label="表名:">
+                  <el-input v-model="dataForm.title" placeholder="请输入搜索内容" clearable></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="数据库:">
+                    <el-input v-model="dataForm.database" placeholder="请输入搜索内容" clearable></el-input>
+                </el-form-item> -->
+                <el-form-item>
+                  <el-button type="primary" @click="getSearchList()">查询</el-button>
+                  <el-button @click="resetForm()">重置</el-button>
+                </el-form-item>
+              </el-form>
+              <el-table :data="dataList" border v-loading="dataListLoading" :height="tableHeight+32" style="width: 100%;">
+                <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column> -->
+                <el-table-column prop="title" align="center" label="表名"></el-table-column>
+                <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
+                <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>
+                <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+                <el-table-column align="center" label="操作" min-width='120px'>
+                  <template slot-scope="scope">
+                    <el-button size="small" type="text" @click="getTableStructure(scope.row)">查看表结构</el-button>
+                    <el-button size="small" type="text" @click="getTableData(scope.row)">查看表数据</el-button>
+                    <el-button size="small" type="text" @click="getTableClear(scope.row)">数据清除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <!-- 分页
+            <el-pagination
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="apComServerData.pageIndex"
+             :page-sizes="[10, 20, 50, 100]"
+             :page-size="apComServerData.size"
+             :total="apComServerData.total"
+             layout="total, sizes, prev, pager, next, jumper">
+             </el-pagination> -->
+            </div>
+          </div>
+        </div>
         <el-dialog :visible.sync="StructureDialog" title="查看表结构" :close-on-click-modal="false" :modal-append-to-body="false" :close-on-press-escape="false">
             <TableStructure v-if="StructureDialog" @close="closeStructureDrawer" @ok="StructureSucceed" :structureList="structureList" :structureName="structureName"></TableStructure>
             <span slot="footer" class="dialog-footer">
@@ -298,12 +297,45 @@ export default {
     // display: inline-block;
     align-items: center;
 }
-    .tree-label {
-        max-width: 180px;
-        display: inline-block;
-        overflow:hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        -o-text-overflow:ellipsis;
-    }
+.tree-label {
+    max-width: 180px;
+    display: inline-block;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow:ellipsis;
+}
+.custom-tree-container {
+  /*overflow-y: hidden;*/
+  overflow-x: auto;
+  width: 100%;
+  height: 100%;
+  .el-tree {
+    min-width: 100%;
+    display: inline-block !important;
+  }
+}
+.box {
+  width:100%;
+  height:100%;
+  display: flex;
+  justify-content: space-between;
+}
+.box > div {
+  /*height: 73vh;*/
+  /*border: 1px solid #ddd;*/
+  padding: 1%;
+  overflow: auto;
+}
+.left {
+  width: 25%;
+  border-right: none;
+}
+.right {
+  width: 75%;
+  height: 100%!important;
+}
+.inline-block {
+  display: inline-block;
+}
 </style>

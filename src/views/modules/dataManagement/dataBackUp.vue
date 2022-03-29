@@ -16,10 +16,10 @@
         <!-- 列表 -->
         <div class="listDisplay">
             <div class='f_right'>
-                <el-button size="mini" type="primary" @click="backupsClick">备份</el-button>
-                <el-button size="mini" type="primary" @click="reductionClick">还原</el-button>
+                <el-button type="primary" @click="backupsClick">备份</el-button>
+                <el-button type="primary" @click="reductionClick">还原</el-button>
             </div>
-            <el-table :data="tableList" border  :height="tableHeight-45" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
+            <el-table :data="tableList" border  :height="tableHeight-55" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
                 <el-table-column prop="fileName" header-align="center" align="center" label="文件名称"></el-table-column>
                 <el-table-column prop="formDate" header-align="center" align="center" label="时间"></el-table-column>

@@ -427,11 +427,12 @@ export default {
   // overflow-x: auto;
   .auditRuleMonitoring-left {
     width: 300px;
+    height: 100%;
     // min-height: 100vh;
-    min-height: calc(100vh - 165px);
+    /*min-height: calc(100vh - 165px);*/
     // margin-right: 20px;
     // border: 1px solid #ddd;
-    // overflow: auto;
+    /*overflow: auto;*/
     min-width: 300px;
   }
   .auditRuleMonitoring-right {
@@ -460,10 +461,13 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  height: 80vh;
+  overflow: auto;
+  .el-card{
+    overflow: auto;
+  }
 }
 .result-view-text {
-   color: #0cbde5;
-   cursor: pointer;
+  color: #0cbde5;
+  cursor: pointer;
 }
 </style>

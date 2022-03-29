@@ -1,9 +1,9 @@
 <template>
-  <div style="height:46vh;overflow:auto;">
+  <div :style="{height:(tableHeight-60)+'px'}">
     <el-table
       :data="dataList"
       border
-      height="46vh"
+      :height="tableHeight-60"
       style="width: 100%;">
       <el-table-column
        v-for="(column,index) in columnList"
@@ -27,6 +27,11 @@
         //dataListLoading: false,
         columnList: []
       }
+    },
+    computed:{
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
     },
     created () {
       this.getDataList();
