@@ -223,6 +223,12 @@ export default {
     //打开选择医院弹窗
     chooseHospital() {
       this.showHospitalDialog = true;
+      this.$nextTick(() => {
+        if (this.$refs.hospital) {
+          var arr = this.dataForm.hospitalCode.split(",");
+          this.$refs.hospital.toggleRowSelection(arr);
+        }
+      });
     },
     //获取选择医院数据
     getHospitalData() {

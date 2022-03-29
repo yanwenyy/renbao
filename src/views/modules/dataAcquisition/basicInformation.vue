@@ -298,11 +298,11 @@ export default {
     },
     //重置
     resetForm() {
-      this.dataForm.hospitalName = '',
-      this.dataForm.hospitalType = '',
-      this.dataForm.moneyEnd = '',
-      this.dataForm.moneyStart = ''
-      this.apComServerData.pageIndex = 1
+      (this.dataForm.hospitalName = ""),
+        (this.dataForm.hospitalType = ""),
+        (this.dataForm.moneyEnd = ""),
+        (this.dataForm.moneyStart = "");
+      this.apComServerData.pageIndex = 1;
     },
     //查询
     getDataList() {
@@ -360,6 +360,16 @@ export default {
       this.multipleSelection = [];
       this.$refs.multipleTable.clearSelection(this.multipleSelection);
     },
+    //动态设置已选状态
+    toggleRowSelection(item) {
+      this.tableList.forEach(id => {
+        item.forEach(row => {
+          if (row["医疗机构编码"] == id) {
+            this.$refs.multipleTable.toggleRowSelection(row, true);
+          }
+        });
+      });
+    }
   }
 };
 </script>

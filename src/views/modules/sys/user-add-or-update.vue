@@ -5,7 +5,7 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="用户账号" prop="userLoginName">
-        <el-input v-model="dataForm.userLoginName" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
+        <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword" :class="{ 'is-required': !dataForm.id }">
         <el-input class="no-autofill-pwd" v-model="dataForm.userPassword" type="text" placeholder="密码"></el-input>

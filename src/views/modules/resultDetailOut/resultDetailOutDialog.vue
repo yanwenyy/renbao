@@ -3,7 +3,7 @@
     <el-dialog
       ref="resultDetailOutDialog"
       title="结果明细导出"
-      width="30%"
+      width="40%"
       :visible.sync="dialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -15,6 +15,8 @@
           :model="exportForm"
           :rules="exportFormRules"
           :inline="true"
+          label-width="120px"
+          style="height:400px;overflow-y:auto"
         >
           <el-form-item prop="hospital" label="选择医院：">
             <el-select
@@ -22,6 +24,7 @@
               placeholder="请选择"
               multiple
               @change="val => checkChange(val)"
+              style="width:400px"
             >
               <el-option
                 v-for="item in hospitalTableData"
@@ -31,7 +34,10 @@
               >
               </el-option>
             </el-select>
-            <el-checkbox v-model="checked" @change="selectAll"
+            <el-checkbox
+              v-model="checked"
+              @change="selectAll"
+              style="position:absolute;margin-left:10px"
               >全选</el-checkbox
             >
           </el-form-item>

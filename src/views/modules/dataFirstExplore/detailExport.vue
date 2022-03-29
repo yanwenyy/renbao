@@ -136,12 +136,12 @@
           title="结果明细导出"
           :close-on-click-modal="false"
           :modal-append-to-body="false"
-          width="30%"
+          width="40%"
           :close-on-press-escape="false"
           v-if="detailExportDialog"
         >
           <el-form
-            style="height:100px;overflow-y:auto"
+            style="height:400px;overflow-y:auto"
             :model="dataForm1"
             ref="dataForm1"
             label-width="120px"
@@ -155,6 +155,7 @@
                 placeholder="请选择医院"
                 multiple
                 @change="val => checkChange(val)"
+                style="width:400px"
               >
                 <el-option
                   v-for="item in hospitals"
@@ -164,7 +165,10 @@
                 >
                 </el-option>
               </el-select>
-              <el-checkbox v-model="checked" @change="selectAll"
+              <el-checkbox
+                style="position:absolute;margin-left:10px"
+                v-model="checked"
+                @change="selectAll"
                 >全选</el-checkbox
               >
             </el-form-item>

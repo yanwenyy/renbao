@@ -15,7 +15,7 @@
           :readonly="readonly"
         ></el-input>
       </el-form-item>
-      <el-form-item prop="manuscriptName" label="证据名称：">
+      <el-form-item v-if="readonly" prop="manuscriptName" label="底稿名称：">
         <el-input
           v-model="dataForm.manuscriptName"
           placeholder="底稿名称"
@@ -43,6 +43,7 @@
             :http-request="uploadData"
             :before-remove="beforeRemove"
             :on-progress="handleProgress"
+            :on-change="fileChange"
           >
             <el-button size="small" type="primary" v-if="showBtn"
               >点击上传</el-button
@@ -136,7 +137,8 @@ export default {
       // form对象
       dataForm: {
         evidenceName: "",
-        evidenceRemark: ""
+        evidenceRemark: "",
+        manuscriptName: ""
       },
       //form校验
       rules: {
@@ -178,7 +180,7 @@ export default {
           var data = data.result;
           this.dataForm.evidenceName = data.evidenceName;
           this.dataForm.evidenceRemark = data.evidenceRemark;
-        // this.dataForm.
+          this.dataForm.manuscriptName = data.manuscriptName;
           this.fileData = data.fileInfos;
         }
       });
@@ -189,7 +191,6 @@ export default {
     },
     // 表单提交
     submitForm(dataForm) {
-      console.log(this.multipartFiles);
       this.$refs[dataForm].validate(valid => {
         if (valid) {
           //过滤在上传时移除的文件
@@ -202,52 +203,18 @@ export default {
               });
             });
           }
-          if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
+          //附件去重
+          this.multipartFiles = this.distinct(this.multipartFiles);
+          //处理重复上传
+          /*  if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
             this.multipartFiles.forEach(item => {
               this.fileData.forEach(it => {
                 if (item.name == it.fileName) {
                   this.$message.error(item.name + "已存在");
-                } else {
-                  let evidence = new FormData();
-                  evidence.append("evidenceId", this.id || undefined);
-                  evidence.append("evidenceName", this.dataForm.evidenceName);
-                  evidence.append(
-                    "evidenceRemark",
-                    this.dataForm.evidenceRemark
-                  );
-                  for (var i = 0; i < this.multipartFiles.length; i++) {
-                    evidence.append("multipartFiles", this.multipartFiles[i]);
-                  }
-                  if (this.removeFileIdList.length > 0) {
-                    evidence.append("fileInfoIds", this.removeFileIdList);
-                  }
-                  this.$http({
-                    url: this.$http.adornUrl(
-                      `/evidence/${!this.id ? "add" : "updateByUuId"}`
-                    ),
-                    headers: {
-                      "Content-Type": "multipart/form-data"
-                    },
-                    method: "post",
-                    data: evidence
-                  }).then(({ data }) => {
-                    if (data && data.code === 200) {
-                      this.$message({
-                        message: "操作成功",
-                        type: "success",
-                        duration: 1500,
-                        onClose: () => {
-                          this.$emit("ok");
-                        }
-                      });
-                    } else {
-                      this.$message.error(data.message);
-                    }
-                  });
                 }
               });
             });
-          }
+          } */
           //是否上传附件校验
           /* if (this.multipartFiles.length == 0) {
             this.$message({
@@ -256,6 +223,39 @@ export default {
             });
             return;
           } */
+          let evidence = new FormData();
+          evidence.append("evidenceId", this.id || undefined);
+          evidence.append("evidenceName", this.dataForm.evidenceName);
+          evidence.append("evidenceRemark", this.dataForm.evidenceRemark);
+          for (var i = 0; i < this.multipartFiles.length; i++) {
+            evidence.append("multipartFiles", this.multipartFiles[i]);
+          }
+          if (this.removeFileIdList.length > 0) {
+            evidence.append("fileInfoIds", this.removeFileIdList);
+          }
+          this.$http({
+            url: this.$http.adornUrl(
+              `/evidence/${!this.id ? "add" : "updateByUuId"}`
+            ),
+            headers: {
+              "Content-Type": "multipart/form-data"
+            },
+            method: "post",
+            data: evidence
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.$emit("ok");
+                }
+              });
+            } else {
+              this.$message.error(data.message);
+            }
+          });
         }
       });
     },
@@ -289,6 +289,18 @@ export default {
     handleProgress(event, file, fileList) {
       // console.log(file,fileList)
     },
+    //文件状态改变时
+    fileChange(file, fileList) {
+      // 该上传文件是否已经存在上传列表中
+      let isTrue = this.fileList.some(f => f.name === file.name);
+      if (isTrue) {
+        this.$message.warning("请勿重复上传文件！");
+        // 文件展示列表是将新添加的文件放在数组末尾
+        fileList.pop();
+        return;
+      }
+      this.fileList = fileList;
+    },
     //删除附件
     deleteData(index, data, row) {
       this.$confirm(`确定删除${row.fileName}?`, "提示", {
@@ -316,6 +328,11 @@ export default {
             "&token="
         ) + this.$cookie.get("token");
       window.open(url);
+    },
+    //附件去重
+    distinct(arr) {
+      const res = new Map();
+      return arr.filter(a => !res.has(a.from) && res.set(a.from, 1));
     }
   }
 };
