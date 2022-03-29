@@ -71,7 +71,7 @@
                             <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="步骤结果" align="center" prop="stepResult">
+                    <el-table-column label="步骤结果" align="center" min-width='120' prop="stepResult">
                     </el-table-column>
                 </el-table>
                 <div class="itemBtn">
