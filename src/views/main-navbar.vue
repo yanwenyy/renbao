@@ -14,6 +14,11 @@
           <icon-svg name="zhedie"></icon-svg>
         </el-menu-item>
       </el-menu>
+      <!--<el-switch-->
+        <!--class="btn-magnifier"-->
+        <!--v-model="useMagnifier"-->
+        <!--active-text="放大镜">-->
+      <!--</el-switch>-->
       <el-menu
         class="site-navbar__menu site-navbar__menu--right"
         mode="horizontal">
@@ -101,6 +106,10 @@
       },
       projectList: {
         get () { return this.$store.state.common.projectList }
+      },
+      useMagnifier: {
+        get () { return this.$store.state.common.useMagnifier },
+        set (val) { this.$store.commit('common/updateUseMagnifier', val) }
       }
     },
     created () {
@@ -180,5 +189,7 @@
     border:none;
     text-align: right;
   }
-
+  .btn-magnifier{
+    height: 50px;
+  }
 </style>

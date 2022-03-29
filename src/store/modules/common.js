@@ -22,6 +22,7 @@ export default {
     mainTabsActiveName: '',
     projectList: [], // 项目列表
     projectId:'',//项目id
+    useMagnifier:false,//使用放大镜效果
   },
   mutations: {
     updateDocumentClientHeight (state, height) {
@@ -57,6 +58,9 @@ export default {
     },
     updateProjectId (state, data) {
       state.projectId = data
+    },
+    updateUseMagnifier (state, data) {
+      state.useMagnifier = data
     }
   },
   actions: {

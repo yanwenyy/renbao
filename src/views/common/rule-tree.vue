@@ -12,7 +12,6 @@
             class="treeClass"
             :data="treeData"
             :show-checkbox="isShowCheckBox"
-            default-expand-all
             :filter-node-method="filterNode"
             :props="layoutTreeProps"
             :expand-on-click-node="false"
@@ -21,6 +20,7 @@
             @check-change="callCheckChange"
             highlight-current
             @node-click="nodeClick"
+            :default-expand-all="ifExpand"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span v-if="!isShowIcon" :class="isShowEdit ? 'cut-width custom-tree-label tree-label' : 'custom-tree-label tree-label' " :title="node.label">{{ node.label }}</span>
@@ -129,6 +129,7 @@ export default {
     },
     data () {
         return {
+            ifExpand:true,
             filterText: '',
             treeVisible: false,
             treeTitle: '',
@@ -164,7 +165,7 @@ export default {
     },
     methods: {
         // 获取规则树
-        getRuleFolder (callBack) {
+        getRuleFolder (callBack,from) {
             this.treeLoading = true;
             this.$http({
                 isLoading:false,
@@ -176,10 +177,14 @@ export default {
                 this.treeLoading = false
                 if (data.code == 200) {
                     this.treeData = data.result;
+                    if(from=='self'){
+                      this.ifExpand=false;
+                    }
+                    console.log(from,this.ifExpand)
                     if (callBack) {
                         callBack(this.treeData)
                     }
-                    
+
                     this.$emit("getTreeData", this.treeData);
                 }
             }).catch(() => {
@@ -238,7 +243,8 @@ export default {
                         this.btnLoading = false;
                         if (data.code == 200) {
                             this.treeVisible = false;
-                            this.getRuleFolder()
+
+                            this.getRuleFolder(null,'self')
                             this.$bus.$emit('updateRuleData');
                         } else {
                             this.btnLoading = false;
@@ -280,7 +286,8 @@ export default {
                         this.btnLoading = false;
                         if (data.code == 200) {
                             this.treeVisible = false;
-                            this.getRuleFolder()
+                          this.getRuleFolder(null,'self')
+
                             this.$bus.$emit('updateRuleData');
                         } else {
                             this.btnLoading = false;
@@ -353,7 +360,7 @@ export default {
                                     message: '操作成功',
                                     type: 'success',
                                 })
-                                this.getRuleFolder()
+                              this.getRuleFolder(null,'self')
                                 this.$bus.$emit('updateRuleData');
                             } else {
                                 this.$message.error(data.msg)
@@ -366,7 +373,7 @@ export default {
                 }).catch(() => {})
 
             })
-           
+
         },
         nodeClick (data, node) {
             // 调用父组件的获取规则树id的方法
@@ -380,7 +387,7 @@ export default {
             if(this.isRelation) {
                 this.$emit("checkChange", data, checked, this.treeData);
                 if (checked) {
-                    this.$refs.ruleTreeRoot.setCheckedNodes([data]);                  
+                    this.$refs.ruleTreeRoot.setCheckedNodes([data]);
                 } else {
                     this.$refs.ruleTreeRoot.setCheckedNodes([]);
                 }
@@ -454,7 +461,7 @@ export default {
         background-color: #e3edfa;
     }
     /deep/ .el-tree-node__children {
-        overflow:visible;  
+        overflow:visible;
     }
 }
 
