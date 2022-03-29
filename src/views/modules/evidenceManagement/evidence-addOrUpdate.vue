@@ -204,7 +204,7 @@ export default {
             });
           }
           //是否上传了重复文件
-          let ishave = "";
+          let ishave = false;
           //处理重复上传
           if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
             this.multipartFiles.forEach(item => {
@@ -212,8 +212,6 @@ export default {
                 if (item.name == it.fileName) {
                   this.$message.error(item.name + "已存在");
                   ishave = true;
-                } else {
-                  ishave = false;
                 }
               });
             });
