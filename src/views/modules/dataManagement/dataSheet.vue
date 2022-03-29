@@ -28,7 +28,7 @@
                         </el-form-item> -->
                         <el-form-item>
                             <el-button type="primary" @click="getSearchList()">查询</el-button>
-                            <el-button @click="resetForm('dataForm')">重置</el-button>
+                            <el-button @click="resetForm()">重置</el-button>
                         </el-form-item>
                     </el-form>
                     <el-table :data="dataList" border v-loading="dataListLoading" :height="tableHeight+32" style="width: 100%;">
@@ -120,7 +120,7 @@ export default {
             projectList:'',
             structureList:'',
             structureName:'',
-            isCheckedId: [], //数据授权回显id
+            isCheckedId: '', //数据授权回显id
             treeDataToHint:[]
         }
     },
@@ -163,6 +163,7 @@ export default {
 
         //tree点击事件
         handleNodeClick(data,node){
+            this.isCheckedId = data.projectId
             //  this.childArr = []
             this.getTreeChild(data,node)
         },
@@ -174,7 +175,7 @@ export default {
                 url: this.$http.adornUrl("/prjBusDatabaseRelation/listAllTablesByDB"),
                 method: "get",
                 params: this.$http.adornParams({
-                projectId: this.projectList.projectId,
+                projectId: this.isCheckedId,
                 },false)
             }).then(({data}) => {
                 if(data && data.code === 200){
@@ -249,6 +250,7 @@ export default {
         resetForm(){
             this.dataForm.title = '';
             this.apComServerData.pageIndex = 1
+            this.getTreeChild()
         },
         //数据清除
         getTableClear(row){

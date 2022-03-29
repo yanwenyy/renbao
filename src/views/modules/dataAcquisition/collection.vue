@@ -346,13 +346,13 @@ export default {
         },
         //重置
         getReset(){
-            this.dataForm.fileName = '',
+           this.dataForm.fileName = '',
             this.dataForm.filePath = '',
             this.dataForm.collectPath = '',
+            this.dataForm.collectStatus = '',
             this.dataForm.startTimeBegin = '',
             this.dataForm.startTimeEnd = ''
             this.apComServerData.pageIndex = 1
-
         },
         //查询
         getSearch(){
