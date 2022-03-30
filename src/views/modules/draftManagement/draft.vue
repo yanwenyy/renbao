@@ -22,7 +22,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="创建人">
+          <el-form-item label="创建人：">
             <el-input
               v-model="searchForm.createUserName"
               clearable

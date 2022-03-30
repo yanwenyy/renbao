@@ -125,7 +125,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           tableName: this.resultTableName,
-          resultId: this.info,
+          resultId: this.info.resultId,
           complexWhere: this.sqlData,
           pageNum: this.apComServerData.pageIndex,
           pageSize: this.apComServerData.size
@@ -180,7 +180,7 @@ export default {
           }
         })
         .then(response => {
-          this.exportExcel(response, "数据导出");
+          this.exportExcel(response, this.info.ruleName);
           // this.loading = false;
           this.$message({
             // message: data.message,
