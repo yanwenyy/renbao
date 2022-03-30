@@ -2,7 +2,7 @@
 <template>
   <div class="box">
     <div class="left">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <div
           class="auditRuleMonitoring-left"
           style="width:100%;overflow-y:auto"
@@ -18,8 +18,15 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <el-form ref="dataForm" :model="dataForm" :inline="true">
+          <el-form-item label="规则名称">
+            <el-input
+              v-model="dataForm.ruleName"
+              placeholder="规则名称"
+              clearable
+            ></el-input>
+          </el-form-item>
           <el-form-item label="运行状态：">
             <el-select
               v-model="dataForm.batchResultExportStatus"
@@ -68,16 +75,21 @@
                 <div v-if="scope.row.batchResultExportStatus == 3">
                   已完成
                 </div>
-                <div v-if="scope.row.batchResultExportStatus == 4">执行失败</div>
+                <div v-if="scope.row.batchResultExportStatus == 4">
+                  执行失败
+                </div>
               </template>
             </el-table-column>
-            <!--  <el-table-column prop="moblie" label="操作">
+            <el-table-column prop="moblie" label="操作">
               <template slot-scope="scope">
-                <el-button type="text" @click="detailHandle(scope.row)"
-                  >查看明细</el-button
+                <el-button
+                  type="text"
+                  v-if="scope.row.batchResultExportStatus == 4"
+                  @click="detailHandle(scope.row)"
+                  >查看错误信息</el-button
                 >
               </template>
-            </el-table-column> -->
+            </el-table-column>
           </el-table>
           <div>
             <el-pagination
@@ -94,6 +106,21 @@
         </div>
       </el-card>
     </div>
+    <!-- 查看错误信息弹窗 -->
+    <el-dialog
+      :visible.sync="showDialog"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      width="30%"
+      :close-on-press-escape="false"
+      title="查看错误信息"
+    >
+      <el-form>
+        <el-form-item prop="errorLog">
+          <el-input type="textarea" readonly="" v-model="errorLog"></el-input>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -108,6 +135,7 @@ export default {
     return {
       //条件查询
       dataForm: {
+        ruleName: "",
         batchResultExportStatus: "",
         total: ""
       },
@@ -153,13 +181,17 @@ export default {
         pageSize: 10,
         pageIndex: 1,
         total: 0
-      }
+      },
+      showDialog: false,
+      errorLog: ""
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   activated() {
     this.initTree();
@@ -176,6 +208,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           batchId: this.batchId,
+          ruleName: this.dataForm.ruleName,
           batchResultExportStatus: this.dataForm.batchResultExportStatus,
           pageNo: this.Pager.pageIndex,
           pageSize: this.Pager.pageSize
@@ -231,6 +264,7 @@ export default {
           this.initData();
         } else {
           this.$message.error("生成报告失败");
+          this.initData();
         }
       });
     },
@@ -262,6 +296,7 @@ export default {
     resetForm(formName) {
       this.submitData = {};
       this.$refs[formName].resetFields();
+      this.initData();
     },
     //分页
     sizeChangeHandle(val) {
@@ -307,6 +342,11 @@ export default {
         batchId: ""
       };
       this.checked = false;
+    },
+    //查看错误信息
+    detailHandle(data) {
+      this.showDialog = true;
+      this.errorLog = data.errorLog;
     }
   }
 };
@@ -352,7 +392,7 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  .el-card{
+  .el-card {
     overflow: auto;
   }
 }

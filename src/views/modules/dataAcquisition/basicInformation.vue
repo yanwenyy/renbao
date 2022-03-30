@@ -60,7 +60,7 @@
         :data="tableList"
         border
         style="100%"
-        :height="tableHeight-10"
+        :height="tableHeight - 10"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange"
@@ -187,10 +187,12 @@ export default {
       importType: ""
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   created() {
     this.token = this.$cookie.get("token");
@@ -201,7 +203,7 @@ export default {
   methods: {
     //初始化数据列表
     getInitList() {
-      this.tableLoading = true;
+      // this.tableLoading = true;
       this.$http({
         url: this.$http.adornUrl("/hospitalBasicInfo/getPageList"),
         method: "get",
@@ -223,7 +225,7 @@ export default {
           this.tableList = [];
           this.apComServerData.total = 0;
         }
-        this.tableLoading = false;
+        // this.tableLoading = false;
       });
     },
     //多选
@@ -362,6 +364,7 @@ export default {
     },
     //动态设置已选状态
     toggleRowSelection(item) {
+      console.log(item)
       this.tableList.forEach(id => {
         item.forEach(row => {
           if (row["医疗机构编码"] == id) {
