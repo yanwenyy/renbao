@@ -403,12 +403,16 @@ img {
   vertical-align: middle;
   margin-right: 5px;
 }
-.el-button--danger.is-disabled:hover,.el-button--primary.is-disabled:hover,.el-button--warning.is-disabled:hover,
-.el-button--danger.is-disabled,.el-button--primary.is-disabled,.el-button--warning.is-disabled,
-.el-button--primary,.el-button--warning,
+.el-button--warning.is-disabled:hover,
+.el-button--warning.is-disabled,
+.el-button--primary,.el-button--warning,.el-button--danger,.el-button--danger:hover,
 .el-button--primary:hover,.el-button--warning:hover,.el-button--primary:focus,.el-button--warning:focus{
-  background: $--theme-red;
+  background:$--theme-red;
   border: $--theme-red;
+}
+.el-button--danger.is-disabled:hover,.el-button--danger.is-disabled,.el-button--primary.is-disabled:hover,.el-button--primary.is-disabled{
+  background: mix(#fff, $--theme-red, 60%);
+  border: mix(#fff, $--theme-red, 60%);
 }
 .project-box{
   .el-input,input,.el-input__suffix i{
@@ -444,3 +448,16 @@ img {
     font-size:$--magnifier-fontSize;
   }
 }
+//.loadingIcon .el-loading-text:after{
+//  display: table;
+//  content: '停止运行';
+//  color:red;
+//  text-align: center;
+//  width: 100%;
+//  margin-bottom: 20px;
+//  cursor: pointer;
+//}
+//.el-icon-loading:before{
+//  display: table;
+//  content: '我是按钮';
+//}

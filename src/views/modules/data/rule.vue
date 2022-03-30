@@ -304,6 +304,7 @@ export default {
   activated() {
     // this.getDataList();
     this.getRuleFolder();
+    this.$refs.addOrUpdate.deletCm();
   },
   mounted() {
     this.$bus.$on("updateRuleData", () => {
@@ -314,14 +315,15 @@ export default {
     // 新增 / 修改
     addOrUpdateHandle(id) {
       // this.addOrUpdateVisible = true
-      // this.$nextTick(() => {
-      if (id) {
-        this.$refs.addOrUpdate.init(id, this.ruleCheckData);
-      } else {
-        this.$refs.addOrUpdate.init("", this.ruleCheckData);
-      }
 
-      // })
+      this.$nextTick(() => {
+
+        if (id) {
+          this.$refs.addOrUpdate.init(id, this.ruleCheckData);
+        } else {
+          this.$refs.addOrUpdate.init("", this.ruleCheckData);
+        }
+      });
     },
     // 获取规则树
     getRuleFolder() {

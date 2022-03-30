@@ -7,7 +7,7 @@
     >
       <el-form-item label="底稿名称：">
         <el-input
-          v-model="dataForm.roleNumber"
+          v-model="dataForm.manuscriptName"
           placeholder="底稿名称"
           clearable
         ></el-input>
@@ -144,13 +144,13 @@ export default {
     // addOrUpdate,
     // authorityUser
   },
-  created() {
+  mounted() {
     this.getDataList();
   },
   methods: {
     // 获取数据列表
     getDataList() {
-      this.dataListLoading = true;
+      // this.dataListLoading = true;
       this.$http({
         url: this.$http.adornUrl("/manuscript/selectManuscriptPage"),
         method: "get",
@@ -168,7 +168,7 @@ export default {
           this.dataList = [];
           this.totalPage = 0;
         }
-        this.dataListLoading = false;
+        // this.dataListLoading = false;
       });
     },
     // 每页数
@@ -250,6 +250,7 @@ export default {
         ruleName: "",
         manuscriptName: ""
       };
+      this.pageIndex = 1
       this.getDataList();
     },
     // 删除

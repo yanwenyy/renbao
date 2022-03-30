@@ -429,7 +429,7 @@
     },
     data() {
       return {
-
+        selfFrom:'',
         boxHeight:0,
         dragParmasList:[],//拖拽进来的参数数组
         // SelfparamsList:[],//参数设置列表
@@ -651,7 +651,9 @@
         deep: true,
         handler(val) {
           if(val!=''){
+            this.deletCm();
             this.sqlData=val;
+            this.selfFrom='eidt';
             this.editorValue=val;
             this.getSqlMsg(val);
             if(this.$refs.myCm){
@@ -738,7 +740,7 @@
 
     mounted(){
       this.dragControllerDiv2();
-
+      this.deletCm();
       var that=this,str=this.sqlData;
       setTimeout(function(){
         if(str!=''){
@@ -747,6 +749,13 @@
       },300);
     },
     methods: {
+      //删除智能提示框
+      deletCm(){
+        var cm_complete=document.getElementsByClassName("CodeMirror-hints");
+        if(cm_complete[0]){
+          cm_complete[0].parentNode.removeChild(cm_complete[0])
+        }
+      },
       //执行结果页码点击
       currentChangeTable(val,item,index){
         item.pageIndex=val;

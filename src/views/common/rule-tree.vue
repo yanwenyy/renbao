@@ -221,7 +221,6 @@ export default {
             return checkedNodes;
         },
         addRuleFolder (formName) {
-            this.btnLoading = true;
             let folderPath =  this.getParent(this.editRuleItemNode, 'add');
             folderPath = folderPath.reverse()
             let addRuleFolderdata = {
@@ -234,6 +233,7 @@ export default {
 
             this.$refs[formName].validate((valid) => {
                 if (valid) {
+                    this.btnLoading = true;
                     this.$http({
                         isLoading:false,
                         url: this.$http.adornUrl('ruleFolder/add'),
@@ -265,7 +265,6 @@ export default {
 
         },
         editRuleFolder (formName) {
-            this.btnLoading = true;
             // let folderPath =  this.getParent(this.editRuleItemNode, 'edit');
             let editRuleFolderdata = {
                 folderId: this.editRuleItem.folderId,
@@ -277,6 +276,7 @@ export default {
             }
             this.$refs[formName].validate((valid) => {
                 if (valid) {
+                    this.btnLoading = true;
                     this.$http({
                         isLoading:false,
                         url: this.$http.adornUrl('ruleFolder/updateByUuId'),

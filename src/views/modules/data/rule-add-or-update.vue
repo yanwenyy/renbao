@@ -247,6 +247,12 @@
         ruleCheckData: {}
       }
     },
+    activated(){
+      this.deletCm();
+    },
+    updated(){
+      this.deletCm();
+    },
     methods: {
       handleDragStart(node, ev) {
         // console.log('drag start', node);
@@ -526,6 +532,7 @@
               this.dataForm.createUserName = datas.createUserName;
               this.dataForm.createTime = datas.createTime;
               this.sqlEditMsg.msg = datas.ruleSqlValue;
+              this.deletCm();
               this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
 
               if(datas.ruleStatisticsColumns){
@@ -553,7 +560,9 @@
               this.dataForm.paramRules = datas.params;
               var str=JSON.parse(JSON.stringify(datas.ruleSqlValue));
               this.dataForm.ruleSqlValue =this.stringToBtn(_list,datas.ruleSqlValue) ;
+
               // this.menuListTreeSetCurrentNode();
+              this.deletCm();
             }
           })
         }
@@ -615,7 +624,7 @@
           var v={ruleStatisticsColumnName:item.columnName};
           ruleStatisticsColumns.push(v);
         });
-        if(this.dataForm.ruleSqlStatisticsValue!=''){
+        if(this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!=''){
           if(this.dataForm.ruleSqlStatisticsValue.indexOf("总人次")==-1||this.dataForm.ruleSqlStatisticsValue.indexOf("总金额")==-1){
             this.$message.error('统计sql编写的总人次和总金额是必填');
             return false;
@@ -650,6 +659,7 @@
                   onClose: () => {
                     this.visible = false;
                     this.cleanMsg();
+                    this.deletCm();
                     this.$emit('refreshDataList');
                   }
                 })

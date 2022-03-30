@@ -5,6 +5,10 @@
       :class="{ 'site-sidebar--fold': sidebarFold }"
       v-loading.fullscreen.lock="loading"
       element-loading-text="拼命加载中">
+      <!--<div-->
+        <!--class="site-wrapper"-->
+        <!--:class="{ 'site-sidebar&#45;&#45;fold': sidebarFold }"-->
+       <!--&gt;-->
       <template v-if="!loading">
         <main-navbar />
         <main-sidebar />

@@ -2,11 +2,8 @@
 <template>
   <div class="box">
     <div class="left">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
-        <div
-          class="auditRuleMonitoring-left"
-          style="width:100%;overflow-y:auto"
-        >
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
+        <div class="auditRuleMonitoring-left">
           <batch-list
             :batchLoading="treeLoading"
             :batchTreeList="batchTreeList"
@@ -18,7 +15,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <el-form ref="dataForm" :model="dataForm" :inline="true">
           <el-form-item label="规则名称：">
             <el-input
@@ -259,10 +256,12 @@ export default {
       }
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   activated() {
     this.initTree();
@@ -273,7 +272,7 @@ export default {
   methods: {
     //初始化列表数据
     initData() {
-      this.loading = true;
+      // this.loading = true;
       this.$http({
         url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
@@ -295,7 +294,7 @@ export default {
           this.tableData = [];
           this.Pager.total = 0;
           this.dataForm.total = 0;
-          this.loading = false;
+          // this.loading = false;
         }
       });
     },
@@ -412,7 +411,7 @@ export default {
     },
     //查看结果明细
     detailHandle(data) {
-      this.info = data.resultId;
+      this.info = data;
       this.resultTableName = data.resultTableName;
       this.showDetailDialog = true;
     },
@@ -571,7 +570,7 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  .el-card{
+  .el-card {
     overflow: auto;
   }
 }

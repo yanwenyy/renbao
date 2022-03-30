@@ -1,5 +1,9 @@
 <template>
-  <div style="width:100%">
+  <div style="width:100%"
+       v-loading.fullscreen.lock="loading"
+       element-loading-text="点击取消执行"
+       element-loading-custom-class="selfCustom"
+       element-loading-background="rgba(0, 0, 0, 0.8)">
     <sql-edit
       ref="sqlEdits"
       :treeDefaultProps="treeDefaultProps"
@@ -33,6 +37,7 @@
 <script>
   import sqlEdit from '@/components/codemirror/sqlEditor'
   import {PxSocket,randomString} from '@/utils'
+  import {showSelfLoading} from '@/utils/selfLoading'
   export default {
     components: {
       sqlEdit
@@ -57,6 +62,7 @@
     },
     data() {
       return {
+        loading:false,
         from:'',
         paramsSqlMsg:'',//当前页面自己的属性 参数点确定之后返回的转义的sql
         paramsList:[],//后台返回的参数列表
@@ -127,6 +133,7 @@
       },
     },
     mounted(){
+
       if(this.treeData==[]||this.treeData.length==0){
         this.$refs.sqlEdits.dragControllerDiv()
         this.sqlListData=[];
@@ -443,10 +450,12 @@
               dataSize:"500",
               webSocketId:this.userId,
             };
+            // showSelfLoading();
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
               method: 'post',
-              data: this.$http.adornData(params)
+              data: this.$http.adornData(params),
+              isLoading:false
             }).then(({data}) => {
               if(data.code==200){
 
@@ -464,5 +473,7 @@
 </script>
 
 <style scoped>
-
+  >>>.selfCustom .el-loading-text{
+      cursor: pointer;
+  }
 </style>
