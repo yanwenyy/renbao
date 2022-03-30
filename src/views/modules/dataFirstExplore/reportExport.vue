@@ -20,7 +20,7 @@
     <div style="width:100%">
       <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <el-form ref="dataForm" :model="dataForm" :inline="true">
-          <el-form-item label="规则名称">
+          <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
               placeholder="规则名称"
@@ -57,12 +57,11 @@
             :data="tableData"
             border
             ref="tableData"
-            @selection-change="handleSelectionChange"
             v-loading="loading"
             style="width: 100%"
             :height="tableHeight - 30"
           >
-            <el-table-column type="selection" width="55"> </el-table-column>
+            <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
             <el-table-column prop="ruleName" label="规则名称"></el-table-column>
             <el-table-column prop="batchResultExportBeginTime" label="开始时间">
             </el-table-column>
@@ -71,16 +70,23 @@
             <el-table-column prop="batchResultExportStatus" label="状态">
               <template slot-scope="scope">
                 <div v-if="scope.row.batchResultExportStatus == 1">待执行</div>
+                <div v-if="scope.row.batchResultExportStatus == null">
+                  待执行
+                </div>
                 <div v-if="scope.row.batchResultExportStatus == 2">执行中</div>
                 <div v-if="scope.row.batchResultExportStatus == 3">
                   已完成
                 </div>
-                <div v-if="scope.row.batchResultExportStatus == 4">
+                <el-button
+                  type="text"
+                  @click="detailHandle(scope.row)"
+                  v-if="scope.row.batchResultExportStatus == 4"
+                >
                   执行失败
-                </div>
+                </el-button>
               </template>
             </el-table-column>
-            <el-table-column prop="moblie" label="操作">
+            <!-- <el-table-column prop="moblie" label="操作">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -89,7 +95,7 @@
                   >查看错误信息</el-button
                 >
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
           <div>
             <el-pagination
@@ -253,6 +259,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("batchResultExport/generateBatchReport"),
         method: "post",
+        isLoading: false,
         data: this.$http.adornData({
           batchId: this.batchId,
           batchName: this.batchName,
@@ -272,6 +279,16 @@ export default {
     reportExport() {
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
+      }
+      let isNull = true;
+      for (var i in this.tableData) {
+        if (this.tableData[i].batchResultExportBeginTime != null) {
+          isNull = false;
+        }
+        break;
+      }
+      if (isNull == true) {
+        this.$message.error("请在导出前生成报告");
       } else {
         let url =
           this.$http.adornUrl(
@@ -289,9 +306,9 @@ export default {
       this.closeDetail();
     },
     //列表多选
-    handleSelectionChange(val) {
+    /*  handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
+    }, */
     //重置表单
     resetForm(formName) {
       this.submitData = {};

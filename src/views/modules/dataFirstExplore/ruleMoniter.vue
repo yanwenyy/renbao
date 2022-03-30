@@ -241,9 +241,9 @@ export default {
   methods: {
     //获取列表数据
     getTableData() {
-      this.tableLoading = true;
+      // this.tableLoading = true;
       this.$http({
-        isLoading: false,
+        // isLoading: false,
         url: this.$http.adornUrl("/ruleResult/selectPageByRuleResult"),
         method: "get",
         params: this.$http.adornParams(
@@ -269,7 +269,7 @@ export default {
           }
         })
         .catch(() => {
-          this.tableLoading = false;
+          // this.tableLoading = false;
         });
     },
     //获取左侧批次树数据
