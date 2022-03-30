@@ -110,13 +110,13 @@
               <el-button
                 type="text"
                 size="small"
-                @click="addOrUpdateHandle(scope.row.ruleId)"
+                @click="addOrUpdateHandle(scope.row.policyId)"
                 >修改
               </el-button>
               <el-button
                 type="text"
                 size="small"
-                @click="deleteHandle(scope.row.ruleId)"
+                @click="deleteHandle(scope.row.policyId)"
                 >删除
               </el-button>
             </template>

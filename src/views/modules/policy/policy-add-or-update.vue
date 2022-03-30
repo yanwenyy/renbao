@@ -75,26 +75,15 @@
       }
     },
     methods: {
-      // postionChange:function(i,val){
-      //   if(val == '7'){
-      //     this.charsetList[i].show = true;
-      //     this.charsetList[i].inpValue="";
-      //   }else{
-      //     this.charsetList[i].show = false;
-      //     this.charsetList[i].inpValue="";
-      //     this.charsetList[i].inpValue = val;
-      //   }
-      //   var count=0;
-      //   this.charsetList.forEach(item=>{
-      //     if(item.selValue=='自定义字符串的id'){
-      //       count=count+1;
-      //     }
-      //   })
-      //   //stringCount data里定义的字符串出现的次数 初始值stringCount:0;
-      //   this.stringCount=count;
-      //   //el-option写法
-      //   //el-option v-if="stringCount==3&&item.value=='字符串的id'"
-      // },
+     cleanMsg(){
+       this.dataForm={
+         id: 0,
+         policyName: '',
+         beginTime: '',
+         endTime: '',
+         multipartFiles :[],
+       }
+     },
       //移除已上传的附件
       handleRemove(file, fileList) {
         // console.log(fileList);
@@ -129,6 +118,7 @@
         }
       },
       init (id,regionId) {
+        this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
         this.dataForm.regionId=regionId;
