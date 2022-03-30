@@ -226,7 +226,7 @@
           </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="checkFileTableDialogVisible = false">取 消</el-button>
+        <el-button @click="checkFileTableDialogVisible = false">返回上一步</el-button>
         <el-button type="primary" @click="findFileTable">下一步</el-button>
       </span>
     </el-dialog>
@@ -301,7 +301,7 @@
       </el-tabs>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="fileTableDialogVisible = false">取 消</el-button>
+        <el-button @click="fileTableDialogVisible = false">返回上一步</el-button>
         <el-button type="primary" @click="checkTableColumn">下一步</el-button>
       </span>
     </el-dialog>
@@ -360,7 +360,7 @@
       </el-tabs>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="columnTableDialogVisible = false">取 消</el-button>
+        <el-button @click="columnTableDialogVisible = false">返回上一步</el-button>
         <el-button type="primary" @click="impYYData">导入</el-button>
       </span>
     </el-dialog>
@@ -417,7 +417,7 @@
           </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="checkDmpFileTableDialogVisible = false">取 消</el-button>
+        <el-button @click="checkDmpFileTableDialogVisible = false">返回上一步</el-button>
         <el-button type="primary" @click="findFileTableDmp">下一步</el-button>
       </span>
     </el-dialog>
@@ -452,11 +452,15 @@
       :before-close="dmpLoghandleClose"
       :close-on-click-modal="false">
       <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
-      <el-row style="width: 100%;height:42vh; overflow:auto;">
-        <el-row
-          v-for="(log,index) in webSocketDataList"
-          :key="index">
-          {{log}}
+      <el-row
+        v-loading="dmpLogLoading"
+        element-loading-text="数据库还原中..."> 
+        <el-row style="width: 100%;height:42vh; overflow:auto;">
+          <el-row
+            v-for="(log,index) in webSocketDataList"
+            :key="index">
+            {{log}}
+          </el-row>
         </el-row>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -560,7 +564,9 @@
         //websocketId
         webSocketId: '',
         // 出错的文件
-        errFiles: []
+        errFiles: [],
+        // dmp日志加载loading
+        dmpLogLoading: true
       }
     },
     computed:{
@@ -593,6 +599,9 @@
           this.countDmpDown()
         }
       },
+      webSocketDataList(val) {
+        this.dmpLogLoading = false
+      }
     },
     methods: {
       // dmp日志关闭
@@ -601,6 +610,7 @@
          ,{dangerouslyUseHTMLString: true,
           confirmButtonText: '仍要关闭'})
           .then(_ => {
+            this.checkDmpFileTableDialogVisible = false
             done()
           })
           .catch(_ => {})
@@ -761,18 +771,27 @@
         }
         if(dmpFileFlag) {
           if (this.selectedFileData.length >1) {
-            this.$confirm('<span style="color:#af0f16">检测到选择了多个dmp文件，只有分卷dmp可以批量导入，请确认您选择的文件是否为分卷dmp，若不是请取消导入<span>', '确认信息', {
+            this.$confirm('<span style="color:#af0f16">检测到选择了多个dmp文件，只有分卷dmp可以批量导入，请确认您选择的文件是否为分卷dmp，若不是请返回上一步<span>', '确认信息', {
               dangerouslyUseHTMLString: true,
               confirmButtonText: '确定',
-              cancelButtonText: '取消导入'
+              cancelButtonText: '返回上一步'
             })
             .then(() => {
               // dmp还原日志
               this.webSocketDataList = []
               this.webSocketDataList.push('正在还原文件，请耐心等待......')
+              this.dmpLogLoading = true
               this.dmpImpFlag = false
               this.dmpImpFalseFlag = false
               this.dmpLogDialogVisible = true
+               this.timer = setInterval(()=>{
+                if(this.dmpImpFlag || this.dmpImpFalseFlag) {
+                    this.dmpLogLoading = false
+                }
+                if(!this.dmpImpFlag && !this.dmpImpFalseFlag) {
+                  this.dmpLogLoading = true
+                }
+              },3000)
               this.$http({
                 url: this.$http.adornUrl(`dataImp/impDmpFile/${1}/${this.webSocketId}`),
                 method: 'post',
@@ -815,9 +834,18 @@
             // dmp还原日志
             this.webSocketDataList = []
             this.webSocketDataList.push('正在还原文件，请耐心等待......')
+            this.dmpLogLoading = true
             this.dmpImpFlag = false
             this.dmpImpFalseFlag = false
             this.dmpLogDialogVisible = true
+             this.timer = setInterval(()=>{
+                if(this.dmpImpFlag || this.dmpImpFalseFlag) {
+                    this.dmpLogLoading = false
+                }
+                if(!this.dmpImpFlag && !this.dmpImpFalseFlag) {
+                  this.dmpLogLoading = true
+                }
+              },3000)
             this.$http({
               url: this.$http.adornUrl(`dataImp/impDmpFile/${1}/${this.webSocketId}`),
               method: 'post',
