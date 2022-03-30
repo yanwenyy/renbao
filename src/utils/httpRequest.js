@@ -11,10 +11,10 @@ function startLoading () {
   loading = Vue.prototype.$loading({
     lock: true,
     text: "努力加载中...",
-    // background: 'rgba(0,0,0,0.3)',
     background: 'transparent',
     customClass: 'loadingIcon',
-    target: document.querySelector(".loading-area") // 设置加载动画区域
+    spinner:'el-icon-loading',
+    // target: document.querySelector(".loading-area") // 设置加载动画区域
   });
 }
 function endLoading () {
@@ -46,7 +46,7 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
-  if (config.isLoading !== false) {
+  if (config.isLoading!= false) {
     // 如果配置了isLoading: false，则不显示loading
     showFullScreenLoading();
   }

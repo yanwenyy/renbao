@@ -3,7 +3,10 @@
     <div class="site-navbar__header">
       <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
         <a class="site-navbar__brand-lg" href="javascript:;">人保健康飞检系统</a>
-        <a class="site-navbar__brand-mini" href="javascript:;">人保</a>
+        <!--<a class="site-navbar__brand-mini" href="javascript:;">人保</a>-->
+        <a class="site-navbar__brand-mini" href="javascript:;">
+          <img class="mnb-img" src="../assets/img/mainNavBarLogo.png" alt="">
+        </a>
       </h1>
     </div>
     <div class="site-navbar__body clearfix">
@@ -191,5 +194,9 @@
   }
   .btn-magnifier{
     height: 50px;
+  }
+  .mnb-img{
+    width: 40px;
+    height:40px;
   }
 </style>

@@ -4,19 +4,21 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="政策名称" prop="userLoginName">
-        <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id" placeholder="政策名称" maxlength="15"></el-input>
+      <el-form-item label="政策名称" prop="policyName">
+        <el-input v-model="dataForm.policyName" placeholder="政策名称" maxlength="15"></el-input>
       </el-form-item>
-      <el-form-item label="开始时间" prop="userPassword">
+      <el-form-item label="开始时间">
         <el-date-picker
-          v-model="dataForm.userLoginName"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          v-model="dataForm.beginTime"
           type="date"
           placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="有效时间" prop="userPassword">
+      <el-form-item label="有效时间">
         <el-date-picker
-          v-model="dataForm.userLoginName"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          v-model="dataForm.endTime"
           type="date"
           placeholder="选择日期">
         </el-date-picker>
@@ -39,8 +41,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <!--<el-button type="primary" @click="dataFormSubmit()">确定</el-button>-->
-      <el-button type="primary" @click="">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -49,85 +50,60 @@
   import { isEmail, isMobile } from '@/utils/validate'
   export default {
     data () {
-      var validatePassword = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('密码不能为空'))
-        } else {
-          callback()
-        }
-      }
-      var validateComfirmPassword = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('确认密码不能为空'))
-        } else if (this.dataForm.userPassword !== value) {
-          callback(new Error('确认密码与密码输入不一致'))
-        } else {
-          callback()
-        }
-      }
-      var validateEmail = (rule, value, callback) => {
-        if (!isEmail(value)) {
-          callback(new Error('邮箱格式错误'))
-        } else {
-          callback()
-        }
-      }
-      var validateMobile = (rule, value, callback) => {
-        if (!isMobile(value)) {
-          callback(new Error('手机号格式错误'))
-        } else {
-          callback()
-        }
-      }
       return {
         visible: false,
         roleList: [],
         fileList:[],
         dataForm: {
           id: 0,
-          userLoginName: '',
-          userPassword: '',
-          comfirmPassword: '',
-          userName: '',
-          userNumber: '',
-          userPhone: '',
-          userSex:1,
+          policyName: '',
+          beginTime: '',
+          endTime: '',
+          multipartFiles :[],
         },
         dataRule: {
-          userLoginName: [
-            { required: true, message: '用户账号不能为空', trigger: 'blur' }
+          policyName: [
+            { required: true, message: '政策名称不能为空', trigger: 'blur' }
           ],
-          userPassword: [
-            { validator: validatePassword, trigger: 'blur' }
+          beginTime: [
+            { required: true, message: '开始时间不能为空', trigger: 'blur' }
           ],
-          comfirmPassword: [
-            { validator: validateComfirmPassword, trigger: 'blur' }
+          endTime: [
+            { required: true, message: '有效时间能为空', trigger: 'blur' }
           ],
-          userName: [
-            { required: true, message: '用户姓名不能为空', trigger: 'blur' }
-          ],
-          userNumber: [
-            { required: true, message: '工号不能为空', trigger: 'blur' }
-          ],
-          email: [
-            { required: true, message: '邮箱不能为空', trigger: 'blur' },
-            { validator: validateEmail, trigger: 'blur' }
-          ],
-          userPhone: [
-            { required: true, message: '手机号不能为空', trigger: 'blur' },
-            { validator: validateMobile, trigger: 'blur' }
-          ]
         }
       }
     },
     methods: {
+      // postionChange:function(i,val){
+      //   if(val == '7'){
+      //     this.charsetList[i].show = true;
+      //     this.charsetList[i].inpValue="";
+      //   }else{
+      //     this.charsetList[i].show = false;
+      //     this.charsetList[i].inpValue="";
+      //     this.charsetList[i].inpValue = val;
+      //   }
+      //   var count=0;
+      //   this.charsetList.forEach(item=>{
+      //     if(item.selValue=='自定义字符串的id'){
+      //       count=count+1;
+      //     }
+      //   })
+      //   //stringCount data里定义的字符串出现的次数 初始值stringCount:0;
+      //   this.stringCount=count;
+      //   //el-option写法
+      //   //el-option v-if="stringCount==3&&item.value=='字符串的id'"
+      // },
       //移除已上传的附件
       handleRemove(file, fileList) {
-
+        // console.log(fileList);
+        this.dataForm.multipartFiles=fileList;
       },
       //获取上传的文件
       uploadData(file) {
-        console.log(file)
+        // console.log(file);
+        this.dataForm.multipartFiles.push(file.file);
       },
       //验证唯一性
       verification(val,msg,name){
@@ -152,27 +128,25 @@
           });
         }
       },
-      init (id) {
+      init (id,regionId) {
         this.visible = true;
         this.dataForm.id=id;
+        this.dataForm.regionId=regionId;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
         if (this.dataForm.id) {
           this.$http({
-            url: this.$http.adornUrl(`/user/selectByUuid/${this.dataForm.id}`),
+            url: this.$http.adornUrl(`/policy/selectByUuid/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 200) {
-              var user=data.result;
-              this.dataForm.userLoginName = user.userLoginName
-              this.dataForm.userPassword = user.userPassword
-              this.dataForm.comfirmPassword = user.comfirmPassword
-              this.dataForm.userName = user.userName
-              this.dataForm.userNumber = user.userNumber
-              this.dataForm.userPhone = user.userPhone
-              this.dataForm.userSex = user.userSex
+              var datas=data.result;
+              this.dataForm.policyName = datas.policyName;
+              this.dataForm.beginTime = datas.beginTime;
+              this.dataForm.endTime = datas.endTime;
+              this.dataForm.regionId = datas.regionId;
             }
           })
         }
@@ -181,18 +155,27 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/user/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'userId': this.dataForm.id || undefined,
-                'userLoginName': this.dataForm.userLoginName,
-                'userPassword': this.dataForm.userPassword,
-                'userName': this.dataForm.userName,
-                'userNumber': this.dataForm.userNumber,
-                'userPhone': this.dataForm.userPhone,
-                'userSex': this.dataForm.userSex,
+            if(!this.dataForm.id){
+              var params = new FormData();
+              params.append("policyName", this.dataForm.policyName);
+              params.append("beginTime", this.dataForm.beginTime);
+              params.append("endTime", this.dataForm.endTime);
+              params.append("regionId", this.dataForm.regionId);
+              this.dataForm.multipartFiles.forEach(item=>{
+                params.append("multipartFiles", item);
               })
+            }else{
+              var editParmas={
+                policyName:this.dataForm.policyName,
+                beginTime:this.dataForm.beginTime,
+                endTime:this.dataForm.endTime,
+                regionId:this.dataForm.regionId,
+              }
+            }
+            this.$http({
+              url: this.$http.adornUrl(`/policy/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
+              method: 'post',
+              data: !this.dataForm.id ? params:editParmas,
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.$message({

@@ -10,33 +10,11 @@
            <el-tree
             class="treeClass"
             :data="treeData"
-            show-checkbox
-            node-key="id"
+            :props="defaultProps"
+            node-key="regionId"
             default-expand-all
+            @node-click="nodeClick"
             :expand-on-click-node="false">
-            <span class="custom-tree-node" slot-scope="{ node, data }">
-              <span>{{ node.label }}</span>
-              <span class="tree-btn">
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click="() => append(data,'add')">
-                  <i class="el-icon-circle-plus-outline" title="新增"></i>
-                </el-button>
-                 <el-button
-                   type="text"
-                   size="mini"
-                   @click="() => append(data,'edit')">
-                  <i class="el-icon-edit" title="编辑"></i>
-                </el-button>
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click="() => remove(node, data)">
-                  <i class="el-icon-delete" title="删除"></i>
-                </el-button>
-              </span>
-            </span>
           </el-tree>
         </div>
       </div>
@@ -48,14 +26,14 @@
         >
           <el-form-item label="政策名称:">
             <el-input
-              v-model="dataForm.ruleName"
+              v-model="dataForm.policyName"
               placeholder="政策名称"
               clearable
             ></el-input>
           </el-form-item>
           <el-form-item label="有效时间:">
             <el-date-picker
-              v-model="dataForm.ruleName"
+              v-model="dataForm.endTime"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
@@ -75,7 +53,7 @@
           </el-form-item>
         </el-form>
         <div class="search-btn">
-          <el-button type="primary" @click="addOrUpdateHandle('')"
+          <el-button type="primary" :disabled="dataForm.regionId==''" @click="addOrUpdateHandle('')"
             >新增</el-button
           >
           <el-button
@@ -106,17 +84,17 @@
             width="50"
           >
           </el-table-column>
-          <el-table-column prop="ruleName" align="center" label="政策名称">
+          <el-table-column prop="policyName" align="center" label="政策名称">
           </el-table-column>
           <el-table-column
-            prop="avgRunTime"
+            prop="beginTime"
             header-align="center"
             align="center"
             label="开始时间"
           >
           </el-table-column>
           <el-table-column
-            prop="createTime"
+            prop="endTime"
             header-align="center"
             align="center"
             label="有效时间"
@@ -182,6 +160,10 @@ import ruleTree from "../../common/rule-tree.vue";
 export default {
   data() {
     return {
+      defaultProps: {
+        children: 'children',
+        label: 'regionName'
+      },
       treeData:[],
       filterText:'',
       tableMinus:75,
@@ -194,10 +176,9 @@ export default {
 
       path: window.SITE_CONFIG.cdnUrl,
       dataForm: {
-        ruleName: "",
-        createUserName: "",
-        folderPath: "", //规则分类主键
-        folderId: ""
+        policyName: "",
+        endTime: "",
+        regionId: "", //行政区划分主键
       },
       token: "",
       imgUrlfront: "",
@@ -240,29 +221,35 @@ export default {
 
   },
   mounted() {
-
+    this.getTreeData();
   },
   methods: {
+    //左侧树节点点击
+    nodeClick(data,node,ele){
+      this.dataForm.regionId=data.regionId;
+      this.getDataList();
+    },
     // 新增 / 修改
     addOrUpdateHandle(id) {
       // this.addOrUpdateVisible = true
       // this.$nextTick(() => {
       if (id) {
-        this.$refs.addOrUpdate.init(id, this.ruleCheckData);
+        this.$refs.addOrUpdate.init(id, this.dataForm.regionId);
       } else {
-        this.$refs.addOrUpdate.init("", this.ruleCheckData);
+        this.$refs.addOrUpdate.init("", this.dataForm.regionId);
       }
 
       // })
     },
-    // 获取规则树
-    getRuleFolder() {
+    // 获取左侧树
+    getTreeData() {
       this.$http({
-        url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+        url: this.$http.adornUrl("region/getRegion"),
         method: "get",
-        params: this.$http.adornParams({ folderSorts: "" })
+        params: this.$http.adornParams(),
+        isLoading:false,
       }).then(({ data }) => {
-        this.ruleData = data.result;
+        this.treeData = data.result;
       });
     },
     //重置点击
@@ -274,28 +261,17 @@ export default {
     },
     // 获取数据列表
     getDataList() {
-      // 判断不选左侧规则节点列表为空
-      if (!this.ruleCheckData.folderId) {
-        this.$message({ message: "请选择对应的规则分类", type: "warning" });
-        return;
-      }
-
       this.dataListLoading = true;
-      // 如何改规则节点有子节点的话folderId为空
-      if (this.ruleCheckData.children) {
-        this.dataForm.folderId = "";
-      }
       this.$http({
         isLoading: false,
-        url: this.$http.adornUrl("/rule/selectPage"),
+        url: this.$http.adornUrl("/policy/selectPage"),
         method: "get",
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
-          ruleName: this.dataForm.ruleName,
-          createUserName: this.dataForm.createUserName,
-          folderPath: this.dataForm.folderPath,
-          folderId: this.dataForm.folderId
+          policyName: this.dataForm.policyName,
+          endTime: this.dataForm.endTime,
+          regionId: this.dataForm.regionId,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -379,9 +355,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl("/rule/deleteByIds"),
+            url: this.$http.adornUrl("/policy/delete/"+id),
             method: "delete",
-            data: this.$http.adornData(userIds, false)
+            // data: this.$http.adornData(userIds, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
