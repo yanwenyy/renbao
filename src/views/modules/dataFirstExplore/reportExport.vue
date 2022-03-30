@@ -288,7 +288,7 @@ export default {
         break;
       }
       if (isNull == true) {
-        this.$message.error("请在导出前生成报告");
+        this.$message.error("请先生成报告！");
       } else {
         let url =
           this.$http.adornUrl(
