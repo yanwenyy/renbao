@@ -141,7 +141,7 @@
           v-if="detailExportDialog"
         >
           <el-form
-            style="max-height:400px;overflow-y:auto"
+            style="height:400px;overflow-y:auto"
             :model="dataForm1"
             ref="dataForm1"
             label-width="120px"
@@ -155,6 +155,7 @@
                 placeholder="请选择医院"
                 multiple
                 @change="val => checkChange(val)"
+                style="width:400px"
               >
                 <el-option
                   v-for="item in hospitals"
