@@ -796,7 +796,12 @@
                     })
                     //this.checkDmpFileTableDialogVisible = true
                   } else {
-                    this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+                    this.$message({
+                      showClose: true,
+                      message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                      type: 'error',
+                      duration: 0
+                    })
                   }
               })
               return
@@ -836,7 +841,12 @@
                   })
                   //this.checkDmpFileTableDialogVisible = true
                 } else {
-                  this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+                  this.$message({
+                    showClose: true,
+                    message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                    type: 'error',
+                    duration: 0
+                  })
                 }
             })
             return
@@ -865,7 +875,12 @@
                 })
                 this.checkFileTableDialogVisible = true
               } else {
-                this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+                this.$message({
+                  showClose: true,
+                  message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                  type: 'error',
+                  duration: 0
+                })
               }
           })
          }
@@ -896,7 +911,12 @@
             // 打开文件表弹窗
             this.fileTableDialogVisible = true
           } else {
-            this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+            this.$message({
+              showClose: true,
+              message: data.message? data.message : "读取文件失败，请检查数据文件！",
+              type: 'error',
+              duration: 0
+            })
           }
         })
 
@@ -923,9 +943,19 @@
           } else {
             if(data.result != null) {
               this.errFiles = data.result
-              this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+              this.$message({
+                showClose: true,
+                message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                type: 'error',
+                duration: 0
+              })
             } else {
-              this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+              this.$message({
+                showClose: true,
+                message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                type: 'error',
+                duration: 0
+              })
             }
           }
         })
@@ -981,7 +1011,12 @@
           data: this.importDataModelList
         }).then(({data}) => {
           if (data && data.code !== 200){
-            this.$message.error(data.message? data.message : "文件数据列信息重复")
+            this.$message({
+              showClose: true,
+              message: data.message? data.message : "文件数据列信息重复",
+              type: 'error',
+              duration: 0
+            })
             return
           }
           if (data && data.code === 200) {
