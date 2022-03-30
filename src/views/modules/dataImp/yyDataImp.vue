@@ -742,15 +742,71 @@
              return
           }
         }
+         // 不包含dmp的标准
         var flag = true
+        // 全为 dmp的标准
+        var dmpFileFlag = true
         this.selectedFileData.forEach(item=>{
-          if(this.checkType(item.fileType) && this.selectedFileData.length >1) {
-            if(flag) this.$message.error("dmp文件只能单独导入")
+          if(!this.checkType(item.fileType)) {
+            dmpFileFlag = false
+          }
+          if(this.checkType(item.fileType)) {
             flag = false
+          }
+        })
+        // 包含dmp但是不全为dmp
+        if(!flag && !dmpFileFlag) {
+          this.$message.error("dmp文件不能和其它类型文件一起导入")
+          return
+        }
+        if(dmpFileFlag) {
+          if (this.selectedFileData.length >1) {
+            this.$confirm('<span style="color:#af0f16">检测到选择了多个dmp文件，只有分卷dmp可以批量导入，请确认您选择的文件是否为分卷dmp，若不是请取消导入<span>', '确认信息', {
+              dangerouslyUseHTMLString: true,
+              confirmButtonText: '确定',
+              cancelButtonText: '取消导入'
+            })
+            .then(() => {
+              // dmp还原日志
+              this.webSocketDataList = []
+              this.webSocketDataList.push('正在还原文件，请耐心等待......')
+              this.dmpImpFlag = false
+              this.dmpImpFalseFlag = false
+              this.dmpLogDialogVisible = true
+              this.$http({
+                url: this.$http.adornUrl(`dataImp/impDmpFile/${1}/${this.webSocketId}`),
+                method: 'post',
+                data: this.selectedFileData
+              }).then(({data}) => {
+                  if (data && (data.code === 200 || data.code == 500) && data.result) {
+                    //  this.fileTableInfos = data.result
+                    //  this.findFileTable()
+                  //} else if (data && data.code == 500 && data.result) {
+                    //this.dmpFileTables = data.result
+                    this.dmpImp = data.result
+                    this.$http({
+                      url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
+                      method: 'get'
+                    }).then(({data}) => {
+                        if (data && data.code == 200) {
+                          if(data.result != null) {
+                            this.tableInfos = data.result
+                          }
+                        }
+                    })
+                    //this.checkDmpFileTableDialogVisible = true
+                  } else {
+                    this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
+                  }
+              })
+              return
+            })
+            .catch(action => {
+              return
+            });
             return
           }
-          // dmp文件导入
-          if(this.checkType(item.fileType) && this.selectedFileData.length ==1) {
+          if(this.selectedFileData.length ==1) {
             // dmp还原日志
             this.webSocketDataList = []
             this.webSocketDataList.push('正在还原文件，请耐心等待......')
@@ -778,15 +834,14 @@
                         }
                       }
                   })
-                  // this.checkDmpFileTableDialogVisible = true
+                  //this.checkDmpFileTableDialogVisible = true
                 } else {
                   this.$message.error(data.message? data.message : "读取文件失败，请检查数据文件！")
                 }
             })
-            flag = false
             return
           }
-        })
+        }
         if(flag){
           this.$http({
             url: this.$http.adornUrl(`dataImp/checkFileTable/${1}`),
@@ -977,8 +1032,8 @@
       },
       // 文件类型是否为dmp或者bak
       checkType(fileType) {
+        //case 'BAK':
          switch (fileType.toUpperCase()) {
-            case 'BAK':
             case 'DMP':
               return true
               break
