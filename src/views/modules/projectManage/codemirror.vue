@@ -37,6 +37,7 @@
 <script>
   import sqlEdit from '@/components/codemirror/sqlEditor'
   import {PxSocket,randomString} from '@/utils'
+  import {showSelfLoading} from '@/utils/selfLoading'
   export default {
     components: {
       sqlEdit
@@ -449,11 +450,7 @@
               dataSize:"500",
               webSocketId:this.userId,
             };
-            // this.loading=true;
-            // var cancelLoad=document.querySelector(".selfCustom");
-            // cancelLoad.addEventListener("click",function () {
-            //   this.loading=false;
-            // });
+            // showSelfLoading();
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
               method: 'post',
