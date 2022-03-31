@@ -20,6 +20,7 @@
         <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
+        <el-button type="warning" @click="getDmpReImpList()">继续导入</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
@@ -469,6 +470,36 @@
         <el-button type="primary" @click="dmpLogDialogVisible = false" v-if="dmpImpFalseFlag">返回上一步</el-button>
       </span>
     </el-dialog>
+    <el-dialog 
+    title="dmp文件继续采集"
+      :visible.sync="dmpReImpDialogVisible"
+      width="60%">
+      <el-table
+        border
+        style="width: 100%;height:45vh; overflow:auto;"
+        :data="dmpReImpList">
+        <el-table-column
+          align="center"
+          prop="dmpFilePath"
+          label="文件名"/>
+          <el-table-column
+            align="center"
+            width="200"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="reImpDmp(scope.row)"
+                type="text"
+                size="small">
+                继续采集
+              </el-button>
+            </template>
+          </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dmpReImpDialogVisible = false">取消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -506,6 +537,8 @@
         checkDmpFileTableDialogVisible: false,
         // dmp还原日志
         dmpLogDialogVisible: false,
+        // dmp继续采集弹窗
+        dmpReImpDialogVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -567,7 +600,9 @@
         // 出错的文件
         errFiles: [],
         // dmp日志加载loading
-        dmpLogLoading: true
+        dmpLogLoading: true,
+        // 继续导入的implist
+        dmpReImpList: []
       }
     },
     computed:{
@@ -605,6 +640,49 @@
       }
     },
     methods: {
+       //获取继续导入的dmp列表
+      getDmpReImpList(){
+        this.dmpReImpDialogVisible = true
+        this.dmpReImpList = []
+        this.$http({
+          url: this.$http.adornUrl(`dmpCollectPlan/selectPage`),
+          method: 'get',
+          params: this.$http.adornParams({"busType":"2"})
+        }).then(({data}) => {
+            if (data && data.code == 200) {
+              if(data.result != null) {
+                this.dmpReImpList = data.result.records
+              }
+            }
+        })
+      },
+      // 恢复采集dmp
+      reImpDmp(data){
+        this.checkDmpFileTableDialogVisible = true
+        this.$http({
+          url: this.$http.adornUrl(`dmpCollectPlan/startCollectDmp`),
+          method: 'get',
+          params: this.$http.adornParams({"dmpCollectPlanId":data.dmpCollectPlanId})
+        }).then(({data}) => {
+            if (data && data.code == 200) {
+              if(data.result != null) {
+                // 请求dmp
+                this.dmpImp = data.result
+                this.$http({
+                  url: this.$http.adornUrl(`dataImp/getTableInfos/${2}`),
+                  method: 'get'
+                }).then(({data}) => {
+                    if (data && data.code == 200) {
+                      if(data.result != null) {
+                        this.tableInfos = data.result
+                      }
+                    }
+                })
+              }
+            }
+        })
+        
+      },
       // dmp日志关闭
       dmpLoghandleClose(done){
          this.$confirm('<span style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
@@ -921,7 +999,9 @@
        // const path = this.selectedFileData[0].path
         //this.fileTableInfos = {}
         //this.fileTableInfos[this.selectedFileData[0].path] = this.dmpFileTables
-        this.dmpImp.filePath = this.selectedFileData[0].path
+        if(!this.dmpImp.filePath) {
+            this.dmpImp.filePath = this.selectedFileData[0].path
+        }
         this.$http({
           url: this.$http.adornUrl(`dataImp/getDmpFileTable/${1}`),
           method: 'post',
