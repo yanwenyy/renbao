@@ -112,12 +112,12 @@
                     </el-table-column>
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <div class="tac">成功{{scope.row.executeSuccess}}条,总共{{scope.row.executeTotal}}条</div>
+                            <div class="tac">总共{{scope.row.executeTotal}}条,成功{{scope.row.executeSuccess}}条</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="进度" align="center" prop="collectStatus">
+                    <el-table-column label="进度" align="center">
                         <template slot-scope="scope">
-                            <el-progress v-if="scope.row.collectStatus" :percentage="100"></el-progress>
+                            <el-progress :percentage="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)" v-if="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)"></el-progress>
                         </template>
                     </el-table-column>
                     <el-table-column align="center" label="操作">

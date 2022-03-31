@@ -35,7 +35,7 @@
             </el-table-column>
             <el-table-column align="center" label="日志">
                 <template slot-scope="scope">
-                    <el-button @click="editClicks(scope.row.collectPlanMonitorId)" size="mini">查看</el-button>
+                    <el-button @click="editClicks(scope.row.collectPlanMonitorId)" type="text">查看</el-button>
                 </template>
             </el-table-column>
         </el-table>
