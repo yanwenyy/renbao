@@ -20,7 +20,7 @@
         <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
-        <el-button type="warning" @click="getDmpReImpList()">继续导入</el-button>
+        <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
@@ -471,8 +471,9 @@
       </span>
     </el-dialog>
     <el-dialog 
-    title="dmp文件继续采集"
+    title="已导入dmp文件"
       :visible.sync="dmpReImpDialogVisible"
+      show-overflow-tooltip
       width="60%">
       <el-table
         border
