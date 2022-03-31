@@ -364,9 +364,8 @@ export default {
     },
     //动态设置已选状态
     toggleRowSelection(item) {
-      console.log(item)
-      this.tableList.forEach(id => {
-        item.forEach(row => {
+      this.tableList.forEach(row => {
+        item.forEach(id => {
           if (row["医疗机构编码"] == id) {
             this.$refs.multipleTable.toggleRowSelection(row, true);
           }

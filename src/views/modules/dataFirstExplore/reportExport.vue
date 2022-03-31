@@ -255,46 +255,41 @@ export default {
     toReport() {
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
+      } else {
+        this.$http({
+          url: this.$http.adornUrl("batchResultExport/generateBatchReport"),
+          method: "post",
+          isLoading: false,
+          data: this.$http.adornData({
+            batchId: this.batchId,
+            batchName: this.batchName,
+            batchType: 1
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.$message.success("生成报告成功");
+            this.initData();
+          } else {
+            this.$message.error("生成报告失败");
+            this.initData();
+          }
+        });
       }
-      this.$http({
-        url: this.$http.adornUrl("batchResultExport/generateBatchReport"),
-        method: "post",
-        isLoading: false,
-        data: this.$http.adornData({
-          batchId: this.batchId,
-          batchName: this.batchName,
-          batchType: 1
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 200) {
-          this.$message.success("生成报告成功");
-          this.initData();
-        } else {
-          this.$message.error("生成报告失败");
-          this.initData();
-        }
-      });
     },
     //导出报告
     reportExport() {
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
-      }
-      let isNull = true;
-      for (var i in this.tableData) {
-        if (this.tableData[i].batchResultExportBeginTime != null) {
-          isNull = false;
-        }
-        break;
-      }
-      if (isNull == true) {
-        this.$message.error("请先生成报告！");
       } else {
-        let url =
-          this.$http.adornUrl(
-            "/batchResultExport/download?dataId=" + this.batchId + "&token="
-          ) + this.$cookie.get("token");
-        window.open(url);
+        if (isNull == 1) {
+          this.$message.error("请先生成报告！");
+        } else {
+          let url =
+            this.$http.adornUrl(
+              "/batchResultExport/download?dataId=" + this.batchId + "&token="
+            ) + this.$cookie.get("token");
+          window.open(url);
+        }
       }
     },
     // 关闭详细弹窗

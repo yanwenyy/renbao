@@ -8,15 +8,20 @@
         </div>
         <div class="login-main-div">
           <div class="login-main">
+            <!--<div class="login-main-left">-->
+              <!--<div class="lm-left-title">欢迎登录</div>-->
+              <!--<div class="lm-left-title-line"></div>-->
+              <!--<div class="lm-left-img">-->
+                <!--<img src="../../assets/img/lm-left-img.png" alt="">-->
+              <!--</div>-->
+            <!--</div>-->
             <div class="login-main-left">
-              <div class="lm-left-title">欢迎登录</div>
-              <div class="lm-left-title-line"></div>
-              <div class="lm-left-img">
-                <img src="../../assets/img/lm-left-img.png" alt="">
+              <div class="lm-left-title-new">
+                <img src="../../assets/img/login-logo.png" alt="">
               </div>
             </div>
             <div class="login-main-right">
-              <h3 class="login-title">人保健康飞检系统</h3>
+              <h3 class="login-title">人保健康医保基金监管飞行检查系统</h3>
               <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
                 <el-form-item prop="userName" class="lm-right-input">
                   <div>用户名</div>
@@ -198,7 +203,7 @@
       position: relative;
     }
     .login-main-right{
-      padding:0 60px;
+      padding:0 40px;
       box-sizing: border-box;
     }
     .lm-left-title{
@@ -234,7 +239,7 @@
       overflow: hidden;
     }
     .login-title {
-      font-size: 26px;
+      font-size: 17px;
       font-family: Microsoft YaHei;
       font-weight: bold;
       color: #AF0F16;
@@ -262,6 +267,14 @@
       width: 100%;
       margin-top: 38px;
       border-radius: 20px;
+    }
+    .lm-left-title-new{
+      margin: auto;
+      margin-top: 35%;
+    }
+    .lm-left-title-new>img{
+      width: 80%;
+      height: auto;
     }
   }
 </style>

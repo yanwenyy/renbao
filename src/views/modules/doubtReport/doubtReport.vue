@@ -12,10 +12,10 @@
           clearable
         ></el-input>
       </el-form-item>
-      <el-form-item label="关联规则名称：">
+      <el-form-item label="规则名称：">
         <el-input
           v-model="dataForm.ruleName"
-          placeholder="关联规则名称"
+          placeholder="规则名称"
           clearable
         ></el-input>
       </el-form-item>
@@ -65,7 +65,7 @@
         prop="ruleName"
         header-align="center"
         align="center"
-        label="关联规则名称"
+        label="规则名称"
       >
       </el-table-column>
       <el-table-column
@@ -130,7 +130,9 @@ export default {
       //弹窗标题
       title: "",
       //弹窗按钮
-      showBtn: ""
+      showBtn: "",
+      //是否已生成报告
+      batchResultExportReportStatus: ""
     };
   },
   computed: {
@@ -163,6 +165,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 200) {
           this.dataList = data.result.records;
+          this.batchResultExportReportStatus =
+            data.result.batchResultExportReportStatus;
           this.totalPage = data.result.total;
         } else {
           this.dataList = [];
@@ -242,6 +246,7 @@ export default {
     },
     //查询
     search() {
+      this.pageIndex = "";
       this.getDataList();
     },
     //重置
@@ -250,7 +255,7 @@ export default {
         ruleName: "",
         manuscriptName: ""
       };
-      this.pageIndex = 1
+      this.pageIndex = 1;
       this.getDataList();
     },
     // 删除
