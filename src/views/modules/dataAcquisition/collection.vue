@@ -117,7 +117,7 @@
                     </el-table-column>
                     <el-table-column label="进度" align="center">
                         <template slot-scope="scope">
-                            <el-progress :percentage="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)" v-if="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)"></el-progress>
+                            <el-progress :percentage="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)" v-if="!isNaN(parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100))"></el-progress>
                         </template>
                     </el-table-column>
                     <el-table-column align="center" label="操作">
