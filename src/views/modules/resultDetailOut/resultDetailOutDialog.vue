@@ -45,7 +45,8 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button
-          type="warning"
+          type="primary"
+          :disabled="this.exportForm.hospName.length <= 0"
           @click="exportClick('exportForm')"
           :loading="loading"
           >导出</el-button
