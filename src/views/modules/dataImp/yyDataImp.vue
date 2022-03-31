@@ -647,7 +647,7 @@
         this.$http({
           url: this.$http.adornUrl(`dmpCollectPlan/selectPage`),
           method: 'get',
-          params: this.$http.adornParams({"busType":"2"})
+          params: this.$http.adornParams({"busType":"1"})
         }).then(({data}) => {
             if (data && data.code == 200) {
               if(data.result != null) {
@@ -669,7 +669,7 @@
                 // 请求dmp
                 this.dmpImp = data.result
                 this.$http({
-                  url: this.$http.adornUrl(`dataImp/getTableInfos/${2}`),
+                  url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
                   method: 'get'
                 }).then(({data}) => {
                     if (data && data.code == 200) {
