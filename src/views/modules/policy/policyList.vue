@@ -179,6 +179,7 @@ export default {
         policyName: "",
         endTime: "",
         regionId: "", //行政区划分主键
+        regionPath: "", //行政区划分path
       },
       token: "",
       imgUrlfront: "",
@@ -226,8 +227,21 @@ export default {
   methods: {
     //左侧树节点点击
     nodeClick(data,node,ele){
+      var _list=this.getParentName(node,'regionName');
+      this.dataForm.regionPath=_list.join("-");
       this.dataForm.regionId=data.regionId;
       this.getDataList();
+    },
+    getParentName(obj,name){
+      const list=[];
+      function _getName(obj){
+        obj.data[name]&&list.unshift(obj.data[name]);
+        if(obj.parent){
+          _getName(obj.parent,name)
+        }
+      }
+      _getName(obj,name);
+      return list;
     },
     // 新增 / 修改
     addOrUpdateHandle(id) {
@@ -272,6 +286,7 @@ export default {
           policyName: this.dataForm.policyName,
           endTime: this.dataForm.endTime,
           regionId: this.dataForm.regionId,
+          regionPath: this.dataForm.regionPath,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {

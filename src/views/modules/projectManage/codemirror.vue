@@ -37,7 +37,7 @@
 <script>
   import sqlEdit from '@/components/codemirror/sqlEditor'
   import {PxSocket,randomString} from '@/utils'
-  // import SelfLoading from '@/utils/selfLoading'
+  import SelfLoading from '@/utils/selfLoading'
   export default {
     components: {
       sqlEdit
@@ -425,12 +425,14 @@
               }
               _dataList.push(v)
             });
+
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeParamsSQL'),
               method: 'post',
               data: _dataList
             }).then(({data}) => {
               if(data.code==200){
+
                 var datas=data.result;
                 datas.forEach(item=>{
                   item.label=item.paramName;
@@ -450,13 +452,18 @@
               dataSize:"500",
               webSocketId:this.userId,
             };
-            // SelfLoading.show();
+            SelfLoading.show({
+              buttonClass:'el-button el-button--primary',
+              buttonText:'取消执行',
+              buttonFun:function(){SelfLoading.hide()}
+            });
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
               method: 'post',
               data: this.$http.adornData(params),
               isLoading:false
             }).then(({data}) => {
+              SelfLoading.hide();
               if(data.code==200){
 
               }else{

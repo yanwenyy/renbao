@@ -123,6 +123,7 @@
             >
               <template slot-scope="scope">
                 <el-select
+                            filterable
                             class="userList"
                             multiple
                             v-model="scope.row.userIds"
