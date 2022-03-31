@@ -174,6 +174,12 @@
               <el-button
                 type="text"
                 size="small"
+                @click="addOrUpdateHandle(scope.row.ruleId,'look')"
+                >查看
+              </el-button>
+              <el-button
+                type="text"
+                size="small"
                 @click="deleteHandle(scope.row.ruleId)"
                 >删除
               </el-button>
@@ -313,15 +319,15 @@ export default {
   },
   methods: {
     // 新增 / 修改
-    addOrUpdateHandle(id) {
+    addOrUpdateHandle(id,type) {
       // this.addOrUpdateVisible = true
 
       this.$nextTick(() => {
 
         if (id) {
-          this.$refs.addOrUpdate.init(id, this.ruleCheckData);
+          this.$refs.addOrUpdate.init(id, this.ruleCheckData,type);
         } else {
-          this.$refs.addOrUpdate.init("", this.ruleCheckData);
+          this.$refs.addOrUpdate.init("", this.ruleCheckData,);
         }
       });
     },

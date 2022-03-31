@@ -83,6 +83,7 @@
          endTime: '',
          multipartFiles :[],
        }
+       this.fileList=[];
      },
       //移除已上传的附件
       handleRemove(file, fileList) {

@@ -14,10 +14,10 @@
         <el-tab-pane name="1" label="基本信息">
             <div class="tabs1-div">
               <el-form-item label="规则名称" prop="ruleName">
-                <el-input v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
+                <el-input :disabled="type=='look'" v-model="dataForm.ruleName" placeholder="规则名称"></el-input>
               </el-form-item>
               <el-form-item label="规则类别" prop="ruleCategory">
-                <el-select v-model="dataForm.ruleCategory">
+                <el-select v-model="dataForm.ruleCategory" :disabled="type=='look'">
                   <el-option label="请选择" value=""></el-option>
                   <el-option label="门诊规则" :value="1"></el-option>
                   <el-option label="住院规则" :value="2"></el-option>
@@ -25,6 +25,7 @@
               </el-form-item>
               <el-form-item label="规则分类"  prop="folderId">
                 <el-popover
+                  :disabled="type=='look'"
                   ref="menuListPopover"
                   placement="bottom-start"
                   trigger="click"
@@ -47,17 +48,18 @@
                   </span>
                   </el-tree>
                 </el-popover>
-                <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
+                <el-input :disabled="type=='look'" @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
                           placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
               </el-form-item>
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
-                <el-input type="textarea" :rows="6" v-model="dataForm.ruleRemark" placeholder="例：规则名称（规则名称中所填写的内容），涉及{人次}人次，{金额}金额。"></el-input>
+                <el-input :disabled="type=='look'" type="textarea" :rows="6" v-model="dataForm.ruleRemark" placeholder="例：规则名称（规则名称中所填写的内容），涉及{人次}人次，{金额}金额。"></el-input>
               </el-form-item>
               <el-form-item label="创建人">
-                <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
+                <el-input :disabled="type=='look'" readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
               </el-form-item>
               <el-form-item label="创建时间">
                 <el-date-picker
+                  :disabled="type=='look'"
                   readonly
                   v-model="dataForm.createTime"
                   type="datetime"
@@ -69,8 +71,8 @@
 
         </el-tab-pane>
         <el-tab-pane name="2" label="sql编写">
-          <el-button type="primary" @click="openSql()">sql编译器</el-button>
-          <el-button type="primary">图形化工具</el-button>
+          <el-button v-if="type!='look'" type="primary" @click="openSql()">sql编译器</el-button>
+          <el-button v-if="type!='look'" type="primary">图形化工具</el-button>
           <el-form-item prop="ruleSqlValue" class="no-label">
             <div class="sqlDiv-html" v-html="dataForm.ruleSqlValue"></div>
             <!--<el-input-->
@@ -89,6 +91,7 @@
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
                 <el-tree
+                  :disabled="type=='look'"
                   :props="defaultProps"
                   :data="treedata"
                   node-key="id"
@@ -105,7 +108,7 @@
                 </el-tree>
               </div>
               <div class="tabs3-right inline-block">
-                <el-input class="self-input" type="textarea" :rows="4" id="selfInput" v-model="dataForm.ruleSqlStatisticsValue"></el-input>
+                <el-input :disabled="type=='look'" class="self-input" type="textarea" :rows="4" id="selfInput" v-model="dataForm.ruleSqlStatisticsValue"></el-input>
               </div>
             </div>
           </el-tab-pane>
@@ -113,7 +116,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="sqlEditMsg.msg='',visible = false,cleanMsg()">取消</el-button>
-        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+        <el-button v-if="type!='look'" type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -167,6 +170,7 @@
         }
       };
       return {
+        type:'',
         sqlKey:0,
         rjMust:{},//总人次和宗金额必填项
         mustList:{},//sql编译器必填的项
@@ -509,12 +513,13 @@
           cm_complete[0].parentNode.removeChild(cm_complete[0])
         }
       },
-      init (id, ruleCheckData) {
+      init (id, ruleCheckData,type) {
         this.deletCm();
         this.getMustList();
         this.getRJMust();
         this.cleanMsg();
         this.visible = true;
+        this.type=type;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
         this.dataForm.ruleId = id;
         this.dataForm.folderId = this.ruleCheckData.folderId;
