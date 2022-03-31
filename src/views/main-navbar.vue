@@ -1,22 +1,27 @@
 <template>
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
     <div class="site-navbar__header">
-      <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
-        <a class="site-navbar__brand-lg" href="javascript:;">人保健康飞检系统</a>
-        <!--<a class="site-navbar__brand-mini" href="javascript:;">人保</a>-->
-        <a class="site-navbar__brand-mini" href="javascript:;">
-          <img class="mnb-img" src="../assets/img/mainNavBarLogo.png" alt="">
-        </a>
-      </h1>
+      <div class="navbar_header_new">
+        <div class="inline-block navbar_header_new-title">
+          <img src="../assets/img/home-logo.png" alt="">
+        </div>
+      </div>
+      <!--<h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">-->
+        <!--<a class="site-navbar__brand-lg" href="javascript:;">人保健康飞检系统</a>-->
+        <!--&lt;!&ndash;<a class="site-navbar__brand-mini" href="javascript:;">人保</a>&ndash;&gt;-->
+        <!--<a class="site-navbar__brand-mini" href="javascript:;">-->
+          <!--<img class="mnb-img" src="../assets/img/mainNavBarLogo.png" alt="">-->
+        <!--</a>-->
+      <!--</h1>-->
     </div>
     <div class="site-navbar__body clearfix">
-      <el-menu
-        class="site-navbar__menu"
-        mode="horizontal">
-        <el-menu-item class="site-navbar__switch" index="0" @click="sidebarFold = !sidebarFold">
-          <icon-svg name="zhedie"></icon-svg>
-        </el-menu-item>
-      </el-menu>
+      <!--<el-menu-->
+        <!--class="site-navbar__menu"-->
+        <!--mode="horizontal">-->
+        <!--<el-menu-item class="site-navbar__switch" index="0" @click="sidebarFold = !sidebarFold">-->
+          <!--<icon-svg name="zhedie"></icon-svg>-->
+        <!--</el-menu-item>-->
+      <!--</el-menu>-->
       <!--<el-switch-->
         <!--class="btn-magnifier"-->
         <!--v-model="useMagnifier"-->
@@ -198,5 +203,6 @@
   .mnb-img{
     width: 40px;
     height:40px;
+    margin-top: 5px;
   }
 </style>

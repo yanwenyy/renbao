@@ -1325,6 +1325,11 @@
     }
   };
 </script>
+<style scoped>
+  .el-table >>>th{
+    user-select: inherit;
+  }
+</style>
 <style>
   .CodeMirror-selected {
     background-color: blue !important;

@@ -68,15 +68,31 @@ img {
 
 /* Sidebar fold
 ------------------------------ */
+.navbar_header_new{
+  height: 50px;
+  line-height: 50px;
+  background: #fff;
+  margin-left: 24px;
+}
+.navbar_header_new-titlename{
+  font-size: 18px;
+  font-weight: bold;
+}
+.navbar_header_new-title{
+  vertical-align: top;
+}
+.inline-block{
+  display: inline-block;
+}
 .site-sidebar--fold {
-  .site-navbar__header,
-  .site-navbar__brand,
+  //.site-navbar__header,
+  //.site-navbar__brand,
   .site-sidebar,
   .site-sidebar__inner,
   .el-menu.site-sidebar__menu {
     width: 64px;
   }
-  .site-navbar__body,
+  //.site-navbar__body,
   .site-content__wrapper {
     margin-left: 64px;
   }
@@ -100,7 +116,7 @@ img {
     left: 64px;
   }
 }
-// animation
+// animation 折叠切换的时候动画效果
 .site-navbar__header,
 .site-navbar__brand,
 .site-navbar__body,
@@ -125,7 +141,8 @@ img {
   height: 50px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
   //background-color: $navbar--background-color;
-  background-color: $sidebar--background-color-dark;
+  //background-color: $sidebar--background-color-dark;
+  background: #fff;
   .site-navbar__header{
     .site-navbar__brand-lg,.site-navbar__brand-mini{
       color:#000;
@@ -165,14 +182,14 @@ img {
   &__header {
     position: relative;
     float: left;
-    width: 230px;
+    //width: 230px;
     height: 50px;
     overflow: hidden;
   }
   &__brand {
     display: table-cell;
     vertical-align: middle;
-    width: 230px;
+    //width: 230px;
     height: 50px;
     margin: 0;
     line-height: 50px;
@@ -217,7 +234,8 @@ img {
   }
   &__body {
     position: relative;
-    margin-left: 230px;
+    //margin-left: 230px;
+    margin-left: 450px;
     padding-right: 15px;
     background-color: #fff;
   }
@@ -448,16 +466,18 @@ img {
     font-size:$--magnifier-fontSize;
   }
 }
-//.loadingIcon .el-loading-text:after{
-//  display: table;
-//  content: '停止运行';
-//  color:red;
-//  text-align: center;
-//  width: 100%;
-//  margin-bottom: 20px;
-//  cursor: pointer;
-//}
-//.el-icon-loading:before{
-//  display: table;
-//  content: '我是按钮';
-//}
+.new-zhedie{
+  width: 20px;
+  height: 40px;
+  line-height: 40px;
+  background: $--theme-red;
+  position: absolute;
+  top:40vh;
+  right:0;
+  font-size: 16px;
+  color: #fff;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}

@@ -155,6 +155,9 @@
           :dynamicMenuRoutes="dynamicMenuRoutes">
         </sub-menu>
       </el-menu>
+      <div class="new-zhedie"  @click="sidebarFold = !sidebarFold">
+        <i :class="!sidebarFold?'el-icon-arrow-left':'el-icon-arrow-right'"></i>
+      </div>
     </div>
   </aside>
 </template>
@@ -173,15 +176,15 @@
       SubMenu
     },
     computed: {
+
       sidebarLayoutSkin: {
         get() {
           return this.$store.state.common.sidebarLayoutSkin
         }
       },
       sidebarFold: {
-        get() {
-          return this.$store.state.common.sidebarFold
-        }
+        get () { return this.$store.state.common.sidebarFold },
+        set (val) { this.$store.commit('common/updateSidebarFold', val) }
       },
       menuList: {
         get() {
