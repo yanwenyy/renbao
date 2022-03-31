@@ -70,9 +70,10 @@
                             <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress>
                         </template>
                     </el-table-column>
-                    <el-table-column align="center" label="日志">
+                    <el-table-column align="center" label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text">查看</el-button>
+                            <el-button @click="editClick(scope.row.collectPlanMonitorId)" type="text">查看日志</el-button>
+                            <el-button @click="deleteClick(scope.row.collectPlanMonitorId)" type="text">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -112,22 +113,17 @@
                     <el-table-column label="状态" align="center" prop="collectStatus">
                         <template slot-scope="scope">
                             <div class="tac">成功{{scope.row.executeSuccess}}条,总共{{scope.row.executeTotal}}条</div>
-                            <!-- <div class="tac" v-if="scope.row.collectStatus=='1'">进行中</div> -->
-                            <!-- <div class="tac" v-if="scope.row.collectStatus=='2'">已完成</div> -->
-                            <!-- <div class="tac" v-if="scope.row.collectStatus=='3'">失败</div> -->
                         </template>
                     </el-table-column>
                     <el-table-column label="进度" align="center" prop="collectStatus">
                         <template slot-scope="scope">
-                            <!-- <el-progress v-if="scope.row.collectStatus=='0'" :percentage="0"></el-progress> -->
-                            <!-- <el-progress v-if="scope.row.collectStatus=='1'" :percentage="50"></el-progress> -->
                             <el-progress v-if="scope.row.collectStatus" :percentage="100"></el-progress>
-                            <!-- <el-progress v-if="scope.row.collectStatus=='3'" :percentage="0"></el-progress> -->
                         </template>
                     </el-table-column>
                     <el-table-column align="center" label="操作">
                         <template slot-scope="scope">
                             <el-button @click="edit(scope.row)" type="text">查看进度</el-button>
+                            <el-button @click="deleteHospital(scope.row.hospitalCollectPlanId)" type="text">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -248,7 +244,7 @@ export default {
 
 
         },
-        //初始化数据
+        //初始化医保数据
         getInitList(){
             this.dataLoading = true
             this.$http({
@@ -295,7 +291,6 @@ export default {
                     collectStatus:this.dataForm.collectStatus || '',
                     startTimeBegin:this.dataForm.startTimeBegin,
                     startTimeEnd:this.dataForm.startTimeEnd
-
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
@@ -366,6 +361,66 @@ export default {
         getStopCollection(){
             this.notImportVisible = true
         },
+        //医保删除
+        deleteClick(id){
+            if(id){
+                this.$confirm('确认进行删除操作么?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                      this.$http({
+                        isLoading: false,
+                        url: this.$http.adornUrl("/collectPlanMonitor/deleteLog"),
+                        method: "get",
+                        params: this.$http.adornParams({collectPlanMonitorId:id})
+                    }).then(({ data }) => {
+                        if (data && data.code === 200) {
+                        this.$message({ message: "删除成功", type: "success" });
+                        this.apComServerData.pageIndex = 1;
+                        this.apComServerData.pageSize = 10;
+                        this.getInitList()
+                        } else {
+                        this.$message.error(data.message);
+                        }
+                    });
+                }).catch(() => {
+
+                });
+            }else{
+                this.$message.error("主键id不能为空")
+            }
+        },
+        //医院删除
+        deleteHospital(id){
+            if(id){
+                this.$confirm('确认进行删除操作么?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                      this.$http({
+                        isLoading: false,
+                        url: this.$http.adornUrl("/hospitalCollectPlan/deleteLog"),
+                        method: "get",
+                        params: this.$http.adornParams({hospitalCollectPlanId:id})
+                    }).then(({ data }) => {
+                        if (data && data.code === 200) {
+                        this.$message({ message: "删除成功", type: "success" });
+                        this.apComServerData.pageIndex = 1;
+                        this.apComServerData.pageSize = 10;
+                        this.getDataList()
+                        } else {
+                        this.$message.error(data.message);
+                        }
+                    });
+                }).catch(() => {
+
+                });
+            }else{
+                this.$message.error("主键id不能为空")
+            }
+        }
     }
 }
 </script>

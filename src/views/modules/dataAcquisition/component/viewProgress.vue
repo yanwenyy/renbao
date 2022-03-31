@@ -71,7 +71,13 @@
                             <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="步骤结果" align="center" min-width='120' prop="stepResult">
+                    <el-table-column label="步骤结果" align="center" prop="stepResult">
+                       <template slot-scope="scope">
+                            <el-tooltip class="item" effect="light" placement="top">
+                                <div v-html="scope.row.stepResult" slot="content" style="max-width:300px"></div>
+                                <div class="oneLine">{{scope.row.stepResult}}</div>
+                            </el-tooltip>
+                        </template>
                     </el-table-column>
                 </el-table>
                 <div class="itemBtn">
@@ -187,5 +193,16 @@ export default {
 /deep/.el-table{
 padding:0;
 }
+}
+
+// .oneLine {
+//   overflow: hidden;
+//   white-space: nowrap;
+//   text-overflow: ellipsis;
+// }
+.el-tooltip__popper {
+
+  max-width: 500px;
+
 }
 </style>

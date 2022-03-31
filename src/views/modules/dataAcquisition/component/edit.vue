@@ -1,6 +1,6 @@
 <template>
     <div class='Edit'>
-        <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}" style="width: 100%">
+        <el-table :data="tableList" border :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" style="width: 100%">
             <el-table-column label="步骤规则" align="center" prop="stepName"></el-table-column>
             <el-table-column label="步骤开始时间" align="center">
                 <template slot-scope="scope">{{scope.row.stepStartTime | datetimeformat}}</template>
@@ -16,7 +16,7 @@
                     <div class="tac" v-if="scope.row.stepStatus=='3'">失败</div>
                 </template>
             </el-table-column>
-            <el-table-column label="步骤结果" align="center" prop="stepResult">
+            <el-table-column label="步骤结果" align="center" prop="stepResult" show-overflow-tooltip>
             </el-table-column>
         </el-table>
         <div class="itemBtn">
