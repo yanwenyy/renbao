@@ -37,7 +37,7 @@
 <script>
   import sqlEdit from '@/components/codemirror/sqlEditor'
   import {PxSocket,randomString} from '@/utils'
-  import {showSelfLoading} from '@/utils/selfLoading'
+  // import SelfLoading from '@/utils/selfLoading'
   export default {
     components: {
       sqlEdit
@@ -450,7 +450,7 @@
               dataSize:"500",
               webSocketId:this.userId,
             };
-            // showSelfLoading();
+            // SelfLoading.show();
             this.$http({
               url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
               method: 'post',

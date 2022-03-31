@@ -69,6 +69,7 @@ export default {
         isLoading:false,
         url: httpRequest.adornUrl('/xmProject/projectList'),
         method: 'get',
+        params: {userId:userId}
       }).then(({data}) => {
         if (data.code == 200) {
           commit('updateProjectList', data.result)

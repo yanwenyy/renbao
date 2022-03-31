@@ -51,7 +51,7 @@
                           placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
               </el-form-item>
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
-                <el-input type="textarea" :rows="6" v-model="dataForm.ruleRemark" placeholder="规则备注"></el-input>
+                <el-input type="textarea" :rows="6" v-model="dataForm.ruleRemark" placeholder="例：规则名称（规则名称中所填写的内容），涉及{人次}人次，{金额}金额。"></el-input>
               </el-form-item>
               <el-form-item label="创建人">
                 <el-input readonly v-model="dataForm.createUserName" placeholder="创建人"></el-input>
@@ -168,6 +168,7 @@
       };
       return {
         sqlKey:0,
+        rjMust:{},//总人次和宗金额必填项
         mustList:{},//sql编译器必填的项
         paramsSqlSelf:'',//选择参数后返回的转义的sql
         slqTabelEdt:[],//sql执行结果
@@ -477,6 +478,7 @@
           this.$refs['dataForm'].clearValidate()
         }
       },
+      //医疗机构编码和医疗机构名称必填字
       getMustList(){
         this.$http({
           url: this.$http.adornUrl('/batch/getMedicalInformation'),
@@ -485,6 +487,18 @@
         }).then(({data}) => {
           if (data && data.code === 200) {
             this.mustList=data.result;
+          }
+        })
+      },
+      //总人次和总金额必填字
+      getRJMust(){
+        this.$http({
+          url: this.$http.adornUrl('/batchResultExport/getMoney'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.rjMust=data.result;
           }
         })
       },
@@ -498,6 +512,7 @@
       init (id, ruleCheckData) {
         this.deletCm();
         this.getMustList();
+        this.getRJMust();
         this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
@@ -625,8 +640,8 @@
           ruleStatisticsColumns.push(v);
         });
         if(this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!=''){
-          if(this.dataForm.ruleSqlStatisticsValue.indexOf("总人次")==-1||this.dataForm.ruleSqlStatisticsValue.indexOf("总金额")==-1){
-            this.$message.error('统计sql编写的总人次和总金额是必填');
+          if(this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust['personTime'])==-1||this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust['money'])==-1){
+            this.$message.error(`统计sql编写的${this.rjMust['personTime']}和${this.rjMust['money']}是必填`);
             return false;
           }
         }
