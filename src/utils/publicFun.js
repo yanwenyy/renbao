@@ -1,6 +1,5 @@
 //根据list转义传过来的sql
 export function transSql (str,list) {
-  debugger
   var _str=JSON.parse(JSON.stringify(str));
   if(list.length==1){
     list.forEach((item,index)=>{

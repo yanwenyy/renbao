@@ -278,17 +278,36 @@ export default {
     },
     //导出报告
     reportExport() {
+      let isExpot = false;
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
       } else {
-        if (isNull == 1) {
+        //判断是否已生成报告
+        for (var i in this.tableData) {
+          if (this.tableData[i].batchResultReportStatus != 0) {
+            isExpot = true;
+          }
+          break;
+        }
+        if (isExpot == false) {
           this.$message.error("请先生成报告！");
         } else {
-          let url =
-            this.$http.adornUrl(
-              "/batchResultExport/download?dataId=" + this.batchId + "&token="
-            ) + this.$cookie.get("token");
-          window.open(url);
+          let success = false;
+          for (var i in this.tableData) {
+            if (this.tableData[i].batchResultExportStatus != 4) {
+              success = true;
+            }
+            break;
+          }
+          if (success == true) {
+            let url =
+              this.$http.adornUrl(
+                "/batchResultExport/download?dataId=" + this.batchId + "&token="
+              ) + this.$cookie.get("token");
+            window.open(url);
+          } else {
+            this.$message.error("规则全部执行失败时不能导出！");
+          }
         }
       }
     },

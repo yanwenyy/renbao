@@ -305,6 +305,7 @@ export default {
         (this.dataForm.moneyEnd = ""),
         (this.dataForm.moneyStart = "");
       this.apComServerData.pageIndex = 1;
+      this.getInitList();
     },
     //查询
     getDataList() {
@@ -371,6 +372,10 @@ export default {
           }
         });
       });
+    },
+    //设置全选
+    checkAll() {
+      this.$refs.multipleTable.toggleAllSelection();
     }
   }
 };

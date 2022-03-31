@@ -215,6 +215,7 @@ export default {
       this.$nextTick(() => {
         if (this.$refs.hospital) {
           this.$refs.hospital.reSetHospital();
+          this.$refs.hospital.toggleAllSelection();
         }
       });
     },
