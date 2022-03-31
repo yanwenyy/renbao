@@ -108,7 +108,9 @@
               </el-table-column> -->
             <el-table-column prop="moblie" label="操作">
               <template slot-scope="scope">
-                <el-button type="text" @click="detailHandle(scope.row.ruleId)"
+                <el-button
+                  type="text"
+                  @click="detailHandle(scope.row.ruleId, 'look')"
                   >查看详情</el-button
                 >
               </template>
@@ -160,7 +162,7 @@
           </el-row>
         </div>
         <!--查看详细弹窗 -->
-        <el-dialog
+        <!-- <el-dialog
           :visible.sync="showDetailDialog"
           title="初探规则详细"
           :close-on-click-modal="false"
@@ -174,7 +176,7 @@
             :ruleId="ruleId"
             v-if="showDetailDialog"
           ></detail>
-        </el-dialog>
+        </el-dialog> -->
         <el-dialog
           :visible.sync="showRunDialog"
           title="规则运行"
@@ -217,13 +219,13 @@
   </div>
 </template>
 <script>
-import detail from "./component/ruleConfig-detail.vue";
+// import detail from "./component/ruleConfig-detail.vue";
 import runNow from "./component/ruleConfig-runNow.vue";
 import ruleTree from "../../common/rule-tree.vue";
 import addOrUpdate from "@/views/modules/data/rule-add-or-update.vue";
 export default {
   components: {
-    detail,
+    // detail,
     runNow,
     ruleTree,
     addOrUpdate
@@ -418,9 +420,9 @@ export default {
         .catch(() => {});
     },
     //查看详情
-    detailHandle(id) {
-      this.showDetailDialog = true;
-      this.ruleId = id;
+    detailHandle(id, type) {
+      // this.showDetailDialog = true;
+      this.$refs.addOrUpdate.init(id, this.ruleCheckData, type);
     },
     //搜索
     getAllSearch() {

@@ -1,12 +1,13 @@
 //根据list转义传过来的sql
 export function transSql (str,list) {
+  debugger
   var _str=JSON.parse(JSON.stringify(str));
   if(list.length==1){
     list.forEach((item,index)=>{
       for(let i in item){
         if(_str.indexOf("{#"+i+"#}")!=-1){
           var _reg=new RegExp("{#"+i+"#}",'g');
-          _str=_str.replace(_reg,","+item[i]+",")
+          _str=_str.replace(_reg,"'"+item[i]+"'")
         }
       }
     })
