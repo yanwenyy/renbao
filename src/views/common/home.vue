@@ -130,9 +130,12 @@
                           </template>
                     </el-table-column> -->
                     <el-table-column label="进度" align="center" prop="collectStatus">
-                        <template slot-scope="scope">
-                            <el-progress v-if="scope.row.collectStatus" :percentage="100"></el-progress>
+                       <template slot-scope="scope">
+                            <el-progress :percentage="parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100)" v-if="!isNaN(parseInt((scope.row.executeSuccess/scope.row.executeTotal)*100))"></el-progress>
                         </template>
+                        <!-- <template slot-scope="scope">
+                            <el-progress v-if="scope.row.collectStatus" :percentage="100"></el-progress>
+                        </template> -->
                     </el-table-column>
                   <el-table-column align="center" label="操作">
                       <template slot-scope="scope">

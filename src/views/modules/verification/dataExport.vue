@@ -22,7 +22,7 @@
                 <div v-if="activeName == 'insurance'">
                 <div class='listDisplay'>
                     <el-button type="primary" @click="downloadClick">下载报告</el-button>
-                    <el-button type="primary" v-if="startClick" @click="startCheck">开始校验</el-button>
+                    <el-button type="primary" @click="startCheck">开始校验</el-button>
                 </div>
                 <el-table :data="tableList" border stripe style="width: 100%"  :height="tableHeight-85" v-loading="dataLoading" >
                     <el-table-column label="校验规则" align="center" prop="ruleContent"></el-table-column>
@@ -35,6 +35,11 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="校验结果" align="center" prop="checkResult"></el-table-column>
+                    <el-table-column align="center" label="操作" prop="affirmStatus">
+                        <template slot-scope="scope">
+                            <el-button @click="tableSqlView(scope.row.dataCeeckTemplateProjectId)" type="text" size="small">查看sql</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 </div>
                 <!-- <InsuranceData  v-if="activeName == 'insurance'" ref="insurance"></InsuranceData> -->
@@ -44,6 +49,7 @@
                 <div v-if="activeName == 'hospital'">
                     <div class='listDisplay'>
                         <el-button type="primary" @click="addClick()">新增校验</el-button>
+                        <el-button type="primary" @click="getStartclick()">开始校验</el-button>
                     </div>
                     <el-table :data="tableData" border stripe style="width: 100%"  :height="tableHeight-85" v-loading='dataLoading' @selection-change="handleSelectionChange">
                         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
@@ -68,13 +74,20 @@
                         <el-table-column label="日志" align="center" prop="startDate">
                             <template slot-scope="scope">
                                 <el-button @click="detail(scope.row)" type="text" size="small">查看</el-button>
+
                             </template>
+                        </el-table-column>
+                        <el-table-column label="合格状态" align="center" prop="affirmStatus">
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.affirmStatus == '0'">已确认合格</div>
+                                <div v-if="scope.row.affirmStatus == '1'">已确认不合格</div>
+                            </template> 
                         </el-table-column>
                         <el-table-column label="批次" align="center" prop="bathNo"></el-table-column>
                         <el-table-column align="center" label="操作" prop="affirmStatus">
                             <template slot-scope="scope">
-                                <el-button type="text" size="small" v-if="scope.row.affirmStatus == '0'">合格</el-button>
-                                <el-button @click="determineClick(scope.row.dataQualityId)" type="text" size="small" v-if="scope.row.affirmStatus !== '0'">不合格</el-button>
+                                <el-button type="text" size="small" @click='qualified(scope.row.dataQualityId,0)'>合格</el-button>
+                                <el-button @click="qualified(scope.row.dataQualityId,1)" type="text" size="small">不合格</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -110,16 +123,22 @@
                 <!-- <Hospitaldata v-if="activeName == 'hospital'" ref="hospital"></Hospitaldata> -->
             </el-tab-pane>
          </el-tabs>
+        <el-dialog title='查看Sql日志' :close-on-click-modal="false" width="50%" :visible.sync="showSqlViewVisible">
+            <sqlView v-if="showSqlViewVisible" :sqlId = 'sqlId'></sqlView>
+            <span slot="footer" class="dialog-footer" style="text-align:center">
+                <el-button @click="showSqlViewVisible = false">关 闭</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
-import ruleTreeVue from '../../common/rule-tree.vue'
 import Detail from './component/detail.vue'
 import Hospitaldata from './component/Hospitaldata.vue'
+import sqlView from './component/sqlView.vue'
 export default {
     components:{
         Hospitaldata,
-        Detail
+        Detail,sqlView
     },
     data(){
         return{
@@ -129,36 +148,36 @@ export default {
             },
             options:[{
                 value:'0',
-                label:'进行中'
+                label:'待校验'
             },{
                 value:'1',
-                label:'已完成'
+                label:'校验中'
             },{
                 value:'2',
-                label:'失败'
+                label:'校验成功'
+            }, {
+                value:'3',
+                label:'校验失败'
             }],
             activeName:'insurance',
             tableList:[],
             tableData:[],
             addTableList:[], //新增校验teble
             detailShowVisible:false,
+            showSqlViewVisible:false,//查看sql
             dataLoading:false, //loading
             ShowAddVisible:false,
-            multipleSelection:[],
             token:'',
-            qualified:'确定合格',
             ruleType:'',
             dataQualityId:'',
-            projectId:'',
-            exportList:[],
             pageIndex:1,
             pageSize:10,
             total:0,
-            ExportruleType:1,
             hospitalCollectPlanId:'',
             multipleSelection:'',
             selectId:'', //新增校验id,
-            startClick:false
+            startClick:false,
+            sqlId:'',
         }
     },
     computed:{
@@ -201,10 +220,10 @@ export default {
             }).then(({data}) =>{
                 if(data && data.code === 200){
                     this.tableList = data.result.records
-                    if(this.tableList.length == 0 || this.tableList.length > 1){
-                        this.startClick = true
-                    }else{
+                    if(this.tableList.length > 1){
                         this.startClick = false
+                    }else{
+                        this.startClick = true
                     }
                     // this.apComServerData.total = data.result.total
                 }else{
@@ -231,12 +250,12 @@ export default {
                     this.tableData = data.result.records
                     this.total = data.result.total
                 }else{
-                    this.tableList = []
-                    this.apComServerData.total = 0
+                    this.tableData = []
+                    this.total = 0
                 }
                 this.dataLoading = false;
             })
-            },
+        },
         //查询
         getSearch(){
             if(this.activeName === 'insurance'){
@@ -278,10 +297,6 @@ export default {
          //新增校验
         addClick(){
             this.ShowAddVisible = true;
-            this.getDataList()
-        },
-        //新增校验teble
-        getDataList(){
             this.$http({
                 url:this.$http.adornUrl('dataQualityReport/hospitalList'),
                 method: 'get',
@@ -292,6 +307,45 @@ export default {
                     this.addTableList = []
                 }
             })
+        },
+
+        //医院重复校验
+        getStartclick(){
+            for(let i =0;i<this.multipleSelection.length;i++){
+                this.selectId = this.multipleSelection[i].dataQualityId
+            }
+            // if(this.tableData.length >= 1 || this.tableData.length == 0){
+            //     this.$message({
+            //         message: "请先新增校验",
+            //         type: "warning"
+            //     });
+            // }
+            if(this.multipleSelection.length == 0 || this.multipleSelection.length > 1){
+                this.$confirm(`请选择至少一条数据`, "提示",{
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning"
+                }).then(() =>{ 
+                })
+            }else{
+                this.$http({
+                    url:this.$http.adornUrl('/dataQualityCheckPlan/dataQualityCheckExecute'),
+                    method: 'get',
+                    params: this.$http.adornParams({
+                        ruleType:1,
+                        dataQualityId:this.selectId,
+                    })
+                }).then(({data}) =>{
+                    if(data && data.code === 200){
+                        this.$message({
+                        message: '校验成功',
+                        type: 'success',
+                        })
+                    }else{
+                        this.$message.error(data.message)
+                    }
+                })
+            }
         },
 
         //医院数据开始校验事件
@@ -337,8 +391,8 @@ export default {
         },
 
         //确认合格
-        determineClick(id){
-            this.$confirm(`确定进行删除操作?`, "提示", {
+        qualified(id,status){
+            this.$confirm(`确定进行此操作?`, "提示", {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
                 type: "warning"
@@ -348,6 +402,7 @@ export default {
                     method: 'get',
                     params: this.$http.adornParams({
                         dataQualityId:id,
+                        affirmStatus:status
                     })
                 }).then(({data}) =>{
                     if(data && data.code === 200){
@@ -363,7 +418,6 @@ export default {
                 })
             }).catch(() => {})
         }, 
-
         // 页数
         handleSizeChange(val){
             if(this.activeName === 'insurance'){
@@ -388,6 +442,31 @@ export default {
         },
         //医保开始校验
         startCheck(){
+            if(this.tableList.length == 0){
+                 this.$confirm('当前校验规则为空不可校验','信息',{
+                    confirmButtonText:'关闭',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                 })
+            }else if(this.tableList.length >1){
+                 this.$http({
+                    url:this.$http.adornUrl('/dataQualityCheckPlan/dataQualityCheckExecute'),
+                    method: 'get',
+                    params: this.$http.adornParams({
+                        ruleType:2,
+                    })
+                }).then(({data}) =>{
+                    if(data && data.code === 200){
+                        this.$message({
+                        message: '新增成功',
+                        type: 'success',
+                    })      
+                    this.getInitList()        
+                    }else{
+                        this.$message.error(data.message)
+                    }
+                })
+            }else{
                 this.$http({
                     url:this.$http.adornUrl('/dataQualityCheckPlan/dataQualityCheckAdd'),
                     method: 'get',
@@ -405,9 +484,13 @@ export default {
                         this.$message.error(data.message)
                     }
                 })
-            
+            }
+        },
+        //医保查看日志
+        tableSqlView(id){
+            this.showSqlViewVisible = true
+            this.sqlId = id
         }
-
     }
 }
 </script>
