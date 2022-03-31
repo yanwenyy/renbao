@@ -436,6 +436,7 @@
       title="dmp还原日志"
       :visible.sync="dmpLogDialogVisible"
       width="60%"
+      class="dmpLogDia"
       :before-close="dmpLoghandleClose"
       :close-on-click-modal="false">
       <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
@@ -1119,4 +1120,8 @@
 /deep/.el-table .warning-row {
     color: #af0f16;
   }
+
+.dmpLogDia /deep/ .el-loading-mask {
+	background-color: rgba(255,255,255,.1);
+}
 </style>
