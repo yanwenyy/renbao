@@ -171,7 +171,10 @@
             </el-form-item>
           </el-form>
           <div align="center">
-            <el-button type="primary" @click="exportExcel('dataForm1')"
+            <el-button
+              :disabled="this.dataForm1.hospName.length <= 0"
+              type="primary"
+              @click="exportExcel('dataForm1')"
               >导出</el-button
             >
             <el-button @click="closeExport">取消</el-button>
