@@ -11,7 +11,7 @@
         <el-date-picker
           value-format="yyyy-MM-dd HH:mm:ss"
           v-model="dataForm.beginTime"
-          type="date"
+          type="datetime"
           placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
@@ -19,7 +19,7 @@
         <el-date-picker
           value-format="yyyy-MM-dd HH:mm:ss"
           v-model="dataForm.endTime"
-          type="date"
+          type="datetime"
           placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
