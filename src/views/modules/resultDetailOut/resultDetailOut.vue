@@ -356,7 +356,7 @@ export default {
       // this.showDetailDialog = true;
       // this.$refs.viewDetails.showDialog(data);
 
-      this.info = data.resultId;
+      this.info = data;
       this.resultTableName = data.resultTableName;
       this.showDetailDialog = true;
     },

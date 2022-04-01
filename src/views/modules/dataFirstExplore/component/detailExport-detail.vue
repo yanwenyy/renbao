@@ -67,7 +67,7 @@
 import myquerybuilder from "@/views/modules/dataAcquisition/myquerybuilder.vue";
 export default {
   props: {
-    info: String,
+    info: Object,
     resultTableName: String
   },
   components: {
@@ -127,6 +127,7 @@ export default {
           tableName: this.resultTableName,
           resultId: this.info.resultId,
           complexWhere: this.sqlData,
+          tableRowCount:this.info.resultCount,
           pageNum: this.apComServerData.pageIndex,
           pageSize: this.apComServerData.size
         })
