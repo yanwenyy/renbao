@@ -278,15 +278,18 @@ export default {
     },
     //导出报告
     reportExport() {
-      let isExpot = false;
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
       } else {
         //判断是否已生成报告
+        let isExpot = true;
         for (var i in this.tableData) {
-          if (this.tableData[i].batchResultExportStatus != null) {
-            isExpot = true;
-          }
+          if (
+            this.tableData[i].batchResultExportStatus == null ||
+            this.tableData[i].batchResultExportStatus == 1
+          ) {
+            isExpot = false;
+          } 
           break;
         }
         if (isExpot == false) {
