@@ -20,7 +20,7 @@
         <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
-        <el-button type="warning" @click="deletDmpData()">清除dmp缓存数据</el-button>
+        <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button>
         <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
@@ -28,7 +28,7 @@
     <!-- height="60vh" -->
     <el-table
       :data="dataList"
-      :height="tableHeight+30"
+      :height="tableHeight-26"
       border
       v-loading="dataListLoading"
       element-loading-text="努力加载中..."
@@ -656,21 +656,26 @@
     },
     methods: {
       deletDmpData(){
-        this.$http({
-          url: this.$http.adornUrl(`dmpCollectPlan/deleteDmpUserAndTableSpace`),
-          method: 'get',
-        }).then(({data}) => {
-            if (data && data.code == 200) {
-              this.$message.success("清除缓存数据成功")
-            }else{
-              this.$message({
-                      showClose: true,
-                      message: data.message? data.message : "数据清除失败！",
-                      type: 'error',
-                      duration: 0
-                    })
-            }
-        })
+        this.$confirm('<span style="color:#af0f16">将删除该项目dmp文件采集中产生的所有数据，是否确认删除？</span>'
+         ,{dangerouslyUseHTMLString: true,
+          confirmButtonText: '确认'})
+          .then(_ => {
+            this.$http({
+              url: this.$http.adornUrl(`dmpCollectPlan/deleteDmpUserAndTableSpace`),
+              method: 'get',
+            }).then(({data}) => {
+                if (data && data.code == 200) {
+                  this.$message.success("清除缓存数据成功")
+                }else{
+                  this.$message({
+                    showClose: true,
+                    message: data.message? data.message : "数据清除失败！",
+                    type: 'error',
+                    duration: 0
+                  })
+                }
+            })
+          })
       },
        //获取继续导入的dmp列表
       getDmpReImpList(){
@@ -716,8 +721,28 @@
         
       },
       // 删除已导入的dmp文件
-      delReImpDmp(){
-
+      delReImpDmp(data){
+        this.$confirm('<span style="color:#af0f16">将删除该dmp文件采集中产生的所有数据，是否确认删除？</span>'
+         ,{dangerouslyUseHTMLString: true,
+          confirmButtonText: '确认'})
+          .then(_ => {
+            this.$http({
+              url: this.$http.adornUrl(`dmpCollectPlan/delete/${data.dmpCollectPlanId}`),
+              method: 'post'
+            }).then(({data}) => {
+                if (data && data.code == 200) {
+                  this.$message.success("清除缓存数据成功")
+                  this.getDmpReImpList()
+                }else{
+                  this.$message({
+                    showClose: true,
+                    message: data.message? data.message : "数据清除失败！",
+                    type: 'error',
+                    duration: 0
+                  })
+                }
+            })
+          })
       },
       // dmp日志关闭
       dmpLoghandleClose(done){
