@@ -754,13 +754,15 @@ export default {
         //   return false;
         // }
       }
-      if(this.dataForm.ruleSqlStatisticsValue != '') {
-        if(this.dataForm.ruleRemark == '') {
-          return this.$message.error('规则备注不能为空！');
+      if (this.dataForm.ruleSqlStatisticsValue) {
+        if (this.dataForm.ruleRemark == "") {
+          return this.$message.error("规则备注不能为空！");
         }
         if (
-          this.dataForm.ruleRemark.indexOf(`{${ this.rjMust["personTime"]}}`) == -1 ||
-          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) ==-1) {
+          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) ==
+            -1 ||
+          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1
+        ) {
           this.$message.error(
             `规则备注的{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填`
           );
