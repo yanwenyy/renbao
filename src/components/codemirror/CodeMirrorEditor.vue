@@ -113,14 +113,15 @@
           >
             <div v-if="item.list==''">
               <div v-if="!item.columnList">{{item.msg}}</div>
-              <el-table v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+              <el-table :height="tableHeight*0.55" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
                 <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
                 </el-table-column>
               </el-table>
             </div>
             <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
-            <el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
+            <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
+            <el-table :height="fullScreen?'70vh':tableHeight*0.55" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
               <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
                 <template slot-scope="scope">
                   <div>
@@ -427,10 +428,15 @@
         default: null,
       },
     },
+    computed:{
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
+    },
     data() {
       return {
         selfFrom:'',
-        boxHeight:0,
+        // boxHeight:0,
         dragParmasList:[],//拖拽进来的参数数组
         // SelfparamsList:[],//参数设置列表
         // SlefparamsListVisible:false,//参数设置显示状态
@@ -657,7 +663,7 @@
             this.editorValue=val;
             this.getSqlMsg(val);
             if(this.$refs.myCm){
-              this.idToButton(val);
+              this.idToButton(this.editorValue);
 
             }
           }
@@ -783,6 +789,7 @@
             if(item.children&&item.children.length>0){
               item.children.forEach(vtem=>{
                 if(this.editorValue.indexOf("{#"+vtem.id+"#}")!=-1){
+
                   this.dragParmasList.push(vtem);
                   var line=this.$refs.myCm.codemirror.getCursor().line;
                   var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
@@ -918,6 +925,7 @@
       //使用sql
       useSql(row){
         this.editorValue=row.draftSql;
+        this.idToButton(this.editorValue);
         this.draftSqlId=row.draftId;
         this.sqlvisible=false;
       },

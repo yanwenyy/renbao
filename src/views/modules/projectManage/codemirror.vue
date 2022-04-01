@@ -357,14 +357,20 @@
       //格式化sql点击,data 编译器内容
       formatContent(datas){
         // /sqlScript/formatSql
-        console.log(datas)
+        if(datas.indexOf("{#")!=-1&&datas.indexOf("#}")!=-1){
+          datas=datas.replace("{#","'{#").replace("#}","#}'");
+        }
         this.$http({
           url: this.$http.adornUrl('/sqlScript/formatSql'),
           method: 'post',
           data: this.$http.adornData({sqlScript:datas})
         }).then(({data}) => {
           if(data.code==200){
-            this.sqlData=data.result;
+            var _data=data.result;
+            if(_data.indexOf("'{#")!=-1&&_data.indexOf("#}'")!=-1){
+              _data=_data.replace("'{#","{#").replace("#}'","#}");
+            }
+            this.sqlData=_data;
           }else{
             this.$message.error(data.message);
           }
