@@ -755,18 +755,21 @@ export default {
         }
       }
       if (this.dataForm.ruleSqlStatisticsValue) {
-        if (this.dataForm.ruleRemark == "") {
-          return this.$message.error("规则备注不能为空！");
-        }
-        if (
-          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) ==
-            -1 ||
-          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1
-        ) {
-          this.$message.error(
-            `规则备注的{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填`
-          );
-          return false;
+        // if (this.dataForm.ruleRemark == "") {
+        //   return this.$message.error("规则备注不能为空！");
+        // }
+        // if (
+        //   this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) ==
+        //     -1 ||
+        //   this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1
+        // ) {
+        //   this.$message.error(
+        //     `规则备注的{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填`
+        //   );
+        //   return false;
+        // }
+        if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+          return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
         }
       }
       this.$refs["dataForm"].validate(valid => {
