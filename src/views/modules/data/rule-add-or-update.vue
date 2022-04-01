@@ -298,13 +298,13 @@ export default {
             trigger: ["blur", "change"]
           }
         ],
-        ruleRemark: [
+        /* ruleRemark: [
           {
             required: true,
             message: "规则备注不能为空",
             trigger: ["blur", "change"]
           }
-        ],
+        ], */
         folderId: [
           { required: true, message: "规则分类不能为空", trigger: "change" }
         ],
