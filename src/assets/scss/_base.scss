@@ -438,7 +438,7 @@ img {
   background:$--theme-red;
   border: $--theme-red;
 }
-.el-button--danger.is-disabled:hover,.el-button--danger.is-disabled,.el-button--primary.is-disabled:hover,.el-button--primary.is-disabled{
+.el-button--warning.is-disabled:hover,.el-button--warning.is-disabled,.el-button--danger.is-disabled:hover,.el-button--danger.is-disabled,.el-button--primary.is-disabled:hover,.el-button--primary.is-disabled{
   background: mix(#fff, $--theme-red, 60%);
   border: mix(#fff, $--theme-red, 60%);
 }

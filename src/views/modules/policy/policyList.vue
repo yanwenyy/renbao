@@ -63,6 +63,7 @@
             >全部导出</el-button
           >
           <el-button
+            :disabled="dataListSelections.length==0"
             type="warning"
             @click="ruleExport('one')"
             :loading="ruleExportLoading"
@@ -302,7 +303,7 @@ export default {
     // 批量导出
     ruleExport(isAll) {
       var exportList = [];
-      let ruleIds = "";
+      let policyIds = "";
       // 判断是否为全部导出，全部导出的话exportList为空列表
       if (isAll == "one") {
         // 单个导出
@@ -312,20 +313,20 @@ export default {
             type: "warning"
           });
         this.dataListSelections.forEach(item => {
-          exportList.push(item.ruleId);
+          exportList.push(item.policyId);
         });
         // this.ruleExportLoading = true
-        ruleIds = exportList.join(",");
+        policyIds = exportList.join(",");
       } else {
         // 全部导出
         // this.ruleExportAllLoading = true;
         ruleIds = "";
       }
       window.location.href =
-        this.$http.adornUrl("/rule/ruleExport?token=") +
+        this.$http.adornUrl("/policy/exportData?token=") +
         this.$cookie.get("token") +
-        "&ruleIds=" +
-        ruleIds;
+        "&policyIds=" +
+        policyIds;
     },
     // 导入
     ruleImport() {
