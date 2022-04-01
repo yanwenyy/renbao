@@ -458,7 +458,7 @@
       </span>
     </el-dialog>
     <el-dialog 
-    title="已导入dmp文件"
+    title="查看已导入dmp文件"
       :visible.sync="dmpReImpDialogVisible"
       width="60%">
       <el-table
@@ -471,16 +471,26 @@
           show-overflow-tooltip
           label="文件名"/>
           <el-table-column
+          align="center"
+          prop="endTime"
+          label="采集结束时间"
+          />
+          <el-table-column
+          align="center"
+          prop="dmpStatus"
+          label="采集状态"
+          >
+          <template slot-scope="scope">
+            {{scope.row.dmpStatus == 1?"已完成":"失败"}}
+          </template>
+          </el-table-column>
+          <el-table-column
             align="center"
             width="200"
             label="操作">
             <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="reImpDmp(scope.row)"
-                type="text"
-                size="small">
-                继续采集
-              </el-button>
+              <el-button v-if="scope.row.dmpStatus == 1" @click.native.prevent="reImpDmp(scope.row)" type="text" size="small">继续采集</el-button>
+              <el-button type="text" size="small" @click="delReImpDmp(scope.row)">删除</el-button>
             </template>
           </el-table-column>
       </el-table>
@@ -574,7 +584,9 @@
         // dmp日志加载loading
         dmpLogLoading: true,
         // 继续导入的implist
-        dmpReImpList: []
+        dmpReImpList: [],
+        // 是否强行关闭了
+        isForceColse: false
       }
     },
     computed:{
@@ -628,6 +640,21 @@
             }
         })
       },
+      // 删除已导入的dmp文件
+      delReImpDmp(data){
+        this.$confirm('<span style="color:#af0f16">将删除该dmp文件采集中产生的所有数据，是否确认删除？</span>'
+         ,{dangerouslyUseHTMLString: true,
+          confirmButtonText: '确认'})
+          .then(_ => {
+            this.$http({
+              url: this.$http.adornUrl(`dmpCollectPlan/delete/${data.dmpCollectPlanId}`),
+              method: 'get'
+            }).then(({data}) => {
+                
+            })
+            done()
+          })
+      },
       // 恢复采集dmp
       reImpDmp(data){
         this.checkDmpFileTableDialogVisible = true
@@ -662,6 +689,7 @@
           confirmButtonText: '仍要关闭'})
           .then(_ => {
             this.checkDmpFileTableDialogVisible = false
+            this.isForceColse = true
             done()
           })
           .catch(_ => {})
@@ -702,7 +730,9 @@
             if(this.countDown==0){
               clearInterval(this.timer)
               this.dmpLogDialogVisible = false
-              this.checkDmpFileTableDialogVisible = true
+              if(!this.isForceColse) {
+                 this.checkDmpFileTableDialogVisible = true
+              }
             }
           },1000)
         }
@@ -856,6 +886,7 @@
               this.dmpImpFlag = false
               this.dmpImpFalseFlag = false
               this.dmpLogDialogVisible = true
+              this.isForceColse = false
               this.timer = setInterval(()=>{
                 if(this.dmpImpFlag || this.dmpImpFalseFlag) {
                     this.dmpLogLoading = false
@@ -910,6 +941,7 @@
             this.dmpImpFlag = false
             this.dmpImpFalseFlag = false
             this.dmpLogDialogVisible = true
+            this.isForceColse = false
             this.timer = setInterval(()=>{
                 if(this.dmpImpFlag || this.dmpImpFalseFlag) {
                     this.dmpLogLoading = false

@@ -482,18 +482,29 @@
         <el-table-column
           align="center"
           prop="dmpFilePath"
+          show-overflow-tooltip
           label="文件名"/>
+          <el-table-column
+          align="center"
+          prop="endTime"
+          label="采集结束时间"
+          />
+          <el-table-column
+          align="center"
+          prop="dmpStatus"
+          label="采集状态"
+          >
+          <template slot-scope="scope">
+            {{scope.row.dmpStatus == 1?"已完成":"失败"}}
+          </template>
+          </el-table-column>
           <el-table-column
             align="center"
             width="200"
             label="操作">
             <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="reImpDmp(scope.row)"
-                type="text"
-                size="small">
-                继续采集
-              </el-button>
+              <el-button v-if="scope.row.dmpStatus == 1" @click.native.prevent="reImpDmp(scope.row)" type="text" size="small">继续采集</el-button>
+              <el-button type="text" size="small" @click="delReImpDmp(scope.row)">删除</el-button>
             </template>
           </el-table-column>
       </el-table>
@@ -603,7 +614,9 @@
         // dmp日志加载loading
         dmpLogLoading: true,
         // 继续导入的implist
-        dmpReImpList: []
+        dmpReImpList: [],
+        // 是否强行关闭了
+        isForceColse: false
       }
     },
     computed:{
@@ -684,6 +697,10 @@
         })
         
       },
+      // 删除已导入的dmp文件
+      delReImpDmp(){
+
+      },
       // dmp日志关闭
       dmpLoghandleClose(done){
          this.$confirm('<span style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
@@ -691,6 +708,7 @@
           confirmButtonText: '仍要关闭'})
           .then(_ => {
             this.checkDmpFileTableDialogVisible = false
+            this.isForceColse = true
             done()
           })
           .catch(_ => {})
@@ -764,7 +782,9 @@
             if(this.countDown==0){
               clearInterval(this.timer)
               this.dmpLogDialogVisible = false
-              this.checkDmpFileTableDialogVisible = true
+               if(!this.isForceColse) {
+                  this.checkDmpFileTableDialogVisible = true
+               }
             }
           },1000)
         }
