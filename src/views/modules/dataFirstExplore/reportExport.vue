@@ -284,7 +284,7 @@ export default {
       } else {
         //判断是否已生成报告
         for (var i in this.tableData) {
-          if (this.tableData[i].batchResultReportStatus != 0) {
+          if (this.tableData[i].batchResultExportStatus != null) {
             isExpot = true;
           }
           break;
@@ -300,11 +300,24 @@ export default {
             break;
           }
           if (success == true) {
-            let url =
-              this.$http.adornUrl(
-                "/batchResultExport/download?dataId=" + this.batchId + "&token="
-              ) + this.$cookie.get("token");
-            window.open(url);
+            let doing = false;
+            for (var i in this.tableData) {
+              if (this.tableData[i].batchResultExportStatus != 2) {
+                doing = true;
+              }
+              break;
+            }
+            if (doing == true) {
+              this.$message.error("有正在生成的报告，请稍后导出！");
+            } else {
+              let url =
+                this.$http.adornUrl(
+                  "/batchResultExport/download?dataId=" +
+                    this.batchId +
+                    "&token="
+                ) + this.$cookie.get("token");
+              window.open(url);
+            }
           } else {
             this.$message.error("规则全部执行失败时不能导出！");
           }

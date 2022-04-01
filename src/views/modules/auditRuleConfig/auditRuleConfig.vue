@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="left">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <rule-tree
           ref="ruleTree"
           :isShowSearch="true"
@@ -14,7 +14,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
           <el-form-item label="审核规则名称：">
             <el-input v-model="searchForm.ruleName" clearable></el-input>
@@ -43,10 +43,15 @@
               >提交至地区个性化规则</el-button
             >
             <el-button type="primary" @click="addFun">新增</el-button>
-            <el-button type="primary" @click="editorFun">编辑</el-button>
+            <el-button
+              type="primary"
+              @click="editorFun(0)"
+              :disabled="this.multipleTable <= 0"
+              >编辑</el-button
+            >
             <el-button
               type="danger"
-              @click="deleteFn"
+              @click="deleteFn(0)"
               :disabled="this.multipleTable.length <= 0"
               >删除</el-button
             >
@@ -78,6 +83,16 @@
               :align="items.align ? items.align : 'center'"
               :width="items.width"
             >
+            </el-table-column>
+            <el-table-column prop="mobile" label="操作" align="center">
+              <template slot-scope="scope">
+                <el-button type="text" @click="editorFun(scope.row.ruleId)"
+                  >编辑
+                </el-button>
+                <el-button type="text" @click="deleteFn(scope.row.ruleId)"
+                  >删除
+                </el-button>
+              </template>
             </el-table-column>
           </el-table>
           <el-row>
@@ -183,15 +198,7 @@ export default {
           dataname: "createTime",
           label: "创建时间",
           issortable: false,
-          type: "",
-          minWidth: 200
-        },
-        {
-          dataname: "mobile",
-          label: "操作",
-          issortable: false,
-          type: "",
-          minWidth: 200
+          type: ""
         }
       ],
       Pager: {
@@ -313,32 +320,33 @@ export default {
       // this.searchForm.folderPath = '';
       // this.searchForm.folderId = '';
     },
+    //新增
     addFun() {
       // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
     },
-    editorFun() {
-      if (this.multipleTable.length != 1)
-        return this.$message({
-          message: "请选择一条数据进行编辑",
-          type: "warning"
-        });
-      // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
-      this.$refs.addOrUpdate.init(
-        this.multipleTable[0].ruleId,
-        this.ruleCheckData
-      );
+    //修改
+    editorFun(data) {
+      if (data == 0) {
+        // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
+        this.$refs.addOrUpdate.init(
+          this.multipleTable[0].ruleId,
+          this.ruleCheckData
+        );
+      } else {
+        this.$refs.addOrUpdate.init(data, this.ruleCheckData);
+      }
     },
-    deleteFn() {
-      if (this.multipleTable.length === 0)
-        return this.$message({
-          message: "请选择至少一条数据",
-          type: "warning"
-        });
+    //删除
+    deleteFn(data) {
       var deleteList = [];
-      this.multipleTable.forEach(item => {
-        deleteList.push(item.ruleId);
-      });
+      if (data == 0) {
+        this.multipleTable.forEach(item => {
+          deleteList.push(item.ruleId);
+        });
+      } else {
+        deleteList.push(data);
+      }
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -460,8 +468,10 @@ export default {
       }
     },
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   components: {
     submitPersonalityRule,
@@ -524,11 +534,6 @@ export default {
     }
     .content {
       margin-top: 10px;
-    }
-    .auditRuleConfig-right-bottom {
-      // display: flex;
-      // justify-content: space-between;
-      // align-items: center;
     }
   }
 }
