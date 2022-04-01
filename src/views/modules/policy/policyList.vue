@@ -358,7 +358,7 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var userIds = id
+      var policyIds = id
         ? [id]
         : this.dataListSelections.map(item => {
             return item.userId;
@@ -370,9 +370,9 @@ export default {
       })
         .then(() => {
           this.$http({
-            url: this.$http.adornUrl("/policy/delete/"+id),
-            method: "delete",
-            // data: this.$http.adornData(userIds, false)
+            url: this.$http.adornUrl("/policy/deleteByIds"),
+            method: "post",
+            data: this.$http.adornData(policyIds, false)
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$message({
