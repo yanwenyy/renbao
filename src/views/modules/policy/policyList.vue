@@ -367,8 +367,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      })
-        .then(() => {
+      }).then(() => {
           this.$http({
             url: this.$http.adornUrl("/policy/deleteByIds"),
             method: "post",
