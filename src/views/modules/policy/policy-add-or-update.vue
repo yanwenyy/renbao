@@ -165,6 +165,7 @@
             }else{
               var editParmas={
                 policyName:this.dataForm.policyName,
+                policyId:this.dataForm.policyId,
                 beginTime:this.dataForm.beginTime,
                 endTime:this.dataForm.endTime,
                 regionId:this.dataForm.regionId,

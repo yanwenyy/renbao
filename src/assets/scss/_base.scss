@@ -83,6 +83,7 @@ img {
   width: 227px;
   height: auto;
   margin-top: -8px;
+  margin-left: 3px;
 }
 .navbar_header_new-title{
   vertical-align: top;
@@ -97,6 +98,9 @@ img {
   .site-sidebar__inner,
   .el-menu.site-sidebar__menu {
     width: 64px;
+    .el-menu-item,.el-submenu{
+      margin-left: -10px;
+    }
   }
   //.site-navbar__body,
   .site-content__wrapper {

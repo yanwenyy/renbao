@@ -53,10 +53,10 @@
               >转小写
               </el-dropdown-item
               >
-              <!--<el-dropdown-item @click.native="notes">
+              <el-dropdown-item @click.native="notes">
                 注释选中行
-              </el-dropdown-item>-->
-              <!--<el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>-->
+              </el-dropdown-item>
+              <el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>
               <!--<el-dropdown-item @click.native="changeSize(1)"-->
               <!--&gt;字体放大-->
               <!--</el-dropdown-item-->
@@ -1157,6 +1157,43 @@
           this.$refs.myCm.codemirror.setOption("foldGutter", true);
         });
       },
+      //注释选中行
+      notes(){
+        if (this.$refs.myCm.codemirror.somethingSelected()) {
+          var strSelect = this.$refs.myCm.codemirror.getSelection();
+          if (strSelect.length >= 2) {
+            //如果字符串开头不为/*，则可以进行下面操作
+            var fststr = strSelect.substring(0, 2);
+            if (fststr !== "/*") {
+              //如果字符串最后是*/，则需要替换成
+              var latstr = strSelect.substring(strSelect.length - 2, strSelect.length);
+              if (latstr === "*/") {
+                strSelect = "/*" + strSelect.substring(0, strSelect.length - 2) + "*\\*/";
+              } else {
+                strSelect = "/*" + strSelect + "*/";
+              }
+            }
+          } else {
+            strSelect = "/*" + strSelect + "*/";
+          }
+          this.$refs.myCm.codemirror.replaceSelection(strSelect);
+        }else{
+          this.$message.error("请选择注释内容")
+        }
+      },
+      //取消注释行
+      noteOff(){
+        if (this.$refs.myCm.codemirror.somethingSelected()) {
+          var strSelect = this.$refs.myCm.codemirror.getSelection();
+          if(strSelect.indexOf("/*")!=-1)
+          strSelect=strSelect.replace('/*','');
+          if(strSelect.indexOf("*/")!=-1)
+          strSelect=strSelect.replace('*/','');
+          this.$refs.myCm.codemirror.replaceSelection(strSelect);
+        }else{
+          this.$message.error("请选择取消注释内容")
+        }
+      },
       // 修改编辑框样式
       setStyle(style) {
         try {
@@ -1437,5 +1474,7 @@
   .box-table .el-table__header-wrapper{
     padding-top: 10px;
   }
-
+  .cm-comment{
+    color:#C1C1C1;
+  }
 </style>

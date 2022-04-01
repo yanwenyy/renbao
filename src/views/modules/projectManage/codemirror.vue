@@ -1,9 +1,5 @@
 <template>
-  <div style="width:100%"
-       v-loading.fullscreen.lock="loading"
-       element-loading-text="点击取消执行"
-       element-loading-custom-class="selfCustom"
-       element-loading-background="rgba(0, 0, 0, 0.8)">
+  <div style="width:100%">
     <sql-edit
       ref="sqlEdits"
       :treeDefaultProps="treeDefaultProps"
@@ -69,10 +65,10 @@
         ws:{},//websoket对象
         treeDefaultProps:{
           label:'title',
-        },//tree显示数据绑定的名字
+        },//左侧数据表tree显示数据绑定的名字
         parmsDefaultProps:{
           label:'name',
-        },//tree显示数据绑定的名字
+        },//左侧参数tree显示数据绑定的名字
         sqlListData:[],//sql列表data
         sqlListTotal:0,//sql列表data
         sqlData:'',//sql编译器内容
@@ -439,7 +435,6 @@
                   item.list=item.jsonObject.data;
                 });
                 this.paramsList=datas;
-                console.log(this.paramsList,7878)
               }else{
                 this.$message.error(data.message);
               }
