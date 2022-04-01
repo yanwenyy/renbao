@@ -10,7 +10,7 @@
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
                     <el-button size="small" type="text" @click="getImportclick(scope.row)">导入模板</el-button>
-                    <el-button size="small" type="text" @click="getExportClick(scope.row)">导出模板</el-button>
+                    <el-button size="small" type="text" @click="getExportClick(scope.row.attachmentId)">导出模板</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -162,9 +162,16 @@ export default {
             this.showImportVisible = true
         },
         //导出模板
-        getExportClick(data){
-            let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+this.fileId +'&token=') + this.$cookie.get('token')
-            window.open(url)
+        getExportClick(id){
+            if(id){
+                let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
+                window.open(url)
+            }else{
+                this.$message({
+                    message: '请先导入模板在进行导出模板',
+                    type: 'success',})
+            }
+           
         },
         // 每页数
         handleSizeChange(val){
