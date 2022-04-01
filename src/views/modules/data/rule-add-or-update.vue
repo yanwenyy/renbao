@@ -741,18 +741,18 @@ export default {
         this.dataForm.ruleSqlStatisticsValue &&
         this.dataForm.ruleSqlStatisticsValue != ""
       ) {
-        // if (
-        //   this.dataForm.ruleSqlStatisticsValue.indexOf(
-        //     this.rjMust["personTime"]
-        //   ) == -1 ||
-        //   this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
-        //     -1
-        // ) {
-        //   this.$message.error(
-        //     `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
-        //   );
-        //   return false;
-        // }
+        if (
+          this.dataForm.ruleSqlStatisticsValue.indexOf(
+            this.rjMust["personTime"]
+          ) == -1 ||
+          this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
+            -1
+        ) {
+          this.$message.error(
+            `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
+          );
+          return false;
+        }
       }
       if (this.dataForm.ruleSqlStatisticsValue) {
         if (this.dataForm.ruleRemark == "") {
