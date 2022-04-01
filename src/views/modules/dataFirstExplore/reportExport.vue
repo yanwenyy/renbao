@@ -302,7 +302,7 @@ export default {
           if (success == true) {
             let doing = false;
             for (var i in this.tableData) {
-              if (this.tableData[i].batchResultExportStatus != 2) {
+              if (this.tableData[i].batchResultExportStatus == 2) {
                 doing = true;
               }
               break;
