@@ -272,8 +272,8 @@ export default {
             for (var i in this.tableData) {
               if (this.tableData[i].batchResultExportStatus == 3) {
                 success = true;
+                break;
               }
-              break;
             }
             if (success == true) {
               this.$message.success("生成报告成功");
