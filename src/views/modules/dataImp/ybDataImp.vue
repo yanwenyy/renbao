@@ -20,7 +20,7 @@
         <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
-        <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button>
+        <!-- <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button> -->
         <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
@@ -482,7 +482,9 @@
           label="采集状态"
           >
           <template slot-scope="scope">
-            {{scope.row.dmpStatus == 1?"已完成":"失败"}}
+            <span v-if="scope.row.dmpStatus == 0">进行中</span>
+            <span v-if="scope.row.dmpStatus == 1">已完成</span>
+            <span v-if="scope.row.dmpStatus == 2">失败</span>
           </template>
           </el-table-column>
           <el-table-column
