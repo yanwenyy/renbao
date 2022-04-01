@@ -17,7 +17,11 @@
       <el-card :style="{ height: tableHeight + 120 + 'px' }">
         <el-form ref="searchForm" :model="searchForm" :inline="true">
           <el-form-item label="审核规则名称：">
-            <el-input v-model="searchForm.ruleName" clearable></el-input>
+            <el-input
+              v-model="searchForm.ruleName"
+              clearable
+              placeholder="审核规则名称："
+            ></el-input>
           </el-form-item>
           <el-form-item label="审核规则类别：">
             <el-select
@@ -44,16 +48,16 @@
             >
             <el-button type="primary" @click="addFun">新增</el-button>
             <!--<el-button-->
-              <!--type="primary"-->
-              <!--@click="editorFun(0)"-->
-              <!--:disabled="this.multipleTable <= 0"-->
-              <!--&gt;编辑</el-button-->
+            <!--type="primary"-->
+            <!--@click="editorFun(0)"-->
+            <!--:disabled="this.multipleTable <= 0"-->
+            <!--&gt;编辑</el-button-->
             <!--&gt;-->
             <!--<el-button-->
-              <!--type="danger"-->
-              <!--@click="deleteFn(0)"-->
-              <!--:disabled="this.multipleTable.length <= 0"-->
-              <!--&gt;删除</el-button-->
+            <!--type="danger"-->
+            <!--@click="deleteFn(0)"-->
+            <!--:disabled="this.multipleTable.length <= 0"-->
+            <!--&gt;删除</el-button-->
             <!--&gt;-->
           </el-form-item>
         </el-form>
@@ -89,7 +93,9 @@
                 <el-button type="text" @click="editorFun(scope.row.ruleId)"
                   >修改
                 </el-button>
-                <el-button type="text" @click="editorFun(scope.row.ruleId,'look')"
+                <el-button
+                  type="text"
+                  @click="editorFun(scope.row.ruleId, 'look')"
                   >查看
                 </el-button>
                 <el-button type="text" @click="deleteFn(scope.row.ruleId)"
@@ -329,7 +335,7 @@ export default {
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
     },
     //修改
-    editorFun(data,type) {
+    editorFun(data, type) {
       if (data == 0) {
         // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
         this.$refs.addOrUpdate.init(
@@ -337,7 +343,7 @@ export default {
           this.ruleCheckData
         );
       } else {
-        this.$refs.addOrUpdate.init(data, this.ruleCheckData,type);
+        this.$refs.addOrUpdate.init(data, this.ruleCheckData, type);
       }
     },
     //删除

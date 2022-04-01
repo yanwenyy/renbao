@@ -7,16 +7,15 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :before-close="handleClose"
-      width="35%"
+      width="40%"
     >
       <div class="rule-operation">
         <el-form
           ref="ruleOperationForm"
           :model="ruleOperationForm"
           :rules="ruleOperationFormRules"
-          label-width="130px"
+          label-width="160px"
           style="text-align: left"
-          class="rule-form-inline"
         >
           <el-form-item
             label="选择开始执行时间"
@@ -37,6 +36,7 @@
               class="size"
               :disabled="true"
               placeholder="请选择医院"
+              style="width:80%"
               v-model="ruleOperationForm.hospital"
               autocomplete="off"
             ></el-input>
@@ -45,6 +45,7 @@
           <el-form-item label="批次名称" prop="batchName">
             <el-input
               class="size"
+              style="width:80%"
               v-model="ruleOperationForm.batchName"
               autocomplete="off"
             ></el-input>
@@ -52,10 +53,10 @@
           <el-form-item label="备注" prop="batchRemark">
             <el-input
               class="size"
+              style="width:80%"
               v-model="ruleOperationForm.batchRemark"
               autocomplete="off"
               type="textarea"
-              :autosize="{ minRows: 4 }"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -274,14 +275,6 @@ export default {
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
-  }
-  .rule-form-inline {
-    /deep/ .el-textarea {
-      width: 350px;
-    }
-    /deep/ .el-input {
-      width: 280px;
-    }
   }
 }
 </style>

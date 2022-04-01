@@ -374,7 +374,7 @@ export default {
       });
     },
     //设置全选
-    checkAll() {
+    toggleAllSelection() {
       this.$refs.multipleTable.toggleAllSelection();
     }
   }
