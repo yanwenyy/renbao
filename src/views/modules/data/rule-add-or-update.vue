@@ -80,7 +80,7 @@
                   type="textarea"
                   :rows="6"
                   v-model="dataForm.ruleRemark"
-                  placeholder="例：规则名称（规则名称中所填写的内容），涉及{人次}人次，{金额}金额。"
+                  placeholder="例：规则名称（规则名称中所填写的内容），涉及{总人次}总人次，{总金额}总金额。"
                 ></el-input>
               </el-form-item>
               <el-form-item label="创建人">
@@ -741,15 +741,28 @@ export default {
         this.dataForm.ruleSqlStatisticsValue &&
         this.dataForm.ruleSqlStatisticsValue != ""
       ) {
+        // if (
+        //   this.dataForm.ruleSqlStatisticsValue.indexOf(
+        //     this.rjMust["personTime"]
+        //   ) == -1 ||
+        //   this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
+        //     -1
+        // ) {
+        //   this.$message.error(
+        //     `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
+        //   );
+        //   return false;
+        // }
+      }
+      if(this.dataForm.ruleSqlStatisticsValue != '') {
+        if(this.dataForm.ruleRemark == '') {
+          return this.$message.error('规则备注不能为空！');
+        }
         if (
-          this.dataForm.ruleSqlStatisticsValue.indexOf(
-            this.rjMust["personTime"]
-          ) == -1 ||
-          this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
-            -1
-        ) {
+          this.dataForm.ruleRemark.indexOf(`{${ this.rjMust["personTime"]}}`) == -1 ||
+          this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) ==-1) {
           this.$message.error(
-            `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
+            `规则备注的{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填`
           );
           return false;
         }
