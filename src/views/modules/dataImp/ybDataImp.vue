@@ -931,7 +931,8 @@
               this.$http({
                 url: this.$http.adornUrl(`dataImp/impDmpFile/${2}/${this.webSocketId}`),
                 method: 'post',
-                data: this.selectedFileData
+                data: this.selectedFileData,
+                isLoading: false
               }).then(({data}) => {
                   if (data && (data.code === 200 || data.code == 500) && data.result) {
                     //  this.fileTableInfos = data.result
@@ -986,7 +987,8 @@
             this.$http({
               url: this.$http.adornUrl(`dataImp/impDmpFile/${2}/${this.webSocketId}`),
               method: 'post',
-              data: this.selectedFileData
+              data: this.selectedFileData,
+              isLoading: false
             }).then(({data}) => {
                 if (data && (data.code === 200 || data.code == 500) && data.result) {
                   //  this.fileTableInfos = data.result
