@@ -462,7 +462,13 @@
               if(data.code==200){
 
               }else{
-                this.$message.error(data.message);
+                // this.$message.error(data.message);
+                this.$alert(data.message, '注意', {
+                  cancelButtonText: '关闭',
+                  showConfirmButton: false,
+                  showCancelButton: true,
+                  type: 'error',
+                });
               }
             })
           }
