@@ -113,8 +113,8 @@ export default {
                 data:formData,
                 }).then(({data})=>{
                     if(data && data.code === 200){
-                        this.fileId = data.result.uploaderId
-                        console.log( this.fileInfoId )
+                        this.fileId = data.result.fileInfoId
+                        console.log( this.fileId )
                         this.$message({
                             message: '导入成功',
                             type: 'success',
@@ -163,7 +163,7 @@ export default {
         },
         //导出模板
         getExportClick(data){
-             let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+this.fileInfoId +'&token=') + this.$cookie.get('token')
+            let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+this.fileId +'&token=') + this.$cookie.get('token')
             window.open(url)
         },
         // 每页数

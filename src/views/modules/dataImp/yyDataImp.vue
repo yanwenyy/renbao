@@ -20,6 +20,7 @@
         <span style="margin-left:30px;color:#af0f16">数据采集完成需要收集表信息，数据会造成时间差。</span>
       </el-form-item>
       <el-form-item style="float:right">
+        <el-button type="warning" @click="deletDmpData()">清除dmp缓存数据</el-button>
         <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
@@ -654,6 +655,23 @@
       }
     },
     methods: {
+      deletDmpData(){
+        this.$http({
+          url: this.$http.adornUrl(`dmpCollectPlan/deleteDmpUserAndTableSpace`),
+          method: 'get',
+        }).then(({data}) => {
+            if (data && data.code == 200) {
+              this.$message.success("清除缓存数据成功")
+            }else{
+              this.$message({
+                      showClose: true,
+                      message: data.message? data.message : "数据清除失败！",
+                      type: 'error',
+                      duration: 0
+                    })
+            }
+        })
+      },
        //获取继续导入的dmp列表
       getDmpReImpList(){
         this.dmpReImpDialogVisible = true

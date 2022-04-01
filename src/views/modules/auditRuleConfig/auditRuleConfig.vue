@@ -75,7 +75,6 @@
               :key="index"
               :label="items.label"
               :sortable="items.issortable"
-              :min-width="items.minWidth"
               :align="items.align ? items.align : 'center'"
               :width="items.width"
             >
@@ -183,6 +182,13 @@ export default {
         {
           dataname: "createTime",
           label: "创建时间",
+          issortable: false,
+          type: "",
+          minWidth: 200
+        },
+        {
+          dataname: "mobile",
+          label: "操作",
           issortable: false,
           type: "",
           minWidth: 200
