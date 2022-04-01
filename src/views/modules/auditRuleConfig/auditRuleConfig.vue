@@ -43,18 +43,18 @@
               >提交至地区个性化规则</el-button
             >
             <el-button type="primary" @click="addFun">新增</el-button>
-            <el-button
-              type="primary"
-              @click="editorFun(0)"
-              :disabled="this.multipleTable <= 0"
-              >编辑</el-button
-            >
-            <el-button
-              type="danger"
-              @click="deleteFn(0)"
-              :disabled="this.multipleTable.length <= 0"
-              >删除</el-button
-            >
+            <!--<el-button-->
+              <!--type="primary"-->
+              <!--@click="editorFun(0)"-->
+              <!--:disabled="this.multipleTable <= 0"-->
+              <!--&gt;编辑</el-button-->
+            <!--&gt;-->
+            <!--<el-button-->
+              <!--type="danger"-->
+              <!--@click="deleteFn(0)"-->
+              <!--:disabled="this.multipleTable.length <= 0"-->
+              <!--&gt;删除</el-button-->
+            <!--&gt;-->
           </el-form-item>
         </el-form>
 
@@ -87,7 +87,10 @@
             <el-table-column prop="mobile" label="操作" align="center">
               <template slot-scope="scope">
                 <el-button type="text" @click="editorFun(scope.row.ruleId)"
-                  >编辑
+                  >修改
+                </el-button>
+                <el-button type="text" @click="editorFun(scope.row.ruleId,'look')"
+                  >查看
                 </el-button>
                 <el-button type="text" @click="deleteFn(scope.row.ruleId)"
                   >删除
@@ -326,7 +329,7 @@ export default {
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
     },
     //修改
-    editorFun(data) {
+    editorFun(data,type) {
       if (data == 0) {
         // this.$refs.ruleConfigDialog.showDialog(this.multipleTable, this.treeData, 'edit');
         this.$refs.addOrUpdate.init(
@@ -334,7 +337,7 @@ export default {
           this.ruleCheckData
         );
       } else {
-        this.$refs.addOrUpdate.init(data, this.ruleCheckData);
+        this.$refs.addOrUpdate.init(data, this.ruleCheckData,type);
       }
     },
     //删除
