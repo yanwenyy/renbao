@@ -267,8 +267,19 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
-            this.$message.success("生成报告成功");
             this.initData();
+            let success = false;
+            for (var i in this.tableData) {
+              if (this.tableData[i].batchResultExportStatus == 3) {
+                success = true;
+              }
+              break;
+            }
+            if (success == true) {
+              this.$message.success("生成报告成功");
+            } else {
+              this.$message.error("生成报告失败");
+            }
           } else {
             this.$message.error("生成报告失败");
             this.initData();
@@ -281,48 +292,55 @@ export default {
       if (this.batchId == "" || this.batchId == null) {
         this.$message.warning("请先选择批次");
       } else {
-        //判断是否已生成报告
-        let isExpot = true;
-        for (var i in this.tableData) {
-          if (
-            this.tableData[i].batchResultExportStatus == null ||
-            this.tableData[i].batchResultExportStatus == 1
-          ) {
-            isExpot = false;
-          } 
-          break;
-        }
-        if (isExpot == false) {
-          this.$message.error("请先生成报告！");
+        if (this.tableData == [] || this.tableData.length == 0) {
+          this.$message.error("请先生成报告");
         } else {
-          let success = false;
-          for (var i in this.tableData) {
-            if (this.tableData[i].batchResultExportStatus != 4) {
-              success = true;
-            }
-            break;
-          }
-          if (success == true) {
-            let doing = false;
-            for (var i in this.tableData) {
-              if (this.tableData[i].batchResultExportStatus == 2) {
-                doing = true;
-              }
+          var status = [];
+          this.tableData.forEach(item => {
+            status.push(item.batchResultExportStatus);
+          });
+          //判断报告是否生成
+          var isExport = true;
+          for (var i in status) {
+            if (status[i] == null || status[i] == 1) {
+              isExport = false;
               break;
             }
-            if (doing == true) {
-              this.$message.error("有正在生成的报告，请稍后导出！");
-            } else {
-              let url =
-                this.$http.adornUrl(
-                  "/batchResultExport/download?dataId=" +
-                    this.batchId +
-                    "&token="
-                ) + this.$cookie.get("token");
-              window.open(url);
-            }
+          }
+          if (isExport == false) {
+            this.$message.error("请先生成报告");
+            isExport = "";
           } else {
-            this.$message.error("规则全部执行失败时不能导出！");
+            //判断是否有执行中的报告
+            var isDoing = true;
+            for (var i in status) {
+              if (status[i] == 2) {
+                isDoing = false;
+                break;
+              }
+            }
+            if (isDoing == false) {
+              this.$message.error("有正在执行中的报告，请稍后再导出！");
+              isDoing = "";
+            } else {
+              var failNum = [];
+              for (var i in status) {
+                if (status[i] == 4) {
+                  failNum.push(status[i]);
+                }
+              }
+              if (failNum.length == status.length) {
+                this.$message.error("全部执行失败时，请勿导出！");
+              } else {
+                let url =
+                  this.$http.adornUrl(
+                    "/batchResultExport/download?dataId=" +
+                      this.batchId +
+                      "&token="
+                  ) + this.$cookie.get("token");
+                window.open(url);
+              }
+            }
           }
         }
       }
