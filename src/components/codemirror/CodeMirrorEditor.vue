@@ -1474,7 +1474,7 @@
   .box-table .el-table__header-wrapper{
     padding-top: 10px;
   }
-  .cm-comment{
+  .cm-comment:not(.CodeMirror-widget + .cm-comment){
     color:#C1C1C1;
   }
 </style>
