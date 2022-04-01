@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="box">
-      <div id="top" class="codemirror-div" v-if="!fullScreen">
+      <div id="top" class="codemirror-div" v-show="!fullScreen">
         <div class="btn-group">
           <el-button  v-if="!useChinese" type="text"
                      @click="formatContentSelf">
@@ -737,7 +737,9 @@
 
       }
     },
-
+    updated(){
+      this.dragControllerDiv2();
+    },
     mounted(){
       this.dragControllerDiv2();
       this.deletCm();

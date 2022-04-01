@@ -59,6 +59,8 @@
           policyName: '',
           beginTime: '',
           endTime: '',
+          regionId: '',
+          regionPath: '',
           multipartFiles :[],
         },
         dataRule: {
@@ -81,6 +83,8 @@
          policyName: '',
          beginTime: '',
          endTime: '',
+         regionId: '',
+         regionPath: '',
          multipartFiles :[],
        }
        this.fileList=[];
@@ -118,11 +122,12 @@
           });
         }
       },
-      init (id,regionId) {
+      init (id,regionId,regionPath) {
         this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
         this.dataForm.regionId=regionId;
+        this.dataForm.regionPath=regionPath;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
@@ -138,6 +143,7 @@
               this.dataForm.beginTime = datas.beginTime;
               this.dataForm.endTime = datas.endTime;
               this.dataForm.regionId = datas.regionId;
+              this.dataForm.regionPath = datas.regionPath;
             }
           })
         }
@@ -152,6 +158,7 @@
               params.append("beginTime", this.dataForm.beginTime);
               params.append("endTime", this.dataForm.endTime);
               params.append("regionId", this.dataForm.regionId);
+              params.append("regionPath", this.dataForm.regionPath);
               this.dataForm.multipartFiles.forEach(item=>{
                 params.append("multipartFiles", item);
               })
@@ -161,6 +168,7 @@
                 beginTime:this.dataForm.beginTime,
                 endTime:this.dataForm.endTime,
                 regionId:this.dataForm.regionId,
+                regionPath:this.dataForm.regionPath,
               }
             }
             this.$http({

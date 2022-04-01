@@ -383,8 +383,8 @@
       },
       openSql(){
         this.sqlKey=Math.random();
-        this.sqlEditMsg.msg=JSON.parse(JSON.stringify(this.sqlMsgCopy));
-        this.$set(this.sqlEditMsg,'msg',this.sqlMsgCopy);
+        this.sqlEditMsg.msg=JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg,'msg',this.paramsSqlSelf);
 
         // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
         this.slqTabelEdt=[];
@@ -478,6 +478,9 @@
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
+        this.sqlEditMsg.msg = '';
+        this.sqlMsgCopy = '';
+        this.paramsSqlSelf = '';
         if (this.$refs['dataForm']) {
           this.$refs['dataForm'].clearValidate()
         }
@@ -554,7 +557,7 @@
               this.sqlEditMsg.msg = datas.ruleSqlValue;
               this.deletCm();
               this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
-
+              this.paramsSqlSelf = JSON.parse(JSON.stringify(this.sqlMsgCopy));
               if(datas.ruleStatisticsColumns){
                 var list=[];
                 datas.ruleStatisticsColumns.forEach((item)=>{

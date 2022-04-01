@@ -75,8 +75,14 @@ img {
   margin-left: 24px;
 }
 .navbar_header_new-titlename{
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
+  font-family: FZYaSong-B-GBK;
+}
+.navbar_header_new-titlename>img{
+  width: 227px;
+  height: auto;
+  margin-top: -8px;
 }
 .navbar_header_new-title{
   vertical-align: top;
@@ -235,7 +241,7 @@ img {
   &__body {
     position: relative;
     //margin-left: 230px;
-    margin-left: 450px;
+    margin-left: 650px;
     padding-right: 15px;
     background-color: #fff;
   }

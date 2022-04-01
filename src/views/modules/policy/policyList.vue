@@ -250,7 +250,7 @@ export default {
       if (id) {
         this.$refs.addOrUpdate.init(id, this.dataForm.regionId);
       } else {
-        this.$refs.addOrUpdate.init("", this.dataForm.regionId);
+        this.$refs.addOrUpdate.init("", this.dataForm.regionId,this.dataForm.regionPath);
       }
 
       // })

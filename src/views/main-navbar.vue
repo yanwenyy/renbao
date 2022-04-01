@@ -4,6 +4,7 @@
       <div class="navbar_header_new">
         <div class="inline-block navbar_header_new-title">
           <img src="../assets/img/home-logo.png" alt="">
+          <div class="navbar_header_new-titlename inline-block"><img src="../assets/img/home-logo-2.png" alt=""></div>
         </div>
       </div>
       <!--<h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">-->

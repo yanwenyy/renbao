@@ -1,6 +1,6 @@
 <template>
   <div class="box-mirror box"  ref="box">
-    <div class="code-mirror-tree left" v-if="!fullScreen">
+    <div id="code-mirror-tree_left" class="code-mirror-tree left" v-show="!fullScreen">
       <div class="tree-left">
         <div class="tree-left-one" :class="treeType==='1'?'tree-left-active':''" @click="changeTree('1')">数据表</div>
         <div class="tree-left-three" :class="treeType==='3'?'tree-left-active':''" @click="changeTree('3')">参数</div>
@@ -117,7 +117,7 @@
     <div v-if="!fullScreen" class="resize tree-resize" title="收缩侧边栏">
       <!--<div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>-->
     </div>
-    <div class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
+    <div id="code-mirror-div_right" class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
       <!--<div class="tool-bar">-->
         <!--<span>请选择主题</span>-->
         <!--<el-select v-model="cmTheme" placeholder="请选择" size="small" style="width:150px">-->
@@ -888,7 +888,9 @@
     },
     mounted(){
       this.dragControllerDiv();
-
+    },
+    updated(){
+      this.dragControllerDiv();
     },
     methods: {
       //左侧右击事件
@@ -990,15 +992,23 @@
         }
 
       },
-      treeToHint(list){
-        list.for
-      },
+      // treeToHint(list){
+      //   list.for
+      // },
       handleNodeClick(data,obj,node){
         this.getLoadTree(data,obj,node)
       },
       getFullScreen(data){
-        console.log(data)
         this.fullScreen=data;
+        let left = document.getElementById('code-mirror-tree_left');
+        let mid = document.getElementById('code-mirror-div_right');
+        if(data===false){
+          if(mid.style.width!="68%"){
+            left.style.width="calc(32% - 10px)";
+            mid.style.width="68%";
+          }
+        }
+
       },
       filterNode(value, data) {
         if (!value) return true;
@@ -1248,6 +1258,7 @@
     background: #FFFFFF;
     float: left;
     box-sizing: border-box;
+    vertical-align: top;
   }
   /*拖拽区div样式*/
   .resize {
@@ -1265,6 +1276,7 @@
     /*z-index: 99999;*/
     font-size: 32px;
     color: white;
+    vertical-align: top;
   }
   .resize-div{
     height:78px;
@@ -1281,6 +1293,7 @@
     height: 100%;
     background: #fff;
     box-sizing: border-box;
+    vertical-align: top;
   }
   .mid-100{
     width: 100%!important;
