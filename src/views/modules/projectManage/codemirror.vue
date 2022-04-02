@@ -223,8 +223,8 @@
       //导出按钮点击
       exportSql(data){
         if(data){
-          //let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
-          //window.open(url)
+          // let url = this.$http.adornUrl('/sqlScript/exportExcel?token=') + this.$cookie.get("token")
+          // window.open(url)
           this.$http({
             url: this.$http.adornUrl('/sqlScript/setSession'),
             method: 'post',
@@ -357,7 +357,9 @@
       //格式化sql点击,data 编译器内容
       formatContent(datas){
         // /sqlScript/formatSql
-        if(datas.indexOf("{#")!=-1&&datas.indexOf("#}")!=-1){
+        var _reg=new RegExp('{#\\w+\#}','g');
+        // if(datas.indexOf("{#")!=-1&&datas.indexOf("#}")!=-1){
+        if(_reg.test(datas)){
           datas=datas.replace(/{#/g,"'{#").replace(/#}/g,"#}'");
         }
         this.$http({
@@ -367,7 +369,9 @@
         }).then(({data}) => {
           if(data.code==200){
             var _data=data.result;
-            if(_data.indexOf("'{#")!=-1&&_data.indexOf("#}'")!=-1){
+            var _regs=new RegExp("'{#\\w+\#}'",'g');
+            // if(_data.indexOf("'{#")!=-1&&_data.indexOf("#}'")!=-1){
+            if(_regs.test(_data)){
               _data=_data.replace(/'{#/g,"{#").replace(/#}'/g,"#}");
             }
             this.sqlData=_data;

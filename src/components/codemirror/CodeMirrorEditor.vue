@@ -1414,7 +1414,7 @@
   .cm-keyword{
     line-height: 1em;
     font-weight: bold;
-    color: #281EF9;
+    color: #281EF9!important;
   }
   .codeMirror-blue{
     background: blue !important;
@@ -1509,7 +1509,7 @@
   .box-table .el-table__header-wrapper{
     padding-top: 10px;
   }
-  .cm-comment:not(.CodeMirror-widget + .cm-comment){
+  .cm-comment:not(.CodeMirror-widget + .cm-comment):not(.cm-overlay){
     color:#C1C1C1;
   }
 </style>
