@@ -89,7 +89,7 @@ export default {
                 ruleRemark: this.multipleTable[0].ruleRemark||'',
 
                 ruleSqlValue: this.multipleTable[0].ruleSqlValue||'',
-                paramRules: this.multipleTable[0].paramRules||[],
+                paramRules: this.multipleTable[0].params||[],
             }
             this.loading = true
             this.$http({

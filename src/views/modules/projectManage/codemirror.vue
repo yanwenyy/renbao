@@ -358,7 +358,7 @@
       formatContent(datas){
         // /sqlScript/formatSql
         if(datas.indexOf("{#")!=-1&&datas.indexOf("#}")!=-1){
-          datas=datas.replace("{#","'{#").replace("#}","#}'");
+          datas=datas.replace(/{#/g,"'{#").replace(/#}/g,"#}'");
         }
         this.$http({
           url: this.$http.adornUrl('/sqlScript/formatSql'),
@@ -368,7 +368,7 @@
           if(data.code==200){
             var _data=data.result;
             if(_data.indexOf("'{#")!=-1&&_data.indexOf("#}'")!=-1){
-              _data=_data.replace("'{#","{#").replace("#}'","#}");
+              _data=_data.replace(/'{#/g,"{#").replace(/#}'/g,"#}");
             }
             this.sqlData=_data;
           }else{

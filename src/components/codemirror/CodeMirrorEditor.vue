@@ -113,7 +113,7 @@
           >
             <div v-if="item.list==''">
               <div v-if="!item.columnList">{{item.msg}}</div>
-              <el-table :height="tableHeight*0.55" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+              <el-table :height="tableHeight*0.35" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
                 <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
                 </el-table-column>
@@ -121,7 +121,7 @@
             </div>
             <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
             <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
-            <el-table :height="fullScreen?'70vh':tableHeight*0.55" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
+            <el-table :height="fullScreen?'70vh':tableHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
               <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
                 <template slot-scope="scope">
                   <div>
@@ -428,14 +428,10 @@
         default: null,
       },
     },
-    computed:{
-      tableHeight: {
-        get () { return this.$store.state.common.tableHeight}
-      },
-    },
     data() {
       return {
         selfFrom:'',
+        tableHeight:document.documentElement.clientHeight,
         // boxHeight:0,
         dragParmasList:[],//拖拽进来的参数数组
         // SelfparamsList:[],//参数设置列表
@@ -664,7 +660,6 @@
             this.getSqlMsg(val);
             if(this.$refs.myCm){
               this.idToButton(this.editorValue);
-
             }
           }
 
@@ -755,8 +750,30 @@
           that.idToButton(str);
         }
       },300);
+      window.onresize=function (e) {
+        return(()=>{
+          let screenHeight=document.documentElement.clientHeight;
+          that.tableHeight=screenHeight;
+        })();
+      };
     },
     methods: {
+      //获取选中的参数
+      getSelectParams(list,markList){
+        var _newList=[];
+        markList.forEach(atem=>{
+          list.forEach(item=>{
+            if(item.children&&item.children.length>0){
+              item.children.forEach(vtem=>{
+                if(atem=="{#"+vtem.id+"#}"){
+                  _newList.push(vtem)
+                }
+              })
+            }
+          });
+        });
+        return _newList;
+      },
       //删除智能提示框
       deletCm(){
         var cm_complete=document.getElementsByClassName("CodeMirror-hints");
@@ -785,31 +802,39 @@
         this.dragParmasList=[];
         if(sql){
           this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
+          var lines = this.$refs.myCm.codemirror.lineCount();//获取sql行数
           this.paramsData.forEach(item=>{
             if(item.children&&item.children.length>0){
               item.children.forEach(vtem=>{
-                if(this.editorValue.indexOf("{#"+vtem.id+"#}")!=-1){
-
+                var ch = [];
+                if(sql.indexOf("{#"+vtem.id+"#}")!=-1){
                   this.dragParmasList.push(vtem);
-                  var line=this.$refs.myCm.codemirror.getCursor().line;
-                  var ch=this.getIndexArr(this.editorValue,"{#"+vtem.id+"#}",  0, [])
-                  var sliceString=sql.slice(0,ch[0]);
-                  var id="{#"+vtem.id+"#}";
-                  this.editorValue=this.editorValue.replace(id,'');
+                  // var line=this.$refs.myCm.codemirror.getCursor().line;
+                  for (var b = 0; b < lines; b++) {
+                    ch = [];//数组清空
+                    var text = this.$refs.myCm.codemirror.getLine(b);//获取当前行的内容
+                    ch=this.getIndexArr(text,"{#"+vtem.id+"#}",  0, ch);
+                    for (var i = 0; i < ch.length; i++) {
+                      var sliceString=sql.slice(0,ch[i]);
+                      var id="{#"+vtem.id+"#}";
+                      this.editorValue=this.editorValue.replace(id,'');
 
-                  var dom = document.createElement("button");
-                  dom.className = "parmasBtn";
-                  dom.innerHTML = vtem.name;
-                  dom.id=id;
-                  var startCursor = {ch: to?to.ch+sliceString.length:ch[0], line: to?to.line:line, sticky: null};
-                  const endPos = { ch: to?to.ch+sliceString.length+("{#"+vtem.id+"#}").length:ch[0]+("{#"+vtem.id+"#}").length, line: to?to.line:line,sticky:null };
+                      var dom = document.createElement("button");
+                      dom.className = "parmasBtn";
+                      dom.innerHTML = vtem.name;
+                      dom.id=id;
+                      // var startCursor = {ch: to?(to.ch+sliceString.length):ch[i], line: to?to.line:b, sticky: null};
+                      // var endPos = { ch: to?(to.ch+sliceString.length+("{#"+vtem.id+"#}").length):(ch[i]+("{#"+vtem.id+"#}").length), line: to?to.line:b,sticky:null };
+                      var startCursor = {ch: ch[i], line: b, sticky: null};
+                      var endPos = { ch:(ch[i]+("{#"+vtem.id+"#}").length), line: b,sticky:null };
+                      this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
+                      this.$refs.myCm.codemirror.markText(startCursor, endPos, {
+                        replacedWith: dom,
+                        className:"paramBlock",
+                      });
+                    }
 
-                  this.$refs.myCm.codemirror.replaceRange(id, startCursor,endPos);
-                  this.$refs.myCm.codemirror.markText(startCursor, endPos, {
-                    replacedWith: dom,
-                    className:"paramBlock",
-                  });
-
+                  }
                 }
               })
             }
@@ -1037,10 +1062,11 @@
           }
         });
         var selectValue = this.$refs.myCm.codemirror.getSelection();
-        this.dragParmasList=this.dragParmasList.filter(item=>{
-          console.log(_list.indexOf("{#"+item.id+"#}"),item.id)
-          return _list.indexOf("{#"+item.id+"#}")!=-1
-        });
+        this.dragParmasList=this.getSelectParams(this.paramsData,_list);
+        // this.dragParmasList=this.dragParmasList.filter(item=>{
+        //   console.log(_list.indexOf("{#"+item.id+"#}"),item.id);
+        //   return _list.indexOf("{#"+item.id+"#}")!=-1
+        // });
         this.getwsData(selectValue!=''?selectValue:this.$refs.myCm.codemirror.getValue(),selectValue!=''&&selectValue.indexOf("{#")==-1?[]:_list,this.dragParmasList);
       },
       // 打开
@@ -1198,6 +1224,7 @@
           if(strSelect.indexOf("*/")!=-1)
           strSelect=strSelect.replace('*/','');
           this.$refs.myCm.codemirror.replaceSelection(strSelect);
+          this.idToButton(strSelect);
         }else{
           this.$message.error("请选择取消注释内容")
         }
