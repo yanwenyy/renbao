@@ -64,7 +64,7 @@
               :allow-drop="returnFalse"
               :allow-drag="allowDrag">
                <span class="custom-tree-node" slot-scope="{ node, data }">
-                    <span>
+                    <span :title="node.data.displayName">
                          <img v-if="node.data.type=='funFolder'" class="tree-icon" src="./icons/files.png" alt="">
                          <img v-if="node.data.type=='funNode'" class="tree-icon" src="./icons/function.png" alt="">
                         {{ node.label }}

@@ -5,7 +5,7 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="政策名称" prop="policyName">
-        <el-input v-model="dataForm.policyName" placeholder="政策名称" maxlength="15"></el-input>
+        <el-input v-model="dataForm.policyName" placeholder="政策名称" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="开始时间">
         <el-date-picker
