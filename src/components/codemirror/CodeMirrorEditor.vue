@@ -54,7 +54,7 @@
               </el-dropdown-item
               >
               <el-dropdown-item @click.native="notes">
-                注释选中行
+                注释选中内容
               </el-dropdown-item>
               <el-dropdown-item @click.native="noteOff">取消注释</el-dropdown-item>
               <!--<el-dropdown-item @click.native="changeSize(1)"-->
@@ -798,7 +798,6 @@
       },
       //将参数id转换成按钮显示到页面
       idToButton(sql,to){
-
         this.dragParmasList=[];
         if(sql){
           this.$refs.myCm.codemirror.setCursor({line:1,ch:sql.length});
@@ -811,6 +810,7 @@
                   this.dragParmasList.push(vtem);
                   // var line=this.$refs.myCm.codemirror.getCursor().line;
                   for (var b = 0; b < lines; b++) {
+
                     ch = [];//数组清空
                     var text = this.$refs.myCm.codemirror.getLine(b);//获取当前行的内容
                     ch=this.getIndexArr(text,"{#"+vtem.id+"#}",  0, ch);
@@ -950,9 +950,10 @@
       //使用sql
       useSql(row){
         this.editorValue=row.draftSql;
-        this.idToButton(this.editorValue);
         this.draftSqlId=row.draftId;
         this.sqlvisible=false;
+        this.$refs.myCm.codemirror.setValue(row.draftSql);
+        this.idToButton(this.editorValue);
       },
       //删除sql
       deleteSqlSef(id){
