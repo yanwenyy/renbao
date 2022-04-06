@@ -21,17 +21,19 @@
             <el-tab-pane label="医保数据" name="insurance">
                 <div v-if="activeName == 'insurance'">
                 <div class='listDisplay'>
+                    <el-button type="primary" @click="getSearch()">查询</el-button>
                     <el-button type="primary" @click="downloadClick">下载报告</el-button>
                     <el-button type="primary" @click="startCheck">开始校验</el-button>
                 </div>
-                <el-table :data="tableList" border stripe style="width: 100%"  :height="tableHeight-85" v-loading="dataLoading" >
+                <el-table :data="tableList" border stripe style="width: 100%"  :height="tableHeight-85" v-loading="dataLoading">
+                    <el-table-column label="序号" prop='ruleNumber' align="center" width="50"></el-table-column>
                     <el-table-column label="校验规则" align="center" prop="ruleContent"></el-table-column>
                     <el-table-column label="校验状态" align="center" prop="checkStatus">
                         <template slot-scope="scope">
                             <div v-if="scope.row.checkStatus == '0'">待校验</div>
                             <div v-if="scope.row.checkStatus == '1'">校验中</div>
                             <div v-if="scope.row.checkStatus == '2'">校验成功</div>
-                            <div v-if="scope.row.checkStatus == '3'">校验失败</div>
+                            <div v-if="scope.row.checkStatus == '3'" style="color:red">校验失败</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="校验结果" align="center" prop="checkResult"></el-table-column>
@@ -69,12 +71,11 @@
                                 <div v-if="scope.row.checkStatus == '0'">待校验</div>
                                 <div v-if="scope.row.checkStatus == '1'">校验中</div>
                                 <div v-if="scope.row.checkStatus == '2'">校验成功</div>
-                                <div v-if="scope.row.checkStatus == '3'">校验失败</div>
+                                <div v-if="scope.row.checkStatus == '3'" style="color:red">校验失败</div>
                             </template> </el-table-column>
                         <el-table-column label="日志" align="center" prop="startDate">
                             <template slot-scope="scope">
                                 <el-button @click="detail(scope.row)" type="text" size="small">查看</el-button>
-
                             </template>
                         </el-table-column>
                         <el-table-column label="合格状态" align="center" prop="affirmStatus">
@@ -171,7 +172,7 @@ export default {
             ruleType:'',
             dataQualityId:'',
             pageIndex:1,
-            pageSize:10,
+            pageSize:10000,
             total:0,
             hospitalCollectPlanId:'',
             multipleSelection:'',
@@ -460,7 +461,7 @@ export default {
                 }).then(({data}) =>{
                     if(data && data.code === 200){
                         this.$message({
-                        message: '新增成功',
+                        message: '校验成功',
                         type: 'success',
                     })      
                     this.getInitList()        
@@ -469,23 +470,23 @@ export default {
                     }
                 })
             }else{
-                this.$http({
-                    url:this.$http.adornUrl('/dataQualityCheckPlan/dataQualityCheckAdd'),
-                    method: 'get',
-                    params: this.$http.adornParams({
-                        ruleType:2,
-                    })
-                }).then(({data}) =>{
-                    if(data && data.code === 200){
-                        this.$message({
-                        message: '新增成功',
-                        type: 'success',
-                    })      
-                    this.getInitList()        
-                    }else{
-                        this.$message.error(data.message)
-                    }
-                })
+                // this.$http({
+                //     url:this.$http.adornUrl('/dataQualityCheckPlan/dataQualityCheckAdd'),
+                //     method: 'get',
+                //     params: this.$http.adornParams({
+                //         ruleType:2,
+                //     })
+                // }).then(({data}) =>{
+                //     if(data && data.code === 200){
+                //         this.$message({
+                //         message: '校验成功',
+                //         type: 'success',
+                //     })      
+                //     this.getInitList()        
+                //     }else{
+                //         this.$message.error(data.message)
+                //     }
+                // })
             }
         },
         //医保查看日志
