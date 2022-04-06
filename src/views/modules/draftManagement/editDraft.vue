@@ -81,7 +81,7 @@
         ref="hospital"
         v-if="showHospitalDialog"
       ></basicInformation>
-      <div>
+      <div style="margin-top: 10px;text-align: right">
         <el-button type="primary" @click="getHospitalData">确定</el-button>
         <el-button @click="closeHospital">取消</el-button>
       </div>
