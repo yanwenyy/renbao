@@ -208,7 +208,7 @@ export default {
             }
             if(this.importType.length == 0){
                 this.$message({
-                    message: "请选择要采集的文件！",
+                    message: "请选择导入类型！",
                     type: "error",
                 });
                 return;
