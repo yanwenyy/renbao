@@ -930,7 +930,7 @@
         // bak文件导入
         if(bakFileFlag) {
           if(this.selectedFileData.length ==1) {
-            
+
           }
         }
         // dmp文件导入
@@ -959,7 +959,7 @@
                 }
               },3000)
               this.$http({
-                url: this.$http.adornUrl(`dataImp/impDmpFile/${2}/${this.webSocketId}`),
+                url: this.$http.adornUrl(`dataImp/impDmpBakFile/${2}/${this.webSocketId}`),
                 method: 'post',
                 data: this.selectedFileData,
                 isLoading: false
@@ -1015,7 +1015,7 @@
                 }
            },3000)
             this.$http({
-              url: this.$http.adornUrl(`dataImp/impDmpFile/${2}/${this.webSocketId}`),
+              url: this.$http.adornUrl(`dataImp/impDmpBakFile/${2}/${this.webSocketId}`),
               method: 'post',
               data: this.selectedFileData,
               isLoading: false
@@ -1094,7 +1094,7 @@
             this.dmpImp.filePath = this.selectedFileData[0].path
         }
         this.$http({
-          url: this.$http.adornUrl(`dataImp/getDmpFileTable/${2}`),
+          url: this.$http.adornUrl(`dataImp/getDmpBakFileTable/${2}`),
           method: 'post',
           data: this.dmpImp
         }).then(({data}) => {

@@ -21,7 +21,12 @@
                 <span class="restore-label">被审核单位:</span>
                 <span :title="project.auditedUnit">{{project.auditedUnit}}</span>
             </div>
-            <div class="restore_content">
+             <div class="restore_desc">
+                <span class="restore-label">项目备注:</span>
+                <span class="restore-project-desc" :title="project.projectRemark">{{project.projectRemark}}</span>
+            </div>
+            
+            <!-- <div class="restore_content">
                 <span class="restore-label">项目成本:</span>
                 <div> 
                     <el-table :data="project.projectCosts" width="85%" class="demo-ruleForm">
@@ -29,7 +34,7 @@
                         <el-table-column prop="costMoney" align="center" label="成本金额（元/天）"></el-table-column>
                     </el-table>
                 </div>
-            </div>
+            </div> -->
         </div>
       </el-col>
       <!-- 流程中心  -->
@@ -493,6 +498,23 @@
     .restore-label{
         margin-right: 10px;
         margin-left: 8px;
+    }
+  }
+  .restore_desc{
+    // width: 100%;
+    //overflow: hidden;
+    //text-overflow: ellipsis;
+    // white-space: nowrap;
+    padding-bottom: 8px;
+    margin-left: 8px;
+    display: inline-block;
+    height: 106px;
+    overflow: hidden;
+    .restore-label{
+        margin-right: 10px;
+    }
+    .restore-project-desc{
+        line-height: 22px;
     }
   }
   .el-table{
