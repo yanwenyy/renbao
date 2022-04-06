@@ -56,12 +56,12 @@
           <el-button type="primary" :disabled="dataForm.regionId==''" @click="addOrUpdateHandle('')"
             >新增</el-button
           >
-          <el-button
-            type="warning"
-            @click="ruleExport('all')"
-            :loading="ruleExportAllLoading"
-            >全部导出</el-button
-          >
+          <!--<el-button-->
+            <!--type="warning"-->
+            <!--@click="ruleExport('all')"-->
+            <!--:loading="ruleExportAllLoading"-->
+            <!--&gt;全部导出</el-button-->
+          <!--&gt;-->
           <el-button
             :disabled="dataListSelections.length==0"
             type="warning"
