@@ -273,10 +273,8 @@ export default {
     },
     //重置
     onReset() {
-      this.searchForm = {
-        ruleName: "",
-        createUserName: ""
-      };
+      this.searchForm.ruleName='';
+      this.searchForm.createUserName='';
       this.Pager.pageIndex = 1;
       this.getSelectPage();
       // 调用规则树的重置方法
