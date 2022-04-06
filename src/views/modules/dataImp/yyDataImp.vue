@@ -966,7 +966,7 @@
                 }
               },3000)
               this.$http({
-                url: this.$http.adornUrl(`dataImp/impDmpFile/${1}/${this.webSocketId}`),
+                url: this.$http.adornUrl(`dataImp/impDmpBakFile/${1}/${this.webSocketId}`),
                 method: 'post',
                 data: this.selectedFileData,
                 isLoading: false
@@ -1021,7 +1021,7 @@
                 }
               },3000)
             this.$http({
-              url: this.$http.adornUrl(`dataImp/impDmpFile/${1}/${this.webSocketId}`),
+              url: this.$http.adornUrl(`dataImp/impDmpBakFile/${1}/${this.webSocketId}`),
               method: 'post',
               data: this.selectedFileData,
               isLoading: false
@@ -1099,7 +1099,7 @@
             this.dmpImp.filePath = this.selectedFileData[0].path
         }
         this.$http({
-          url: this.$http.adornUrl(`dataImp/getDmpFileTable/${1}`),
+          url: this.$http.adornUrl(`dataImp/getDmpBakFileTable/${1}`),
           method: 'post',
           data: this.dmpImp
         }).then(({data}) => {
