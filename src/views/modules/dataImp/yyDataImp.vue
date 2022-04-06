@@ -375,7 +375,7 @@
       <el-table
         border
         style="width: 100%;height:45vh; overflow:auto;"
-        :data="dmpImp.dmpTableInfoMaps">
+        :data="dmpImp.dmpBakTableInfoMaps">
         <el-table-column
           align="center"
           label="数据表">
@@ -410,7 +410,7 @@
             label="操作">
             <template slot-scope="scope">
               <el-button
-                @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpTableInfoMaps)"
+                @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpBakTableInfoMaps)"
                 type="text"
                 size="small">
                 移除
@@ -937,8 +937,43 @@
         }
         // bak文件导入
         if(bakFileFlag) {
-          if(this.selectedFileData.length ==1) {
-            
+          if(this.selectedFileData.length == 1) {
+            this.$http({
+              url: this.$http.adornUrl(`dataImp/impDmpBakFile/${1}/${this.webSocketId}`),
+              method: 'post',
+              data: this.selectedFileData,
+              isLoading: false
+            }).then(({data}) => {
+                if (data && (data.code === 200 || data.code == 500) && data.result) {
+                  //  this.fileTableInfos = data.result
+                  //  this.findFileTable()
+                //} else if (data && data.code == 500 && data.result) {
+                  //this.dmpFileTables = data.result
+                  this.dmpImp = data.result
+                  this.$http({
+                    url: this.$http.adornUrl(`dataImp/getTableInfos/${1}`),
+                    method: 'get'
+                  }).then(({data}) => {
+                      if (data && data.code == 200) {
+                        if(data.result != null) {
+                          this.tableInfos = data.result
+                        }
+                      }
+                  })
+                  this.checkDmpFileTableDialogVisible = true
+                } else {
+                  this.$message({
+                    showClose: true,
+                    message: data.message? data.message : "读取文件失败，请检查数据文件！",
+                    type: 'error',
+                    duration: 0
+                  })
+                }
+            })
+            return
+          } else{
+            this.$message.error("bak文件只能单独导入")
+            return
           }
         }
         // dmp文件导入
