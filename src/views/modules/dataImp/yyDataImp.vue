@@ -897,23 +897,51 @@
              return
           }
         }
-         // 不包含dmp的标准
+         // 不包含dmp的标志
         var flag = true
-        // 全为 dmp的标准
+        // 全为 dmp的标志
         var dmpFileFlag = true
+        // 包含dmp的标志
+        var hasDmp = false
+        // 全为bak的标志
+        var bakFileFlag = true
+        // 包含bak的标志
+        var hasBak = false
+        // 判断文件类型
         this.selectedFileData.forEach(item=>{
-          if(!this.checkType(item.fileType)) {
+          if(!this.checkDmpType(item.fileType)) {
             dmpFileFlag = false
+          }
+          if(this.checkDmpType(item.fileType)) {
+            hasDmp = true
+          }
+          if(!this.checkBakType(item.fileType)) {
+            bakFileFlag = false
+          }
+          if(this.checkBakType(item.fileType)) {
+            hasBak = true
           }
           if(this.checkType(item.fileType)) {
             flag = false
           }
         })
         // 包含dmp但是不全为dmp
-        if(!flag && !dmpFileFlag) {
+        if(hasDmp && !dmpFileFlag) {
           this.$message.error("dmp文件不能和其它类型文件一起导入")
           return
         }
+        // 包含bak但是不全为bak
+        if(hasBak && !bakFileFlag) {
+          this.$message.error("bak文件不能和其它类型文件一起导入")
+          return
+        }
+        // bak文件导入
+        if(bakFileFlag) {
+          if(this.selectedFileData.length ==1) {
+            
+          }
+        }
+        // dmp文件导入
         if(dmpFileFlag) {
           if (this.selectedFileData.length >1) {
             this.$confirm('<span style="color:#af0f16">检测到选择了多个dmp文件，只有分卷dmp可以批量导入，请确认您选择的文件是否为分卷dmp，若不是请返回上一步<span>', '确认信息', {
@@ -1244,9 +1272,28 @@
       },
       // 文件类型是否为dmp或者bak
       checkType(fileType) {
-        //case 'BAK':
+        // case 'BAK':
          switch (fileType.toUpperCase()) {
             case 'DMP':
+            case 'BAK':
+              return true
+              break
+          }
+          return false
+      },
+      // 文件类型是否为dmp
+      checkDmpType(fileType) {
+         switch (fileType.toUpperCase()) {
+            case 'DMP':
+              return true
+              break
+          }
+          return false
+      },
+      // 文件类型是否为bak
+      checkBakType(fileType) {
+         switch (fileType.toUpperCase()) {
+            case 'BAK':
               return true
               break
           }
