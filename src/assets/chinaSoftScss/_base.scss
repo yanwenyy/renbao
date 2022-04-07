@@ -735,7 +735,7 @@ img {
     .el-table{
       border-radius: 0;
     }
-    /deep/ .el-table thead tr, /deep/ .el-table thead th {
+    .el-table thead tr,.el-table thead th {
       background: $--theme-red !important;
       border-radius: 0;
       color: #ffffff;
@@ -756,10 +756,10 @@ img {
   }
   /*待办样式 */
   .todoList{
-    /deep/ .el-table .el-table__header-wrapper {
+    .el-table .el-table__header-wrapper {
       padding-top: 0px;
     }
-    /deep/ .el-tabs__item {
+    .el-tabs__item {
       padding: 0 10px;
       height: 30px;
       line-height: 25px;
@@ -768,7 +768,7 @@ img {
   }
   /* 采集监控样式*/
   .collectionList,.dataList{
-    /deep/ .el-button--mini, .el-button--mini.is-round,.el-button--text {
+    .el-button--mini, .el-button--mini.is-round,.el-button--text {
       padding: 5px 6px;
       border: 0;
       margin: 0;
@@ -792,7 +792,7 @@ img {
       font-weight: 400;
       background: #f7edf0;
     }
-    /deep/ .el-progress__text{
+    .el-progress__text{
       font-size: 12px !important;
     }
   }
