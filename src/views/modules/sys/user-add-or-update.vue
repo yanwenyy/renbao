@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
       <el-form-item label="用户账号" prop="userLoginName">
         <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
       </el-form-item>
@@ -16,8 +16,8 @@
       <el-form-item label="用户姓名" prop="userName">
         <el-input v-model="dataForm.userName" placeholder="用户姓名（30字以内）" maxlength="30"></el-input>
       </el-form-item>
-      <el-form-item label="工号" prop="userNumber">
-        <el-input v-model="dataForm.userNumber" placeholder="工号"></el-input>
+      <el-form-item label="部门及职务">
+        <el-input v-model="dataForm.userNumber" placeholder="部门及职务"></el-input>
       </el-form-item>
       <el-form-item label="手机号" prop="userPhone">
         <el-input v-model="dataForm.userPhone" placeholder="手机号"></el-input>

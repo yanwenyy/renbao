@@ -15,7 +15,7 @@
       <el-form-item>
         <el-input
           v-model="dataForm.userNumber"
-          placeholder="工号"
+          placeholder="部门及职务"
           clearable
         ></el-input>
       </el-form-item>

@@ -77,7 +77,7 @@
         prop="auditedUnit"
         header-align="center"
         align="center"
-        label="被审核单位">
+        label="委托单位">
       </el-table-column>
       <el-table-column
         prop="createUserName"

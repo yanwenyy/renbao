@@ -19,7 +19,10 @@ Vue.prototype.$bus = bus;
 // 引入jshint用于实现js自动补全提示
 
 import jshint from "jshint";
-
+//使用gojs
+import gojs from 'gojs';
+Vue.prototype.go = gojs;
+//使用codemirror
 window.JSHINT = jshint.JSHINT;
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
