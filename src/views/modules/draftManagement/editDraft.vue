@@ -72,7 +72,7 @@
       :visible.sync="showHospitalDialog"
       title="选择医院"
       :close-on-click-modal="false"
-      :modal-append-to-body="false"
+      :modal-append-to-body="false"R
       width="90%"
       :close-on-press-escape="false"
       append-to-body

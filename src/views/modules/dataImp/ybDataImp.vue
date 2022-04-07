@@ -444,7 +444,7 @@
       <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
       <el-row
         v-loading="dmpLogLoading"
-        element-loading-text="数据库还原中..."> 
+        element-loading-text="数据库还原中...">
         <el-row style="width: 100%;height:42vh; overflow:auto;" >
           <el-row
           v-for="(log,index) in webSocketDataList"
@@ -458,7 +458,7 @@
         <el-button type="primary" @click="dmpLogDialogVisible = false" v-if="dmpImpFalseFlag">返回上一步</el-button>
       </span>
     </el-dialog>
-    <el-dialog 
+    <el-dialog
     title="查看已导入dmp文件"
       :visible.sync="dmpReImpDialogVisible"
       width="60%">
@@ -648,7 +648,7 @@
                 }
             })
           })
-        
+
       },
       //获取继续导入的dmp列表
       getDmpReImpList(){
@@ -715,7 +715,7 @@
               }
             }
         })
-        
+
       },
       // dmp日志关闭
       dmpLoghandleClose(done){
