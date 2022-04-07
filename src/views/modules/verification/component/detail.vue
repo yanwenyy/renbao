@@ -15,7 +15,7 @@
                 </template>
             </el-table-column>
             <el-table-column label="校验结果" align="center" prop="checkResult" width="100"></el-table-column>   
-            <el-table-column align="center" label="操作" prop="affirmStatus">
+            <el-table-column align="center" label="操作" width='120' prop="affirmStatus">
                 <template slot-scope="scope">
                     <el-button @click="tableSqlView(scope.row.dataCeeckTemplateProjectId)" type="text" size="small">查看sql</el-button>
                 </template>
