@@ -608,13 +608,13 @@ img {
   }
   .login-title:after{
     display: inline-block;
-    font-size: 17px;
+    font-size: 20px;
     font-family: Microsoft YaHei;
     font-weight: bold;
     color: $--theme-red;
     line-height: 35px;
     margin-bottom: 40px;
-    content: '北京中软国际信息技术有限公司';
+    content: '医保基金现场检查系统';
   }
   .lm-right-input {
     margin-bottom: 10px;
@@ -663,10 +663,11 @@ img {
     margin-top: 5px;
   }
   .navbar_header_new-titlename:after{
-    font-weight: 500;
+    font-weight: 600;
     margin-left: 5px;
     display: inline-block;
-    content: '北京中软国际信息技术有限公司';
+    content: '医保基金现场检查系统';
+    color:#004EA0;
   }
 }
 //首页样式
