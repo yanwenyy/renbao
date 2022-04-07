@@ -10,6 +10,7 @@
     >
       <el-form-item prop="evidenceName" label="证据名称：">
         <el-input
+          maxlength="255"
           v-model="dataForm.evidenceName"
           placeholder="证据名称"
           :readonly="readonly"

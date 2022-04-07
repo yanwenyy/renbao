@@ -12,6 +12,7 @@ import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/a
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import moment from 'moment'
+import $ from 'jquery' 
 // 引入bus
 import { bus } from '@/utils/bus.js'
 Vue.prototype.$bus = bus;
@@ -19,7 +20,10 @@ Vue.prototype.$bus = bus;
 // 引入jshint用于实现js自动补全提示
 
 import jshint from "jshint";
-
+//使用gojs
+import gojs from 'gojs';
+Vue.prototype.go = gojs;
+//使用codemirror
 window.JSHINT = jshint.JSHINT;
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
