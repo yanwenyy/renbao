@@ -12,6 +12,7 @@ import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/a
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import moment from 'moment'
+import $ from 'jquery' 
 // 引入bus
 import { bus } from '@/utils/bus.js'
 Vue.prototype.$bus = bus;
