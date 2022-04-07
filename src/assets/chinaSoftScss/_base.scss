@@ -556,7 +556,7 @@ img {
     padding: 50px;
     width: 826px;
     height: 509px;
-    background-image: url(../img/bg1.png);
+    background-image: url(../img/bg1-cs.png);
     background-size:  100% 100%;
     border-radius: 10px;
     display: flex;
@@ -603,15 +603,18 @@ img {
     height: 100vh;
     overflow: hidden;
   }
+  .login-title{
+    text-align: center;
+  }
   .login-title:after{
     display: inline-block;
-    font-size: 17px;
+    font-size: 20px;
     font-family: Microsoft YaHei;
     font-weight: bold;
     color: $--theme-red;
     line-height: 35px;
     margin-bottom: 40px;
-    content: '人保健康医保基金监管飞行检查系统';
+    content: '医保基金现场检查系统';
   }
   .lm-right-input {
     margin-bottom: 10px;
@@ -637,28 +640,34 @@ img {
   }
   .lm-left-title-new{
     margin: auto;
-    margin-top: 35%;
+    margin-top: 20%;
+    text-align: center;
   }
   .lm-left-title-new>div{
-    width: 343px;
-    height: 89px;
-    background: url(../img/login-logo.png) 100% 100% no-repeat;
+    width: 176px;
+    height: 80px;
+    background: url(../img/login-logo-cs.png) 100% 100% no-repeat;
+    display: inline-block;
+    margin-left: -40px;
   }
 }
 
 //首页logo
 .navbar_header_new-title{
   .navbar_header_new-img{
-    width: 374px;
-    height:30px;
-    background: url(../img/home-logo.png);
-    vertical-align: middle;
-  }
-  .navbar_header_new-titlename{
-    width: 230px;
-    height:30px;
-    background: url(../img/home-logo-2.png) 100% 100% no-repeat;
+    width: 88px;
+    height: 40px;
+    background: url(../img/login-logo-cs.png);
+    background-size: 100% 100%;
     vertical-align: top;
+    margin-top: 5px;
+  }
+  .navbar_header_new-titlename:after{
+    font-weight: 600;
+    margin-left: 5px;
+    display: inline-block;
+    content: '医保基金现场检查系统';
+    color:#004EA0;
   }
 }
 //首页样式

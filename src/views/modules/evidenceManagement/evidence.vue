@@ -49,6 +49,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      ref="multipleTable"
       :height="tableHeight - 60"
       :data="dataList"
       border
@@ -148,7 +149,11 @@
 import addOrUpdate from "./evidence-addOrUpdate.vue";
 export default {
   props: {
-    isShow: Boolean
+    isShow: Boolean,
+    evidenceId:{
+      type:String,
+      default: null,
+    }
   },
   components: {
     addOrUpdate
@@ -212,6 +217,14 @@ export default {
         if (data && data.code === 200) {
           this.dataList = data.result.records;
           this.totalPage = data.result.total;
+          this.$nextTick(()=>{
+            this.dataList.forEach((item,index)=>{
+              if(item.evidenceId==this.evidenceId){
+                this.$refs.multipleTable.toggleRowSelection(item,true);
+              }
+            })
+          })
+
         } else {
           this.dataList = [];
           this.totalPage = 0;

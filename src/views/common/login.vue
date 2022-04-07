@@ -17,11 +17,12 @@
             <!--</div>-->
             <div class="login-main-left">
               <div class="lm-left-title-new">
-                <img src="../../assets/img/login-logo.png" alt="">
+                <!--<img src="../../assets/img/login-logo.png" alt="">-->
+                <div></div>
               </div>
             </div>
             <div class="login-main-right">
-              <h3 class="login-title">人保健康医保基金监管飞行检查系统</h3>
+              <h3 class="login-title"></h3>
               <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
                 <el-form-item prop="userName" class="lm-right-input">
                   <div>用户名</div>
@@ -126,155 +127,155 @@
   }
 </script>
 
-<style lang="scss">
-  .site-wrapper.site-page--login {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    /*background-color: rgba(38, 50, 56, .6);*/
-    overflow: hidden;
-    &:before {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      width: 100%;
-      height: 100%;
-      content: "";
-      background-image: url(~@/assets/img/bg-div.png);
-      /*background-size:  100% 100%;*/
-      background-size: 100% 100%;
-    }
-    .site-content__wrapper {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      padding: 0;
-      margin: 0;
-      overflow-x: hidden;
-      overflow-y: auto;
-      background-color: transparent;
-    }
-    .site-content {
-      min-height: 100%;
-      padding: 30px 500px 30px 30px;
-    }
-    .brand-info {
-      margin: 220px 100px 0 90px;
-      color: #000;
-      text-shadow:5px 2px 6px #fff;
-    }
-    .brand-info__text {
-      margin:  0 0 22px 0;
-      font-size: 50px;
-      font-weight: bold;
-      text-transform : uppercase;
-    }
-    .brand-info__intro {
-      margin: 10px 0;
-      font-size: 16px;
-      line-height: 1.58;
-      opacity: .6;
-    }
-    .login-main-div{
-      width: 100%;
-      position: absolute;
-      top: 0;
-    }
-    .login-main {
-      margin: auto;
-      margin-top: 10vh;
-      padding: 50px;
-      width: 826px;
-      height: 509px;
-      background-image: url(~@/assets/img/bg1.png);
-      background-size:  100% 100%;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .login-main>div{
-      width: 50%;
-      display: inline-block;
-      position: relative;
-    }
-    .login-main-right{
-      padding:0 40px;
-      box-sizing: border-box;
-    }
-    .lm-left-title{
-      font-size: 36px;
-      font-family: Microsoft YaHei;
-      font-weight: 400;
-      color: #304155;
-    }
-    .lm-left-title-line{
-      width: 117px;
-      height: 2px;
-      background: #AF0F16;
-      margin-top: 13px;
-    }
-    .lm-left-img{
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-    }
-    .lm-left-img>img{
-      width: 100%;
-      height: auto;
-    }
-    .site-content__wrapper{
-      height: 100%;
-      overflow: hidden;
-    }
-    .site-content{
-      padding: 0!important;
-      position: static;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .login-title {
-      font-size: 17px;
-      font-family: Microsoft YaHei;
-      font-weight: bold;
-      color: #AF0F16;
-      line-height: 35px;
-      margin-bottom: 40px;
-    }
-    .lm-right-input {
-      margin-bottom: 10px;
-      .el-input__inner{
-        border-color: #AF0F16;
-        border-radius: 20px;
-      }
-      .el-input__icon{
-        color: #AF0F16;
-      }
-    }
-    .login-captcha {
-      overflow: hidden;
-      > img {
-        width: 100%;
-        cursor: pointer;
-      }
-    }
-    .login-btn-submit {
-      width: 100%;
-      margin-top: 38px;
-      border-radius: 20px;
-    }
-    .lm-left-title-new{
-      margin: auto;
-      margin-top: 35%;
-    }
-    .lm-left-title-new>img{
-      width: 80%;
-      height: auto;
-    }
-  }
-</style>
+<!--<style lang="scss">-->
+  <!--.site-wrapper.site-page&#45;&#45;login {-->
+    <!--position: absolute;-->
+    <!--top: 0;-->
+    <!--right: 0;-->
+    <!--bottom: 0;-->
+    <!--left: 0;-->
+    <!--/*background-color: rgba(38, 50, 56, .6);*/-->
+    <!--overflow: hidden;-->
+    <!--&:before {-->
+      <!--position: fixed;-->
+      <!--top: 0;-->
+      <!--left: 0;-->
+      <!--z-index: -1;-->
+      <!--width: 100%;-->
+      <!--height: 100%;-->
+      <!--content: "";-->
+      <!--background-image: url(~@/assets/img/bg-div.png);-->
+      <!--/*background-size:  100% 100%;*/-->
+      <!--background-size: 100% 100%;-->
+    <!--}-->
+    <!--.site-content__wrapper {-->
+      <!--position: absolute;-->
+      <!--top: 0;-->
+      <!--right: 0;-->
+      <!--bottom: 0;-->
+      <!--left: 0;-->
+      <!--padding: 0;-->
+      <!--margin: 0;-->
+      <!--overflow-x: hidden;-->
+      <!--overflow-y: auto;-->
+      <!--background-color: transparent;-->
+    <!--}-->
+    <!--.site-content {-->
+      <!--min-height: 100%;-->
+      <!--padding: 30px 500px 30px 30px;-->
+    <!--}-->
+    <!--.brand-info {-->
+      <!--margin: 220px 100px 0 90px;-->
+      <!--color: #000;-->
+      <!--text-shadow:5px 2px 6px #fff;-->
+    <!--}-->
+    <!--.brand-info__text {-->
+      <!--margin:  0 0 22px 0;-->
+      <!--font-size: 50px;-->
+      <!--font-weight: bold;-->
+      <!--text-transform : uppercase;-->
+    <!--}-->
+    <!--.brand-info__intro {-->
+      <!--margin: 10px 0;-->
+      <!--font-size: 16px;-->
+      <!--line-height: 1.58;-->
+      <!--opacity: .6;-->
+    <!--}-->
+    <!--.login-main-div{-->
+      <!--width: 100%;-->
+      <!--position: absolute;-->
+      <!--top: 0;-->
+    <!--}-->
+    <!--.login-main {-->
+      <!--margin: auto;-->
+      <!--margin-top: 10vh;-->
+      <!--padding: 50px;-->
+      <!--width: 826px;-->
+      <!--height: 509px;-->
+      <!--background-image: url(~@/assets/img/bg1.png);-->
+      <!--background-size:  100% 100%;-->
+      <!--border-radius: 10px;-->
+      <!--display: flex;-->
+      <!--justify-content: space-between;-->
+    <!--}-->
+    <!--.login-main>div{-->
+      <!--width: 50%;-->
+      <!--display: inline-block;-->
+      <!--position: relative;-->
+    <!--}-->
+    <!--.login-main-right{-->
+      <!--padding:0 40px;-->
+      <!--box-sizing: border-box;-->
+    <!--}-->
+    <!--.lm-left-title{-->
+      <!--font-size: 36px;-->
+      <!--font-family: Microsoft YaHei;-->
+      <!--font-weight: 400;-->
+      <!--color: #304155;-->
+    <!--}-->
+    <!--.lm-left-title-line{-->
+      <!--width: 117px;-->
+      <!--height: 2px;-->
+      <!--background: #AF0F16;-->
+      <!--margin-top: 13px;-->
+    <!--}-->
+    <!--.lm-left-img{-->
+      <!--width: 100%;-->
+      <!--position: absolute;-->
+      <!--bottom: 0;-->
+      <!--left: 0;-->
+    <!--}-->
+    <!--.lm-left-img>img{-->
+      <!--width: 100%;-->
+      <!--height: auto;-->
+    <!--}-->
+    <!--.site-content__wrapper{-->
+      <!--height: 100%;-->
+      <!--overflow: hidden;-->
+    <!--}-->
+    <!--.site-content{-->
+      <!--padding: 0!important;-->
+      <!--position: static;-->
+      <!--height: 100vh;-->
+      <!--overflow: hidden;-->
+    <!--}-->
+    <!--.login-title {-->
+      <!--font-size: 17px;-->
+      <!--font-family: Microsoft YaHei;-->
+      <!--font-weight: bold;-->
+      <!--color: #AF0F16;-->
+      <!--line-height: 35px;-->
+      <!--margin-bottom: 40px;-->
+    <!--}-->
+    <!--.lm-right-input {-->
+      <!--margin-bottom: 10px;-->
+      <!--.el-input__inner{-->
+        <!--border-color: #AF0F16;-->
+        <!--border-radius: 20px;-->
+      <!--}-->
+      <!--.el-input__icon{-->
+        <!--color: #AF0F16;-->
+      <!--}-->
+    <!--}-->
+    <!--.login-captcha {-->
+      <!--overflow: hidden;-->
+      <!--&gt; img {-->
+        <!--width: 100%;-->
+        <!--cursor: pointer;-->
+      <!--}-->
+    <!--}-->
+    <!--.login-btn-submit {-->
+      <!--width: 100%;-->
+      <!--margin-top: 38px;-->
+      <!--border-radius: 20px;-->
+    <!--}-->
+    <!--.lm-left-title-new{-->
+      <!--margin: auto;-->
+      <!--margin-top: 35%;-->
+    <!--}-->
+    <!--.lm-left-title-new>img{-->
+      <!--width: 80%;-->
+      <!--height: auto;-->
+    <!--}-->
+  <!--}-->
+<!--</style>-->

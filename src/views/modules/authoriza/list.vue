@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="left">
+    <div class="left authoriza-left">
       <!--<el-input-->
       <!--placeholder="输入关键字进行过滤"-->
       <!--v-model="filterText">-->
@@ -373,10 +373,5 @@ export default {
   display: inline-block;
   width: 70%;
 }
-.userList-div:hover {
-  color: #af0f16;
-}
-.active {
-  color: #af0f16;
-}
+
 </style>
