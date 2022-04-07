@@ -6,8 +6,8 @@ import VueCookie from 'vue-cookie'            // api: https://github.com/alfhen/
 import '@/element-ui'                         // api: https://github.com/ElemeFE/element
 import '@/icons'                              // api: http://www.iconfont.cn/
 import '@/element-ui-theme'
-import '@/assets/chinaSoftScss/index.scss' //中软样式
-// import '@/assets/scss/index.scss' //人保样式
+// import '@/assets/chinaSoftScss/index.scss' //中软样式
+import '@/assets/scss/index.scss' //人保样式
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'

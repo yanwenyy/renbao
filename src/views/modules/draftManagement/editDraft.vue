@@ -100,6 +100,7 @@
         ref="evidence"
         v-if="showEvidenceDialog"
         :isShow="isShow"
+        :evidenceId="dataForm.evidenceId"
       ></evidence>
       <div>
         <el-button type="primary" @click="getEvidenceData">确定</el-button>
