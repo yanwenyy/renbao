@@ -15,12 +15,12 @@
     </div>
     <div style="width:100%">
       <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="searchForm" :model="searchForm" :inline="true">
+        <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
           <el-form-item label="审核规则名称：">
             <el-input
               v-model="searchForm.ruleName"
               clearable
-              placeholder="审核规则名称："
+              placeholder="审核规则名称"
             ></el-input>
           </el-form-item>
           <el-form-item label="审核规则类别：">
@@ -87,6 +87,10 @@
               :align="items.align ? items.align : 'center'"
               :width="items.width"
             >
+              <template slot-scope="scope">
+                <div v-if="items.dataname == 'ruleName'" :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+                <div v-else><span>{{scope.row[items.dataname]}}</span></div>
+              </template>
             </el-table-column>
             <el-table-column prop="mobile" label="操作" align="center">
               <template slot-scope="scope">

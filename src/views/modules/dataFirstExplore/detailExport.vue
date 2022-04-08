@@ -16,11 +16,10 @@
     </div>
     <div style="width:100%">
       <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="dataForm" :model="dataForm" :inline="true">
+        <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
           <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
-              size="small"
               placeholder="规则名称"
               clearable
             ></el-input>
@@ -30,8 +29,7 @@
               v-model="dataForm.ruleCategory"
               filterable
               clearable
-              placeholder="规则类别"
-              size="small"
+              placeholder="请选择"
             >
               <el-option
                 v-for="(item, index) in ruleCategory"
@@ -60,36 +58,39 @@
         <div>
           <el-table
             :data="tableData"
-            border
             ref="tableData"
             @selection-change="handleSelectionChange"
             v-loading="loading"
             style="width: 100%"
-            :height="tableHeight - 80"
+            :height="tableHeight - 85"
           >
-            <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
-            <el-table-column prop="rule.ruleCategory" label="规则类别">
+            <el-table-column type="selection" width="55" align="center"> </el-table-column>
+            <el-table-column prop="ruleName" label="规则名称" width="140" align="center">
+               <template slot-scope="scope">
+                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="rule.ruleCategory" label="规则类别" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
               </template>
             </el-table-column>
-            <el-table-column prop="actualBeginTime" label="开始时间">
+            <el-table-column prop="actualBeginTime" label="开始时间" min-width="160" align="center">
               <template slot-scope="scope">{{
                 scope.row.actualBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="actualEndTime" label="结束时间">
+            <el-table-column prop="actualEndTime" label="结束时间" min-width="160" align="center">
               <template slot-scope="scope">{{
                 scope.row.actualEndTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="resultCount" label="结果条数">
+            <el-table-column prop="resultCount" label="结果条数" align="center">
             </el-table-column>
-            <el-table-column prop="createUserName" label="执行人">
+            <el-table-column prop="createUserName" label="执行人" align="center">
             </el-table-column>
-            <el-table-column prop="moblie" label="操作">
+            <el-table-column prop="moblie" label="操作" align="center" width="100">
               <template slot-scope="scope">
                 <el-button type="text" @click="detailHandle(scope.row)"
                   >查看明细</el-button

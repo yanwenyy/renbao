@@ -19,7 +19,7 @@
     </div>
     <div style="width:100%">
       <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="dataForm" :model="dataForm" :inline="true">
+        <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
           <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
@@ -30,7 +30,7 @@
           <el-form-item label="运行状态：">
             <el-select
               v-model="dataForm.batchResultExportStatus"
-              placeholder="运行状态"
+              placeholder="请选择"
               clearable
             >
               <el-option
@@ -55,19 +55,22 @@
         <div>
           <el-table
             :data="tableData"
-            border
             ref="tableData"
             v-loading="loading"
             style="width: 100%"
-            :height="tableHeight - 30"
+            :height="tableHeight - 85"
           >
             <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
-            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
-            <el-table-column prop="batchResultExportBeginTime" label="开始时间">
+            <el-table-column prop="ruleName" label="规则名称" min-width="140" align="center">
+              <template slot-scope="scope">
+                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+              </template>
             </el-table-column>
-            <el-table-column prop="batchResultExportEndTime" label="结束时间">
+            <el-table-column prop="batchResultExportBeginTime" label="开始时间" align="center" min-width="160">
             </el-table-column>
-            <el-table-column prop="batchResultExportStatus" label="状态">
+            <el-table-column prop="batchResultExportEndTime" label="结束时间" align="center" min-width="160">
+            </el-table-column>
+            <el-table-column prop="batchResultExportStatus" label="状态" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.batchResultExportStatus == 1">待执行</div>
                 <div v-if="scope.row.batchResultExportStatus == null">

@@ -2,13 +2,13 @@
   <div class="mod-user">
     <el-form class="search-form-new" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
 
-      <el-form-item label="项目编号:">
+      <el-form-item label="项目编号：">
         <el-input v-model="dataForm.projectCode" placeholder="项目编号" clearable></el-input>
       </el-form-item>
-      <el-form-item label="项目名称:">
+      <el-form-item label="项目名称：">
         <el-input v-model="dataForm.projectName" placeholder="项目名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="创建时间:">
+      <el-form-item label="创建时间：">
         <el-date-picker
           :picker-options="pickerOptionsStart"
           v-model="dataForm.createTimeBegin"
@@ -61,14 +61,19 @@
       <el-table-column
         prop="projectName"
         align="center"
-        label="项目名称">
+        label="项目名称"
+        min-width="160">
+        <template slot-scope="scope">
+          <div :title="scope.row.projectName" class="show-ellipsis">{{scope.row.projectName}}</div>
+        </template>
       </el-table-column>
 
       <el-table-column
         prop="dataAmount"
         header-align="center"
         align="center"
-        label="项目周期">
+        label="项目周期"
+        min-width="160">
         <template slot-scope="scope">
           {{scope.row.projectPeriodBegin }}至{{scope.row.projectPeriodEnd}}
         </template>
@@ -89,7 +94,8 @@
         prop="createTime"
         header-align="center"
         align="center"
-        label="创建时间">
+        label="创建时间"
+        min-width="160">
         <template slot-scope="scope">
           {{scope.row.createTime }}
         </template>

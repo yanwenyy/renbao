@@ -23,22 +23,23 @@
           :inline="true"
           :model="dataForm"
           @keyup.enter.native="getDataList()"
+          class="search-form-new"
         >
-          <el-form-item label="政策名称:">
+          <el-form-item label="政策名称：">
             <el-input
               v-model="dataForm.policyName"
               placeholder="政策名称"
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="有效时间:">
+          <el-form-item label="有效时间：">
             <el-date-picker
               v-model="dataForm.endTime"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="文件内容:">
+          <el-form-item label="文件内容：">
             <el-input
               v-model="dataForm.createUserName"
               placeholder="文件内容"

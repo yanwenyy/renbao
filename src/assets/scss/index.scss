@@ -16,5 +16,13 @@
   right: 0;
   cursor: pointer;
 }
+.show-ellipsis{
+  width: 100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  -o-text-overflow:ellipsis;
+  white-space:nowrap;
+  cursor: pointer;
+}
 
 
