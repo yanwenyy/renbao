@@ -115,6 +115,7 @@
   </div>
 </template>
 <script>
+  require("../../../utils/jquery/jquery-3.3.1");
   const make = go.GraphObject.make;
   export default {
     data() {
@@ -849,22 +850,21 @@
       },
       //显示表连接关系
       showJoin() {
-        try {
+        try{
           $("#form").html("");
           var mainHtml = '<div class="form-group" id="join"><div class="col-sm-12"><input name="MainTable" type="text" class="form-control" id="MainTable" disabled="disabled"></input></div></div>';
           $("#form").html(mainHtml);
-          if (join.length > 0) {
-            $("#MainTable").val(join[0].chineseName);
-            for (var i = 1; i < join.length; i++) {
-              var joinData = join[i];
-              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="assistSqlEdit.changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
+          if(this.join.length>0){
+            $("#MainTable").val(this.join[0].chineseName);
+            for(var i=1 ;i<this.join.length;i++){
+              var joinData = this.join[i];
+              var joinHtml ='<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type'+i+'" onchange="assistSqlEdit.changeType('+i+')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable'+i+'" type="text" class="form-control" id="slaverTable'+i+'" disabled="disabled"></input></div></div>';
               $("#join").append(joinHtml);
-              $("#type" + i).val(joinData.type);
-              $("#slaverTable" + i).val(joinData.chineseName);
+              $("#type"+i).val(joinData.type);
+              $("#slaverTable"+i).val(joinData.chineseName);
             }
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       },
       //初始化order div
       initOrder() {
