@@ -10,7 +10,7 @@
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
                     <el-button size="small" type="text" @click="getImportclick(scope.row)">导入模板</el-button>
-                    <el-button size="small" type="text" @click="getExportClick(scope.row.attachmentId)">导出模板</el-button>
+                    <el-button size="small" type="text" @click="getExportClick(scope.row.attachmentId,scope.row.templateName)">导出模板</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -43,7 +43,11 @@
     </div>
 </template>
 <script>
+// import { exportZip } from "@/utils";
 export default {
+//     components: {
+//     exportZip,
+//  },
     data(){
         return{
             tableData:[],
@@ -59,7 +63,10 @@ export default {
             token:'',
             fileInfoId:'',
             fileId:'',
-            importId:''
+            importId:'',
+            dataForm1: {
+                fileInfoId: "",
+            }
         }
     },
   computed:{
@@ -162,17 +169,58 @@ export default {
             this.showImportVisible = true
         },
         //导出模板
-        getExportClick(id){
+        getExportClick(id,name){
+          this.dataForm1.fileInfoId = id;
             if(id){
-                let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
-                window.open(url)
+                this.$http({
+                    url:this.$http.adornUrl('/fileInfo/pa/fileIfor/download'),
+                    method: "get",
+                    headers: {
+                    token: this.$cookie.get('token')
+                    },
+                    responseType: "blob",
+                    params: this.$http.adornParams({
+                    fileInfoId:id,
+                    })
+                }).then(({data}) =>{
+                    if (data.type) {
+                        // 文件下载
+                        const blob = new Blob([data], {
+                        type: "application/vnd.ms-excel"
+                        });
+                        let link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.setAttribute('download',name + '.xlsx');
+                        link.click();
+                        link = null;
+                        this.$message.success('导出成功');
+                    } else {
+                        // 返回json
+                        this.$message.warning(data.message);
+                        }
+                }).catch(err => {
+                    this.$message.error("下载失败");
+                    this.$message({
+                    message: '请先导入模板在进行导出模板',
+                    type: 'success',
+                })
+                });   
             }else{
                 this.$message({
                     message: '请先导入模板在进行导出模板',
                     type: 'success',})
-            }
-           
+            }      
+            // if(id){
+            //     // let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
+            //     // // console.log(url)
+            //     // window.open(url)
+            // }else{
+            //     this.$message({
+            //         message: '请先导入模板在进行导出模板',
+            //         type: 'success',})
+            // }
         },
+
         // 每页数
         handleSizeChange(val){
             this.apComServerData.pageSize = val
