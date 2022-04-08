@@ -193,7 +193,7 @@ export default {
           label: "操作",
           issortable: false,
           type: "option",
-          minWidth: 120
+          minWidth: 100
         }
       ],
       //多选

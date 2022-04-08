@@ -90,7 +90,7 @@
             </el-table-column>
             <el-table-column prop="createUserName" label="执行人" align="center">
             </el-table-column>
-            <el-table-column prop="moblie" label="操作" align="center" width="100">
+            <el-table-column prop="moblie" label="操作" align="center" min-width="100">
               <template slot-scope="scope">
                 <el-button type="text" @click="detailHandle(scope.row)"
                   >查看明细</el-button
@@ -134,12 +134,12 @@
           title="结果明细导出"
           :close-on-click-modal="false"
           :modal-append-to-body="false"
-          width="40%"
+          width="650px"
           :close-on-press-escape="false"
           v-if="detailExportDialog"
         >
           <el-form
-            style="height:400px;overflow-y:auto"
+            style="height:280px;overflow-y:auto"
             :model="dataForm1"
             ref="dataForm1"
             label-width="120px"
