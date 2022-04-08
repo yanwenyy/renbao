@@ -40,14 +40,14 @@
             </div>
             <div id="tjHidden" class="data-option-box">
                 <div class="tstext">连接条件</div>
-                <div id="linkDiv" class="box-bg" >			
-                    <div class="form-group" id="join2"  style="display:none;">					
+                <div id="linkDiv" class="box-bg" >
+                    <div class="form-group" id="join2"  style="display:none;">
                         <div class="col-sm-12">
                             <input name="MainPort" type="text" class="form-control" id="MainPort" disabled="disabled"></input>
                         </div>
                     </div>
                     <div class="form-group" id="select" style="display:none;">
-                        
+
                         <div class="col-sm-8">
                             <select id="comper" onchange="assistSqlEdit.changeCopare()">
                                 <option value="=">等于</option>
@@ -57,9 +57,9 @@
                                 <option value="&lt;">小于</option>
                                 <option value="&lt;=">小于等于</option>
                             </select>
-                        </div>				
+                        </div>
                     </div>
-                    <div class="form-group" id="join1" style="display:none;">					
+                    <div class="form-group" id="join1" style="display:none;">
                         <div class="col-sm-12">
                             <input name="toPort" type="text" class="form-control" id="toPort" disabled="disabled"></input>
                             <input name="from" type="hidden" class="form-control" id="from"></input>
@@ -68,7 +68,7 @@
                     </div>
                 </div>
             </div>
-           
+
 
         </div>
     </div>
@@ -95,7 +95,7 @@
                             :label="items.label"
                             :sortable="items.issortable"
                             :align="items.align ? items.align : 'center'"
-                            
+
                         >
                         </el-table-column>
                     </el-table>
@@ -106,10 +106,10 @@
 
 
     </div>
-   
-   
 
-   
+
+
+
   </div>
 </template>
 <script>
@@ -143,7 +143,7 @@ export default {
             {dataname: "gridTable_group",label: "分组",issortable: false,type: ""},
         ],
         tableData: []
-     
+
     };
   },
   activated () {
@@ -157,14 +157,14 @@ export default {
         diagramDiv.onmousemove = function(event) {
             layeX = event.layerX;
             layeY = event.layerY;
-        };	
+        };
         assistSqlEdit.init();
         // var assistSqlEdit = new AssistSqlEdit();
 
 
 
   },
- 
+
   methods: {
     //展开树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
     getLoadTree(datas, obj, node) {
@@ -237,14 +237,14 @@ export default {
     },
   },
   computed: {
-  
+
   },
   components: {
-   
+
   },
   watch: {
-   
-  
+
+
   }
 };
 </script>
@@ -260,7 +260,7 @@ export default {
         .data-left {
             width: 300px;
             overflow: scroll;
-            
+
         }
         .data-canvas {
             flex: 1;
@@ -274,7 +274,7 @@ export default {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                
+
                 .box-bg {
                     flex: 1;
                 }

@@ -15,7 +15,7 @@
     </div>
     <div style="width:100%">
       <el-card :style="{height:(tableHeight+120)+'px'}">
-        <div class="search-box">
+        <div class="search-box search-form-new">
           <el-form ref="searchForm" :model="searchForm" :inline="true">
             <el-form-item label="规则名称：">
               <el-input
@@ -42,7 +42,7 @@
             <el-form-item label="运行状态：">
               <el-select
                 v-model="searchForm.runStatus"
-                placeholder="运行状态"
+                placeholder="请选择"
                 clearable
               >
                 <el-option
@@ -71,7 +71,6 @@
             ref="multipleTable"
             :data="tableData"
             tooltip-effect="dark"
-            border
             style="width: 100%"
             @selection-change="handleSelectionChange"
             :height="tableHeight - 80"
@@ -89,27 +88,27 @@
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
               </template>
             </el-table-column>
-            <el-table-column prop="expectedBeginTime" label="预计开始时间">
+            <el-table-column width="120" prop="expectedBeginTime" label="预计开始时间">
               <template slot-scope="scope">{{
                 scope.row.expectedBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="actualBeginTime" label="实际开始时间">
+            <el-table-column width="120" prop="actualBeginTime" label="实际开始时间">
               <template slot-scope="scope">{{
                 scope.row.actualBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="expectedEndTime" label="预计结束时间">
+            <el-table-column width="120" prop="expectedEndTime" label="预计结束时间">
               <template slot-scope="scope">{{
                 scope.row.expectedEndTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="actualEndTime" label="实际结束时间">
+            <el-table-column width="120" prop="actualEndTime" label="实际结束时间">
               <template slot-scope="scope">{{
                 scope.row.actualEndTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="runStatus" label="运行状态">
+            <el-table-column width="120" prop="runStatus" label="运行状态">
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 1">待执行</div>
                 <div v-if="scope.row.runStatus == 2">执行中</div>
@@ -117,7 +116,7 @@
                 <div v-if="scope.row.runStatus == 4">已完成</div>
               </template>
             </el-table-column>
-            <el-table-column prop="moblie" label="操作">
+            <el-table-column width="120" prop="moblie" label="操作">
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 4">运行成功</div>
                 <el-button

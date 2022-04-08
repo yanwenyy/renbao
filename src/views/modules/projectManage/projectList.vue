@@ -1,6 +1,6 @@
 <template>
   <div class="mod-user">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form class="search-form-new" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
 
       <el-form-item label="项目编号:">
         <el-input v-model="dataForm.projectCode" placeholder="项目编号" clearable></el-input>
