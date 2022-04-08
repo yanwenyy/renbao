@@ -20,11 +20,10 @@
     <div style="width:100%">
       <el-card class="box-card" :style="{ height: tableHeight + 120 + 'px' }">
         <div class="search-box">
-          <el-form ref="dataForm" :model="dataForm" :inline="true">
+          <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
             <el-form-item label="规则名称：">
               <el-input
                 v-model="dataForm.ruleName"
-                size="small"
                 placeholder="规则名称"
                 clearable
               ></el-input>
@@ -34,8 +33,8 @@
                 v-model="dataForm.ruleCategory"
                 filterable
                 clearable
-                placeholder="规则类型"
-                size="small"
+                placeholder="请选择"
+               
               >
                 <el-option
                   v-for="(item, index) in ruleCategory"
@@ -77,7 +76,6 @@
             </div> -->
           <el-table
             :data="tableData"
-            border
             ref="tableData"
             @selection-change="handleSelectionChange"
             v-loading="loading"
@@ -87,12 +85,17 @@
           >
             <el-table-column
               type="selection"
+              align="center"
               :reserve-selection="true"
               width="55"
             >
             </el-table-column>
-            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
-            <el-table-column prop="ruleCategory" label="规则类别">
+            <el-table-column prop="ruleName" label="规则名称" align="center" width="140">
+              <template slot-scope="scope">
+                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="ruleCategory" label="规则类别" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
@@ -101,12 +104,13 @@
             <el-table-column
               prop="createUserName"
               label="创建人"
+              align="center"
             ></el-table-column>
-            <el-table-column prop="createTime" label="创建时间">
+            <el-table-column prop="createTime" label="创建时间" align="center" width="160">
             </el-table-column>
             <!-- <el-table-column prop="hospitalName" label="医院">
               </el-table-column> -->
-            <el-table-column prop="moblie" label="操作">
+            <el-table-column prop="moblie" label="操作" align="center">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -232,7 +236,7 @@ export default {
   },
   data() {
     return {
-      tableMinus: 120,
+      tableMinus: 73,
       //条件查询数据定义
       dataForm: {
         ruleName: "",

@@ -15,12 +15,11 @@
     </div>
     <div style="width:100%">
       <el-card :style="{height:(tableHeight+120)+'px'}">
-        <div class="search-box search-form-new">
-          <el-form ref="searchForm" :model="searchForm" :inline="true">
+        <div class="search-box">
+          <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
             <el-form-item label="规则名称：">
               <el-input
                 v-model="searchForm.ruleName"
-                size="small"
                 placeholder="规则名称"
                 clearable
               ></el-input>
@@ -28,7 +27,7 @@
             <el-form-item label="规则类型：">
               <el-select
                 v-model="searchForm.ruleCategory"
-                placeholder="规则类型"
+                placeholder="请选择"
                 clearable
               >
                 <el-option
@@ -53,8 +52,10 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-button type="primary" @click="onQuery">查询</el-button>
-            <el-button @click="onReset">重置</el-button>
+            <el-form-item>
+              <el-button type="primary" @click="onQuery">查询</el-button>
+              <el-button @click="onReset">重置</el-button>
+            </el-form-item>
             <el-button
               style="float:right"
               @click="deleteData"
@@ -73,42 +74,47 @@
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="handleSelectionChange"
-            :height="tableHeight - 80"
+            :height="tableHeight - 93"
             :row-key="getRowKeys"
           >
             <el-table-column
               type="selection"
               :reserve-selection="true"
+              align="center"
               width="55"
             ></el-table-column>
-            <el-table-column prop="ruleName" label="规则名称"></el-table-column>
-            <el-table-column prop="ruleCategory" label="规则类别">
+            <el-table-column prop="ruleName" label="规则名称" min-width="140" align="center">
+              <template slot-scope="scope">
+                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="ruleCategory" label="规则类别" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
               </template>
             </el-table-column>
-            <el-table-column width="120" prop="expectedBeginTime" label="预计开始时间">
+            <el-table-column min-width="160" prop="expectedBeginTime" label="预计开始时间" align="center">
               <template slot-scope="scope">{{
                 scope.row.expectedBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column width="120" prop="actualBeginTime" label="实际开始时间">
+            <el-table-column min-width="160" prop="actualBeginTime" label="实际开始时间" align="center">
               <template slot-scope="scope">{{
                 scope.row.actualBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column width="120" prop="expectedEndTime" label="预计结束时间">
+            <el-table-column min-width="160" prop="expectedEndTime" label="预计结束时间" align="center">
               <template slot-scope="scope">{{
                 scope.row.expectedEndTime
               }}</template>
             </el-table-column>
-            <el-table-column width="120" prop="actualEndTime" label="实际结束时间">
+            <el-table-column min-width="160" prop="actualEndTime" label="实际结束时间" align="center">
               <template slot-scope="scope">{{
                 scope.row.actualEndTime
               }}</template>
             </el-table-column>
-            <el-table-column width="120" prop="runStatus" label="运行状态">
+            <el-table-column width="120" prop="runStatus" label="运行状态" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 1">待执行</div>
                 <div v-if="scope.row.runStatus == 2">执行中</div>
@@ -116,7 +122,7 @@
                 <div v-if="scope.row.runStatus == 4">已完成</div>
               </template>
             </el-table-column>
-            <el-table-column width="120" prop="moblie" label="操作">
+            <el-table-column width="120" prop="moblie" label="操作" align="center">
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 4">运行成功</div>
                 <el-button

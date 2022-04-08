@@ -14,7 +14,7 @@
     </div>
     <div class="auditRuleConfig-right" :style="{height:(tableHeight+120)+'px'}">
       <div class="search-box">
-        <el-form ref="searchForm" :model="searchForm" :inline="true">
+        <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
           <el-form-item label="规则名称：">
             <el-input
               v-model="searchForm.ruleName"
@@ -67,9 +67,10 @@
               header-align="center"
               align="center"
               label="规则名称"
+              min-width="130"
             >
               <template slot-scope="scope">
-                <el-button type="text" @click="detail(scope.row)">{{
+                <el-button type="text" @click="detail(scope.row)" class="show-ellipsis" :title="scope.row.ruleName">{{
                   scope.row.ruleName
                 }}</el-button>
               </template>
@@ -86,6 +87,7 @@
               header-align="center"
               align="center"
               label="创建时间"
+              min-width="130"
             >
             </el-table-column>
             <el-table-column

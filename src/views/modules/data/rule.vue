@@ -54,14 +54,14 @@
           :model="dataForm"
           @keyup.enter.native="getDataList()"
         >
-          <el-form-item label="规则名称:">
+          <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
               placeholder="规则名称"
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="创建人:">
+          <el-form-item label="创建人：">
             <el-input
               v-model="dataForm.createUserName"
               placeholder="创建人"
@@ -119,13 +119,17 @@
             width="50"
           >
           </el-table-column>
-          <el-table-column prop="ruleName" align="center" label="规则名称">
+          <el-table-column prop="ruleName" align="center" label="规则名称" min-width="140">
+            <template slot-scope="scope">
+              <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+            </template>
           </el-table-column>
           <el-table-column
             prop="avgRunTime"
             header-align="center"
             align="center"
             label="平均运行时间"
+            min-width="160"
           >
           </el-table-column>
           <el-table-column
@@ -133,6 +137,7 @@
             header-align="center"
             align="center"
             label="创建时间"
+            min-width="160"
           >
           </el-table-column>
           <el-table-column

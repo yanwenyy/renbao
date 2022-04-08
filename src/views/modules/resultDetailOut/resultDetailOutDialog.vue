@@ -3,7 +3,7 @@
     <el-dialog
       ref="resultDetailOutDialog"
       title="结果明细导出"
-      width="40%"
+      width="650px"
       :visible.sync="dialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -16,7 +16,7 @@
           :rules="exportFormRules"
           :inline="true"
           label-width="120px"
-          style="height:400px;overflow-y:auto"
+          style="height:280px;overflow-y:auto"
         >
           <el-form-item prop="hospital" label="选择医院：">
             <el-select
@@ -38,8 +38,7 @@
               v-model="checked"
               @change="selectAll"
               style="position:absolute;margin-left:10px"
-              >全选</el-checkbox
-            >
+              >全选</el-checkbox>
           </el-form-item>
         </el-form>
       </div>
@@ -217,6 +216,9 @@ export default {
   }
   >>> .el-cascader-menu__wrap {
     overflow: unset !important;
+  }
+  /deep/ .el-form-item__content {
+    width: 450px;
   }
 }
 </style>

@@ -12,7 +12,7 @@
     </div>
     <div style="width:100%">
       <el-card :style="{height:(tableHeight+120)+'px'}">
-        <el-form ref="searchForm" :model="searchForm" :inline="true">
+        <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
           <el-form-item label="规则名称：">
             <el-input
               v-model="searchForm.ruleName"
@@ -53,7 +53,7 @@
             :data="tableData"
             tooltip-effect="dark"
             style="width: 100%"
-            :height="tableHeight - 80"
+            :height="tableHeight - 85"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"></el-table-column>
@@ -78,15 +78,8 @@
                     >
                   </div>
                 </div>
-                <div v-else>
-                  <span
-                    :style="
-                      scope.row[items.dataname] == '0' ? 'color:#ccc' : ''
-                    "
-                  >
-                    {{ scope.row[items.dataname] }}
-                  </span>
-                </div>
+                <div v-else-if="items.dataname == 'ruleName'" :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+                <div v-else>{{ scope.row[items.dataname] }} </div>
               </template>
             </el-table-column>
           </el-table>
@@ -161,7 +154,7 @@ export default {
           label: "规则名称",
           issortable: false,
           type: "",
-          minWidth: 100
+          minWidth: 140
         },
         {
           dataname: "dealRuleType",
@@ -200,7 +193,7 @@ export default {
           label: "操作",
           issortable: false,
           type: "option",
-          minWidth: 120
+          minWidth: 100
         }
       ],
       //多选

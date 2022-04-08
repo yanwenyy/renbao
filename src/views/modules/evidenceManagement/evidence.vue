@@ -5,6 +5,7 @@
       :inline="true"
       :model="dataForm"
       @keyup.enter.native="getDataList()"
+      class="search-form-new"
     >
       <el-form-item label="证据名称：">
         <el-input
@@ -13,7 +14,7 @@
           clearable
         ></el-input>
       </el-form-item>
-      <el-form-item label="创建人:">
+      <el-form-item label="创建人：">
         <el-input
           v-model="dataForm.createUserName"
           placeholder="创建人"

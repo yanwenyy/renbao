@@ -13,7 +13,7 @@
     <div style="width:100%">
       <el-card :style="{height:(tableHeight+120)+'px'}">
         <div class="search-box">
-          <el-form ref="searchForm" :model="searchForm" :inline="true">
+          <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
             <el-form-item label="规则类型：">
               <el-select
                 v-model="searchForm.ruleCategory"
@@ -58,8 +58,7 @@
             :data="tableData"
             tooltip-effect="dark"
             style="width: 100%"
-            border
-            :height="tableHeight - 80"
+            :height="tableHeight - 85"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"></el-table-column>
@@ -88,14 +87,12 @@
                     <span v-else-if="scope.row.option == 4">运行成功</span>
                   </div>
                 </div>
+                <div v-else-if="items.dataname == 'ruleName'" :title="scope.row.ruleName" class="show-ellipsis">
+                 {{scope.row.ruleName}}
+                </div>
+
                 <div v-else>
-                  <span
-                    :style="
-                      scope.row[items.dataname] == '0' ? 'color:#ccc' : ''
-                    "
-                  >
-                    {{ scope.row[items.dataname] }}
-                  </span>
+                  <span>{{ scope.row[items.dataname] }}</span>
                 </div>
               </template>
             </el-table-column>
@@ -141,7 +138,7 @@ export default {
           label: "审核规则名称",
           issortable: false,
           type: "",
-          minWidth: 120
+          minWidth: 140
         },
         {
           dataname: "dealRuleType",
