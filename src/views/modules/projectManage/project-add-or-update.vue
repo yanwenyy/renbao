@@ -477,7 +477,7 @@
           method: "get",
           params: this.$http.adornParams({
             pageNo: 1,
-            pageSize: 1000,
+            pageSize: 10000,
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
@@ -491,7 +491,7 @@
           method: "get",
           params: this.$http.adornParams({
             pageNo: 1,
-            pageSize: 1000,
+            pageSize: 10000,
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
@@ -505,7 +505,7 @@
           method: "get",
           params: this.$http.adornParams({
             pageNo: 1,
-            pageSize: 1000,
+            pageSize: 10000,
             projectId: projectId,
           })
         }).then(({ data }) => {

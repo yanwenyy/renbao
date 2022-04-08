@@ -89,19 +89,108 @@
               ref="gridTable"
               :data="tableData"
               tooltip-effect="dark"
-              :height="tableHeight-100"
+              :height="tableHeight-130"
               style="width: 100%;"
             >
               <el-table-column
-                v-for="(items, index) in tablePositionKey"
-                :prop="items.dataname"
-                :key="index"
-                :label="items.label"
-                :sortable="items.issortable"
-                :align="items.align ? items.align : 'center'"
-
+                label="序号"
+                type="index"
+                width="50"
+                align="center">
+              </el-table-column>
+              <el-table-column
+                prop="tableName"
+                header-align="center"
+                align="center"
+                label="来源"
               >
               </el-table-column>
+              <el-table-column
+                prop="name"
+                header-align="center"
+                align="center"
+                label="英文字段名"
+                width="150"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="中文字段名"
+                width="150"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="别名"
+                width="150"
+              >
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.alias" @change="changeAlisa(scope.row.id,scope.row.table)"></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="聚合函数"
+                width="150"
+              >
+                <template slot-scope="scope">
+                  <el-select v-model="scope.row.fun" @change="changeGruop(scope.row.id,scope.row.table,scope.row.name)">
+                    <el-option value="jh" label="聚合函数"></el-option>
+                    <el-option value="count" label="总行数"></el-option>
+                    <el-option value="max" label="最大"></el-option>
+                    <el-option value="min" label="最小"></el-option>
+                    <el-option value="sum" label="求和"></el-option>
+                    <el-option value="avg" label="平均值"></el-option>
+                    <el-option value="variance" label="方差"></el-option>
+                    <el-option value="variance" label="样本方差"></el-option>
+                    <el-option value="stddev_pop" label="标准偏差"></el-option>
+                    <el-option value="stddev_pop" label="样本标准偏差"></el-option>
+                  </el-select>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="排序"
+                width="100"
+              >
+                <template slot-scope="scope">
+                  <i class="el-icon-sort-up table-sort-btn" @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
+                  <i class="el-icon-sort-down table-sort-btn" @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
+                  <i class="el-icon-s-fold table-sort-btn" @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="筛选"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="info"
+                header-align="center"
+                align="center"
+                label="分组"
+              >
+              </el-table-column>
+              <!--<el-table-column-->
+              <!--v-for="(items, index) in tablePositionKey"-->
+              <!--:prop="items.dataname"-->
+              <!--:key="index"-->
+              <!--:label="items.label"-->
+              <!--:sortable="items.issortable"-->
+              <!--:align="items.align ? items.align : 'center'"-->
+
+              <!--&gt;-->
+              <!--</el-table-column>-->
             </el-table>
           </div>
         </div>
@@ -120,7 +209,7 @@
   export default {
     data() {
       return {
-        filter:{},
+        filter: {},
         layeX: -1,
         layeY: -1,
         myDiagram: {},
@@ -647,6 +736,104 @@
           });
         });
       },
+      //点击正序
+      clickOrderASC(id, table, name) {
+        var column = table + "." + name;
+        for (var i = 0; i < this.order.length; i++) {
+          var data = this.order[i];
+          if (data.column == column) {
+            this.order.splice(i, 1);
+          }
+        }
+        var orderdata = {};
+        orderdata.column = column;
+        orderdata.order = "ASC";
+        this.order.push(orderdata);
+
+        this.initOrder();
+        this.initTableRow();
+        this.toSql();
+
+      },
+      //点击倒序
+      clickOrderDESC(id, table, name) {
+        var column = table + "." + name;
+        for (var i = 0; i < this.order.length; i++) {
+          var data = this.order[i];
+          if (data.column == column) {
+            this.order.splice(i, 1);
+          }
+        }
+        var orderdata = {};
+        orderdata.column = column;
+        orderdata.order = "DESC";
+        this.order.push(orderdata);
+        this.initOrder();
+        this.initTableRow();
+        this.toSql();
+      },
+      //点击无续
+      clickOrderWX(id, table, name) {
+        var column = table + "." + name;
+        for (var i = 0; i < this.order.length; i++) {
+          var data = this.order[i];
+          if (data.column == column) {
+            this.order.splice(i, 1);
+          }
+        }
+        this.initOrder();
+        this.initTableRow();
+        this.toSql();
+      },
+      //初始化聚合标记
+      groupInit() {
+        var state = false;
+        for (var s = 0; s < this.join.length; s++) {
+          var data = this.join[s];
+          for (var i = 0; i < data.fields.length; i++) {
+            var field = data.fields[i];
+            if (field.group == true) {
+              state = true;
+            }
+          }
+        }
+        if (state == true) {
+          this.group = true;
+        } else {
+          this.group = false;
+        }
+      },
+      //改变聚合函数
+      changeGruop(id, table, name) {
+        var idx = this.indexOfJoin(table);
+        var data = this.join[idx];
+        var selectData = $("#fun" + id).val();
+        for (var i = 0; i < data.fields.length; i++) {
+          var field = data.fields[i];
+          if (field.id == id) {
+            this.join[idx].fields[i].fun = selectData;
+            //join[idx].fields[i].group=true;
+          }
+        }
+        this.groupInit();
+        this.initOrder();
+        this.initTableRow();
+        this.toSql();
+      },
+      //改变别名
+      changeAlisa(id, table) {
+        var idx = this.indexOfJoin(table);
+        var data = join[idx];
+        var val = $("#" + id).val();
+        for (var i = 0; i < data.fields.length; i++) {
+          var field = data.fields[i];
+          if (field.id == id) {
+            this.join[idx].fields[i].alias = val;
+          }
+        }
+        this.initTableRow();
+        this.toSql();
+      },
       //初始化分组
       initGroup() {
         if (this.group == true) {
@@ -655,9 +842,9 @@
             for (var j = 0; j < joinData.fields.length; j++) {
               var field = joinData.fields[j];
               if (field.hidden == false) {
-                var _funEle=document.getElementById("#fun" + field.id);
+                var _funEle = document.getElementById("#fun" + field.id);
                 // $("#fun" + field.id).val(field.fun);
-                _funEle.value=field.fun;
+                _funEle.value = field.fun;
               }
             }
           }
@@ -822,7 +1009,7 @@
       },
       //生成每一行数据
       initTableRow(tableId) {
-        this.tableData=[];
+        this.tableData = [];
         for (var i = 0; i < this.join.length; i++) {
           var table = this.join[i];
           for (var j = 0; j < table.fields.length; j++) {
@@ -850,21 +1037,22 @@
       },
       //显示表连接关系
       showJoin() {
-        try{
+        try {
           $("#form").html("");
           var mainHtml = '<div class="form-group" id="join"><div class="col-sm-12"><input name="MainTable" type="text" class="form-control" id="MainTable" disabled="disabled"></input></div></div>';
           $("#form").html(mainHtml);
-          if(this.join.length>0){
+          if (this.join.length > 0) {
             $("#MainTable").val(this.join[0].chineseName);
-            for(var i=1 ;i<this.join.length;i++){
+            for (var i = 1; i < this.join.length; i++) {
               var joinData = this.join[i];
-              var joinHtml ='<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type'+i+'" onchange="assistSqlEdit.changeType('+i+')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable'+i+'" type="text" class="form-control" id="slaverTable'+i+'" disabled="disabled"></input></div></div>';
+              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="assistSqlEdit.changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
               $("#join").append(joinHtml);
-              $("#type"+i).val(joinData.type);
-              $("#slaverTable"+i).val(joinData.chineseName);
+              $("#type" + i).val(joinData.type);
+              $("#slaverTable" + i).val(joinData.chineseName);
             }
           }
-        } catch (e) {}
+        } catch (e) {
+        }
       },
       //初始化order div
       initOrder() {
@@ -975,6 +1163,7 @@
             field.tableId = nodes[i].data.id;
             field.name = nodes[i].data.title;
             field.info = nodes[i].data.title;
+            field.alias = nodes[i].data.title;
             field.color = "#FFFFFF";
             field.hidden = true;
             fieldArr.push(field);
@@ -990,7 +1179,9 @@
     },
     computed: {
       tableHeight: {
-        get () { return this.$store.state.common.tableHeight}
+        get() {
+          return this.$store.state.common.tableHeight
+        }
       },
     },
     components: {},
@@ -1019,6 +1210,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
         .data-option-box {
           flex: 1;
           display: flex;
@@ -1093,4 +1285,9 @@
     }
   }
 
+  .table-sort-btn {
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 </style>
