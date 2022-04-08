@@ -14,7 +14,7 @@ module.exports = {
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
-        target: 'http://127.0.0.1:1070/dataanalysis/',
+        target: 'http://10.10.104.46:1070/dataanalysis/',
         // target: 'http://10.10.113.229:1070/dataanalysis/',
         // target: 'http://10.10.113.44:1077/dataanalysis/',
         changeOrigin: true,
