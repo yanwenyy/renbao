@@ -1,210 +1,924 @@
 <template>
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
-        <div class="data-left">
-            <div class="data-tree">
-               <el-tree
-                class="sql-tree-self"
-                :data="dataTreeData"
-                ref="tree1"
-                node-key="id"
-                lazy
-                :load="loadNode"
-                :props="defaultProps"
-                draggable
-                @node-expand="handleNodeClick"
-                :default-expanded-keys="treeExpandData"
-                :allow-drop="returnFalse"
-                :allow-drag="allowDrag">
+      <div class="data-left">
+        <div class="data-tree">
+          <el-tree
+            class="sql-tree-self"
+            :data="dataTreeData"
+            ref="tree1"
+            node-key="id"
+            lazy
+            :load="loadNode"
+            :props="defaultProps"
+            draggable
+            @node-expand="handleNodeClick"
+            :default-expanded-keys="treeExpandData"
+            @node-drag-end="handleDragEnd"
+            :allow-drop="returnFalse"
+            :allow-drag="allowDrag">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                         <span>
-                            <img v-if="node.data.dataType=='1'" class="tree-icon" src="../../../components/codemirror/icons/files.png" alt="">
-                            <img v-if="node.data.dataType=='2'" class="tree-icon" src="../../../components/codemirror/icons/table_1.png" alt="">
-                            <img v-if="node.data.dataType=='3'" class="tree-icon" src="../../../components/codemirror/icons/column.png" alt="">
+                            <img v-if="node.data.dataType=='1'" class="tree-icon"
+                                 src="../../../components/codemirror/icons/files.png" alt="">
+                            <img v-if="node.data.dataType=='2'" class="tree-icon"
+                                 src="../../../components/codemirror/icons/table_1.png" alt="">
+                            <img v-if="node.data.dataType=='3'" class="tree-icon"
+                                 src="../../../components/codemirror/icons/column.png" alt="">
                             {{ node.label }}
                         </span>
                     </span>
-                </el-tree>
-            </div>
+          </el-tree>
         </div>
-        <div class="data-canvas mar-l">
-            <div id="myDiagramDiv" ref="myDiagramDiv"  style="border: solid 1px #F3F3F3;height:100%;"></div>
-            <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
-            <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
-        </div>
-        <div class="data-right mar-l">
-            <div id="joins" class="data-option-box">
-                <div class="tstext">表连接</div>
-                <div id="form" class="box-bg" ></div>
-
-            </div>
-            <div id="tjHidden" class="data-option-box">
-                <div class="tstext">连接条件</div>
-                <div id="linkDiv" class="box-bg" >
-                    <div class="form-group" id="join2"  style="display:none;">
-                        <div class="col-sm-12">
-                            <input name="MainPort" type="text" class="form-control" id="MainPort" disabled="disabled"></input>
-                        </div>
-                    </div>
-                    <div class="form-group" id="select" style="display:none;">
-
-                        <div class="col-sm-8">
-                            <select id="comper" onchange="assistSqlEdit.changeCopare()">
-                                <option value="=">等于</option>
-                                <option value="!=">不等于</option>
-                                <option value="&gt;">大于</option>
-                                <option value="&gt;=">大于等于</option>
-                                <option value="&lt;">小于</option>
-                                <option value="&lt;=">小于等于</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" id="join1" style="display:none;">
-                        <div class="col-sm-12">
-                            <input name="toPort" type="text" class="form-control" id="toPort" disabled="disabled"></input>
-                            <input name="from" type="hidden" class="form-control" id="from"></input>
-                            <input name="to" type="hidden" class="form-control" id="to"></input>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+      </div>
+      <div class="data-canvas mar-l">
+        <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
+        <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
+        <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
+      </div>
+      <div class="data-right mar-l">
+        <div id="joins" class="data-option-box">
+          <div class="tstext">表连接</div>
+          <div id="form" class="box-bg"></div>
 
         </div>
+        <div id="tjHidden" class="data-option-box">
+          <div class="tstext">连接条件</div>
+          <div id="linkDiv" class="box-bg">
+            <div class="form-group" id="join2" style="display:none;">
+              <div class="col-sm-12">
+                <input name="MainPort" type="text" class="form-control" id="MainPort" disabled="disabled"></input>
+              </div>
+            </div>
+            <div class="form-group" id="select" style="display:none;">
+
+              <div class="col-sm-8">
+                <select id="comper" onchange="assistSqlEdit.changeCopare()">
+                  <option value="=">等于</option>
+                  <option value="!=">不等于</option>
+                  <option value="&gt;">大于</option>
+                  <option value="&gt;=">大于等于</option>
+                  <option value="&lt;">小于</option>
+                  <option value="&lt;=">小于等于</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" id="join1" style="display:none;">
+              <div class="col-sm-12">
+                <input name="toPort" type="text" class="form-control" id="toPort" disabled="disabled"></input>
+                <input name="from" type="hidden" class="form-control" id="from"></input>
+                <input name="to" type="hidden" class="form-control" id="to"></input>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
     </div>
     <div class="graphtool-bottom">
-        <div class="data-sort">
-            <div class="tstext">排序</div>
-            <div id="form" class="box-bg" style="overflow: auto;" ></div>
-        </div>
-        <div class="data-list mar-l" id="sqlHidden">
-            <div id="attr" class="data-list-item data-list-table" style="margin-top:34px;margin-bottom:10px">
-                <div class="table-view">
-                    <!-- <table class="table table-striped" id="gridTable"></table> -->
-                    <el-table
-                        ref="gridTable"
-                        :data="tableData"
-                        tooltip-effect="dark"
-                        style="width: 100%;height:100%"
-                        size="mini"
-                    >
-                        <el-table-column
-                            v-for="(items, index) in tablePositionKey"
-                            :prop="items.dataname"
-                            :key="index"
-                            :label="items.label"
-                            :sortable="items.issortable"
-                            :align="items.align ? items.align : 'center'"
+      <div class="data-sort">
+        <div class="tstext">排序</div>
+        <div id="order" class="box-bg" style="overflow: auto;"></div>
+      </div>
+      <div class="data-list mar-l" id="sqlHidden">
+        <div id="attr" class="data-list-item data-list-table" style="margin-top:34px;margin-bottom:10px">
+          <div class="table-view">
+            <!-- <table class="table table-striped" id="gridTable"></table> -->
+            <el-table
+              ref="gridTable"
+              :data="tableData"
+              tooltip-effect="dark"
+              :height="tableHeight-100"
+              style="width: 100%;"
+            >
+              <el-table-column
+                v-for="(items, index) in tablePositionKey"
+                :prop="items.dataname"
+                :key="index"
+                :label="items.label"
+                :sortable="items.issortable"
+                :align="items.align ? items.align : 'center'"
 
-                        >
-                        </el-table-column>
-                    </el-table>
-                </div>
-            </div>
-            <div id="sql" class="box-bg data-list-item sql-box"></div>
-	    </div>
+              >
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+        <div id="sql" class="box-bg data-list-item sql-box"></div>
+      </div>
 
 
     </div>
-
-
 
 
   </div>
 </template>
 <script>
-export default {
-  data() {
-    return {
+  const make = go.GraphObject.make;
+  export default {
+    data() {
+      return {
+        filter:{},
+        layeX: -1,
+        layeY: -1,
+        myDiagram: {},
+        tableNames: [],
+        keyNames: [],
+        group: false,
+        join: [],
+        order: [],
+        models: [],
+        linkData: [],
         defaultProps: {
-            children: 'children',
-            label(data, node) {
-                const config = data.__config__ || data
-                return  config.label || config.title
-            },
-            isLeaf:(data,node) => {
-                if (node.level >2) {// 根据需要进行条件判断添加is-leaf类名
-                return true
-                }
+          children: 'children',
+          label(data, node) {
+            const config = data.__config__ || data
+            return config.label || config.title
+          },
+          isLeaf: (data, node) => {
+            if (node.level > 2) {// 根据需要进行条件判断添加is-leaf类名
+              return true
             }
+          }
         },
         loadTree: [],//左边树懒加载的数据
         dataTreeData: [],//左边树数据表初始的数据
         treeExpandData: [], // 通过接口获取的需要默认打开的节点
         tablePositionKey: [ // 表头
-            {dataname: "order",label: "",issortable: false,type: ""},
-            {dataname: "gridTable_tables",label: "来源",issortable: false,type: ""},
-            {dataname: "gridTable_name",label: "英文字段名",issortable: false,type: ""},
-            {dataname: "gridTable_info",label: "中文字段名",issortable: false,type: ""},
-            {dataname: "gridTable_alias",label: "别名",issortable: false,type: ""},
-            {dataname: "gridTable_fun",label: "聚合函数",issortable: false,type: ""},
-            {dataname: "gridTable_order",label: "排序",issortable: false,type: ""},
-            {dataname: "gridTable_screen",label: "筛选",issortable: false,type: ""},
-            {dataname: "gridTable_group",label: "分组",issortable: false,type: ""},
+          {dataname: "order", label: "", issortable: false, type: ""},
+          {dataname: "tableName", label: "来源", issortable: false, type: ""},
+          {dataname: "name", label: "英文字段名", issortable: false, type: ""},
+          {dataname: "info", label: "中文字段名", issortable: false, type: ""},
+          {dataname: "gridTable_alias", label: "别名", issortable: false, type: ""},
+          {dataname: "gridTable_fun", label: "聚合函数", issortable: false, type: ""},
+          {dataname: "gridTable_order", label: "排序", issortable: false, type: ""},
+          {dataname: "gridTable_screen", label: "筛选", issortable: false, type: ""},
+          {dataname: "gridTable_group", label: "分组", issortable: false, type: ""},
         ],
         tableData: []
 
-    };
-  },
-  activated () {
+      };
+    },
+    activated() {
       this.getSjbData()
-  },
-  mounted () {
-        var assistSqlEdit = new AssistSqlEdit();
-      	var diagramDiv = this.$refs.myDiagramDiv;
-        var layeX = -1;
-	    var layeY = -1;
-        diagramDiv.onmousemove = function(event) {
-            layeX = event.layerX;
-            layeY = event.layerY;
+    },
+    mounted() {
+      this.init();
+      var diagramDivw = document.getElementById("myDiagramDiv");
+      diagramDivw.onmousemove = function (event) {
+        this.layeX = event.layerX;
+        this.layeY = event.layerY;
+      };
+
+
+    },
+
+    methods: {
+      init() {
+
+        var that = this;
+        that.myDiagram = make(
+          go.Diagram,
+          "myDiagramDiv",
+          {
+            validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
+            // For this sample, automatically show the state of the diagram's model on the page
+            "ModelChanged": function (e) {
+              if (e.isTransactionFinished) {
+                that.toSql();
+              }
+            },
+            "undoManager.isEnabled": true
+          }
+        );
+        // This template is a Panel that is used to represent each item in a Panel.itemArray.
+        // 此模板是一个Panel，用于表示Panel.itemArray中的每个项目。
+        // The Panel is data bound to the item object.
+        // Panel是绑定到item对象的数据。
+        var fieldTemplate = make(
+          go.Panel,
+          "TableRow", // this Panel is a row in the containing Table   此Panel是包含表中的一行
+          new go.Binding("portId", "name"), // this Panel is a "port"  这个小组是一个“港口”
+          {
+            background: "transparent", // so this port's background can be picked by the mouse  所以这个港口的背景可以被鼠标选中
+            fromSpot: go.Spot.LeftRightSides, // links only go from the right side to the left side 链接只从右侧到左侧
+            toSpot: go.Spot.LeftRightSides,
+            // allow drawing links from or to this port:允许从此端口绘制链接：
+            fromLinkable: true,
+            toLinkable: true
+          },
+          {
+            // allow the user to select items -- the background color indicates whether "selected"
+            // 允许用户选择项目 - 背景颜色表示是否“选中”
+            // maybe this should be more sophisticated than simple toggling of selection
+            // 也许这应该比简单的选择切换更复杂
+            click: function (e, item) {
+              // assume "transparent" means not "selected", for items 对于项目，假设“透明”表示不“选择”
+              var oldskips = item.diagram.skipsUndoManager;
+              item.diagram.skipsUndoManager = true;
+              if (item.data.color == "#FFFFFF") {
+                item.data.color = "#707070";
+                var obj = item.data;
+                var key = obj.table;
+                var idx = that.indexOfJoin(key);
+                for (var i = 0; i < that.join[idx].fields.length; i++) {
+                  var field = that.join[idx].fields[i];
+                  if (field.name == obj.name) {
+                    field.hidden = false;
+                    break;
+                  }
+                }
+                that.initTableRow();
+                that.toSql();
+              } else {
+                item.data.color = "#FFFFFF";
+                var obj = item.data;
+                var key = obj.table;
+                var idx = that.indexOfJoin(key);
+                for (var i = 0; i < that.join[idx].fields.length; i++) {
+                  var field = that.join[idx].fields[i];
+                  if (field.name == obj.name) {
+                    field.hidden = true;
+                    field.more = [];
+                  }
+                }
+                if (that.filter[item.data.id]) {
+                  delete that.filter[item.data.id];
+                }
+                that.initTableRow(item.data.tableId);
+                that.toSql();
+              }
+              that.myDiagram.model.updateTargetBindings(item.data);
+              item.diagram.skipsUndoManager = oldskips;
+            }
+          },
+          make(
+            go.Shape,
+            {
+              width: 12,
+              height: 12,
+              column: 0,
+              strokeWidth: 2,
+              margin: 4,
+              fromLinkable: false,
+              toLinkable: false,
+            },
+            new go.Binding("figure", "figure"),
+            new go.Binding("fill", "color")
+          ),
+          make(
+            go.TextBlock,
+            {
+              margin: new go.Margin(0, 2),
+              column: 1,
+              font: "bold 13px sans-serif",
+
+            },
+            new go.Binding("text", "name")
+          ),
+          make(
+            go.TextBlock,
+            {
+              margin: new go.Margin(0, 2),
+              column: 2,
+              font: "13px sans-serif"
+            },
+            new go.Binding("text", "info")
+          )
+        );
+
+        // This template represents a whole "record".此模板代表整个“记录”。
+        that.myDiagram.nodeTemplate = make(
+          go.Node,
+          "Auto",
+          new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+          // this rectangular shape surrounds the content of the node:这个矩形形状围绕着节点的内容
+          make(go.Shape, {fill: "#EEEEEE"}),
+          // the content consists of a header and a list of items  内容由标题和项目列表组成
+          make(
+            go.Panel,
+            "Vertical",
+            // this is the header for the whole node  这是整个节点的标题
+            make(
+              go.Panel,
+              "Auto",
+              {stretch: go.GraphObject.Horizontal}, // as wide as the whole node  和整个节点一样宽
+              make(go.Shape, {fill: "#3d80c4", stroke: null}),
+              make(
+                go.TextBlock,
+                {
+                  alignment: go.Spot.Center,
+                  margin: 3,
+                  stroke: "white",
+                  textAlign: "center",
+                  font: "bold 12pt sans-serif"
+                },
+                new go.Binding("text", "chineseName")
+              )
+            ),
+            // this Panel holds a Panel for each item object in the itemArray;
+            // each item Panel is defined by the itemTemplate to be a TableRow in this Table
+            //此Panel为itemArray中的每个item对象保存一个Panel;
+            //每个项目Panel由itemTemplate定义为此表中的TableRow
+            make(
+              go.Panel,
+              "Table",
+              {
+                name: "TABLE",
+                padding: 2,
+                minSize: new go.Size(100, 10),
+                defaultStretch: go.GraphObject.Horizontal,
+                itemTemplate: fieldTemplate
+              },
+              new go.Binding("itemArray", "fields")
+            ) // end Table Panel of items
+          ) // end Vertical Panel
+        ); // end Node
+
+        //结束表项目面板
+        //结束垂直面板
+        //结束节点
+        that.myDiagram.linkTemplate = make(
+          go.Link,
+          {
+            relinkableFrom: true,
+            relinkableTo: true,
+            toShortLength: 4
+          },  // let user reconnect links让用户重新连接链接
+          make(go.Shape, {strokeWidth: 1.5}),
+          //make(go.Shape, {toArrow: "Standard", stroke: null}),
+          {
+            // allow the user to select items -- the background color indicates whether "selected"
+            // 允许用户选择项目 - 背景颜色表示是否“选中”
+            // maybe this should be more sophisticated than simple toggling of selection
+            // 也许这应该比简单的选择切换更复杂
+            click: function (e, item) {
+              //线的点击事件
+              try {
+                var data = item.data;
+
+                var from = data.from;
+                var to = data.to;
+                var i = that.indexOfJoin(from);
+                var j = that.indexOfJoin(to);
+
+                var idx = Math.max(i, j);
+                var compare = "";
+                for (var i = 0; i < that.join[idx].on.length; i++) {
+                  var on = that.join[idx].on[i];
+                  if ((data.fromPort == on.fromPort && data.toPort == on.toPort) || (data.fromPort == on.toPort && data.toPort == on.fromPort)) {
+                    compare = on.compare;
+                  }
+                }
+                $("#comper").val(compare);
+                $("#MainPort").val(data.fromPort);
+                $("#toPort").val(data.toPort);
+                $("#from").val(data.from);
+                $("#to").val(data.to);
+                document.getElementById("join2").style.display = "";
+                document.getElementById("select").style.display = "";
+                document.getElementById("join1").style.display = "";
+              } catch (e) {
+              }
+            }
+          }
+        );
+        that.myDiagram.model = make(
+          go.GraphLinksModel,
+          {
+            copiesArrays: true,
+            copiesArrayObjects: true,
+            linkFromPortIdProperty: "fromPort",
+            linkToPortIdProperty: "toPort",
+            nodeDataArray: that.models,
+            linkDataArray: that.linkData
+          }
+        );
+
+        // this is a bit inefficient, but should be OK for normal-sized graphs with reasonable numbers of items per node
+        // 这有点效率低，但对于每个节点具有合理数量项目的正常大小的图表应该没问题
+        function findAllSelectedItems() {
+          var items = [];
+          for (var nit = that.myDiagram.nodes; nit.next();) {
+            var node = nit.value;
+            var table = node.findObject("TABLE");
+            if (table) {
+              for (var iit = table.elements; iit.next();) {
+                var itempanel = iit.value;
+                if (itempanel.background !== "transparent") {
+                  items.push(itempanel);
+                }
+              }
+            }
+          }
+          return items;
+        }
+
+        //禁用键盘快捷键事件
+        that.myDiagram.commandHandler.doKeyDown = function () {
+          var e = that.myDiagram.lastInput;
+          var control = e.control || e.meta;
+          var key = e.key;
+          // 取消Ctrl+X/C/V/Z/Y键的命令关联:
+          if (control && (key === 'Z' || key === 'Y' || key === 'X' || key === 'C' || key === 'V')) return;
+          go.CommandHandler.prototype.doKeyDown.call(this);
         };
-        assistSqlEdit.init();
-        // var assistSqlEdit = new AssistSqlEdit();
+
+        // Override the standard CommandHandler deleteSelection behavior.
+        // If there are any selected items, delete them instead of deleting any selected nodes or links.
+        //覆盖标准CommandHandler deleteSelection行为。
+        //如果有任何选定的项目，请删除它们，而不是删除任何选定的节点或链接。
+        that.myDiagram.commandHandler.canDeleteSelection = function () {
+          // true if there are any selected deletable nodes or links,
+          // or if there are any selected items within nodes
+          //如果有任何选定的可删除节点或链接，则为true
+          //或者节点中是否有任何选定的项目
+          return go.CommandHandler.prototype.canDeleteSelection.call(that.myDiagram.commandHandler) || findAllSelectedItems().length > 0;
+        };
+
+        that.myDiagram.commandHandler.deleteSelection = function () {
+          go.CommandHandler.prototype.deleteSelection.call(that.myDiagram.commandHandler);
+          return;
+        };
+
+        that.myDiagram.addModelChangedListener(function (evt) {
+          if (!evt.isTransactionFinished) {
+            return;
+          }
+          var txn = evt.object;
+          var count = 0;
+          if (txn === null) {
+            return;
+          }
+          txn.changes.each(function (e) {
+            //连线修改
+            if (e.change === go.ChangedEvent.Property) {
+              if (e.modelChange === "linkFromKey" || e.modelChange === "linkToKey" || e.modelChange === "linkToPortId" || e.modelChange === "linkFromPortId") {
+
+                var objold = e.object;
+
+                if (e.modelChange === "linkFromKey") { //模型修改等于fromkey 就是换源节点
+                  objold.from = e.oldValue
+                }
+                if (e.modelChange === "linkToKey") {//模型修改等于tokey 就是换目标节点
+                  objold.to = e.oldValue
+                }
+                if (e.modelChange === "linkToPortId") {//模型修改等于portid 就是换线的目标列
+                  objold.toPort = e.oldValue
+
+                }
+                if (e.modelChange === "linkFromPortId") {//模型修改等于portid 就是换线的源列
+                  objold.fromPort = e.oldValue
+                }
+
+                var iold = that.indexOfJoin(objold.from);//源节点在join里的下标
+                var jold = that.indexOfJoin(objold.to);//目标节点在join里的下标
+
+                var idxold = Math.max(iold, jold); //求最大的
+
+                var delIdxold = -1;
+                for (var i = 0; i < that.join[idxold].on.length; i++) {
+                  if (that.join[idxold].on[i].fromPort === objold.fromPort && that.join[idxold].on[i].toPort === objold.toPort) {
+                    delIdxold = i;
+                    break;
+                  }
+                }
+
+                that.join[idxold].on.splice(delIdxold, 1);
+
+                if (0 === that.join[idxold].on.length) {
+                  that.join[idxold].type = ",";
+                  delete that.join[idxold].on;
+                }
+
+                var obj = e.object;
+                if (e.modelChange === "linkFromKey") {
+                  obj.from = e.newValue
+                }
+                if (e.modelChange === "linkToKey") {
+                  obj.to = e.newValue
+                }
+                if (e.modelChange === "linkToPortId") {
+                  obj.toPort = e.newValue
+                }
+                if (e.modelChange === "linkFromPortId") {
+
+                  obj.fromPort = e.newValue
+                }
+
+                var i = that.indexOfJoin(obj.from);
+                var j = that.indexOfJoin(obj.to);
+
+                var idx = Math.max(i, j);
+
+                if ("," === that.join[idx].type) {
+                  that.join[idx].type = "INNER JOIN";
+                }
+                if (!that.join[idx].on) {
+                  that.join[idx].on = [];
+                }
+
+                that.join[idx].on.push({
+                  from: obj.from,
+                  to: obj.to,
+                  fromPort: obj.fromPort,
+                  toPort: obj.toPort,
+                  compare: "="
+                });
+
+                $("#comper").val("=");
+                $("#MainPort").val("");
+                $("#toPort").val("");
+                $("#from").val("");
+                $("#to").val("");
+                that.showJoin();
+                that.toSql();
+                document.getElementById("join2").style.display = "none";
+                document.getElementById("select").style.display = "none";
+                document.getElementById("join1").style.display = "none";
+              }
+
+            }
+            //连线新增
+            else if (e.change === go.ChangedEvent.Insert && e.modelChange === "linkDataArray") {
+              try {
+              } catch (e) {
+              }
+              var obj = e.newValue;
+              var i = that.indexOfJoin(obj.from);
+              var j = that.indexOfJoin(obj.to);
+              var idx = Math.max(i, j);
+              if ("," === that.join[idx].type) {
+                that.join[idx].type = "INNER JOIN";
+              }
+              if (!that.join[idx].on) {
+                that.join[idx].on = [];
+              }
+              that.join[idx].on.push({
+                from: obj.from,
+                to: obj.to,
+                fromPort: obj.fromPort,
+                toPort: obj.toPort,
+                compare: "="
+              });
+              $("#comper").val("=");
+              $("#MainPort").val(obj.fromPort);
+              $("#toPort").val(obj.toPort);
+              $("#from").val(obj.from);
+              $("#to").val(obj.to);
+              document.getElementById("join2").style.display = "";
+              document.getElementById("select").style.display = "";
+              document.getElementById("join1").style.display = "";
+              that.toSql();
+              that.showJoin();
+            }
+            //连线删除
+            else if (e.change === go.ChangedEvent.Remove && e.modelChange === "linkDataArray") {
+              try {
+              } catch (e) {
+              }
+              var obj = e.oldValue;
+              var i = that.indexOfJoin(obj.from);
+              var j = that.indexOfJoin(obj.to);
+
+              var idx = Math.max(i, j);
+
+              var delIdx = -1;
+              for (var i = 0; i < that.join[idx].on.length; i++) {
+                if (that.join[idx].on[i].fromPort === obj.fromPort && that.join[idx].on[i].toPort === obj.toPort) {
+                  delIdx = i;
+                  break;
+                }
+              }
+
+              that.join[idx].on.splice(delIdx, 1);
+              try {
+                if (0 === that.join[idx].on.length) {
+                  that.join[idx].type = ",";
+                  delete that.join[idxold].on;
+                }
+              } catch (e) {
+              }
 
 
+              that.showJoin();
+              that.toSql();
+              document.getElementById("join2").style.display = "none";
+              document.getElementById("select").style.display = "none";
+              document.getElementById("join1").style.display = "none";
+            }
 
-  },
+            //节点删除
+            else if (e.change === go.ChangedEvent.Remove && e.modelChange === "nodeDataArray") {
+              that.join.splice(that.join.indexOf(e.oldValue), 1);
 
-  methods: {
-    //展开树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
-    getLoadTree(datas, obj, node) {
-    // console.log(datas,obj,node,222);
-        if(datas.children.length==0){
-            this.$http({
+              for (var i = 0; i < that.order.length; i++) {
+                var data = that.order[i];
+                var dataArr = data.column.split(".");
+                var table = dataArr[0];
+                if (table == e.oldValue.key) {
+                  that.order.splice(i, 1);
+                  i--;
+                }
+              }
+              that.tableNames.splice(that.tableNames.indexOf(e.oldValue.chineseName), 1);
+              that.keyNames.splice(that.keyNames.indexOf(e.oldValue.key), 1);
+              that.initOrder();
+              that.showJoin();
+              that.toSql();
+              that.initTableRow();
+              document.getElementById("join2").style.display = "none";
+              document.getElementById("select").style.display = "none";
+              document.getElementById("join1").style.display = "none";
+            }
+            //节点新增
+            else if (e.change === go.ChangedEvent.Insert && e.modelChange === "nodeDataArray") {
+              console.log(e.newValue)
+              that.join.push(e.newValue);
+              that.showJoin();
+              that.toSql();
+              that.initTableRow();
+              document.getElementById("join2").style.display = "none";
+              document.getElementById("select").style.display = "none";
+              document.getElementById("join1").style.display = "none";
+            }
+          });
+        });
+      },
+      //初始化分组
+      initGroup() {
+        if (this.group == true) {
+          for (var i = 0; i < this.join.length; i++) {
+            var joinData = this.join[i];
+            for (var j = 0; j < joinData.fields.length; j++) {
+              var field = joinData.fields[j];
+              if (field.hidden == false) {
+                var _funEle=document.getElementById("#fun" + field.id);
+                // $("#fun" + field.id).val(field.fun);
+                _funEle.value=field.fun;
+              }
+            }
+          }
+        }
+      },
+      createTableName() {
+        var ii = 0;
+        var db = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+        while (-1 !== this.keyNames.indexOf(db[ii])) {
+          if (ii >= 26) {
+            return "ml**";
+          }
+          ii++;
+        }
+
+        return db[ii];
+
+      },
+      createNewAS(asname) {
+        var i = 0;
+        var idx = 0;
+        var db = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+        while (-1 !== this.tableNames.indexOf(asname + "_" + db[i])) {
+          if (i >= 26) {
+            return "ml**";
+          }
+          i++;
+        }
+        return asname + "_" + db[i];
+      },
+      addNodeData(node, ele) {
+        node.key = this.createTableName();
+        if (node.key == "ml**") {
+          return false;
+        }
+        node.chineseName = this.createNewAS(node.chineseName);
+        this.tableNames.push(node.chineseName);
+        this.keyNames.push(node.key);
+        for (var i = 0; i < node.fields.length; i++) {
+          node.fields[i].id = node.key + "id" + node.fields[i].name;
+          node.fields[i].alias = node.fields[i].name;
+          node.fields[i].fun = "jh";
+          node.fields[i].screen = "";
+          node.fields[i].condition = "";
+          node.fields[i].more = "";
+          node.fields[i].key = node.key;
+          node.fields[i].screen = [];
+          node.fields[i].group = false;
+        }
+        this.myDiagram.model.addNodeData(node);
+      },
+      //生成sql
+      toSql() {
+
+        var sql = "";
+        var fromState = false;
+        var out = "";
+        if (this.group == true) {
+          for (var l = 0; l < this.join.length; l++) {
+            for (var m = 0; m < this.join[l].fields.length; m++) {
+              if (this.join[l].fields[m].hidden == false) {
+                if (this.join[l].fields[m].fun == "jh" && this.join[l].fields[m].group == true) {
+                  fromState = true;
+                  out = out + this.join[l].key + "." + this.join[l].fields[m].name + " AS " + this.join[l].fields[m].alias + ", ";
+                } else if (this.join[l].fields[m].fun != "jh" && this.join[l].fields[m].group == true) {
+                  fromState = true;
+                  var funs = this.join[l].fields[m].fun + " ( " + this.join[l].fields[m].key + "." + this.join[l].fields[m].name + " ) ";
+                  out = out + funs + " AS " + this.join[l].fields[m].alias + ", ";
+                }
+
+              }
+            }
+          }
+        } else {
+          for (var l = 0; l < this.join.length; l++) {
+            for (var m = 0; m < this.join[l].fields.length; m++) {
+              if (this.join[l].fields[m].hidden == false) {
+                fromState = true;
+                out = out + this.join[l].key + "." + this.join[l].fields[m].name + " AS " + this.join[l].fields[m].alias + ", ";
+              }
+            }
+          }
+        }
+        if (fromState) {
+          sql = "SELECT " + out.substring(0, out.length - 2) + " FROM "
+        } else {
+          sql = "SELECT * FROM ";
+        }
+
+        for (var i = 0; i < this.join.length; i++) {
+          var item = this.join[i];
+          if (0 !== i) {
+            sql += item.type + " ";
+          }
+          sql += item.tableName + "  " + item.key + "   ";
+
+          if (item.on) {
+
+            for (var j = 0; j < item.on.length; j++) {
+              if (j == 0) {
+                sql += "ON ";
+              }
+              var option = item.on[j];
+              sql += (option.from + "." + option.fromPort + " " + option.compare + " " + option.to + "." + option.toPort + " ");
+              if (j != item.on.length - 1) {
+                sql += "AND "
+              }
+            }
+          }
+        }
+        var whereSql = " WHERE ";
+
+        for (var z = 0; z < this.join.length; z++) {
+          for (var o = 0; o < this.join[z].fields.length; o++) {
+            if (this.join[z].fields[o].hidden == false && this.join[z].fields[o].more.length != 0) {
+              fromState = true;
+              whereSql = whereSql + this.join[z].fields[o].more + " AND ";
+            }
+          }
+        }
+        if (whereSql != " WHERE ") {
+          sql = sql + whereSql.substring(0, whereSql.length - 4)
+        }
+        var groupSql = " GROUP BY "
+        if (this.group == true) {
+          var sta = false;
+          for (var i = 0; i < this.join.length; i++) {
+            var joinData = this.join[i];
+            for (var j = 0; j < joinData.fields.length; j++) {
+              var field = joinData.fields[j];
+              if (field.hidden == false && field.group == true) {
+                groupSql = groupSql + " " + field.key + "." + field.name + ", ";
+                sta = true;
+              }
+            }
+          }
+          if (sta == true) {
+            sql = sql + groupSql.substring(0, groupSql.length - 2);
+          }
+
+        }
+        var orderSql = " ORDER BY  ";
+
+        if (this.order.length > 0) {
+          for (var ii = 0; ii < this.order.length; ii++) {
+            var orderData = this.order[ii];
+
+            if (ii == this.order.length - 1) {
+              orderSql = orderSql + orderData.column + " " + orderData.order;
+            } else {
+              orderSql = orderSql + orderData.column + " " + orderData.order + ", ";
+            }
+          }
+          sql = sql + orderSql;
+        }
+        if (this.join.length == 0) {
+          document.getElementById("sql").innerHTML = "";
+        } else {
+          document.getElementById("sql").innerHTML = sql;
+        }
+        return sql;
+      },
+      //生成每一行数据
+      initTableRow(tableId) {
+        this.tableData=[];
+        for (var i = 0; i < this.join.length; i++) {
+          var table = this.join[i];
+          for (var j = 0; j < table.fields.length; j++) {
+            var field = table.fields[j];
+            field.table = table.key;
+            field.tables = table.chineseName;
+            if (!field.hidden) {
+              this.tableData.push(field);
+            }
+          }
+
+        }
+        this.initGroup();
+      },
+      //查询join里对象的idx
+      indexOfJoin(tableName) {
+        var idx = -1;
+        for (var i = 0; i < this.join.length; i++) {
+          if (this.join[i].key === tableName || this.join[i].chineseName === tableName) {
+            idx = i;
+            break;
+          }
+        }
+        return idx;
+      },
+      //显示表连接关系
+      showJoin() {
+        try {
+          $("#form").html("");
+          var mainHtml = '<div class="form-group" id="join"><div class="col-sm-12"><input name="MainTable" type="text" class="form-control" id="MainTable" disabled="disabled"></input></div></div>';
+          $("#form").html(mainHtml);
+          if (join.length > 0) {
+            $("#MainTable").val(join[0].chineseName);
+            for (var i = 1; i < join.length; i++) {
+              var joinData = join[i];
+              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="assistSqlEdit.changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
+              $("#join").append(joinHtml);
+              $("#type" + i).val(joinData.type);
+              $("#slaverTable" + i).val(joinData.chineseName);
+            }
+          }
+        } catch (e) {
+        }
+      },
+      //初始化order div
+      initOrder() {
+
+        document.getElementById("order").innerHTML = '';
+        var orderString = "";
+        for (var i = 0; i < order.length; i++) {
+          var data = order[i];
+          var index = i + 1;
+          orderString = "<span>" + orderString + index + " 、 " + data.column + " 、 " + data.order + ", </span></br>";
+        }
+
+        $("#order").append(orderString);
+
+      },
+      //展开树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
+      getLoadTree(datas, obj, node) {
+        // console.log(datas,obj,node,222);
+        if (datas.children.length == 0) {
+          this.$http({
             url: this.$http.adornUrl('/sqlScript/getColumnList'),
             method: 'get',
-            isLoading:false,
+            isLoading: false,
             params: this.$http.adornParams({
-                id:datas.id,
-                tableName:datas.title,
+              id: datas.id,
+              tableName: datas.title,
             })
-            }).then(({data}) => {
-                var _data=data.result;
-                this.loadTree =_data||[];
-            })
+          }).then(({data}) => {
+            var _data = data.result;
+            this.loadTree = _data || [];
+          })
         }
-    },
-    //获取数据表数据
-    getSjbData(){
+      },
+      //获取数据表数据
+      getSjbData() {
         this.$http({
-            url: this.$http.adornUrl('/sqlScript/listDBPTree'),
-            method: 'get',
-            isLoading:false,
-            params: this.$http.adornParams()
+          url: this.$http.adornUrl('/sqlScript/listDBPTree'),
+          method: 'get',
+          isLoading: false,
+          params: this.$http.adornParams()
         }).then(({data}) => {
-            // 注意层级 dataType是必须要的,1:一级,2:表,3:列
-            var datas=data.result;
-            this.dataTreeData=datas?[datas]:[];
-            this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
+          // 注意层级 dataType是必须要的,1:一级,2:表,3:列
+          var datas = data.result;
+          this.dataTreeData = datas ? [datas] : [];
+          this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
         })
-    },
-    loadNode (node, resolve) {
+      },
+      loadNode(node, resolve) {
         if (node.level === 0) {
-            return resolve(this.dataTreeData);
+          return resolve(this.dataTreeData);
         }
-        if(node.data.children&&node.data.children!=''){
+        if (node.data.children && node.data.children != '') {
           return resolve(node.data.children);
-        }else{
+        } else {
           setTimeout(() => {
             // if(this.loadTree.length>0){
             //   this.treeDataToHint.forEach((item,index)=>{
@@ -223,128 +937,160 @@ export default {
           }, 500);
 
         }
-    },
-    handleNodeClick (data,obj,node) {
-        this.getLoadTree(data,obj,node)
-    },
-    allowDrag(draggingNode) {
+      },
+      handleNodeClick(data, obj, node) {
+        this.getLoadTree(data, obj, node)
+      },
+      allowDrag(draggingNode) {
         // return draggingNode.data.level>2||draggingNode.data.type=='funNode';
-        return Number(draggingNode.data.dataType)>1||draggingNode.data.type=='funNode'||draggingNode.data.type=='params';
-    },
-    // 树内不可拖拽
-    returnFalse() {
+        return Number(draggingNode.data.dataType) > 1 || draggingNode.data.type == 'funNode' || draggingNode.data.type == 'params';
+      },
+      handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        if (draggingNode.data.title == null /*|| treeNodes[0].isParent*/) {
+          return;
+        }
+        var dom = document.getElementById("myDiagramDiv");
+        var wight = dom.getBoundingClientRect().width;
+        var height = dom.getBoundingClientRect().height;
+        var offsetX = 0 - wight / 2;
+        var offsetY = 0 - height / 2;
+        var cordinateX = this.layeX + offsetX;
+        var cordinateY = this.layeY + offsetY;
+        var local = cordinateX + " " + cordinateY;
+        var keys = draggingNode.data.id;
+        var chineseName = draggingNode.data.title;
+        var table = {
+          key: keys,//表名
+          tableName: keys,
+          chineseName: chineseName,
+          type: ",",
+          loc: local//在画布上的位置
+        };
+        if (draggingNode.data.type == 'datasource' || draggingNode.data.type == 'table' || draggingNode.data.type == 'view') {
+          var nodes = draggingNode.childNodes;
+          var fieldArr = [];
+          for (var i = 0; i < nodes.length; i++) {
+            var field = {};
+            field.tableName = chineseName;
+            field.tableId = nodes[i].data.id;
+            field.name = nodes[i].data.title;
+            field.info = nodes[i].data.title;
+            field.color = "#FFFFFF";
+            field.hidden = true;
+            fieldArr.push(field);
+          }
+          table.fields = fieldArr;
+        }
+        this.addNodeData(table);
+      },
+      // 树内不可拖拽
+      returnFalse() {
         return false;
+      },
     },
-  },
-  computed: {
-
-  },
-  components: {
-
-  },
-  watch: {
-
-
-  }
-};
+    computed: {
+      tableHeight: {
+        get () { return this.$store.state.common.tableHeight}
+      },
+    },
+    components: {},
+    watch: {}
+  };
 </script>
 <style scoped lang="scss">
-.graphtool-tooldic {
+  .graphtool-tooldic {
     width: 100%;
     height: 100vh;
     .graphtool-top {
-        width: 100%;
-        // height: ;
+      width: 100%;
+      // height: ;
+      display: flex;
+      height: 50vh;
+      .data-left {
+        width: 300px;
+        overflow: scroll;
+
+      }
+      .data-canvas {
+        flex: 1;
+      }
+      .data-right {
+        width: 300px;
+        height: 100%;
         display: flex;
-        height: 50vh;
-        .data-left {
-            width: 300px;
-            overflow: scroll;
+        flex-direction: column;
+        .data-option-box {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
 
-        }
-        .data-canvas {
+          .box-bg {
             flex: 1;
-        }
-        .data-right {
-            width: 300px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            .data-option-box {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
+          }
 
-                .box-bg {
-                    flex: 1;
-                }
-
-            }
         }
+      }
     }
-    .tree-icon{
-        display: inline-block;
-        width: 15px;
-        height: 15px;
-        margin-right: 5px;
+    .tree-icon {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
     }
     .graphtool-bottom {
-        height: 50vh;
+      height: 50vh;
+      display: flex;
+      .data-sort {
+        width: 300px;
         display: flex;
-        .data-sort {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            .box-bg {
-                flex: 1;
-            }
+        flex-direction: column;
+        .box-bg {
+          flex: 1;
         }
-        .data-list {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            .data-list-item {
-                width: 100%;
-                position: relative;
-            }
-            .data-list-table {
-                flex: 1;
-            }
-            .sql-box {
-                height: 100px;
-                overflow: auto;
-            }
-            .table-view {
-                position: absolute;
-                height: 100%;
-                width: 100%;
-                /deep/ .el-table {
-                    height: 100%;
-                }
-            }
+      }
+      .data-list {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        .data-list-item {
+          width: 100%;
+          position: relative;
         }
+        .data-list-table {
+          flex: 1;
+        }
+        .sql-box {
+          /*height: 100px;*/
+          overflow: auto;
+        }
+        .table-view {
+          position: absolute;
+          /*height: 100%;*/
+          width: 100%;
+        }
+      }
     }
     .box-bg {
-        background: #F7F7F7;
-        border: 1px solid #F3F3F3;
-        overflow: auto;
+      background: #F7F7F7;
+      border: 1px solid #F3F3F3;
+      overflow: auto;
     }
     .tstext {
-        height: 26px;
-        color: #5887B3;
-        margin-top: 5px;
-        font-size: 14px;
+      height: 26px;
+      color: #5887B3;
+      margin-top: 5px;
+      font-size: 14px;
     }
     .mar10 {
-        margin: 0 10px;
+      margin: 0 10px;
     }
     .mar-r {
-        margin-left: 10px;
+      margin-left: 10px;
     }
     .mar-l {
-        margin-left: 10px;
+      margin-left: 10px;
     }
-}
+  }
 
 </style>
