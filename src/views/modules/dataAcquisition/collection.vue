@@ -10,7 +10,7 @@
              <el-form-item label="文件路径:" v-if="activeName == 'pass'">
                 <el-input v-model="dataForm.collectPath" placeholder="请输入文件路径"></el-input>
             </el-form-item>
-             <el-form-item label="采集状态:">
+             <el-form-item label="采集状态:" v-if="activeName == 'audit'">
                 <el-select v-model="dataForm.collectStatus" placeholder="请选择" clearable>
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
