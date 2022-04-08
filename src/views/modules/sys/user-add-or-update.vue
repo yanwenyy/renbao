@@ -22,6 +22,18 @@
       <el-form-item label="手机号" prop="userPhone">
         <el-input v-model="dataForm.userPhone" placeholder="手机号"></el-input>
       </el-form-item>
+      <el-form-item v-if="!dataForm.id" size="mini" label="授权">
+        <el-tree
+          :default-checked-keys="selTree"
+          :check-strictly="isCheck"
+          :data="menuList"
+          :props="menuListTreeProps"
+          node-key="menuId"
+          ref="menuListTree"
+          :default-expand-all="true"
+          show-checkbox>
+        </el-tree>
+      </el-form-item>
       <!--<el-form-item label="角色" size="mini" prop="roleIdList">-->
         <!--<el-checkbox-group v-model="dataForm.roleIdList">-->
           <!--<el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>-->
@@ -49,6 +61,7 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
+  import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       var validatePassword = (rule, value, callback) => {
@@ -82,6 +95,14 @@
         }
       }
       return {
+        selTree: [],
+        isCheck:true,
+        tempKey: -666666 ,// 临时key, 用于解决tree半选中状态项不能传给后台接口问题. # 待优化
+        menuList: [],
+        menuListTreeProps: {
+          label: 'menuName',
+          children: 'children'
+        },
         visible: false,
         roleList: [],
         dataForm: {
@@ -148,30 +169,52 @@
       init (id) {
         this.visible = true;
         this.dataForm.id=id;
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-        });
-        if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`/user/selectByUuid/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.code === 200) {
-              var user=data.result;
-              this.dataForm.userLoginName = user.userLoginName
-              this.dataForm.userPassword = user.userPassword
-              this.dataForm.comfirmPassword = user.comfirmPassword
-              this.dataForm.userName = user.userName
-              this.dataForm.userNumber = user.userNumber
-              this.dataForm.userPhone = user.userPhone
-              this.dataForm.userSex = user.userSex
-            }
-          })
-        }
+        this.selTree = [];
+        this.$http({
+          url: this.$http.adornUrl('/menu/getMenuList'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.menuList = treeDataTranslate(data.result, 'menuId','menuParentId')
+        }).then(() => {
+          this.visible = true
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
+            this.$refs.menuListTree.setCheckedKeys([])
+          });
+        }).then(() => {
+          if (this.dataForm.id) {
+            this.$http({
+              url: this.$http.adornUrl(`/user/selectByUuid/${this.dataForm.id}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 200) {
+                var user=data.result;
+                this.dataForm.userLoginName = user.userLoginName
+                this.dataForm.userPassword = user.userPassword
+                this.dataForm.comfirmPassword = user.comfirmPassword
+                this.dataForm.userName = user.userName
+                this.dataForm.userNumber = user.userNumber
+                this.dataForm.userPhone = user.userPhone
+                this.dataForm.userSex = user.userSex
+                this.selTree  = user.menuIds.split(",");
+                this.$nextTick(() => {
+                  //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
+                  this.$refs.menuListTree.setCheckedKeys(this.selTree);//给树节点赋值
+                  this.isCheck= false //重点： 赋值完成后 设置为false
+                })
+              }
+            })
+          }
+        })
+
+
       },
       // 表单提交
       dataFormSubmit () {
+        var _menuList=[].concat(this.$refs.menuListTree.getCheckedKeys(), [this.tempKey], this.$refs.menuListTree.getHalfCheckedKeys());
+        // console.log(_menuList)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -185,6 +228,7 @@
                 'userNumber': this.dataForm.userNumber,
                 'userPhone': this.dataForm.userPhone,
                 'userSex': this.dataForm.userSex,
+                'menuIds': _menuList.join(","),
               })
             }).then(({data}) => {
               if (data && data.code === 200) {
