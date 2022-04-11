@@ -141,6 +141,7 @@
         :showFileTable="showFileTable"
         :showBtn="showBtn"
         :readonly="readonly"
+        :manuscriptName="manuscriptName"
       ></addOrUpdate>
     </el-dialog>
   </div>
@@ -274,6 +275,7 @@ export default {
       this.showFileTable = true;
       this.showBtn = false;
       this.readonly = true;
+      this.manuscriptName = data.manuscriptName
     },
     //关闭新增/修改弹窗
     closeAddDrawer() {

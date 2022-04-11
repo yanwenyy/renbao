@@ -7,6 +7,7 @@
       ref="dataForm"
       label-width="120px"
       v-loading="loading"
+      style="height:50vh;overflow-y:auto"
     >
       <el-form-item prop="evidenceName" label="证据名称：">
         <el-input
@@ -28,7 +29,7 @@
           type="textarea"
           v-model="dataForm.evidenceRemark"
           placeholder="证据描述"
-          :autosize="{ minRows: 6, maxRows: 6 }"
+          :rows="6"
           :readonly="readonly"
         ></el-input>
       </el-form-item>
@@ -58,13 +59,11 @@
           </el-upload>
         </div>
         <el-table
-          v-if="showFileTable"
           :data="fileData"
           border
           v-loading="loading"
           @selection-change="selectionChangeHandle"
           style="width: 100%;"
-          height="300px"
         >
           <el-table-column
             type="index"
@@ -131,7 +130,8 @@ export default {
     id: { type: String },
     showFileTable: { type: Boolean },
     showBtn: { type: Boolean },
-    readonly: { type: Boolean }
+    readonly: { type: Boolean },
+    manuscriptName: { type: String }
   },
   data() {
     return {
@@ -158,13 +158,15 @@ export default {
       //移除的附件id
       removeFileIdList: [],
       //上传时移除的附件
-      removeFileList: []
+      removeFileList: [],
+      uploadPerson: ""
     };
   },
   created() {
     if (this.id != null && this.id != "" && this.id != undefined) {
       this.init();
     }
+    this.getUserInfo();
   },
   methods: {
     //初始化表单
@@ -181,7 +183,7 @@ export default {
           var data = data.result;
           this.dataForm.evidenceName = data.evidenceName;
           this.dataForm.evidenceRemark = data.evidenceRemark;
-          this.dataForm.manuscriptName = data.manuscriptName;
+          this.dataForm.manuscriptName = this.manuscriptName;
           this.fileData = data.fileInfos;
         }
       });
@@ -314,6 +316,13 @@ export default {
         return;
       }
       this.fileList = fileList;
+      this.fileList.forEach(data => {
+        var file = {
+          fileName: data.name,
+          uploaderName: this.uploadPerson
+        };
+        this.fileData.push(file);
+      });
     },
     //删除附件
     deleteData(index, data, row) {
@@ -355,6 +364,18 @@ export default {
         }
       }
       return arr;
+    },
+    //获取当前登录人信息
+    getUserInfo() {
+      this.$http({
+        url: this.$http.adornUrl("/sys/currentUser"),
+        method: "get",
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.uploadPerson = data.result.userName;
+        }
+      });
     }
   }
 };
