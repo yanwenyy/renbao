@@ -106,7 +106,7 @@
         prop="userNumber"
         header-align="center"
         align="center"
-        label="工号"
+        label="部门及职务"
       >
       </el-table-column>
       <el-table-column

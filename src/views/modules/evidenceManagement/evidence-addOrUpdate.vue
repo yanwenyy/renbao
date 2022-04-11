@@ -46,6 +46,7 @@
             :before-remove="beforeRemove"
             :on-progress="handleProgress"
             :on-change="fileChange"
+            :show-file-list="false"
           >
             <el-button size="small" type="primary" v-if="showBtn"
               >点击上传</el-button
@@ -159,6 +160,7 @@ export default {
       removeFileIdList: [],
       //上传时移除的附件
       removeFileList: [],
+      //上传人
       uploadPerson: ""
     };
   },
@@ -173,6 +175,7 @@ export default {
     init() {
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
+        this.fileData = [];
       });
       this.$http({
         url: this.$http.adornUrl(`/evidence/selectByUuid/${this.id}`),
@@ -194,6 +197,7 @@ export default {
     },
     // 表单提交
     submitForm(dataForm) {
+      console.log(this.resultFileList);
       this.$refs[dataForm].validate(valid => {
         if (valid) {
           //过滤在上传时移除的文件
@@ -209,15 +213,30 @@ export default {
           //是否上传了重复文件
           let ishave = false;
           //处理重复上传
-          if (this.multipartFiles.length > 0 && this.fileData.length > 0) {
-            this.multipartFiles.forEach(item => {
-              this.fileData.forEach(it => {
-                if (item.name == it.fileName) {
-                  this.$message.error(item.name + "已存在");
-                  ishave = true;
-                }
+          if (this.id != null && this.id != "" && this.id != undefined) {
+            /* if (
+              this.multipartFiles.length > 0 &&
+              this.resultFileList.length > 0
+            ) {
+              this.multipartFiles.forEach(item => {
+                this.resultFileList.forEach(it => {
+                  if (item.name == it.fileName) {
+                    this.$message.error(item.name + "已存在");
+                    ishave = true;
+                  }
+                });
               });
-            });
+            } */
+            for (var i = 0; i < this.fileData.length - 1; i++) {
+              for (var j = i + 1; j < this.fileData.length; j++) {
+                if (this.fileData[i].fileName == this.fileData[j].fileName) {
+                  this.$message.error(this.fileData[i].fileName + "已存在");
+                  j--;
+                  ishave = true;
+                  break;
+                }
+              }
+            }
           }
           //附件去重
           this.multipartFiles = this.distinct(this.multipartFiles);
@@ -316,13 +335,9 @@ export default {
         return;
       }
       this.fileList = fileList;
-      this.fileList.forEach(data => {
-        var file = {
-          fileName: data.name,
-          uploaderName: this.uploadPerson
-        };
-        this.fileData.push(file);
-      });
+      this.$set(file, "fileName", file.name);
+      this.$set(file, "uploaderName", this.uploadPerson);
+      this.fileData.push(file);
     },
     //删除附件
     deleteData(index, data, row) {
@@ -331,7 +346,9 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        data.splice(index, 1);
+        this.fileData.splice(index, 1);
+        this.fileList.splice(index, 1);
+        this.removeFileList.push(row);
         this.removeFileIdList.push(row.fileInfoId);
       });
     },

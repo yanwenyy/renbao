@@ -152,9 +152,9 @@ import addOrUpdate from "./evidence-addOrUpdate.vue";
 export default {
   props: {
     isShow: Boolean,
-    evidenceId:{
-      type:String,
-      default: null,
+    evidenceId: {
+      type: String,
+      default: null
     }
   },
   components: {
@@ -189,7 +189,9 @@ export default {
       //传给弹窗：是否显示上传按钮
       showBtn: false,
       //传给弹窗：是否只读
-      readonly: ""
+      readonly: "",
+      //底稿名称
+      manuscriptName: ""
     };
   },
   computed: {
@@ -219,14 +221,13 @@ export default {
         if (data && data.code === 200) {
           this.dataList = data.result.records;
           this.totalPage = data.result.total;
-          this.$nextTick(()=>{
-            this.dataList.forEach((item,index)=>{
-              if(item.evidenceId==this.evidenceId){
-                this.$refs.multipleTable.toggleRowSelection(item,true);
+          this.$nextTick(() => {
+            this.dataList.forEach((item, index) => {
+              if (item.evidenceId == this.evidenceId) {
+                this.$refs.multipleTable.toggleRowSelection(item, true);
               }
-            })
-          })
-
+            });
+          });
         } else {
           this.dataList = [];
           this.totalPage = 0;
@@ -275,7 +276,7 @@ export default {
       this.showFileTable = true;
       this.showBtn = false;
       this.readonly = true;
-      this.manuscriptName = data.manuscriptName
+      this.manuscriptName = data.manuscriptName;
     },
     //关闭新增/修改弹窗
     closeAddDrawer() {

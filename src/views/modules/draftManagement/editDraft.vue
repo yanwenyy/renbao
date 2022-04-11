@@ -48,7 +48,7 @@
         <el-input
           v-model="dataForm.manuscriptRemark"
           type="textarea"
-          :autosize="{ minRows: 7, maxRows: 7 }"
+          :rows="6"
           placeholder="请输入"
         ></el-input>
       </el-form-item>
@@ -72,7 +72,7 @@
       :visible.sync="showHospitalDialog"
       title="选择医院"
       :close-on-click-modal="false"
-      :modal-append-to-body="false"R
+      :modal-append-to-body="false"
       width="90%"
       :close-on-press-escape="false"
       append-to-body
