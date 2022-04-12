@@ -2,7 +2,7 @@
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
       <div class="data-left" :class="leftHidden?'data-left-hidden':''">
-        <div @click="leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+        <div @click="leftHidden=!leftHidden,getCanvas()" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
           数据表
         </div>
         <div v-show="!leftHidden" class="data-tree inline-block">
@@ -288,6 +288,9 @@
     },
 
     methods: {
+      getCanvas(){
+
+      },
       init() {
 
         var that = this;
@@ -295,6 +298,8 @@
           go.Diagram,
           "myDiagramDiv",
           {
+            allowZoom: true,
+            autoScale:go.Diagram.UniformToFill,
             validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
             // For this sample, automatically show the state of the diagram's model on the page
             "ModelChanged": function (e) {
@@ -1285,6 +1290,9 @@
       .data-canvas {
         /*flex: 1;*/
         width: 40%;
+        #myDiagramDiv{
+          width: 100%;
+        }
       }
       .data-canvas-noLeft{
         width: 70%;
