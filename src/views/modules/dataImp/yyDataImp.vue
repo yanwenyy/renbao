@@ -21,7 +21,7 @@
       </el-form-item>
       <el-form-item style="float:right">
         <!-- <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button> -->
-        <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
+        <el-button type="warning" @click="getDmpReImpList()">查看已导入文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
