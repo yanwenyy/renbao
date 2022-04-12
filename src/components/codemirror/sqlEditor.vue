@@ -1,12 +1,12 @@
 <template>
   <div class="box-mirror box"  ref="box">
-    <div id="code-mirror-tree_left" class="code-mirror-tree left" v-show="!fullScreen">
+    <div id="code-mirror-tree_left" class="code-mirror-tree left" :class="hideLeftTree?'code-mirror-tree-hide':''"  v-show="!fullScreen">
       <div class="tree-left">
         <div class="tree-left-one" :class="treeType==='1'?'tree-left-active':''" @click="changeTree('1')">数据表</div>
         <div class="tree-left-three" :class="treeType==='3'?'tree-left-active':''" @click="changeTree('3')">参数</div>
         <div class="tree-left-two" :class="treeType==='2'?'tree-left-active':''" @click="changeTree('2')">函数表</div>
       </div>
-      <div class="tree-right">
+      <div class="tree-right" v-show="!hideLeftTree">
         <div class="custom-tree-container">
           <el-input
             placeholder="输入关键字进行过滤"
@@ -117,7 +117,7 @@
     <div v-if="!fullScreen" class="resize tree-resize" title="收缩侧边栏">
       <!--<div v-if="resultTableTabsList.length>0" class="resize-div" v-for="(item,index) in resultTableTabsList"></div>-->
     </div>
-    <div id="code-mirror-div_right" class="code-mirror-div mid" :class="fullScreen?'mid-100':''">
+    <div id="code-mirror-div_right" class="code-mirror-div mid" :class="fullScreen?'mid-100':hideLeftTree?'mid-noLeft':''">
       <!--<div class="tool-bar">-->
         <!--<span>请选择主题</span>-->
         <!--<el-select v-model="cmTheme" placeholder="请选择" size="small" style="width:150px">-->
@@ -276,6 +276,7 @@
     },
     data() {
       return {
+        hideLeftTree:false,//是否隐左边的区域
         treeTabelNode:'',
         showRightMenu:false,//左侧数据表右击弹出框状态
         selfFrom:'',
@@ -962,7 +963,11 @@
       },
       //切换树
       changeTree(type){
-        this.treeType=type;
+        if(this.treeType==type){
+          this.hideLeftTree=!this.hideLeftTree
+        }else{
+          this.treeType=type;
+        }
       },
       loadNode(node, resolve) {
         if (node.level === 0) {
@@ -1200,6 +1205,13 @@
   .code-mirror-tree>div{
     display: inline-block;
     vertical-align: top;
+  }
+  .code-mirror-tree-hide{
+    width: 30px!important;
+    overflow: auto;
+  }
+  .mid-noLeft{
+    width: 95%!important;
   }
   .tree-left{
     margin-top: 50px;
