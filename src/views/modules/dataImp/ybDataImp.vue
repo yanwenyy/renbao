@@ -628,7 +628,7 @@
     },
     methods: {
       deletDmpData(){
-        this.$confirm('<span style="color:#af0f16">将删除该项目dmp文件采集中产生的所有数据，是否确认删除？</span>'
+        this.$confirm('<span style="color:#af0f16">将删除该项目文件采集中产生的所有数据，是否确认删除？</span>'
          ,{dangerouslyUseHTMLString: true,
           confirmButtonText: '确认'})
           .then(_ => {
@@ -668,7 +668,7 @@
       },
       // 删除已导入的dmp文件
       delReImpDmp(data){
-        this.$confirm('<span style="color:#af0f16">将删除该dmp文件采集中产生的所有数据，是否确认删除？</span>'
+        this.$confirm('<span style="color:#af0f16">将删除该文件采集中产生的所有数据，是否确认删除？</span>'
          ,{dangerouslyUseHTMLString: true,
           confirmButtonText: '确认'})
           .then(_ => {
