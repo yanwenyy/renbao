@@ -6,8 +6,9 @@
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-        <el-form-item label="项目编号" prop="project.projectCode">
-          <el-input @blur="verification(dataForm.project.projectCode,'项目编号不能重复','projectCode')" v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>
+        <el-form-item label="项目编号">
+          <!--<el-input @blur="verification(dataForm.project.projectCode,'项目编号不能重复','projectCode')" v-model="dataForm.project.projectCode" placeholder="项目编号"></el-input>-->
+          <el-input disabled v-model="dataForm.project.projectCode" placeholder="自动生成"></el-input>
         </el-form-item>
         <el-form-item label="项目名称" prop="project.projectName">
           <el-input @blur="verification(dataForm.project.projectName,'项目名称不能重复','projectName')" v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
@@ -152,76 +153,76 @@
             <!--</el-table-column>-->
           </el-table>
         </el-form-item>
-        <el-form-item>
-          <div>小组维护：</div>
-          <el-table
-            class="table-list"
-            border
-            :data="dataForm.xmProjectGroupUsers"
-            stripe
-            style="width: 100%">
+        <!--<el-form-item>-->
+          <!--<div>小组维护：</div>-->
+          <!--<el-table-->
+            <!--class="table-list"-->
+            <!--border-->
+            <!--:data="dataForm.xmProjectGroupUsers"-->
+            <!--stripe-->
+            <!--style="width: 100%">-->
+            <!--&lt;!&ndash;<el-table-column&ndash;&gt;-->
+            <!--&lt;!&ndash;type="selection"&ndash;&gt;-->
+            <!--&lt;!&ndash;header-align="center"&ndash;&gt;-->
+            <!--&lt;!&ndash;align="center"&ndash;&gt;-->
+            <!--&lt;!&ndash;width="50">&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-table-column>&ndash;&gt;-->
             <!--<el-table-column-->
-            <!--type="selection"-->
-            <!--header-align="center"-->
-            <!--align="center"-->
-            <!--width="50">-->
-            <!--</el-table-column>-->
-            <el-table-column
-              prop="groupName"
-              label="小组名称"
-              align="center"
-            >
-              <template slot-scope="scope">
-                {{scope.row.groupName}}
-                <!--<el-button class="table-btn" type="text" size="small" @click="addGroupMemberVisable=true">维护</el-button>-->
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="小组组长"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <el-select class="userList" multiple v-model="scope.row.leaderIds" placeholder="请选择">
-                  <el-option
-                    v-for="(item,index) in meberList"
-                    :key="index"
-                    :label="item.userName"
-                    :value="item.userId">
-                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="小组人员"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <el-select class="userList" multiple v-model="scope.row.memberIds" placeholder="请选择">
-                  <el-option
-                    v-for="(item,index) in meberList"
-                    :key="index"
-                    :label="item.userName"
-                    :value="item.userId">
-                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column>
-            <!--<el-table-column-->
-              <!--fixed="right"-->
-              <!--header-align="center"-->
+              <!--prop="groupName"-->
+              <!--label="小组名称"-->
               <!--align="center"-->
-              <!--width="100"-->
-              <!--label="操作">-->
+            <!--&gt;-->
               <!--<template slot-scope="scope">-->
-                <!--<el-button type="text" size="small" @click="">删除</el-button>-->
+                <!--{{scope.row.groupName}}-->
+                <!--&lt;!&ndash;<el-button class="table-btn" type="text" size="small" @click="addGroupMemberVisable=true">维护</el-button>&ndash;&gt;-->
               <!--</template>-->
             <!--</el-table-column>-->
-          </el-table>
-        </el-form-item>
+            <!--<el-table-column-->
+              <!--prop="name"-->
+              <!--label="小组组长"-->
+              <!--align="center"-->
+            <!--&gt;-->
+              <!--<template slot-scope="scope">-->
+                <!--<el-select class="userList" multiple v-model="scope.row.leaderIds" placeholder="请选择">-->
+                  <!--<el-option-->
+                    <!--v-for="(item,index) in meberList"-->
+                    <!--:key="index"-->
+                    <!--:label="item.userName"-->
+                    <!--:value="item.userId">-->
+                    <!--<span style="float: left">{{ item.userName }}({{item.userNumber}})</span>-->
+                  <!--</el-option>-->
+                <!--</el-select>-->
+              <!--</template>-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--prop="name"-->
+              <!--label="小组人员"-->
+              <!--align="center"-->
+            <!--&gt;-->
+              <!--<template slot-scope="scope">-->
+                <!--<el-select class="userList" multiple v-model="scope.row.memberIds" placeholder="请选择">-->
+                  <!--<el-option-->
+                    <!--v-for="(item,index) in meberList"-->
+                    <!--:key="index"-->
+                    <!--:label="item.userName"-->
+                    <!--:value="item.userId">-->
+                    <!--<span style="float: left">{{ item.userName }}({{item.userNumber}})</span>-->
+                  <!--</el-option>-->
+                <!--</el-select>-->
+              <!--</template>-->
+            <!--</el-table-column>-->
+            <!--&lt;!&ndash;<el-table-column&ndash;&gt;-->
+              <!--&lt;!&ndash;fixed="right"&ndash;&gt;-->
+              <!--&lt;!&ndash;header-align="center"&ndash;&gt;-->
+              <!--&lt;!&ndash;align="center"&ndash;&gt;-->
+              <!--&lt;!&ndash;width="100"&ndash;&gt;-->
+              <!--&lt;!&ndash;label="操作">&ndash;&gt;-->
+              <!--&lt;!&ndash;<template slot-scope="scope">&ndash;&gt;-->
+                <!--&lt;!&ndash;<el-button type="text" size="small" @click="">删除</el-button>&ndash;&gt;-->
+              <!--&lt;!&ndash;</template>&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-table-column>&ndash;&gt;-->
+          <!--</el-table>-->
+        <!--</el-form-item>-->
         <el-form-item label="备注">
           <el-input maxlength="2000" type="textarea"
                     :rows="4" v-model="dataForm.project.projectRemark" placeholder="备注"></el-input>

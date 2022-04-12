@@ -2,7 +2,7 @@
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
       <div class="data-left" :class="leftHidden?'data-left-hidden':''">
-        <div @click="leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+        <div @click="leftHidden=!leftHidden,getCanvas()" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
           数据表
         </div>
         <div v-show="!leftHidden" class="data-tree inline-block">
@@ -34,7 +34,7 @@
           </el-tree>
         </div>
       </div>
-      <div class="data-canvas mar-l">
+      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''" class="data-canvas mar-l">
         <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
@@ -288,6 +288,9 @@
     },
 
     methods: {
+      getCanvas(){
+
+      },
       init() {
 
         var that = this;
@@ -295,6 +298,8 @@
           go.Diagram,
           "myDiagramDiv",
           {
+            allowZoom: true,
+            autoScale:go.Diagram.UniformToFill,
             validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
             // For this sample, automatically show the state of the diagram's model on the page
             "ModelChanged": function (e) {
@@ -1275,7 +1280,7 @@
       display: flex;
       height: 50vh;
       .data-left {
-        width: 300px;
+        width: 30%;
         overflow: scroll;
       }
       .data-left-hidden{
@@ -1283,10 +1288,20 @@
         overflow: hidden;
       }
       .data-canvas {
-        flex: 1;
+        /*flex: 1;*/
+        width: 40%;
+        #myDiagramDiv{
+          width: 100%;
+        }
+      }
+      .data-canvas-noLeft{
+        width: 70%;
+      }
+      .data-canvas-noLeftRight{
+        width: 95%;
       }
       .data-right {
-        width: 300px;
+        width:30%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -1326,7 +1341,6 @@
         }
       }
       .data-right-hidden{
-        width: auto;
         overflow: hidden;
         display:block;
         width: 30px;

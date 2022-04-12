@@ -5,7 +5,7 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
       <el-form-item label="用户账号" prop="userLoginName">
-        <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
+        <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id!=0" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword" :class="{ 'is-required': !dataForm.id }">
         <el-input class="no-autofill-pwd" v-model="dataForm.userPassword" type="text" placeholder="密码"></el-input>
@@ -25,7 +25,6 @@
       <el-form-item v-if="!dataForm.id" size="mini" label="授权">
         <el-tree
           :default-checked-keys="selTree"
-          :check-strictly="isCheck"
           :data="menuList"
           :props="menuListTreeProps"
           node-key="menuId"
@@ -143,6 +142,18 @@
       }
     },
     methods: {
+      cleanMsg(){
+        this.dataForm={
+            id: 0,
+            userLoginName: '',
+            userPassword: '',
+            comfirmPassword: '',
+            userName: '',
+            userNumber: '',
+            userPhone: '',
+            userSex:1,
+        };
+      },
       //验证唯一性
       verification(val,msg,name){
         if(val){
@@ -167,6 +178,7 @@
         }
       },
       init (id) {
+        this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
         this.selTree = [];
@@ -179,8 +191,9 @@
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
-            this.$refs['dataForm'].resetFields()
-            this.$refs.menuListTree.setCheckedKeys([])
+            this.$refs['dataForm'].resetFields();
+
+            // this.$refs.menuListTree.setCheckedKeys([])
           });
         }).then(() => {
           if (this.dataForm.id) {
@@ -198,12 +211,12 @@
                 this.dataForm.userNumber = user.userNumber
                 this.dataForm.userPhone = user.userPhone
                 this.dataForm.userSex = user.userSex
-                this.selTree  = user.menuIds.split(",");
-                this.$nextTick(() => {
-                  //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
-                  this.$refs.menuListTree.setCheckedKeys(this.selTree);//给树节点赋值
-                  this.isCheck= false //重点： 赋值完成后 设置为false
-                })
+                this.selTree  = user.menuIds?user.menuIds.split(","):[];
+                // this.$nextTick(() => {
+                //   //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
+                //   this.$refs.menuListTree.setCheckedKeys(this.selTree);//给树节点赋值
+                //   this.isCheck= false //重点： 赋值完成后 设置为false
+                // })
               }
             })
           }
