@@ -21,7 +21,7 @@
       </el-form-item>
       <el-form-item style="float:right">
         <!-- <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button> -->
-        <el-button type="warning" @click="getDmpReImpList()">查看已导入dmp文件</el-button>
+        <el-button type="warning" @click="getDmpReImpList()">查看已导入文件</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
@@ -933,8 +933,7 @@
             this.$http({
               url: this.$http.adornUrl(`dataImp/impDmpBakFile/${2}/${this.webSocketId}`),
               method: 'post',
-              data: this.selectedFileData,
-              isLoading: false
+              data: this.selectedFileData
             }).then(({data}) => {
                 if (data && (data.code === 200 || data.code == 500) && data.result) {
                   //  this.fileTableInfos = data.result
