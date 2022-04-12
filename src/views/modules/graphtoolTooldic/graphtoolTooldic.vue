@@ -2,7 +2,7 @@
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
       <div class="data-left" :class="leftHidden?'data-left-hidden':''">
-        <div @click="leftHidden=!leftHidden,getCanvas()" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+        <div @click="getCanvas(),leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
           数据表
         </div>
         <div v-show="!leftHidden" class="data-tree inline-block">
@@ -75,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div @click="rightHidden=!rightHidden" class="data-right-tab inline-block" :class="!rightHidden?'data-right-tab-act':''">
+        <div @click="getCanvas(),rightHidden=!rightHidden" class="data-right-tab inline-block" :class="!rightHidden?'data-right-tab-act':''">
           表关系
         </div>
 
@@ -289,7 +289,14 @@
 
     methods: {
       getCanvas(){
-
+        this.upDateDiagramAnimationFrame(0)
+      },
+      upDateDiagramAnimationFrame(count){
+        count++;
+        requestAnimationFrame(() => {
+          this.myDiagram.requestUpdate();
+          if(count<60){ this.upDateDiagramAnimationFrame(count); }
+        });
       },
       init() {
 
