@@ -930,6 +930,14 @@
         // bak文件导入
         if(bakFileFlag) {
           if(this.selectedFileData.length ==1) {
+            let thisContent = this
+            let loading = thisContent.$loading({
+              lock: true,
+              text: 'bak还原中，请稍后...',
+              background: 'transparent',
+              customClass: 'loadingIcon',
+              target: document.querySelector(".loading-area")
+            })
             this.$http({
               url: this.$http.adornUrl(`dataImp/impDmpBakFile/${2}/${this.webSocketId}`),
               method: 'post',
@@ -952,6 +960,7 @@
                       }
                   })
                   this.checkDmpFileTableDialogVisible = true
+                  loading.close()
                 } else {
                   this.$message({
                     showClose: true,
