@@ -64,8 +64,10 @@
         </el-menu-item>
       </el-menu>
       <div class="project-box">
-        <el-select v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
+        <el-select :popper-append-to-body="false" v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
           <el-option
+            :title="item.projectName"
+            class="project-option"
             v-for="item in projectList"
             :key="item.projectId"
             :label="item.projectName"
@@ -133,8 +135,12 @@
       }).then(({ data }) => {
         if (data && data.code === 200) {
           if(data.result){
-            this.projectCode=data.result.projectId;
-            this.$store.commit('common/updateProjectId', this.projectCode)
+            this.projectList.forEach(item=>{
+              if(item.projectId==data.result.projectId){
+                this.projectCode=data.result.projectId;
+                this.$store.commit('common/updateProjectId', this.projectCode)
+              }
+            })
           }
           // this.$store.dispatch('common/changeProjectId', this.projectCode)
         }
@@ -207,5 +213,8 @@
     width: 40px;
     height:40px;
     margin-top: 5px;
+  }
+  .project-select >>>.el-select-dropdown__list,.project-select >>>.el-select-dropdown{
+    width: 300px!important;
   }
 </style>

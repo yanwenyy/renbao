@@ -34,7 +34,7 @@
           </el-tree>
         </div>
       </div>
-      <div class="data-canvas mar-l">
+      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''" class="data-canvas mar-l">
         <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
@@ -1275,7 +1275,7 @@
       display: flex;
       height: 50vh;
       .data-left {
-        width: 300px;
+        width: 30%;
         overflow: scroll;
       }
       .data-left-hidden{
@@ -1283,10 +1283,17 @@
         overflow: hidden;
       }
       .data-canvas {
-        flex: 1;
+        /*flex: 1;*/
+        width: 40%;
+      }
+      .data-canvas-noLeft{
+        width: 70%;
+      }
+      .data-canvas-noLeftRight{
+        width: 95%;
       }
       .data-right {
-        width: 300px;
+        width:30%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -1326,7 +1333,6 @@
         }
       }
       .data-right-hidden{
-        width: auto;
         overflow: hidden;
         display:block;
         width: 30px;
