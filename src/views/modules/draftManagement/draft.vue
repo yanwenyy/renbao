@@ -1,7 +1,7 @@
 <!--底稿管理-->
 <template>
   <div class="box">
-    <div class="auditRuleConfig-left" :style="{height:(tableHeight+120)+'px'}">
+    <div class="auditRuleConfig-left" :style="{height:(tableHeight+100)+'px'}">
       <rule-tree
         ref="ruleTree"
         :isShowSearch="true"
@@ -12,7 +12,7 @@
         :isParent="false"
       ></rule-tree>
     </div>
-    <div class="auditRuleConfig-right" :style="{height:(tableHeight+120)+'px'}">
+    <div class="auditRuleConfig-right" :style="{height:(tableHeight+100)+'px'}">
       <div class="search-box">
         <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
           <el-form-item label="规则名称：">

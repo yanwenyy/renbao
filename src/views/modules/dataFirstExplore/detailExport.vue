@@ -1,22 +1,27 @@
 <!--结果明细导出-->
 <template>
-  <div class="box">
+  <div>
     <div class="left">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <div class="auditRuleMonitoring-left">
-          <batch-list
-            :batchLoading="treeLoading"
-            :batchTreeList="batchTreeList"
-            @getbatchData="getbatchData"
-            v-on:refreshBitchData="initTree"
-            :isParent="false"
-          ></batch-list>
-        </div>
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <!-- <div class="auditRuleMonitoring-left"> -->
+        <batch-list
+          :batchLoading="treeLoading"
+          :batchTreeList="batchTreeList"
+          @getbatchData="getbatchData"
+          v-on:refreshBitchData="initTree"
+          :isParent="false"
+        ></batch-list>
+        <!-- </div> -->
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <el-form
+          ref="dataForm"
+          :model="dataForm"
+          :inline="true"
+          class="search-form-new"
+        >
           <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
@@ -64,33 +69,64 @@
             style="width: 100%"
             :height="tableHeight - 85"
           >
-            <el-table-column type="selection" width="55" align="center"> </el-table-column>
-            <el-table-column prop="ruleName" label="规则名称" width="140" align="center">
-               <template slot-scope="scope">
-                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+            <el-table-column type="selection" width="55" align="center">
+            </el-table-column>
+            <el-table-column
+              prop="ruleName"
+              label="规则名称"
+              width="140"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <div :title="scope.row.ruleName" class="show-ellipsis">
+                  {{ scope.row.ruleName }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column prop="rule.ruleCategory" label="规则类别" align="center">
+            <el-table-column
+              prop="rule.ruleCategory"
+              label="规则类别"
+              align="center"
+            >
               <template slot-scope="scope">
                 <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
               </template>
             </el-table-column>
-            <el-table-column prop="actualBeginTime" label="开始时间" min-width="160" align="center">
+            <el-table-column
+              prop="actualBeginTime"
+              label="开始时间"
+              min-width="160"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.actualBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column prop="actualEndTime" label="结束时间" min-width="160" align="center">
+            <el-table-column
+              prop="actualEndTime"
+              label="结束时间"
+              min-width="160"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.actualEndTime
               }}</template>
             </el-table-column>
             <el-table-column prop="resultCount" label="结果条数" align="center">
             </el-table-column>
-            <el-table-column prop="createUserName" label="执行人" align="center">
+            <el-table-column
+              prop="createUserName"
+              label="执行人"
+              align="center"
+            >
             </el-table-column>
-            <el-table-column prop="moblie" label="操作" align="center" min-width="100">
+            <el-table-column
+              prop="moblie"
+              label="操作"
+              align="center"
+              min-width="100"
+            >
               <template slot-scope="scope">
                 <el-button type="text" @click="detailHandle(scope.row)"
                   >查看明细</el-button

@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div class="box" >
-      <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
+    <div class="box">
+      <div
+        class="left list-left-tree"
+        :style="{ height: tableHeight + 120 + 'px' }"
+      >
         <div class="custom-tree-container">
           <!-- <el-input
             placeholder="输入关键字进行过滤"
@@ -48,7 +51,7 @@
           ></ruleTree>
         </div>
       </div>
-      <div class="right" :style="{height:(tableHeight+120)+'px'}">
+      <div class="right" :style="{ height: tableHeight + 120 + 'px' }">
         <el-form
           :inline="true"
           :model="dataForm"
@@ -89,24 +92,29 @@
           <el-button type="primary" @click="addOrUpdateHandle('')"
             >新增</el-button
           >
-          <!--<el-button type="primary" @click="getDataList()">修改</el-button>-->
-          <el-button type="warning" @click="ruleImport">导入</el-button>
           <el-button
-            type="warning"
-            @click="ruleExport('all')"
-            :loading="ruleExportAllLoading"
-            >全部导出</el-button
-          >
+            @click="deleteHandle()"
+            type="primary"
+            :disabled="this.dataListSelections.length <= 0"
+            >删除
+          </el-button>
+          <el-button type="warning" @click="ruleImport">导入</el-button>
+
           <el-button
             type="warning"
             @click="ruleExport('one')"
             :loading="ruleExportLoading"
             >导出</el-button
           >
-          <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
+          <el-button
+            type="warning"
+            @click="ruleExport('all')"
+            :loading="ruleExportAllLoading"
+            >全部导出</el-button
+          >
         </div>
         <el-table
-          :height="tableHeight-tableMinus"
+          :height="tableHeight - tableMinus"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -119,9 +127,20 @@
             width="50"
           >
           </el-table-column>
-          <el-table-column prop="ruleName" align="center" label="规则名称" min-width="140">
+          <el-table-column
+            prop="ruleName"
+            align="center"
+            label="规则名称"
+            min-width="140"
+          >
             <template slot-scope="scope">
-              <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+              <el-button
+                :title="scope.row.ruleName"
+                type="text"
+                @click="addOrUpdateHandle(scope.row.ruleId, 'look')"
+                class="show-ellipsis"
+                >{{ scope.row.ruleName }}</el-button
+              >
             </template>
           </el-table-column>
           <el-table-column
@@ -172,20 +191,16 @@
             <template slot-scope="scope">
               <el-button
                 type="text"
-                size="small"
                 @click="addOrUpdateHandle(scope.row.ruleId)"
                 >修改
               </el-button>
-              <el-button
+              <!--  <el-button
                 type="text"
                 size="small"
                 @click="addOrUpdateHandle(scope.row.ruleId,'look')"
                 >查看
-              </el-button>
-              <el-button
-                type="text"
-                size="small"
-                @click="deleteHandle(scope.row.ruleId)"
+              </el-button> -->
+              <el-button type="text" @click="deleteHandle(scope.row.ruleId)"
                 >删除
               </el-button>
             </template>
@@ -231,7 +246,7 @@ import ImportFile from "./Import-file.vue";
 export default {
   data() {
     return {
-      tableMinus:75,
+      tableMinus: 75,
       ruleData: {}, //组件规则数数据
       form: {
         name: ""
@@ -290,21 +305,24 @@ export default {
       ruleCheckData: {}
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
     },
     documentClientHeight: {
-      get () { return this.$store.state.common.documentClientHeight },
-
-    },
+      get() {
+        return this.$store.state.common.documentClientHeight;
+      }
+    }
   },
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);
     },
-    tableMinus(val){
-      this.tableMinus=val;
+    tableMinus(val) {
+      this.tableMinus = val;
     }
   },
   components: {
@@ -324,15 +342,14 @@ export default {
   },
   methods: {
     // 新增 / 修改
-    addOrUpdateHandle(id,type) {
+    addOrUpdateHandle(id, type) {
       // this.addOrUpdateVisible = true
 
       this.$nextTick(() => {
-
         if (id) {
-          this.$refs.addOrUpdate.init(id, this.ruleCheckData,type);
+          this.$refs.addOrUpdate.init(id, this.ruleCheckData, type);
         } else {
-          this.$refs.addOrUpdate.init("", this.ruleCheckData,);
+          this.$refs.addOrUpdate.init("", this.ruleCheckData);
         }
       });
     },
@@ -543,8 +560,8 @@ export default {
   display: inline-block !important;
 }
 .box {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: space-between;
 }
@@ -560,7 +577,7 @@ export default {
 }
 .right {
   width: 75%;
-  height: 100%!important;
+  height: 100% !important;
 }
 
 .inline-block {
@@ -579,4 +596,4 @@ export default {
 .dr-notice-body > div {
   margin-bottom: 20px;
 }
-</style>
+</style>  

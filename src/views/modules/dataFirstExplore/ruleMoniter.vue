@@ -1,22 +1,25 @@
 <template>
-  <div class="box">
+  <div>
     <div class="left">
-      <el-card v-loading="treeLoading" :style="{height:(tableHeight+120)+'px'}">
-        <div class="auditRuleMonitoring-left">
-          <batch-list
-            :batchLoading="treeLoading"
-            :batchTreeList="batchTreeList"
-            @getbatchData="getbatchData"
-            v-on:refreshBitchData="getbatchList"
-            :isParent="false"
-          ></batch-list>
-        </div>
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <batch-list
+          :batchLoading="treeLoading"
+          :batchTreeList="batchTreeList"
+          @getbatchData="getbatchData"
+          v-on:refreshBitchData="getbatchList"
+          :isParent="false"
+        ></batch-list>
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <div class="search-box">
-          <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
+          <el-form
+            ref="searchForm"
+            :model="searchForm"
+            :inline="true"
+            class="search-form-new"
+          >
             <el-form-item label="规则名称：">
               <el-input
                 v-model="searchForm.ruleName"
@@ -58,12 +61,13 @@
             </el-form-item>
           </el-form>
           <div style="float:right;margin-bottom:22px">
-              <el-button
-                @click="deleteData"
-                type="danger"
-                :disabled="this.multipleTable.length <= 0"
-                >删除</el-button>
-            </div>
+            <el-button
+              @click="deleteData"
+              type="danger"
+              :disabled="this.multipleTable.length <= 0"
+              >删除</el-button
+            >
+          </div>
         </div>
 
         <div class="table-box">
@@ -83,38 +87,74 @@
               align="center"
               width="55"
             ></el-table-column>
-            <el-table-column prop="ruleName" label="规则名称" min-width="140" align="center">
+            <el-table-column
+              prop="ruleName"
+              label="规则名称"
+              min-width="140"
+              align="center"
+            >
               <template slot-scope="scope">
-                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+                <div :title="scope.row.ruleName" class="show-ellipsis">
+                  {{ scope.row.ruleName }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column prop="ruleCategory" label="规则类别" align="center">
+            <el-table-column
+              prop="ruleCategory"
+              label="规则类别"
+              align="center"
+            >
               <template slot-scope="scope">
                 <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
                 <div v-if="scope.row.ruleCategory == 2">住院规则</div>
               </template>
             </el-table-column>
-            <el-table-column min-width="160" prop="expectedBeginTime" label="预计开始时间" align="center">
+            <el-table-column
+              min-width="160"
+              prop="expectedBeginTime"
+              label="预计开始时间"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.expectedBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column min-width="160" prop="actualBeginTime" label="实际开始时间" align="center">
+            <el-table-column
+              min-width="160"
+              prop="actualBeginTime"
+              label="实际开始时间"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.actualBeginTime
               }}</template>
             </el-table-column>
-            <el-table-column min-width="160" prop="expectedEndTime" label="预计结束时间" align="center">
+            <el-table-column
+              min-width="160"
+              prop="expectedEndTime"
+              label="预计结束时间"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.expectedEndTime
               }}</template>
             </el-table-column>
-            <el-table-column min-width="160" prop="actualEndTime" label="实际结束时间" align="center">
+            <el-table-column
+              min-width="160"
+              prop="actualEndTime"
+              label="实际结束时间"
+              align="center"
+            >
               <template slot-scope="scope">{{
                 scope.row.actualEndTime
               }}</template>
             </el-table-column>
-            <el-table-column width="120" prop="runStatus" label="运行状态" align="center">
+            <el-table-column
+              width="120"
+              prop="runStatus"
+              label="运行状态"
+              align="center"
+            >
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 1">待执行</div>
                 <div v-if="scope.row.runStatus == 2">执行中</div>
@@ -122,7 +162,12 @@
                 <div v-if="scope.row.runStatus == 4">已完成</div>
               </template>
             </el-table-column>
-            <el-table-column width="120" prop="moblie" label="操作" align="center">
+            <el-table-column
+              width="120"
+              prop="moblie"
+              label="操作"
+              align="center"
+            >
               <template slot-scope="scope">
                 <div v-if="scope.row.runStatus == 4">运行成功</div>
                 <el-button
@@ -232,10 +277,12 @@ export default {
       }
     };
   },
-  computed:{
+  computed: {
     tableHeight: {
-      get () { return this.$store.state.common.tableHeight}
-    },
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
   },
   activated() {
     this.getbatchList();
@@ -466,8 +513,8 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  overflow: auto;
-  .el-card{
+
+  .el-card {
     overflow: auto;
   }
 }

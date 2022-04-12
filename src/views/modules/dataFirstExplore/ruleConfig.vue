@@ -1,10 +1,10 @@
 <!--初探规则配置-->
 <template>
-  <div>
+  <div class="box">
     <div class="left">
       <el-card
         v-loading="treeLoading"
-        :style="{ height: tableHeight + 120 + 'px' }"
+        :style="{ height: tableHeight + 100 + 'px' }"
       >
         <rule-tree
           :isShowSearch="true"
@@ -18,9 +18,14 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card class="box-card" :style="{ height: tableHeight + 120 + 'px' }">
+      <el-card class="box-card" :style="{ height: tableHeight + 100 + 'px' }">
         <div class="search-box">
-          <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
+          <el-form
+            ref="dataForm"
+            :model="dataForm"
+            :inline="true"
+            class="search-form-new"
+          >
             <el-form-item label="规则名称：">
               <el-input
                 v-model="dataForm.ruleName"
@@ -28,13 +33,12 @@
                 clearable
               ></el-input>
             </el-form-item>
-            <el-form-item label="规则类型：">
+            <el-form-item label="规则类别：">
               <el-select
                 v-model="dataForm.ruleCategory"
                 filterable
                 clearable
                 placeholder="请选择"
-               
               >
                 <el-option
                   v-for="(item, index) in ruleCategory"
@@ -90,27 +94,64 @@
               width="55"
             >
             </el-table-column>
-            <el-table-column prop="ruleName" label="规则名称" align="center" width="140">
+            <el-table-column
+              prop="ruleName"
+              label="规则名称"
+              align="center"
+              min-width="140"
+            >
               <template slot-scope="scope">
-                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="ruleCategory" label="规则类别" align="center">
-              <template slot-scope="scope">
-                <div v-if="scope.row.ruleCategory == 1">门诊规则</div>
-                <div v-if="scope.row.ruleCategory == 2">住院规则</div>
+                <el-button
+                  type="text"
+                  @click="detailHandle(scope.row.ruleId, 'look')"
+                  :title="scope.row.ruleName"
+                  class="show-ellipsis"
+                  >{{ scope.row.ruleName }}</el-button
+                >
               </template>
             </el-table-column>
             <el-table-column
-              prop="createUserName"
-              label="创建人"
+              prop="avgRunTime"
+              header-align="center"
               align="center"
-            ></el-table-column>
-            <el-table-column prop="createTime" label="创建时间" align="center" width="160">
+              label="平均运行时间"
+              min-width="140"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="createTime"
+              header-align="center"
+              align="center"
+              label="创建时间"
+              width="160"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="createUserName"
+              header-align="center"
+              align="center"
+              label="创建人"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="ruleCategory"
+              header-align="center"
+              align="center"
+              label="规则类别"
+            >
+              <template slot-scope="scope">
+                {{
+                  scope.row.ruleCategory == "1"
+                    ? "门诊规则"
+                    : scope.row.ruleCategory == "2"
+                    ? "住院规则"
+                    : ""
+                }}
+              </template>
             </el-table-column>
             <!-- <el-table-column prop="hospitalName" label="医院">
               </el-table-column> -->
-            <el-table-column prop="moblie" label="操作" align="center">
+            <!--  <el-table-column prop="moblie" label="操作" align="center">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -118,7 +159,7 @@
                   >查看详情</el-button
                 >
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
           <el-row>
             <div style="float:left;margin-top:10px">
@@ -140,12 +181,15 @@
                 >
                 <el-popover
                   placement="top"
+                  width="400"
                   trigger="click"
                   v-if="this.multipleSelection.length > 0"
                 >
-                  <p v-for="(i, k) in multipleSelection" :key="k">
-                    {{ i.ruleName }}
-                  </p>
+                  <div style="max-height:300px;overflow-y:auto">
+                    <p v-for="(i, k) in multipleSelection" :key="k">
+                      {{ i.ruleName }}
+                    </p>
+                  </div>
                   <el-button slot="reference">当前所选规则</el-button>
                 </el-popover>
                 <el-button v-else>当前所选规则</el-button>
@@ -236,7 +280,7 @@ export default {
   },
   data() {
     return {
-      tableMinus: 73,
+      tableMinus: 120,
       //条件查询数据定义
       dataForm: {
         ruleName: "",
@@ -555,5 +599,8 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
+  .el-card {
+    overflow: auto;
+  }
 }
 </style>

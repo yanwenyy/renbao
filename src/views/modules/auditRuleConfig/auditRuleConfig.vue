@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="left">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <rule-tree
           ref="ruleTree"
           :isShowSearch="true"
@@ -14,8 +14,13 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <el-form
+          ref="searchForm"
+          :model="searchForm"
+          :inline="true"
+          class="search-form-new"
+        >
           <el-form-item label="审核规则名称：">
             <el-input
               v-model="searchForm.ruleName"
@@ -40,25 +45,30 @@
         </el-form>
         <el-form style="float:right">
           <el-form-item>
+            <el-button type="primary" @click="addFun">新增</el-button>
             <el-button
               type="primary"
               class="search-right-btn"
               @click="submitgxhgz"
+              :disabled="
+                this.multipleTable.length == 0 || this.multipleTable.length > 1
+              "
               >提交至地区个性化规则</el-button
             >
-            <el-button type="primary" @click="addFun">新增</el-button>
+
             <!--<el-button-->
             <!--type="primary"-->
             <!--@click="editorFun(0)"-->
             <!--:disabled="this.multipleTable <= 0"-->
             <!--&gt;编辑</el-button-->
             <!--&gt;-->
-            <!--<el-button-->
-            <!--type="danger"-->
-            <!--@click="deleteFn(0)"-->
-            <!--:disabled="this.multipleTable.length <= 0"-->
-            <!--&gt;删除</el-button-->
-            <!--&gt;-->
+            <el-button
+              type="danger"
+              @click="deleteFn(0)"
+              :disabled="this.multipleTable.length <= 0"
+            >
+              删除</el-button
+            >
           </el-form-item>
         </el-form>
 
@@ -79,29 +89,70 @@
               :reserve-selection="true"
             ></el-table-column>
             <el-table-column
-              v-for="(items, index) in tablePositionKey"
-              :prop="items.dataname"
-              :key="index"
-              :label="items.label"
-              :sortable="items.issortable"
-              :align="items.align ? items.align : 'center'"
-              :width="items.width"
+              prop="ruleName"
+              label="审核规则名称"
+              align="center"
+              min-width="120px"
             >
               <template slot-scope="scope">
-                <div v-if="items.dataname == 'ruleName'" :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
-                <div v-else><span>{{scope.row[items.dataname]}}</span></div>
+                <el-button
+                  :title="scope.row.ruleName"
+                  class="show-ellipsis"
+                  type="text"
+                  @click="editorFun(scope.row.ruleId, 'look')"
+                  >{{ scope.row.ruleName }}</el-button
+                >
               </template>
+            </el-table-column>
+            <el-table-column
+              prop="avgRunTime"
+              header-align="center"
+              align="center"
+              label="平均运行时间"
+              min-width="160"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="createTime"
+              header-align="center"
+              align="center"
+              label="创建时间"
+              min-width="160"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="createUserName"
+              header-align="center"
+              align="center"
+              label="创建人"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="ruleCategory"
+              header-align="center"
+              align="center"
+              label="规则类别"
+            >
+              <!--   <template slot-scope="scope">
+                {{
+                  scope.row.ruleCategory == "1"
+                    ? "门诊规则"
+                    : scope.row.ruleCategory == "2"
+                    ? "住院规则"
+                    : ""
+                }}
+              </template> -->
             </el-table-column>
             <el-table-column prop="mobile" label="操作" align="center">
               <template slot-scope="scope">
                 <el-button type="text" @click="editorFun(scope.row.ruleId)"
                   >修改
                 </el-button>
-                <el-button
+                <!--  <el-button
                   type="text"
                   @click="editorFun(scope.row.ruleId, 'look')"
                   >查看
-                </el-button>
+                </el-button> -->
                 <el-button type="text" @click="deleteFn(scope.row.ruleId)"
                   >删除
                 </el-button>
@@ -117,12 +168,12 @@
                 <el-button
                   :disabled="this.multipleTable.length <= 0"
                   @click="executeImmediatelyClick"
-                  >立即执行</el-button
+                  >立即运行</el-button
                 >
                 <el-button
                   :disabled="this.multipleTable.length <= 0"
                   @click="timedExecutionClick"
-                  >定时执行</el-button
+                  >定时运行</el-button
                 >
                 <el-popover
                   placement="top"
@@ -130,9 +181,11 @@
                   v-if="multipleTable.length > 0"
                   trigger="click"
                 >
-                  <p v-for="(i, k) in multipleTable" :key="k">
-                    {{ i.ruleName }}
-                  </p>
+                  <div style="max-height:300px;overflow-y:auto">
+                    <p v-for="(i, k) in multipleTable" :key="k">
+                      {{ i.ruleName }}
+                    </p>
+                  </div>
                   <el-button slot="reference">当前所选规则</el-button>
                 </el-popover>
                 <el-button v-else>当前所选规则</el-button>
@@ -188,32 +241,6 @@ export default {
         folderId: ""
       },
       tableData: [],
-      tablePositionKey: [
-        {
-          dataname: "ruleName",
-          label: "审核规则名称",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "ruleCategory",
-          label: "审核规则类别",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "createUserName",
-          label: "创建人",
-          issortable: false,
-          type: ""
-        },
-        {
-          dataname: "createTime",
-          label: "创建时间",
-          issortable: false,
-          type: ""
-        }
-      ],
       Pager: {
         pageSize: 10,
         pageIndex: 1,
@@ -404,11 +431,11 @@ export default {
     },
     // 提交个性化规则
     submitgxhgz() {
-      if (this.multipleTable.length != 1)
+      /*  if (this.multipleTable.length != 1)
         return this.$message({
           message: "请选择一条数据进行操作",
           type: "warning"
-        });
+        }); */
       this.$refs.submitPersonalityRule.showDialog(this.multipleTable);
     },
     // 立即执行
@@ -554,5 +581,8 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
+  .el-card {
+    overflow: auto;
+  }
 }
 </style>

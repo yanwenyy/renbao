@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="left">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{height:(tableHeight+100)+'px'}">
         <batch-list
           :batchLoading="batchLoading"
           :batchTreeList="batchTreeList"
@@ -11,7 +11,7 @@
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{height:(tableHeight+120)+'px'}">
+      <el-card :style="{height:(tableHeight+100)+'px'}">
         <div class="search-box">
           <el-form ref="searchForm" :model="searchForm" :inline="true" class="search-form-new">
             <el-form-item label="规则类型：">

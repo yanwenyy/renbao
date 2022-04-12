@@ -1,12 +1,9 @@
 <!--结果明细导出-->
 <template>
-  <div class="box">
+  <div>
     <div class="left">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <div
-          class="auditRuleMonitoring-left"
-          style="width:100%;overflow-y:auto"
-        >
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <!-- <div class="auditRuleMonitoring-left"> -->
           <batch-list
             :batchLoading="treeLoading"
             :batchTreeList="batchTreeList"
@@ -14,12 +11,17 @@
             v-on:refreshBitchData="initTree"
             :isParent="false"
           ></batch-list>
-        </div>
+        <!-- </div> -->
       </el-card>
     </div>
     <div style="width:100%">
-      <el-card :style="{ height: tableHeight + 120 + 'px' }">
-        <el-form ref="dataForm" :model="dataForm" :inline="true" class="search-form-new">
+      <el-card :style="{ height: tableHeight + 100 + 'px' }">
+        <el-form
+          ref="dataForm"
+          :model="dataForm"
+          :inline="true"
+          class="search-form-new"
+        >
           <el-form-item label="规则名称：">
             <el-input
               v-model="dataForm.ruleName"
@@ -61,16 +63,37 @@
             :height="tableHeight - 85"
           >
             <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
-            <el-table-column prop="ruleName" label="规则名称" min-width="140" align="center">
+            <el-table-column
+              prop="ruleName"
+              label="规则名称"
+              min-width="140"
+              align="center"
+            >
               <template slot-scope="scope">
-                <div :title="scope.row.ruleName" class="show-ellipsis">{{scope.row.ruleName}}</div>
+                <div :title="scope.row.ruleName" class="show-ellipsis">
+                  {{ scope.row.ruleName }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column prop="batchResultExportBeginTime" label="开始时间" align="center" min-width="160">
+            <el-table-column
+              prop="batchResultExportBeginTime"
+              label="开始时间"
+              align="center"
+              min-width="160"
+            >
             </el-table-column>
-            <el-table-column prop="batchResultExportEndTime" label="结束时间" align="center" min-width="160">
+            <el-table-column
+              prop="batchResultExportEndTime"
+              label="结束时间"
+              align="center"
+              min-width="160"
+            >
             </el-table-column>
-            <el-table-column prop="batchResultExportStatus" label="状态" align="center">
+            <el-table-column
+              prop="batchResultExportStatus"
+              label="状态"
+              align="center"
+            >
               <template slot-scope="scope">
                 <div v-if="scope.row.batchResultExportStatus == 1">待执行</div>
                 <div v-if="scope.row.batchResultExportStatus == null">
