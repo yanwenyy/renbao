@@ -1,8 +1,11 @@
 <template>
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
-      <div class="data-left">
-        <div class="data-tree">
+      <div class="data-left" :class="leftHidden?'data-left-hidden':''">
+        <div @click="leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+          数据表
+        </div>
+        <div v-show="!leftHidden" class="data-tree inline-block">
           <el-tree
             class="sql-tree-self"
             :data="dataTreeData"
@@ -36,13 +39,13 @@
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
-      <div class="data-right mar-l">
-        <div id="joins" class="data-option-box">
+      <div class="data-right mar-l" :class="rightHidden?'data-right-hidden':''">
+        <div v-show="!rightHidden" id="joins" class="data-option-box inline-block">
           <div class="tstext">表连接</div>
           <div id="form" class="box-bg"></div>
 
         </div>
-        <div id="tjHidden" class="data-option-box">
+        <div v-show="!rightHidden" id="tjHidden" class="data-option-box  inline-block">
           <div class="tstext">连接条件</div>
           <div id="linkDiv" class="box-bg">
             <div class="form-group" id="join2" style="display:none;">
@@ -72,14 +75,16 @@
             </div>
           </div>
         </div>
-
+        <div @click="rightHidden=!rightHidden" class="data-right-tab inline-block" :class="!rightHidden?'data-right-tab-act':''">
+          表关系
+        </div>
 
       </div>
     </div>
     <div class="graphtool-bottom">
-      <div class="data-sort">
+      <div class="data-sort" id="ordera">
         <div class="tstext">排序</div>
-        <div id="order" class="box-bg" style="overflow: auto;"></div>
+        <div id="order" class="box-bg form-group" style="overflow: auto;"></div>
       </div>
       <div class="data-list mar-l" id="sqlHidden">
         <div id="attr" class="data-list-item data-list-table" style="margin-top:34px;margin-bottom:10px">
@@ -140,7 +145,8 @@
                 width="150"
               >
                 <template slot-scope="scope">
-                  <el-select v-model="scope.row.fun" @change="changeGruop(scope.row.id,scope.row.table,scope.row.name)">
+                  <el-select :id="'fun'+scope.row.id" v-if="scope.row.group" v-model="scope.row.fun"
+                             @change="changeGruop(scope.row.id,scope.row.table,scope.row.name)">
                     <el-option value="jh" label="聚合函数"></el-option>
                     <el-option value="count" label="总行数"></el-option>
                     <el-option value="max" label="最大"></el-option>
@@ -162,24 +168,38 @@
                 width="100"
               >
                 <template slot-scope="scope">
-                  <i class="el-icon-sort-up table-sort-btn" @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-sort-down table-sort-btn" @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-s-fold table-sort-btn" @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
+                  <i class="el-icon-sort-up table-sort-btn"
+                     @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
+                  <i class="el-icon-sort-down table-sort-btn"
+                     @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
+                  <i class="el-icon-s-fold table-sort-btn"
+                     @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
+                </template>
+              </el-table-column>
+              <el-table-column
+                header-align="center"
+                align="center"
+                label="筛选"
+              >
+                <template slot-scope="scope">
+                  <el-button type="primary">筛选</el-button>
                 </template>
               </el-table-column>
               <el-table-column
                 prop="info"
                 header-align="center"
                 align="center"
-                label="筛选"
-              >
-              </el-table-column>
-              <el-table-column
-                prop="info"
-                header-align="center"
-                align="center"
                 label="分组"
+                width="150"
               >
+                <template slot-scope="scope">
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,true)"
+                             v-if="!scope.row.group">加入分组
+                  </el-button>
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,false)"
+                             v-if="scope.row.group">取消分组
+                  </el-button>
+                </template>
               </el-table-column>
               <!--<el-table-column-->
               <!--v-for="(items, index) in tablePositionKey"-->
@@ -199,8 +219,6 @@
 
 
     </div>
-
-
   </div>
 </template>
 <script>
@@ -209,6 +227,11 @@
   export default {
     data() {
       return {
+        //是否隐藏数据表
+        leftHidden:false,
+        //是否隐藏表关系
+        rightHidden:false,
+
         filter: {},
         layeX: -1,
         layeY: -1,
@@ -823,7 +846,7 @@
       //改变别名
       changeAlisa(id, table) {
         var idx = this.indexOfJoin(table);
-        var data = join[idx];
+        var data = this.join[idx];
         var val = $("#" + id).val();
         for (var i = 0; i < data.fields.length; i++) {
           var field = data.fields[i];
@@ -835,16 +858,20 @@
         this.toSql();
       },
       //初始化分组
-      initGroup() {
+      initGroup(group) {
         if (this.group == true) {
           for (var i = 0; i < this.join.length; i++) {
             var joinData = this.join[i];
             for (var j = 0; j < joinData.fields.length; j++) {
               var field = joinData.fields[j];
               if (field.hidden == false) {
-                var _funEle = document.getElementById("#fun" + field.id);
-                // $("#fun" + field.id).val(field.fun);
-                _funEle.value = field.fun;
+                // var _funEle = document.getElementById("#fun" + field.id);
+                // // $("#fun" + field.id).val(field.fun);
+                // _funEle.value = field.fun;
+              }
+              //by yw
+              if (group) {
+                field.fun = '';
               }
             }
           }
@@ -1008,7 +1035,7 @@
         return sql;
       },
       //生成每一行数据
-      initTableRow(tableId) {
+      initTableRow(tableId, group) {
         this.tableData = [];
         for (var i = 0; i < this.join.length; i++) {
           var table = this.join[i];
@@ -1022,7 +1049,7 @@
           }
 
         }
-        this.initGroup();
+        this.initGroup(group);
       },
       //查询join里对象的idx
       indexOfJoin(tableName) {
@@ -1054,13 +1081,30 @@
         } catch (e) {
         }
       },
+      //点击分组
+      clickGroup(id, table, name, group) {
+        var idx = this.indexOfJoin(table);
+        var data = this.join[idx];
+
+        for (var i = 0; i < data.fields.length; i++) {
+          var field = data.fields[i];
+          if (field.id == id) {
+            this.join[idx].fields[i].group = group;
+          }
+        }
+
+        this.groupInit();
+        this.initOrder();
+        this.initTableRow(null, group);
+        this.toSql();
+      },
       //初始化order div
       initOrder() {
 
         document.getElementById("order").innerHTML = '';
         var orderString = "";
-        for (var i = 0; i < order.length; i++) {
-          var data = order[i];
+        for (var i = 0; i < this.order.length; i++) {
+          var data = this.order[i];
           var index = i + 1;
           orderString = "<span>" + orderString + index + " 、 " + data.column + " 、 " + data.order + ", </span></br>";
         }
@@ -1145,7 +1189,7 @@
         var cordinateX = this.layeX + offsetX;
         var cordinateY = this.layeY + offsetY;
         var local = cordinateX + " " + cordinateY;
-        var keys = draggingNode.data.id;
+        var keys = draggingNode.data.title;
         var chineseName = draggingNode.data.title;
         var table = {
           key: keys,//表名
@@ -1157,20 +1201,53 @@
         if (draggingNode.data.type == 'datasource' || draggingNode.data.type == 'table' || draggingNode.data.type == 'view') {
           var nodes = draggingNode.childNodes;
           var fieldArr = [];
-          for (var i = 0; i < nodes.length; i++) {
-            var field = {};
-            field.tableName = chineseName;
-            field.tableId = nodes[i].data.id;
-            field.name = nodes[i].data.title;
-            field.info = nodes[i].data.title;
-            field.alias = nodes[i].data.title;
-            field.color = "#FFFFFF";
-            field.hidden = true;
-            fieldArr.push(field);
+          if (nodes && nodes.length > 0) {
+            for (var i = 0; i < nodes.length; i++) {
+              var field = {};
+              field.tableName = chineseName;
+              field.tableId = nodes[i].data.id;
+              field.name = nodes[i].data.title;
+              field.group = false;
+              field.info = nodes[i].data.title;
+              field.alias = nodes[i].data.title;
+              field.color = "#FFFFFF";
+              field.hidden = true;
+              fieldArr.push(field);
+
+            }
+            table.fields = fieldArr;
+            this.addNodeData(table);
+          } else {
+            this.$http({
+              url: this.$http.adornUrl('/sqlScript/getColumnList'),
+              method: 'get',
+              isLoading: false,
+              params: this.$http.adornParams({
+                id: draggingNode.data.id,
+                tableName: draggingNode.data.title,
+              })
+            }).then(({data}) => {
+              var _nodes = data.result;
+              for (var i = 0; i < _nodes.length; i++) {
+                var field = {};
+                field.tableName = chineseName;
+                field.tableId = _nodes[i].id;
+                field.name = _nodes[i].title;
+                field.info = _nodes[i].title;
+                field.alias = _nodes[i].title;
+                field.color = "#FFFFFF";
+                field.hidden = true;
+                fieldArr.push(field);
+
+              }
+              table.fields = fieldArr;
+              this.addNodeData(table);
+            })
+
           }
-          table.fields = fieldArr;
+
         }
-        this.addNodeData(table);
+
       },
       // 树内不可拖拽
       returnFalse() {
@@ -1200,7 +1277,10 @@
       .data-left {
         width: 300px;
         overflow: scroll;
-
+      }
+      .data-left-hidden{
+        width: auto;
+        overflow: hidden;
       }
       .data-canvas {
         flex: 1;
@@ -1211,16 +1291,45 @@
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        position: relative;
         .data-option-box {
           flex: 1;
           display: flex;
           flex-direction: column;
-
+          width: 90%;
           .box-bg {
             flex: 1;
           }
 
         }
+
+        .data-right-tab{
+          top:0;
+          right:0;
+          position: absolute;
+          cursor: pointer;
+          width: 20px;
+          word-break: break-all;
+          vertical-align: middle;
+          padding: 30px 0;
+          color: #939DA6;
+          text-align: center;
+          background: #F0F0F2;
+          border-top-left-radius: 20px;
+          border-top-right-radius: 5px;
+          border-bottom-left-radius: 20px;
+          border-bottom-right-radius: 5px;
+          margin: 5px 0;
+        }
+        .data-right-tab-act{
+          color:#333;
+        }
+      }
+      .data-right-hidden{
+        width: auto;
+        overflow: hidden;
+        display:block;
+        width: 30px;
       }
     }
     .tree-icon {
@@ -1290,4 +1399,29 @@
     font-weight: bold;
     cursor: pointer;
   }
+  .data-left{
+    .data-tree{
+      vertical-align: top;
+      width: 90%;
+    }
+    .data-left-tab{
+      cursor: pointer;
+      width: 20px;
+      word-break: break-all;
+      vertical-align: middle;
+      padding: 30px 0;
+      color: #939DA6;
+      text-align: center;
+      background: #F0F0F2;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 20px;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 20px;
+      margin: 5px 0;
+    }
+    .data-left-tab-act{
+      color:#333;
+    }
+  }
+
 </style>
