@@ -1,55 +1,60 @@
 <template>
   <el-dialog
+    width="70%"
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
-      <el-form-item label="用户账号" prop="userLoginName">
-        <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id!=0" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="userPassword" :class="{ 'is-required': !dataForm.id }">
-        <el-input class="no-autofill-pwd" v-model="dataForm.userPassword" type="text" placeholder="密码"></el-input>
-      </el-form-item>
-      <el-form-item label="确认密码" prop="comfirmPassword" class="no-autofill-pwd" :class="{ 'is-required': !dataForm.id }">
-        <el-input class="no-autofill-pwd" v-model="dataForm.comfirmPassword" type="text" placeholder="确认密码"></el-input>
-      </el-form-item>
-      <el-form-item label="用户姓名" prop="userName">
-        <el-input v-model="dataForm.userName" placeholder="用户姓名（30字以内）" maxlength="30"></el-input>
-      </el-form-item>
-      <el-form-item label="部门及职务">
-        <el-input v-model="dataForm.userNumber" placeholder="部门及职务"></el-input>
-      </el-form-item>
-      <el-form-item label="手机号" prop="userPhone">
-        <el-input v-model="dataForm.userPhone" placeholder="手机号"></el-input>
-      </el-form-item>
-      <el-form-item v-if="!dataForm.id" size="mini" label="授权">
-        <el-tree
-          :default-checked-keys="selTree"
-          :data="menuList"
-          :props="menuListTreeProps"
-          node-key="menuId"
-          ref="menuListTree"
-          :default-expand-all="true"
-          show-checkbox>
-        </el-tree>
-      </el-form-item>
-      <!--<el-form-item label="角色" size="mini" prop="roleIdList">-->
+      <div class="user-left inline-block">
+        <el-form-item label="用户账号" prop="userLoginName">
+          <el-input v-model="dataForm.userLoginName" :readonly="dataForm.id&&dataForm.id!=0" placeholder="用户账号(15字以内)" maxlength="15"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="userPassword" :class="{ 'is-required': !dataForm.id }">
+          <el-input class="no-autofill-pwd" v-model="dataForm.userPassword" type="text" placeholder="密码"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="comfirmPassword" class="no-autofill-pwd" :class="{ 'is-required': !dataForm.id }">
+          <el-input class="no-autofill-pwd" v-model="dataForm.comfirmPassword" type="text" placeholder="确认密码"></el-input>
+        </el-form-item>
+        <el-form-item label="用户姓名" prop="userName">
+          <el-input v-model="dataForm.userName" placeholder="用户姓名（30字以内）" maxlength="30"></el-input>
+        </el-form-item>
+        <el-form-item label="部门及职务">
+          <el-input v-model="dataForm.userNumber" placeholder="部门及职务"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="userPhone">
+          <el-input v-model="dataForm.userPhone" placeholder="手机号"></el-input>
+        </el-form-item>
+        <!--<el-form-item label="角色" size="mini" prop="roleIdList">-->
         <!--<el-checkbox-group v-model="dataForm.roleIdList">-->
-          <!--<el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>-->
+        <!--<el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>-->
         <!--</el-checkbox-group>-->
-      <!--</el-form-item>-->
-      <el-form-item label="性别" size="mini" prop="userSex">
-        <el-radio-group v-model="dataForm.userSex	">
-          <el-radio :label="1">男</el-radio>
-          <el-radio :label="2">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <!--<el-form-item label="状态" size="mini" prop="status">-->
+        <!--</el-form-item>-->
+        <el-form-item label="性别" size="mini" prop="userSex">
+          <el-radio-group v-model="dataForm.userSex	">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!--<el-form-item label="状态" size="mini" prop="status">-->
         <!--<el-radio-group v-model="dataForm.status">-->
-          <!--<el-radio :label="0">禁用</el-radio>-->
-          <!--<el-radio :label="1">正常</el-radio>-->
+        <!--<el-radio :label="0">禁用</el-radio>-->
+        <!--<el-radio :label="1">正常</el-radio>-->
         <!--</el-radio-group>-->
-      <!--</el-form-item>-->
+        <!--</el-form-item>-->
+      </div>
+      <div class="user-right inline-block">
+        <el-form-item size="mini" label="授权">
+          <el-tree
+            :default-checked-keys="selTree"
+            :data="menuList"
+            :props="menuListTreeProps"
+            node-key="menuId"
+            ref="menuListTree"
+            :default-expand-all="false"
+            show-checkbox>
+          </el-tree>
+        </el-form-item>
+      </div>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -267,5 +272,14 @@
 <style scoped>
   >>>.no-autofill-pwd .el-input__inner{
     -webkit-text-security:disc!important;
+  }
+  .user-left,.user-right{
+    width: 49%;
+    vertical-align: top;
+  }
+  .user-right{
+    height: auto;
+    overflow-y: auto;
+    max-height: 70vh;
   }
 </style>
