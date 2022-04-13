@@ -197,10 +197,10 @@
                 width="150"
               >
                 <template slot-scope="scope">
-                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,true)"
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,true),scope.row.group=true"
                              v-if="!scope.row.group">加入分组
                   </el-button>
-                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,false)"
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,false),scope.row.group=false"
                              v-if="scope.row.group">取消分组
                   </el-button>
                 </template>
@@ -948,16 +948,17 @@
       },
       //改变聚合函数
       changeGruop(id, table, name) {
-        var idx = this.indexOfJoin(table);
-        var data = this.join[idx];
-        var selectData = $("#fun" + id).val();
-        for (var i = 0; i < data.fields.length; i++) {
-          var field = data.fields[i];
-          if (field.id == id) {
-            this.join[idx].fields[i].fun = selectData;
-            //join[idx].fields[i].group=true;
-          }
-        }
+        // var idx = this.indexOfJoin(table);
+        // var data = this.join[idx];
+        // // var selectData = $("#fun" + id).val();
+        // var selectData = data.fun;
+        // for (var i = 0; i < data.fields.length; i++) {
+        //   var field = data.fields[i];
+        //   if (field.id == id) {
+        //     // this.join[idx].fields[i].fun = selectData;
+        //     // this.join[idx].fields[i].group=true;
+        //   }
+        // }
         this.groupInit();
         this.initOrder();
         this.initTableRow();
@@ -965,15 +966,15 @@
       },
       //改变别名
       changeAlisa(id, table) {
-        var idx = this.indexOfJoin(table);
-        var data = this.join[idx];
-        var val = $("#" + id).val();
-        for (var i = 0; i < data.fields.length; i++) {
-          var field = data.fields[i];
-          if (field.id == id) {
-            this.join[idx].fields[i].alias = val;
-          }
-        }
+        // var idx = this.indexOfJoin(table);
+        // var data = this.join[idx];
+        // var val = $("#" + id).val();
+        // for (var i = 0; i < data.fields.length; i++) {
+        //   var field = data.fields[i];
+        //   if (field.id == id) {
+        //     this.join[idx].fields[i].alias = val;
+        //   }
+        // }
         this.initTableRow();
         this.toSql();
       },
@@ -1205,15 +1206,15 @@
       },
       //点击分组
       clickGroup(id, table, name, group) {
-        var idx = this.indexOfJoin(table);
-        var data = this.join[idx];
-
-        for (var i = 0; i < data.fields.length; i++) {
-          var field = data.fields[i];
-          if (field.id == id) {
-            this.join[idx].fields[i].group = group;
-          }
-        }
+        // var idx = this.indexOfJoin(table);
+        // var data = this.join[idx];
+        //
+        // for (var i = 0; i < data.fields.length; i++) {
+        //   var field = data.fields[i];
+        //   if (field.id == id) {
+        //     this.join[idx].fields[i].group = group;
+        //   }
+        // }
 
         this.groupInit();
         this.initOrder();

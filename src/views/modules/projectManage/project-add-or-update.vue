@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       width="70%"
-      :title="!dataForm.project.projectId ? '新增' : '修改'"
+      :title="!dataForm.project.projectId ? '新增' : type=='look'?'查看':'修改'"
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
