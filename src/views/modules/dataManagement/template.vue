@@ -9,8 +9,8 @@
             <el-table-column prop="uploadUserName" align="center" label="上传人"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button size="small" type="text" @click="getImportclick(scope.row)">导入模板</el-button>
-                    <el-button size="small" type="text" @click="getExportClick(scope.row.attachmentId,scope.row.templateName)">导出模板</el-button>
+                    <el-button size="small" type="text" v-if="userName== '管理员'" @click="getImportclick(scope.row)">导入模板</el-button>
+                    <el-button size="small" type="text" v-if="userName !== 'admin'" @click="getExportClick(scope.row.attachmentId,scope.row.templateName)">导出模板</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -66,7 +66,8 @@ export default {
             importId:'',
             dataForm1: {
                 fileInfoId: "",
-            }
+            },
+            userName:'',
         }
     },
   computed:{
@@ -78,9 +79,23 @@ export default {
         this.token = this.$cookie.get("token");
     },
     mounted() {
+        //获取当前登录人信息
+        this.getUserInfo()
         this.initData()
     },
     methods:{
+         getUserInfo() {
+            this.$http({
+                url: this.$http.adornUrl("/sys/currentUser"),
+                method: "get",
+                params: this.$http.adornParams()
+            }).then(({ data }) => {
+                if (data && data.code === 200) {
+                this.userName = data.result.userName;
+                console.log(this.userName)
+                }
+            });
+            },
         //初始化数据
         initData(){
             this.listLoading = true;
@@ -181,9 +196,11 @@ export default {
                     responseType: "blob",
                     params: this.$http.adornParams({
                     fileInfoId:id,
+                    token:this.$cookie.get('token')
                     })
                 }).then(({data}) =>{
-                    if (data.type) {
+                    console.log(data)
+                    // if (data.code == 200) {
                         // 文件下载
                         const blob = new Blob([data], {
                         type: "application/vnd.ms-excel"
@@ -194,11 +211,12 @@ export default {
                         link.click();
                         link = null;
                         this.$message.success('导出成功');
-                    } else {
-                        // 返回json
-                        this.$message.warning(data.message);
-                        }
-                }).catch(err => {
+                    // } else {
+                    //     debugger
+                    //     // 返回json
+                    //     this.$message.warning(data.message);
+                    //     }
+                }).catch(data => {
                     this.$message.error("下载失败");
                     this.$message({
                     message: '请先导入模板在进行导出模板',
@@ -211,9 +229,9 @@ export default {
                     type: 'success',})
             }      
             // if(id){
-            //     // let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
-            //     // // console.log(url)
-            //     // window.open(url)
+            //     let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
+            //     // console.log(url)
+            //     window.open(url)
             // }else{
             //     this.$message({
             //         message: '请先导入模板在进行导出模板',
