@@ -2,7 +2,8 @@
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
       <div class="data-left" :class="leftHidden?'data-left-hidden':''">
-        <div @click="getCanvas(),leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+        <div @click="getCanvas(),leftHidden=!leftHidden" class="data-left-tab inline-block"
+             :class="!leftHidden?'data-left-tab-act':''">
           数据表
         </div>
         <div v-show="!leftHidden" class="data-tree inline-block">
@@ -34,7 +35,8 @@
           </el-tree>
         </div>
       </div>
-      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''" class="data-canvas mar-l">
+      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''"
+           class="data-canvas mar-l">
         <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
@@ -75,7 +77,8 @@
             </div>
           </div>
         </div>
-        <div @click="getCanvas(),rightHidden=!rightHidden" class="data-right-tab inline-block" :class="!rightHidden?'data-right-tab-act':''">
+        <div @click="getCanvas(),rightHidden=!rightHidden" class="data-right-tab inline-block"
+             :class="!rightHidden?'data-right-tab-act':''">
           表关系
         </div>
 
@@ -87,7 +90,8 @@
         <div id="order" class="box-bg form-group" style="overflow: auto;"></div>
       </div>
       <div class="data-list mar-l" id="sqlHidden">
-        <div id="attr" class="data-list-item data-list-table" style="margin-top:34px;margin-bottom:10px">
+        <div id="attr" class="data-list-table" style="margin-top:34px;margin-bottom:10px">
+          <!--<div id="attr" class="data-list-item" style="margin-top:34px;margin-bottom:10px">-->
           <div class="table-view">
             <!-- <table class="table table-striped" id="gridTable"></table> -->
             <el-table
@@ -182,7 +186,7 @@
                 label="筛选"
               >
                 <template slot-scope="scope">
-                  <el-button type="primary">筛选</el-button>
+                  <el-button type="primary" @click="screen(scope.row)">筛选</el-button>
                 </template>
               </el-table-column>
               <el-table-column
@@ -214,23 +218,41 @@
             </el-table>
           </div>
         </div>
-        <div id="sql" class="box-bg data-list-item sql-box"></div>
+        <div id="sql" class="box-bg1 sql-box">
+          {{sqlMsg}}
+        </div>
+        <!--<div id="sql" class="box-bg"></div>-->
       </div>
-
-
     </div>
+    <el-dialog width="75%" title="筛选" :visible.sync="dialogFormVisible">
+      <div class="screen-body">
+        <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false,cleanQueryRules()">取 消</el-button>
+        <el-button type="primary" @click="saveScreen()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
+  import queryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
+
   require("../../../utils/jquery/jquery-3.3.1");
   const make = go.GraphObject.make;
   export default {
     data() {
       return {
+        screenKey:0,
+        screenRow: {},//筛选的当前行
+        queryRules: [], // querybuilder的规则数据
+        queryJson: {}, // queryBuilder上动态绑定的json数据
+        dialogFormVisible: false,//筛选弹框状态
+        sqlMsg: '',//sql语句
         //是否隐藏数据表
-        leftHidden:false,
+        leftHidden: false,
         //是否隐藏表关系
-        rightHidden:false,
+        rightHidden: false,
 
         filter: {},
         layeX: -1,
@@ -270,7 +292,6 @@
           {dataname: "gridTable_group", label: "分组", issortable: false, type: ""},
         ],
         tableData: []
-
       };
     },
     activated() {
@@ -286,16 +307,103 @@
 
 
     },
-
     methods: {
-      getCanvas(){
+      //筛选弹框确定点击
+      saveScreen() {
+        this.dialogFormVisible = false;
+        var sql = this.queryToSql(this.queryJson);
+        var idx =  this.indexOfJoin(this.screenRow.table);
+        var datajoin =  this.join[idx];
+        for(var i=0;i<datajoin.fields.length;i++){
+          var field = datajoin.fields[i];
+          if(field.id == this.screenRow.id){
+            this.join[idx].fields[i].more=sql;
+          }
+        }
+        this.initTableRow();
+        this.toSql();
+        this.$refs.queryBuilder.query.children=[];
+        // console.log(this.$refs.queryBuilder);
+      },
+      //通过返显的Json字符串拼出返显的sql
+      queryToSql(query) {
+        const sql = [];
+        const that = this;
+        const logicalOperator = query.logicalOperator;
+        const children = query.children;
+        children.forEach((child) => {
+          const type = child.type;
+          if (type === "query-builder-rule") {
+            var dataTypeObj ='';
+            if (dataTypeObj=='') {
+              if (child.query.operator == "like" || child.query.operator == "not like") {
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("'%" + child.query.value + "%'");
+              } else if (child.query.operator == "is null" || child.query.operator == "is not null") {
+                let arr = ''
+                child.query.value = arr
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("" + child.query.value + "");
+              } else {
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("'" + child.query.value + "'");
+              }
+
+            } else {
+              sql.push(child.query.operand);
+              sql.push(child.query.operator);
+              sql.push(child.query.value);
+            }
+          } else {
+            sql.push("(");
+            sql.push(that.queryToSql(child.query));
+            sql.push(")");
+          }
+          sql.push(logicalOperator);
+        });
+        sql.splice(sql.length - 1, sql.length);
+        return sql.join(" ");
+      },
+      //重置querybuilder的规则数据
+      cleanQueryRules() {
+        this.queryRules = [];
+      },
+      //筛选按钮点击
+      screen(row) {
+
+        this.screenKey=Math.random();
+
+        this.screenRow = row;
+        this.queryRules = [];
+        var v = {
+          type: 'inputselect',
+          label:row.key+"."+ row.info,
+          value:row.key+"."+ row.info,
+          operators: [{'id': "=", "label": "等于"}, {'id': "!=", "label": "不等于"}, {
+            'id': "like",
+            "label": "包含以下内容"
+          }, {'id': "not like", "label": "不包含以下内容"}, {'id': "is null", "label": "为空值"}, {
+            'id': "is not null",
+            "label": "不为空值"
+          },]
+        };
+        this.queryRules.push(v);
+        this.dialogFormVisible = true;
+
+      },
+      getCanvas() {
         this.upDateDiagramAnimationFrame(0)
       },
-      upDateDiagramAnimationFrame(count){
+      upDateDiagramAnimationFrame(count) {
         count++;
         requestAnimationFrame(() => {
           this.myDiagram.requestUpdate();
-          if(count<60){ this.upDateDiagramAnimationFrame(count); }
+          if (count < 60) {
+            this.upDateDiagramAnimationFrame(count);
+          }
         });
       },
       init() {
@@ -306,7 +414,7 @@
           "myDiagramDiv",
           {
             allowZoom: true,
-            autoScale:go.Diagram.UniformToFill,
+            autoScale: go.Diagram.UniformToFill,
             validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
             // For this sample, automatically show the state of the diagram's model on the page
             "ModelChanged": function (e) {
@@ -1040,9 +1148,11 @@
           sql = sql + orderSql;
         }
         if (this.join.length == 0) {
-          document.getElementById("sql").innerHTML = "";
+          this.sqlMsg = '';
+          // document.getElementById("sql").innerHTML = "";
         } else {
-          document.getElementById("sql").innerHTML = sql;
+          this.sqlMsg = sql;
+          // document.getElementById("sql").innerHTML = sql;
         }
         return sql;
       },
@@ -1273,14 +1383,16 @@
         }
       },
     },
-    components: {},
+    components: {
+      queryBuilder
+    },
     watch: {}
   };
 </script>
 <style scoped lang="scss">
   .graphtool-tooldic {
     width: 100%;
-    height: 100vh;
+    /*height: 100vh;*/
     .graphtool-top {
       width: 100%;
       // height: ;
@@ -1290,25 +1402,25 @@
         width: 30%;
         overflow: scroll;
       }
-      .data-left-hidden{
+      .data-left-hidden {
         width: auto;
         overflow: hidden;
       }
       .data-canvas {
         /*flex: 1;*/
         width: 40%;
-        #myDiagramDiv{
+        #myDiagramDiv {
           width: 100%;
         }
       }
-      .data-canvas-noLeft{
+      .data-canvas-noLeft {
         width: 70%;
       }
-      .data-canvas-noLeftRight{
+      .data-canvas-noLeftRight {
         width: 95%;
       }
       .data-right {
-        width:30%;
+        width: 30%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -1325,9 +1437,9 @@
 
         }
 
-        .data-right-tab{
-          top:0;
-          right:0;
+        .data-right-tab {
+          top: 0;
+          right: 0;
           position: absolute;
           cursor: pointer;
           width: 20px;
@@ -1343,13 +1455,13 @@
           border-bottom-right-radius: 5px;
           margin: 5px 0;
         }
-        .data-right-tab-act{
-          color:#333;
+        .data-right-tab-act {
+          color: #333;
         }
       }
-      .data-right-hidden{
+      .data-right-hidden {
         overflow: hidden;
-        display:block;
+        display: block;
         width: 30px;
       }
     }
@@ -1360,34 +1472,45 @@
       margin-right: 5px;
     }
     .graphtool-bottom {
-      height: 50vh;
-      display: flex;
+      /*height: 50vh;*/
+      height: auto;
+      /*display: flex;*/
       .data-sort {
-        width: 300px;
-        display: flex;
-        flex-direction: column;
+        display: inline-block;
+        width: 30%;
+        height: 50vh;
+        /*display: flex;*/
+        /*flex-direction: column;*/
         .box-bg {
-          flex: 1;
+          /*flex: 1;*/
+          width: 100%;
+          height: 90%;
         }
       }
       .data-list {
-        flex: 1;
+        /*flex: 1;*/
+        width: 68%;
+        vertical-align: top;
         height: 100%;
-        display: flex;
+        display: inline-block;
+        /*display: flex;*/
         flex-direction: column;
         .data-list-item {
           width: 100%;
           position: relative;
         }
         .data-list-table {
-          flex: 1;
+          /*flex: 1;*/
+          width: 100%;
         }
         .sql-box {
-          /*height: 100px;*/
+          /*min-height: 100px;*/
+          height: auto;
           overflow: auto;
+          padding: 10px;
         }
         .table-view {
-          position: absolute;
+          /*position: absolute;*/
           /*height: 100%;*/
           width: 100%;
         }
@@ -1397,6 +1520,12 @@
       background: #F7F7F7;
       border: 1px solid #F3F3F3;
       overflow: auto;
+    }
+    .box-bg1 {
+      background: #F7F7F7;
+      border: 1px solid #F3F3F3;
+      overflow: auto;
+      width: 100%;
     }
     .tstext {
       height: 26px;
@@ -1420,12 +1549,13 @@
     font-weight: bold;
     cursor: pointer;
   }
-  .data-left{
-    .data-tree{
+
+  .data-left {
+    .data-tree {
       vertical-align: top;
       width: 90%;
     }
-    .data-left-tab{
+    .data-left-tab {
       cursor: pointer;
       width: 20px;
       word-break: break-all;
@@ -1440,9 +1570,16 @@
       border-bottom-right-radius: 20px;
       margin: 5px 0;
     }
-    .data-left-tab-act{
-      color:#333;
+    .data-left-tab-act {
+      color: #333;
     }
   }
 
+  > > > .form-control {
+    width: 150px !important;
+  }
+
+  .vqb-rule > > > .el-autocomplete {
+    width: 150px !important;
+  }
 </style>

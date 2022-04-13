@@ -167,6 +167,7 @@ export default {
       this.listLoading = true;
       var getSql = this.$refs.myquerybuilder.getSelectSql();
       this.sqlData = getSql.sql;
+      console.log(this.sqlData)
       this.initList();
     },
     //导出

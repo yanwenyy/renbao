@@ -131,6 +131,7 @@ export default {
     },
     //通过返显的Json字符串拼出返显的sql
     queryToSql(query) {
+      // console.log(query,134)
       const sql = [];
       const that = this;
       const logicalOperator = query.logicalOperator;
