@@ -7,6 +7,7 @@
           :batchTreeList="batchTreeList"
           @getbatchData="getbatchData"
           v-on:refreshBitchData="getbatchList"
+          v-on:refreshRuleData="getTableData"
           :isParent="false"
         ></batch-list>
       </el-card>
@@ -337,6 +338,11 @@ export default {
             this.Pager.pageSize = data.result.size;
             this.Pager.pageIndex = data.result.current;
             this.Pager.total = data.result.total;
+          } else {
+            this.tableData = [];
+            this.Pager.pageIndex = 1;
+            this.Pager.total = 0;
+
           }
         })
         .catch(() => {
@@ -403,7 +409,7 @@ export default {
     },
     //左点右显
     getbatchData(data, node) {
-      this.batchId = data.batchId;
+      this.batchId = data && data.batchId && data.batchId || '';
       this.clearChcked();
       this.getTableData();
     },

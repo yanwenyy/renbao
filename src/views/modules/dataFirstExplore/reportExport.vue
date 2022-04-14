@@ -9,6 +9,7 @@
             :batchTreeList="batchTreeList"
             @getbatchData="getbatchData"
             v-on:refreshBitchData="initTree"
+            v-on:refreshRuleData="initData"
             :isParent="false"
           ></batch-list>
         <!-- </div> -->
@@ -434,8 +435,8 @@ export default {
     },
     //左点右显
     getbatchData(data, node) {
-      this.batchId = data.batchId;
-      this.batchName = data.batchName;
+      this.batchId = data && data.batchId && data.batchId || '';
+      this.batchName = data && data.batchName && data.batchName || '';
       this.initData();
     },
 

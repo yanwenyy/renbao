@@ -7,6 +7,7 @@
           :batchTreeList="batchTreeList"
           parentGetTreeData="getbatchData"
           v-on:refreshBitchData="getbatchList"
+          v-on:refreshRuleData="getTableData"
         ></batch-list>
       </el-card>
     </div>
@@ -250,7 +251,9 @@ export default {
   methods: {
     //左点右显
     getbatchData(data, node) {
-      this.batchItem = data;
+      if (data && data.batchId) {
+        this.batchItem = data;
+      }
       this.getTableData();
     },
     //查询

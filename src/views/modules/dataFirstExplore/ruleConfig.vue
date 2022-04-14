@@ -344,7 +344,8 @@ export default {
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
-      sql: []
+      sql: [],
+      folderSorts: '1,2'
     };
   },
   computed: {
@@ -352,11 +353,36 @@ export default {
       get() {
         return this.$store.state.common.tableHeight;
       }
-    }
+    },
+    projectId: {
+      get() {
+        if (this.$store.state.common.projectId) {
+          return this.$store.state.common.projectId;
+        } else {
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+            method: "get",
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              return data.result && data.result.projectId && data.result.projectId || '';
+            }
+          });
+        }
+      }
+    },
   },
   created() {
     //获取列表
     // this.initData();
+  },
+  mounted() {
+    this.$bus.$on("updateRuleData", () => {
+      this.getRuleFolder();
+    });
+  },
+  activated () {
+    this.getRuleFolder()
   },
   methods: {
     //获取列表数据
@@ -400,6 +426,25 @@ export default {
         }
       });
     },
+    // 获取规则树
+    getRuleFolder() {
+      this.$http({
+        isLoading: false,
+        url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+        method: "get",
+        params: this.$http.adornParams(
+          { folderSorts: this.folderSorts, projectId: this.projectId },
+          false
+        )
+        // params:  this.$http.adornParams({}, false)
+      })
+      .then(({ data }) => {
+        if (data.code == 200) {
+          this.ruleData = data.result;
+        }
+      })
+      .catch(() => {});
+    },
     //点击树节点切换表
     handleNodeClick(data) {
       // console.log(data)
@@ -409,7 +454,8 @@ export default {
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
       this.ruleId = "";
       this.folderId = "";
-      this.ruleData = this.$refs.ruleTree.treeData;
+      // this.ruleData = this.$refs.ruleTree.treeData;
+
     },
     //修改弹框
     editData() {
@@ -419,7 +465,7 @@ export default {
       );
       this.ruleId = this.multipleSelection[0].ruleId;
       this.folderId = this.multipleSelection[0].folderId;
-      this.ruleData = this.$refs.ruleTree.treeData;
+      // this.ruleData = this.$refs.ruleTree.treeData;
     },
     // 关闭详情弹窗
     closeDetail() {
@@ -582,6 +628,13 @@ export default {
     clearTableChecked() {
       this.$refs.tableData.clearSelection(this.multipleTable);
       this.multipleSelection = [];
+    }
+  },
+  watch: {
+    projectId(nval, oval) {
+      if (nval) {
+        this.getRuleFolder();
+      }
     }
   }
 };
