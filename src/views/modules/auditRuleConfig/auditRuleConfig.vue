@@ -501,7 +501,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 200) {
-              return data.result.projectId;
+              return data.result && data.result.projectId && data.result.projectId || '';
             }
           });
         }
