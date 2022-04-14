@@ -205,16 +205,6 @@
                   </el-button>
                 </template>
               </el-table-column>
-              <!--<el-table-column-->
-              <!--v-for="(items, index) in tablePositionKey"-->
-              <!--:prop="items.dataname"-->
-              <!--:key="index"-->
-              <!--:label="items.label"-->
-              <!--:sortable="items.issortable"-->
-              <!--:align="items.align ? items.align : 'center'"-->
-
-              <!--&gt;-->
-              <!--</el-table-column>-->
             </el-table>
           </div>
         </div>
@@ -280,17 +270,6 @@
         loadTree: [],//左边树懒加载的数据
         dataTreeData: [],//左边树数据表初始的数据
         treeExpandData: [], // 通过接口获取的需要默认打开的节点
-        tablePositionKey: [ // 表头
-          {dataname: "order", label: "", issortable: false, type: ""},
-          {dataname: "tableName", label: "来源", issortable: false, type: ""},
-          {dataname: "name", label: "英文字段名", issortable: false, type: ""},
-          {dataname: "info", label: "中文字段名", issortable: false, type: ""},
-          {dataname: "gridTable_alias", label: "别名", issortable: false, type: ""},
-          {dataname: "gridTable_fun", label: "聚合函数", issortable: false, type: ""},
-          {dataname: "gridTable_order", label: "排序", issortable: false, type: ""},
-          {dataname: "gridTable_screen", label: "筛选", issortable: false, type: ""},
-          {dataname: "gridTable_group", label: "分组", issortable: false, type: ""},
-        ],
         tableData: []
       };
     },
@@ -304,7 +283,6 @@
         this.layeX = event.layerX;
         this.layeY = event.layerY;
       };
-
 
     },
     methods: {
@@ -373,9 +351,7 @@
       },
       //筛选按钮点击
       screen(row) {
-
         this.screenKey=Math.random();
-
         this.screenRow = row;
         this.queryRules = [];
         var v = {
@@ -1043,6 +1019,7 @@
           node.fields[i].group = false;
         }
         this.myDiagram.model.addNodeData(node);
+
       },
       //生成sql
       toSql() {
@@ -1365,6 +1342,7 @@
               }
               table.fields = fieldArr;
               this.addNodeData(table);
+
             })
 
           }
@@ -1582,5 +1560,8 @@
 
   .vqb-rule > > > .el-autocomplete {
     width: 150px !important;
+  }
+  #order{
+    padding: 10px;
   }
 </style>
