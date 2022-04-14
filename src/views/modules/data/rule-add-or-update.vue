@@ -737,17 +737,8 @@ export default {
         var v = { ruleStatisticsColumnName: item.columnName };
         ruleStatisticsColumns.push(v);
       });
-      if (
-        this.dataForm.ruleSqlStatisticsValue &&
-        this.dataForm.ruleSqlStatisticsValue != ""
-      ) {
-        if (
-          this.dataForm.ruleSqlStatisticsValue.indexOf(
-            this.rjMust["personTime"]
-          ) == -1 ||
-          this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
-            -1
-        ) {
+      if (this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!=null && this.dataForm.ruleSqlStatisticsValue != "") {
+        if (this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["personTime"]) == -1 || this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) == -1) {
           this.$message.error(
             `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
           );
@@ -768,9 +759,12 @@ export default {
         //   );
         //   return false;
         // }
-        if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
-          return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
+        if(this.dataForm.ruleRemark){
+          if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+            return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
+          }
         }
+
       }
       this.$refs["dataForm"].validate(valid => {
         if (valid) {

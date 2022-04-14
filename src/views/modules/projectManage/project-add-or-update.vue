@@ -134,7 +134,7 @@
             >
               <template slot-scope="scope">
                 <el-form-item class="tabelForm" :prop="'xmProjectRoleUsers.' + scope.$index + '.userIds'" :rules="scope.row.roleName.indexOf('组长')!=-1?{
-      required: true, message: '组长不能为空', trigger: 'blur'
+      required: true, message: '组长不能为空', trigger: 'change'
     }:null">
                   <el-select
                     :disabled="type=='look'"
