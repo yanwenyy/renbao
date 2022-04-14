@@ -223,6 +223,25 @@ export default {
     tableHeight: {
       get () { return this.$store.state.common.tableHeight}
     },
+    projectId: {
+      get () {
+        if(this.$store.state.common.projectId){
+          return this.$store.state.common.projectId
+        }else{
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+            method: "get",
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              return data.result && data.result.projectId && data.result.projectId || '';
+
+            }
+          });
+        }
+      }
+    },
+
   },
   activated() {
     this.getbatchList();
@@ -302,7 +321,7 @@ export default {
                 : "",
             ruleName: this.searchForm.ruleName,
             ruleCategory: this.searchForm.ruleCategory,
-            batchType: 2
+            batchType: 2,
           },
           false
         )
@@ -313,15 +332,6 @@ export default {
             data.result.records.map(i => {
               // i.ruleName = i.rule && i.rule.ruleName || ''
               i.dealRuleType = this.dealRuleType(i.ruleCategory);
-              i.expectedBeginTime =
-                (i.expectedBeginTime && i.expectedBeginTime.split("T")[0]) ||
-                "";
-              i.actualBeginTime =
-                (i.actualBeginTime && i.actualBeginTime.split("T")[0]) || "";
-              i.expectedEndTime =
-                (i.expectedEndTime && i.expectedEndTime.split("T")[0]) || "";
-              i.actualEndTime =
-                (i.actualEndTime && i.actualEndTime.split("T")[0]) || "";
               i.runStatusName = this.dealRunStatus(i.runStatus);
             });
             this.tableData = data.result.records;
@@ -410,7 +420,7 @@ export default {
         isLoading: false,
         url: this.$http.adornUrl("/batch/selectList"),
         method: "get",
-        params: this.$http.adornParams({ batchType: 2 }, false)
+        params: this.$http.adornParams({ batchType: 2, projectId:this.projectId}, false)
       })
         .then(({ data }) => {
           this.batchLoading = false;
