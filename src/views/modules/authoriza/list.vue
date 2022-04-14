@@ -14,7 +14,7 @@
       <!--@node-click="getRightData"-->
       <!--ref="tree">-->
       <!--</el-tree>-->
-      <div>用户列表:</div>
+      <div class="user-title">用户列表: <el-input clearable @blur='queryData' @input="queryData" class="search-user-input" placeholder="搜索用户" v-model="selectVal"></el-input></div>
       <ul class="user-list">
         <li v-for="(item, index) in userList" :key="index">
           <div
@@ -66,12 +66,14 @@ import { treeDataTranslate } from "@/utils";
 export default {
   data() {
     return {
+      selectVal:'',
       isCheck:true,
       checkboxTree: 0,
       selTree: [],
       userIdList: [],
       userId: "",
       userList: [],
+      userListCopy: [],
       filterText: "",
       dataLeft: [
         {
@@ -192,6 +194,18 @@ export default {
     this.token = this.$cookie.get("token");
   },
   methods: {
+    //搜索用户
+    queryData(){
+      //并没有输入关键字时，就不要再搜索了
+      if(this.selectVal===''||this.selectVal==null){
+        this.userList=JSON.parse(JSON.stringify(this.userListCopy));
+        return;
+      }
+      //搜索
+      let list=this.userList.filter(item=>item.userName.indexOf(this.selectVal)>=0);
+      this.userList=list;
+
+    },
     //勾选
     checkTree(id, item) {
       if (this.userIdList.length == 0) {
@@ -217,6 +231,7 @@ export default {
         method: "get"
       }).then(({ data }) => {
         this.userList = data.result;
+        this.userListCopy = data.result;
         this.userList.forEach(item => {
           item.checkd = false;
         });
@@ -341,10 +356,14 @@ export default {
 .left {
   width: 40%;
   border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 .right {
   width: 60%;
   position: relative;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 .buttons {
   text-align: right;
@@ -373,5 +392,12 @@ export default {
   display: inline-block;
   width: 70%;
 }
-
+.user-list{
+  height:85%;
+  overflow-y: auto;
+}
+.search-user-input{
+  width: 60%;
+  margin-bottom: 10px;
+}
 </style>
