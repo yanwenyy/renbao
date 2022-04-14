@@ -13,7 +13,7 @@
         </el-form-item>
         <el-form-item label="项目名称" prop="project.projectName">
           <el-input :disabled="type=='look'" @blur="verification(dataForm.project.projectName,'项目名称不能重复','projectName')"
-                    v-model="dataForm.project.projectName" placeholder="项目名称"></el-input>
+                    v-model.trim="dataForm.project.projectName" placeholder="项目名称"></el-input>
         </el-form-item>
         <el-form-item label="项目周期" class="imitate-red">
           <!--<el-date-picker-->
@@ -133,22 +133,27 @@
               align="center"
             >
               <template slot-scope="scope">
-                <el-select
-                  :disabled="type=='look'"
-                  filterable
-                  class="userList"
-                  multiple
-                  v-model="scope.row.userIds"
-                  placeholder="请选择"
-                  @change="getMemberList">
-                  <el-option
-                    v-for="(item,index) in userList"
-                    :key="index"
-                    :label="item.userName"
-                    :value="item.userId">
-                    <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
-                  </el-option>
-                </el-select>
+                <el-form-item class="tabelForm" :prop="'xmProjectRoleUsers.' + scope.$index + '.userIds'" :rules="scope.row.roleName.indexOf('组长')!=-1?{
+      required: true, message: '组长不能为空', trigger: 'blur'
+    }:null">
+                  <el-select
+                    :disabled="type=='look'"
+                    filterable
+                    class="userList"
+                    multiple
+                    v-model="scope.row.userIds"
+                    placeholder="请选择"
+                    @change="getMemberList">
+                    <el-option
+                      v-for="(item,index) in userList"
+                      :key="index"
+                      :label="item.userName"
+                      :value="item.userId">
+                      <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+
               </template>
 
             </el-table-column>
@@ -687,11 +692,11 @@
   }
 </script>
 <style scoped>
-  > > > .el-form-item__label {
+  >>> .el-form-item__label {
     width: 120px !important;
   }
 
-  > > > .el-input {
+  >>> .el-input {
     width: 90%;
   }
 
@@ -708,7 +713,7 @@
     width: 70%;
   }
 
-  .tabelForm > > > .el-form-item__error {
+  .tabelForm >>> .el-form-item__error {
     top: 22%;
     left: 40%;
     text-align: right;
@@ -721,7 +726,7 @@
     width: 80%;
   }
 
-  .userList > > > .el-input {
+  .userList >>> .el-input {
     width: 100%;
     box-sizing: border-box;
   }
@@ -739,7 +744,7 @@
     margin-left: 0 !important;
   }
 
-  > > > .imitate-red > .el-form-item__label:before {
+  >>> .imitate-red > .el-form-item__label:before {
     content: '*';
     color: #F56C6C;
     margin-right: 4px;
