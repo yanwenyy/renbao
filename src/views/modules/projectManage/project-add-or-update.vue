@@ -149,7 +149,7 @@
                       :key="index"
                       :label="item.userName"
                       :value="item.userId">
-                      <span style="float: left">{{ item.userName }}({{item.userNumber}})</span>
+                      <span style="float: left">{{ item.userName }}({{item.userLoginName}})</span>
                     </el-option>
                   </el-select>
                 </el-form-item>
