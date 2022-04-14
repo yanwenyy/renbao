@@ -127,6 +127,7 @@
     },
     created () {
       // alert(11);
+      var that=this;
       this.$store.dispatch('common/changeProjectList',this.userId);
       this.$http({
         url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
@@ -135,17 +136,20 @@
       }).then(({ data }) => {
         if (data && data.code === 200) {
           if(data.result){
-            this.projectList.forEach(item=>{
-              if(item.projectId==data.result.projectId){
-                this.projectCode=data.result.projectId;
-                this.$store.commit('common/updateProjectId', this.projectCode)
-              }
-            })
+            setTimeout(function () {
+              that.projectList.forEach(item=>{
+                if(item.projectId==data.result.projectId){
+                  that.projectCode=data.result.projectId;
+                  that.$store.commit('common/updateProjectId', that.projectCode)
+                }
+              })
+            },100)
           }
           // this.$store.dispatch('common/changeProjectId', this.projectCode)
         }
       });
     },
+    mounted(){},
     methods: {
       // 修改密码
       updatePasswordHandle () {

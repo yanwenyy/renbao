@@ -754,10 +754,12 @@
               try {
               } catch (e) {
               }
+
               var obj = e.newValue;
               var i = that.indexOfJoin(obj.from);
               var j = that.indexOfJoin(obj.to);
               var idx = Math.max(i, j);
+              // console.log(that.join[idx],762)
               if ("," === that.join[idx].type) {
                 that.join[idx].type = "INNER JOIN";
               }
@@ -1019,7 +1021,12 @@
           node.fields[i].group = false;
         }
         this.myDiagram.model.addNodeData(node);
-
+        // if(node.chineseName=='医院住院结算明细_A'){
+        //   console.log(node.chineseName)
+        //   // 添加线数据
+        //   var link_obj= [{ "from": '主诊医师姓名', "to": '住院号' }];
+        //   this.myDiagram.model.addLinkData(link_obj);;//增加单个线
+        // }
       },
       //生成sql
       toSql() {
