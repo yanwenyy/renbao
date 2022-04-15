@@ -64,7 +64,19 @@
         :height="tableHeight - 165"
         class="demo-ruleForm"
         v-loading="tableLoading"
-        @selection-change="handleSelectionChange"
+        @selection-change="handleSelectionChange" v-if="tableList == ''" 
+      >
+      </el-table>
+
+       <el-table
+        ref="multipleTable"
+        :data="tableList"
+        border
+        style="100%"
+        :height="tableHeight - 165"
+        class="demo-ruleForm"
+        v-loading="tableLoading"
+        @selection-change="handleSelectionChange" v-if="tableList != ''" 
       >
         <el-table-column align='center' type="selection" width="55"></el-table-column>
         <template v-for="(item, index) in tableColumns">
