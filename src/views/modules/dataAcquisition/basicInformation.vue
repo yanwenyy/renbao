@@ -64,14 +64,15 @@
         :height="tableHeight - 165"
         class="demo-ruleForm"
         v-loading="tableLoading"
-        @selection-change="handleSelectionChange" :header-cell-style="{ textAlign: 'center' }"
+        @selection-change="handleSelectionChange"
       >
-        <!-- <el-table-column type="selection"></el-table-column> -->
+        <el-table-column align='center' type="selection" width="55"></el-table-column>
         <template v-for="(item, index) in tableColumns">
           <el-table-column
             :prop="item"
             :label="item"
             :key="index"
+            width
             show-overflow-tooltip
           ></el-table-column>
         </template>
@@ -390,8 +391,4 @@ export default {
 .el-form-item {
   margin-bottom: 0;
 }
-// /deep/.el-table .el-table__empty-block{ 
-//   width:100px;
-// }
-
 </style>
