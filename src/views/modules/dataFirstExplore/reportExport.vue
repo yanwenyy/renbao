@@ -237,7 +237,7 @@ export default {
   },
   methods: {
     //初始化列表数据
-    initData() {
+    initData(callBack) {
       // this.loading = true;
       this.$http({
         url: this.$http.adornUrl("batchResultExport/selectPage"),
@@ -250,6 +250,9 @@ export default {
           pageSize: this.Pager.pageSize
         })
       }).then(({ data }) => {
+        if (callBack) {
+          callBack(data)
+        }
         if (data && data.code === 200) {
           this.tableData = data.result.records;
           this.Pager.total = data.result.total;
@@ -298,19 +301,20 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
-            this.initData();
-            let success = false;
-            for (var i in this.tableData) {
-              if (this.tableData[i].batchResultExportStatus == 3) {
-                success = true;
-                break;
+            // 判断如果列表状态有一个为成功则生成报告成功，都失败则生成报告失败
+            this.initData((res) => {
+              let batchResultExportStatus = res.result.records.map(i => {
+                return i.batchResultExportStatus
+              })
+              let createReportStatus = batchResultExportStatus.some(i => {
+                return i == 3
+              })
+              if (createReportStatus) {
+                this.$message.success("生成报告完成");
+              } else {
+                this.$message.error("生成报告失败");
               }
-            }
-            if (success == true) {
-              this.$message.success("生成报告成功");
-            } else {
-              this.$message.error("生成报告失败");
-            }
+            });
           } else {
             this.$message.error("生成报告失败");
             this.initData();
