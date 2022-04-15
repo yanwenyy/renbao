@@ -57,7 +57,7 @@
               </template>
             </el-table-column>
           </el-table>
-             <div class="operate-div">
+          <div class="operate-div">
             <DataSortOperate
               ref="dataSortOperate"
               :dataOperate="multipleSelection"
@@ -85,18 +85,21 @@
               <el-button type="primary" class="el_header_button" @click="resetForm">重置</el-button>
             </div>
           </div>
+          <el-dialog title="代码类别详情" :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="addOrUpdateVisible">
+             <BaseCodeInfo v-if="addOrUpdateVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeInfo>
+          </el-dialog>
         </div>
       </el-card>
+      
     </div>
 </template>
 <script>
 import DataSortOperate from './component/DataSortOperate.vue';
-import BaseCodeOperate from './component/BaseCodeOperate.vue'
+import BaseCodeInfo from './component/BaseCodeInfo.vue'
 export default {
     name:'baseList',
     components: {
-       DataSortOperate,
-       BaseCodeOperate
+       DataSortOperate,BaseCodeInfo
     },
     data() {
         return {
@@ -108,7 +111,11 @@ export default {
         },
         tableData: [],
         multipleSelection: '',
-        editTag: ""
+        editTag: "",
+        addOrUpdateVisible: false,
+        dataSortIds:'',
+        dataSortNames:'',
+        editTags:''
         };
     },
     computed:{
@@ -129,10 +136,14 @@ export default {
         },
         toBaseInfo(row) { 
             if (row.extendTag == 0) {
-                this.$router.push({
-                    path:`/component/BaseCodeInfo/${row.dataSortId}/${row.dataSortName}`,
-                    query: { editTag: row.editTag }
-                });
+                this.addOrUpdateVisible = true,
+                this.dataSortIds = row.dataSortId
+                this.dataSortNames = row.dataSortName
+                this.editTags = row.editTag
+                // this.$router.push({
+                //     path:`/component/BaseCodeInfo/${row.dataSortId}/${row.dataSortName}`,
+                //     query: { editTag: row.editTag }
+                // });
             } else {
                 // this.$store.dispatch("dataSort/setDataSortId", row.dataSortId);
                 // this.$store.dispatch("dataSort/setDataSortName", row.dataSortName);
@@ -217,21 +228,18 @@ export default {
             // },
         // 重置编辑页表单
         resetForm() {
-            // 调用子路由
-            this.$refs.dataSortOperate.reset();
+          // 调用子路由
+          this.$refs.dataSortOperate.reset();
         },
+        //关闭弹框
+        ImportSucceed(){this.closeImportDrawer() },
+        closeImportDrawer(){this.addOrUpdateVisible = false},
 
     },
     mounted() {
-      const that = this;
-      // window.onresize = () => {
-      //   return (() => {
-      //     window.fullHeight = document.documentElement.clientHeight;
-      //     that.screenHeight = window.fullHeight;
-      //   })();
-      // };
-        this.query();
-      }
+      this.query();
+    },
+
 }
 </script>
 <style scoped>
