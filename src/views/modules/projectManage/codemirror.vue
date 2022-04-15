@@ -150,7 +150,7 @@
       });
       this.ws.connect();
     },
-    beforeDestory(){
+    destroyed(){
       this.ws.close();
     },
     methods: {

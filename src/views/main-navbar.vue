@@ -210,17 +210,17 @@
     }
   }
 </script>
-<style lang="scss" scoped>
-.project-box {
-  height: 50px;
-  line-height: 50px;
-  float: right;
-  width:40%
-}
-.project-box .el-select{
-  width: 100%;
+<style scoped>
+  .project-box {
+    height: 50px;
+    line-height: 50px;
+    float: right;
+    width:40%
+  }
+  .project-box .el-select{
+    width: 100%;
 
-}
+  }
   .project-box >>>.el-input input{
     border:none;
     text-align: right;

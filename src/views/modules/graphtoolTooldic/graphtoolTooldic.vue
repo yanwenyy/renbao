@@ -41,11 +41,11 @@
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
+      <div v-show="!rightHidden" class="run-btn"><el-button type="primary" @click="getwsData(sqlMsg)">立即运行</el-button></div>
       <div class="data-right mar-l" :class="rightHidden?'data-right-hidden':''">
         <div v-show="!rightHidden" id="joins" class="data-option-box inline-block">
           <div class="tstext">表连接</div>
           <div id="form" class="box-bg"></div>
-
         </div>
         <div v-show="!rightHidden" id="tjHidden" class="data-option-box  inline-block">
           <div class="tstext">连接条件</div>
@@ -214,7 +214,7 @@
         <!--<div id="sql" class="box-bg"></div>-->
       </div>
     </div>
-    <el-dialog width="75%" title="筛选" :visible.sync="dialogFormVisible">
+    <el-dialog :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
       <div class="screen-body">
         <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
       </div>
@@ -223,16 +223,71 @@
         <el-button type="primary" @click="saveScreen()">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
+      <el-tabs @tab-click="tabClick" v-if="resultTableTabs.length>0" v-model="resultTableTabsValue" type="border-card">
+        <el-tab-pane
+          :key="String(index)"
+          v-for="(item, index) in resultTableTabs"
+          v-if="item"
+          :label="'结果'+(index+1)"
+          :name="String(index)"
+        >
+          <div v-if="item.list==''">
+            <div v-if="!item.columnList">{{item.msg}}</div>
+            <el-table height="52vh" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+              <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
+
+              </el-table-column>
+            </el-table>
+          </div>
+          <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
+          <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
+          <el-table height="52vh" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
+            <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+              <template slot-scope="scope">
+                <div>
+                  <span>{{scope.row[key]}}</span>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="(val)=>{sizeChangeTable(val,item,index)}"
+            @current-change="(val)=>{currentChangeTable(val,item,index)}"
+            :current-page="item.pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="item.pageSize"
+            :total="item.totalPage"
+            layout="total, sizes, prev, pager, next, jumper"
+          >
+          </el-pagination>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
+
   </div>
 </template>
 <script>
+  import {PxSocket,randomString} from '@/utils'
+  import SelfLoading from '@/utils/selfLoading'
   import queryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
 
   require("../../../utils/jquery/jquery-3.3.1");
   const make = go.GraphObject.make;
   export default {
+    props:{
+      modelName: {
+        type: String,
+        default: null,
+      },
+    },
     data() {
       return {
+        resultTableTabs: [],//sql执行返回的动态tab
+        resultTableTabsValue: '2',//动态标签显示项
+        wsVisiable:false,//websocket执行结果显示状态
+        ws:{},//websoket对象
+        userId:sessionStorage.getItem("userId")+"-"+(this.modelName!=null&&this.modelName!=''?this.modelName:'graphtool'),
         screenKey:0,
         screenRow: {},//筛选的当前行
         queryRules: [], // querybuilder的规则数据
@@ -283,9 +338,105 @@
         this.layeX = event.layerX;
         this.layeY = event.layerY;
       };
-
+      this.ws=new PxSocket({
+        url:this.$http.wsUrl('websocket?'+this.userId),
+        succ:this.getDataList
+      });
+      this.ws.connect();
+    },
+    destroyed(){
+      this.ws.close();
     },
     methods: {
+      //sql结果tab切换事件
+      tabClick(e){
+        var list=this.resultTableTabs[e.index].list;
+        this.resultTabClick(list)
+      },
+      //执行结果页码点击
+      currentChangeTable(val,item,index){
+        item.pageIndex=val;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
+      //执行结果页数改变
+      sizeChangeTable(val,item){
+        item.pageSize=val;
+        item.pageIndex = 1;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
+      //点击运行获取websoket数据
+      getwsData(sql) {
+        this.paramsList=[];
+
+        if(sql!=''){
+            this.resultTableTabs=[];
+            var params={
+              sqlScript:sql,
+              loadOnce:false,
+              dataSize:"500",
+              webSocketId:this.userId,
+            };
+            SelfLoading.show({
+              buttonClass:'el-button el-button--primary',
+              buttonText:'取消执行',
+              buttonFun:function(){SelfLoading.hide()}
+            });
+            this.$http({
+              url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+              method: 'post',
+              data: this.$http.adornData(params),
+              isLoading:false
+            }).then(({data}) => {
+              SelfLoading.hide();
+              if(data.code==200){
+
+              }else{
+                // this.$message.error(data.message);
+                this.$alert(data.message, '注意', {
+                  cancelButtonText: '关闭',
+                  showConfirmButton: false,
+                  showCancelButton: true,
+                  type: 'error',
+                });
+              }
+            })
+        }else{
+          this.$message.error("sql语句不能为空")
+        }
+      },
+      //获取sql运行websocket返回的数据
+      getDataList(datas){
+        this.key+=1;
+        if(datas&&datas!='ping'){
+          datas=JSON.parse(datas);
+          console.log(datas);
+          var v={};
+          if(datas.data&&datas.data.result){
+            v={
+              list:datas.data.result||[],
+              columnList:datas.data.columnList,
+              msg:datas.message,
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
+            };
+          }else{
+            v={
+              list:[],
+              columnList:datas.data.columnList,
+              msg:datas.message,
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
+            };
+          }
+          this.resultTableTabs.push(v);
+          console.log(this.resultTableTabs);
+          this.wsVisiable=true;
+        }
+      },
       //筛选弹框确定点击
       saveScreen() {
         this.dialogFormVisible = false;
@@ -486,15 +637,16 @@
             },
             new go.Binding("text", "name")
           ),
-          make(
-            go.TextBlock,
-            {
-              margin: new go.Margin(0, 2),
-              column: 2,
-              font: "13px sans-serif"
-            },
-            new go.Binding("text", "info")
-          )
+          //右边info
+          //   make(
+          //     go.TextBlock,
+          //     {
+          //       margin: new go.Margin(0, 2),
+          //       column: 2,
+          //       font: "13px sans-serif"
+          //     },
+          //     new go.Binding("text", "info")
+          //   )
         );
 
         // This template represents a whole "record".此模板代表整个“记录”。
@@ -513,7 +665,7 @@
               go.Panel,
               "Auto",
               {stretch: go.GraphObject.Horizontal}, // as wide as the whole node  和整个节点一样宽
-              make(go.Shape, {fill: "#F7F7F7", stroke: null}),
+              make(go.Shape, {fill: "#E8ECEF", stroke: null}),
               make(
                 go.TextBlock,
                 {
@@ -1371,12 +1523,40 @@
     components: {
       queryBuilder
     },
-    watch: {}
+    watch: {
+      resultTableTabs: {
+        // 实时监控数据变化
+        deep: true,
+        handler(val) {
+          if (val != "") {
+            if (val !== "") {
+              this.resultTableTabsValue=this.resultTableTabs.length>0?String(this.resultTableTabs.length-1):'0';
+              this.resultTableTabs=val;
+              this.resultTableTabs.forEach(item=>{
+                item.totalPage=item.list.length;
+                item.pageIndex=1;
+                item.pageSize=10;
+                item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+                if(item.columnList){
+                  var v={};
+                  item.columnList.forEach(vtem=>{
+                    v[vtem.columnName]='';
+                  });
+                  item.columnListSelf=[v];
+                }
+              })
+              // console.log( this.resultTableTabsValue)
+            }
+          }
+        },
+      },
+    }
   };
 </script>
 <style scoped lang="scss">
   .graphtool-tooldic {
     width: 100%;
+    position: relative;
     /*height: 100vh;*/
     .graphtool-top {
       width: 100%;
@@ -1405,13 +1585,15 @@
         width: 95%;
       }
       .data-right {
+        margin-top: 4%;
         width: 30%;
-        height: 100%;
+        height: 88%;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
         position: relative;
         .data-option-box {
+
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -1423,7 +1605,7 @@
         }
 
         .data-right-tab {
-          top: 0;
+          top: 10px;
           right: 0;
           position: absolute;
           cursor: pointer;
@@ -1514,7 +1696,7 @@
     }
     .tstext {
       height: 26px;
-      color: #5887B3;
+      /*color: #5887B3;*/
       margin-top: 5px;
       font-size: 14px;
     }
@@ -1553,22 +1735,27 @@
       border-top-right-radius: 20px;
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 20px;
-      margin: 5px 0;
+      margin-top:60px;
     }
     .data-left-tab-act {
       color: #333;
     }
   }
 
-  > > > .form-control {
+  >>> .form-control {
     width: 150px !important;
   }
 
-  .vqb-rule > > > .el-autocomplete {
+  .vqb-rule >>> .el-autocomplete {
     width: 150px !important;
   }
   #order{
     padding: 10px;
   }
-
+  .run-btn{
+    text-align: right;
+    position: absolute;
+    top:0;
+    right:0;
+  }
 </style>
