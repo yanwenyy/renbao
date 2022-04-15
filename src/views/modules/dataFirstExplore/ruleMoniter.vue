@@ -285,23 +285,7 @@ export default {
       }
     },
     projectId: {
-      get () {
-        if(this.$store.state.common.projectId){
-          return this.$store.state.common.projectId
-        }else{
-          this.$http({
-            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
-            method: "get",
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              return data.result && data.result.projectId && data.result.projectId || '';
-
-            }
-          });
-        }
-
-      }
+      get () { return this.$store.state.common.projectId}
     },
   },
   activated() {
