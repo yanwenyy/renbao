@@ -51,19 +51,22 @@
           <!--<el-menu-item index="2-2"><a href="https://gitee.com/renrenio/renren-fast" target="_blank">后台</a></el-menu-item>-->
           <!--<el-menu-item index="2-3"><a href="https://gitee.com/renrenio/renren-generator" target="_blank">代码生成器</a></el-menu-item>-->
         <!--</el-submenu>-->
+
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
               <img style="border-radius: 50%;border:1px solid #666" src="~@/assets/img/jindin.png" :alt="userName">{{ userName }}
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="openChat()">我的聊天</el-dropdown-item>
               <el-dropdown-item @click.native="updatePasswordHandle()">修改密码</el-dropdown-item>
               <el-dropdown-item @click.native="logoutHandle()">退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-menu-item>
       </el-menu>
+      <div class="inline-block mychat">
+        <i class="el-icon-chat-line-square" title="我的聊天" @click="openChat()"></i>
+      </div>
       <div class="project-box">
         <el-select :popper-append-to-body="false" v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
           <el-option
@@ -81,7 +84,7 @@
     <!-- 弹窗, 修改密码 -->
     <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
 
-    <el-dialog title="我的聊天" custom-class="chat-dialog" :visible.sync="chatVisible" @close="closeChat" :append-to-body="true" width="1040px" top="40px">
+    <el-dialog title="我的聊天" custom-class="chat-dialog" :visible.sync="chatVisible" @close="closeChat" :append-to-body="true" width="70%" top="40px">
       <iframe ref="chatIframe" :src="imUrl" frameborder="0" style="width: 100%;height: calc(100vh - 180px); margin: -20px 0"></iframe>
     </el-dialog>
   </nav>
@@ -211,6 +214,13 @@
   }
 </script>
 <style scoped>
+  .mychat{
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 50px;
+    cursor: pointer;
+    float: right;
+  }
   .project-box {
     height: 50px;
     line-height: 50px;
