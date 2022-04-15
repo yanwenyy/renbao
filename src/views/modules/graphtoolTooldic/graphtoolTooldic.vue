@@ -370,8 +370,7 @@
       },
       //点击运行获取websoket数据
       getwsData(sql) {
-        this.paramsList=[];
-
+       console.log(this.join);
         if(sql!=''){
             this.resultTableTabs=[];
             var params={
@@ -996,7 +995,7 @@
             }
             //节点新增
             else if (e.change === go.ChangedEvent.Insert && e.modelChange === "nodeDataArray") {
-              console.log(e.newValue)
+              // console.log(e.newValue)
               that.join.push(e.newValue);
               that.showJoin();
               that.toSql();
