@@ -64,6 +64,11 @@ export default {
   components: {
     BaseCodeOperate
   },
+  props: { 
+    dataSortIds: { type: String } ,
+    dataSortNames:{type: String},
+    editTags:{type: Number}
+  },
   data() {
     return {
       dataSortId: "",
@@ -71,7 +76,8 @@ export default {
       parentCodeUuid: "",
       editTag: "",
       tableData: [],
-      seleteLengthData: []
+      seleteLengthData: [],
+      dataListLoading:false
     };
   },
   methods: {
@@ -128,7 +134,8 @@ export default {
     },
     // 查询列表
     query() {
-       this.$http({
+      this.dataListLoading = true;
+      this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
@@ -136,6 +143,7 @@ export default {
           })
       }).then(({data}) => {
         this.tableData = data.result.records
+        this.dataListLoading = false;
       }).catch(function(error) {
         console.log(error);
       });
@@ -145,18 +153,19 @@ export default {
       this.$refs.baseCodeOperate.reset();
     },
     returnList() {
-      this.$router.push({
-        path: `/baseList`
-      });
+        this.$emit('close')
+      // this.$router.push({
+      //   path: `/baseList`
+      // });
     }
   },
   mounted: function() {
-    this.dataSortId = this.$route.params.dataSortId;
-    this.dataSortName = this.$route.params.dataSortName;
-    this.parentCodeUuid = this.$route.params.dataSortId;
-    this.editTag = this.$route.query.editTag;
+    this.dataSortId = this.dataSortIds;
+    this.dataSortName = this.dataSortNames;
+    this.parentCodeUuid = this.dataSortIds;
+    this.editTag = this.editTags;
     this.query();
-  }
+  },
 };
 </script>
 

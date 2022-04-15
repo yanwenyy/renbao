@@ -84,7 +84,7 @@ export default {
         this.formCodeData.codeName == null ||
         this.formCodeData.codeName == ""
       ) {
-        alert(2, "请输入类型名称");
+        alert("请输入类型名称");
         return false;
       }
       if (
@@ -92,7 +92,7 @@ export default {
         this.formCodeData.codeValue == null ||
         this.formCodeData.codeValue == ""
       ) {
-        alert(2, "请输入类型编码");
+        alert("请输入类型编码");
         return false;
       }
       if (
@@ -100,7 +100,7 @@ export default {
         this.formCodeData.codeDesc == null ||
         this.formCodeData.codeDesc == ""
       ) {
-        alert(2, "请输入类型描述");
+        alert( "请输入类型描述");
         return false;
       }
       this.formCodeData.dataSortId = sortUuid;
