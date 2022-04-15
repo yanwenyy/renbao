@@ -84,6 +84,11 @@ export default {
   components: {
     basicInformation
   },
+  computed: {
+    projectId: {
+      get () { return this.$store.state.common.projectId}
+    },
+  },
   data() {
     return {
       dataForm: {
@@ -137,7 +142,8 @@ export default {
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
                   runType: 1,
-                  resultSqlValue: this.resultSqlValue
+                  resultSqlValue: this.resultSqlValue,
+                  projectId:this.projectId
                 },
                 false
               )
@@ -177,7 +183,8 @@ export default {
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
                   runType: 2,
-                  resultSqlValue: this.resultSqlValue
+                  resultSqlValue: this.resultSqlValue,
+                  projectId:this.projectId
                 },
                 false
               )
