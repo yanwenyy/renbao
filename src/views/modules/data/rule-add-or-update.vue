@@ -765,6 +765,10 @@ export default {
           }
         }
 
+        if((this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!='')&&(!this.dataForm.ruleRemark||this.dataForm.ruleRemark == "")){
+          return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
+        }
+
       }
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
