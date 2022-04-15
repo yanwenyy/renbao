@@ -160,7 +160,7 @@ export default {
                 this.$emit("ok");
               } else {
                 this.$message.error(data.message);
-                this.$emit("close");
+                // this.$emit("close");
               }
             });
           }
@@ -201,7 +201,7 @@ export default {
                 this.$emit("close");
               } else {
                 this.$message.error(data.message);
-                this.$emit("close");
+                // this.$emit("close");
               }
             });
           }
