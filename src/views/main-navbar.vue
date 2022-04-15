@@ -57,6 +57,7 @@
               <img style="border-radius: 50%;border:1px solid #666" src="~@/assets/img/jindin.png" :alt="userName">{{ userName }}
             </span>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="openChat()">我的聊天</el-dropdown-item>
               <el-dropdown-item @click.native="updatePasswordHandle()">修改密码</el-dropdown-item>
               <el-dropdown-item @click.native="logoutHandle()">退出</el-dropdown-item>
             </el-dropdown-menu>
@@ -79,6 +80,10 @@
     </div>
     <!-- 弹窗, 修改密码 -->
     <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
+
+    <el-dialog title="我的聊天" custom-class="chat-dialog" :visible.sync="chatVisible" @close="closeChat" :append-to-body="true" width="1040px" top="40px">
+      <iframe ref="chatIframe" :src="imUrl" frameborder="0" style="width: 100%;height: calc(100vh - 180px); margin: -20px 0"></iframe>
+    </el-dialog>
   </nav>
 </template>
 
@@ -89,8 +94,10 @@
     data () {
       return {
         updatePassowrdVisible: false,
+        chatVisible: false,
         // projectCode: '',
-        userId:sessionStorage.getItem("userId"),//当前用户id
+        userId: sessionStorage.getItem("userId"),//当前用户id
+        imUrl: "http://10.10.107.15:8081/#/index/chatBox?token=" + sessionStorage.getItem("userId"),
       }
     },
     components: {
@@ -190,12 +197,20 @@
            }
          })
        }
-
-      }
+      },
+      // 打开聊天窗口
+      openChat() {
+        this.chatVisible = true;
+      },
+      // 关闭聊天窗口
+      closeChat() {
+        // iframe跨域通信，向聊天界面传递关闭的消息
+        this.$refs["chatIframe"].contentWindow.postMessage("close", "*");
+      },
     }
   }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .project-box {
   height: 50px;
   line-height: 50px;
