@@ -4,16 +4,19 @@
       <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
         <div class="custom-tree-container">
          <el-input
+            class="filter-text"
             placeholder="输入关键字进行过滤"
             v-model="filterText">
           </el-input>
            <el-tree
+            ref="tree"
             class="treeClass"
             :data="treeData"
             :props="defaultProps"
             node-key="regionId"
             default-expand-all
             @node-click="nodeClick"
+            :filter-node-method="filterNode"
             :expand-on-click-node="false">
           </el-tree>
         </div>
@@ -227,6 +230,11 @@ export default {
     this.getTreeData();
   },
   methods: {
+    filterNode (value, data) {
+      if (!value) return true;
+      return data.regionName.indexOf(value) !== -1;
+
+    },
     //左侧树节点点击
     nodeClick(data,node,ele){
       var _list=this.getParentName(node,'regionName');
@@ -489,5 +497,9 @@ export default {
 }
 .dr-notice-body > div {
   margin-bottom: 20px;
+}
+.filter-text {
+  width: 80%;
+  margin-bottom: 5px;
 }
 </style>

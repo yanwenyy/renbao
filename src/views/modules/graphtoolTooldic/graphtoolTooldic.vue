@@ -503,7 +503,7 @@
           "Auto",
           new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
           // this rectangular shape surrounds the content of the node:这个矩形形状围绕着节点的内容
-          make(go.Shape, {fill: "#EEEEEE"}),
+          make(go.Shape, {fill: "#fff",stroke: "#C1C1C1"}),
           // the content consists of a header and a list of items  内容由标题和项目列表组成
           make(
             go.Panel,
@@ -513,13 +513,13 @@
               go.Panel,
               "Auto",
               {stretch: go.GraphObject.Horizontal}, // as wide as the whole node  和整个节点一样宽
-              make(go.Shape, {fill: "#3d80c4", stroke: null}),
+              make(go.Shape, {fill: "#F7F7F7", stroke: null}),
               make(
                 go.TextBlock,
                 {
                   alignment: go.Spot.Center,
                   margin: 3,
-                  stroke: "white",
+                  stroke: "#000",
                   textAlign: "center",
                   font: "bold 12pt sans-serif"
                 },
@@ -1570,4 +1570,5 @@
   #order{
     padding: 10px;
   }
+
 </style>
