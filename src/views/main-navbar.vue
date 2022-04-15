@@ -100,7 +100,7 @@
         chatVisible: false,
         // projectCode: '',
         userId: sessionStorage.getItem("userId"),//当前用户id
-        imUrl: "http://10.10.107.15:8081/#/index/chatBox?token=" + sessionStorage.getItem("userId"),
+        imUrl: this.$http.chatUrl("/index/chatBox?token=" + sessionStorage.getItem("userId")),
       }
     },
     components: {
