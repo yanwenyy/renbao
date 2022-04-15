@@ -103,6 +103,7 @@
           <el-button
             type="warning"
             @click="ruleExport('one')"
+            :disabled="this.dataListSelections.length <= 0"
             :loading="ruleExportLoading"
             >导出</el-button
           >
@@ -596,4 +597,4 @@ export default {
 .dr-notice-body > div {
   margin-bottom: 20px;
 }
-</style>  
+</style>

@@ -68,8 +68,8 @@
           <el-option
             :title="item.projectName"
             class="project-option"
-            v-for="item in projectList"
-            :key="item.projectId"
+            v-for="(item,index) in projectList"
+            :key="index"
             :label="item.projectName"
             :value="item.projectId">
           </el-option>
