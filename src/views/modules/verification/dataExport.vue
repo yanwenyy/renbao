@@ -21,7 +21,7 @@
             <el-tab-pane label="医保数据" name="insurance">
                 <div v-if="activeName == 'insurance'">
                 <div class='listDisplay'>
-                    <el-button type="primary" @click="getSearch()">查询</el-button>
+                    <el-button type="primary" @click="getSearch()">刷新</el-button>
                     <el-button type="primary" @click="downloadClick">下载报告</el-button>
                     <el-button type="primary" @click="startCheck">开始校验</el-button>
                 </div>

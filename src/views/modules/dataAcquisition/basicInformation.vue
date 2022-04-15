@@ -61,7 +61,7 @@
         :data="tableList"
         border
         style="100%"
-        :height="tableHeight - 10"
+        :height="tableHeight - 165"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange"
@@ -190,9 +190,7 @@ export default {
   },
   computed: {
     tableHeight: {
-      get() {
-        return this.$store.state.common.tableHeight;
-      }
+         get () { return this.$store.state.common.tableHeight}
     }
   },
   created() {
