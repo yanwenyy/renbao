@@ -174,7 +174,7 @@ export default {
       },
       multipleTable: [],
       treeData: [],
-      folderSorts: "",
+      folderSorts: "3",
       ruleCheckData: {},
       showEditDialog: false,
       dataListLoading: false,
@@ -206,7 +206,8 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl(
-          `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
+          `/rule/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
+          // `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
         ),
         method: "get",
         params: this.$http.adornParams(this.searchForm, false)
