@@ -53,8 +53,10 @@
           highlight-current
           :props="defaultProps"
           :check-strictly="isCheck"
-          @check-change="isCheck=true"
+
+          @node-click="isCheck=true"
         >
+          <!--@check-change="isCheck=true"-->
         </el-tree>
       </div>
     </div>
