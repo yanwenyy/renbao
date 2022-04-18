@@ -37,7 +37,7 @@
       </div>
       <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''"
            class="data-canvas mar-l">
-        <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
+        <div @dragover="allowDrop" id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
@@ -1550,6 +1550,9 @@
 
         }
 
+      },
+      allowDrop(ev){
+        ev.preventDefault();
       },
       // 树内不可拖拽
       returnFalse(draggingNode, dropNode, type) {

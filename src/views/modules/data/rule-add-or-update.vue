@@ -145,7 +145,7 @@
                 >
                 </el-tree>
               </div>
-              <div class="tabs3-right inline-block">
+              <div class="tabs3-right inline-block" @dragover="allowDropInput">
                 <el-input
                   :disabled="type == 'look'"
                   class="self-input"
@@ -338,6 +338,9 @@ export default {
     this.deletCm();
   },
   methods: {
+    allowDropInput(e){
+      e.preventDefault();
+    },
     handleDragStart(node, ev) {
       // console.log('drag start', node);
     },
