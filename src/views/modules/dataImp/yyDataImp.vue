@@ -533,6 +533,39 @@
         <el-button type="primary" @click="dmpReImpDialogVisible = false">取消</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+    title="选择批次"
+      :visible.sync="dmpReSelectBatchVisible"
+      show-overflow-tooltip
+      width="40%"
+    >
+    <el-row  v-if="!hosBatchFlag">
+        医院名称：
+        <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur" clearable>
+          <el-option v-for="(item, index) in hospitalList"
+                    :label="item['医疗机构名称']"
+                    :value="item['医疗机构名称']"
+                    :key="index"
+          ></el-option>
+          </el-select>
+          <el-button type="primary" @click="getHosBatch">选择已有批次</el-button>
+      </el-row>
+      <el-row v-if="hosBatchFlag">
+        批次名称：
+        <el-select  v-model="hosBatchId" placeholder="" filterable clearable>
+          <el-option v-for="(item, index) in hosBatchList"
+                    :label="item.hospitalCollectPlanBath"
+                    :value="item.hospitalCollectPlanId"
+                    :key="index"
+          ></el-option>
+        </el-select>
+        <el-button type="primary" @click="getHospital">选择医院</el-button>
+      </el-row>
+      <span slot="footer" class="dialog-footer">        
+        <el-button @click="dmpReSelectBatchVisible = false">返回上一步</el-button>
+        <el-button type="primary" @click="checkDmpFileTableDialogVisible = true">下一步</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -575,6 +608,8 @@
         dmpLogDialogVisible: false,
         // dmp继续采集弹窗
         dmpReImpDialogVisible: false,
+        // dmp继续采集选择批次
+        dmpReSelectBatchVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -720,7 +755,12 @@
       },
       // 恢复采集dmp
       reImpDmp(data){
-        this.checkDmpFileTableDialogVisible = true
+        this.dmpReSelectBatchVisible = true
+        this.getHospital()
+        this.hosBatchFlag = false
+        this.hospitalName = data.dmpHospital
+        // 文件夹名称
+        this.fileName = data.dmpHospital
         this.$http({
           url: this.$http.adornUrl(`dmpCollectPlan/startCollectDmp`),
           method: 'get',
@@ -1322,6 +1362,8 @@
         this.checkFileTableDialogVisible = false
         // dmp表匹配弹窗
         this.checkDmpFileTableDialogVisible = false
+        // dmp继续采集选择批次弹窗关闭
+        this.dmpReSelectBatchVisible = false
       },
       // 查看字段
       tableColumnView (tableName) {

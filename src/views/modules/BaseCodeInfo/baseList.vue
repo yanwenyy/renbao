@@ -52,8 +52,8 @@
             <el-table-column prop="dataSortDesc" label="代码类别描述"></el-table-column>
             <el-table-column prop="extendTag" label="展现形式" width="180">
               <template slot-scope="scope">
-                <div v-if="scope.row.extendTag==='1'">树状</div>
-                <div v-else>列表</div>
+                <div v-if="scope.row.extendTag =='1'">树状</div>
+                <div v-if="scope.row.extendTag =='0'">列表</div>
               </template>
             </el-table-column>
           </el-table>
@@ -88,6 +88,9 @@
           <el-dialog title="代码类别详情" :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="addOrUpdateVisible">
              <BaseCodeInfo v-if="addOrUpdateVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeInfo>
           </el-dialog>
+           <el-dialog title="代码类别详情" :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="BaseTreeInfoVisible"  :height="tableHeight">
+             <BaseCodeTreeInfo v-if="BaseTreeInfoVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTreeInfo>
+          </el-dialog>
         </div>
       </el-card>
       
@@ -96,10 +99,11 @@
 <script>
 import DataSortOperate from './component/DataSortOperate.vue';
 import BaseCodeInfo from './component/BaseCodeInfo.vue'
+import BaseCodeTreeInfo from './component/BaseCodeTreeInfo.vue'
 export default {
     name:'baseList',
     components: {
-       DataSortOperate,BaseCodeInfo
+       DataSortOperate,BaseCodeInfo,BaseCodeTreeInfo
     },
     data() {
         return {
@@ -113,6 +117,7 @@ export default {
         multipleSelection: '',
         editTag: "",
         addOrUpdateVisible: false,
+        BaseTreeInfoVisible:false,
         dataSortIds:'',
         dataSortNames:'',
         editTags:''
@@ -145,8 +150,12 @@ export default {
                 //     query: { editTag: row.editTag }
                 // });
             } else {
-                // this.$store.dispatch("dataSort/setDataSortId", row.dataSortId);
-                // this.$store.dispatch("dataSort/setDataSortName", row.dataSortName);
+                // this.$store.dispatch("setDataSortId", row.dataSortId);
+                // this.$store.dispatch("setDataSortName", row.dataSortName);
+                this.BaseTreeInfoVisible = true
+                this.editTags = row.editTag
+                this.dataSortIds = row.dataSortId
+                this.dataSortNames = row.dataSortName
                 // this.$router.push({
                 // path: "/component/BaseCodeTreeInfo",
                 // query: { editTag: row.editTag }
@@ -234,7 +243,6 @@ export default {
         //关闭弹框
         ImportSucceed(){this.closeImportDrawer() },
         closeImportDrawer(){this.addOrUpdateVisible = false},
-
     },
     mounted() {
       this.query();
