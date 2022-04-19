@@ -1,156 +1,112 @@
 <template>
   <div>
-    <div class="box" >
-      <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
-        <div class="custom-tree-container">
-         <el-input
-            class="filter-text"
-            placeholder="输入关键字进行过滤"
-            v-model="filterText">
-          </el-input>
-           <el-tree
-            ref="tree"
-            class="treeClass"
-            :data="treeData"
-            :props="defaultProps"
-            node-key="regionId"
-            default-expand-all
-            @node-click="nodeClick"
-            :filter-node-method="filterNode"
-            :expand-on-click-node="false">
-          </el-tree>
-        </div>
-      </div>
-      <div class="right" :style="{height:(tableHeight+120)+'px'}">
-        <el-form
-          :inline="true"
-          :model="dataForm"
-          @keyup.enter.native="getDataList()"
-          class="search-form-new"
+    <el-form
+      :inline="true"
+      :model="dataForm"
+      @keyup.enter.native="getDataList()"
+      class="search-form-new"
+    >
+      <el-form-item label="政策名称：">
+        <el-input
+          v-model="dataForm.policyName"
+          placeholder="方案名称"
+          clearable
+        ></el-input>
+        <el-input
+          v-model="dataForm.policyName"
+          placeholder="创建人"
+          clearable
+        ></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="(pageIndex = 1), getDataList()"
+        >查询</el-button
         >
-          <el-form-item label="政策名称：">
-            <el-input
-              v-model="dataForm.policyName"
-              placeholder="政策名称"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="有效时间：">
-            <el-date-picker
-              value-format="yyyy-MM-dd"
-              v-model="dataForm.endTime"
-              type="date"
-              placeholder="选择日期">
-            </el-date-picker>
-          </el-form-item>
-          <!--<el-form-item label="文件内容：">-->
-            <!--<el-input-->
-              <!--v-model="dataForm.createUserName"-->
-              <!--placeholder="文件内容"-->
-              <!--clearable-->
-            <!--&gt;</el-input>-->
-          <!--</el-form-item>-->
-          <el-form-item>
-            <el-button type="primary" @click="(pageIndex = 1), getDataList()"
-              >查询</el-button
-            >
-            <el-button @click="reset()">重置</el-button>
-          </el-form-item>
-        </el-form>
-        <div class="search-btn">
-          <el-button type="primary" :disabled="dataForm.regionId==''" @click="addOrUpdateHandle('')"
-            >新增</el-button
-          >
-          <!--<el-button-->
-            <!--type="warning"-->
-            <!--@click="ruleExport('all')"-->
-            <!--:loading="ruleExportAllLoading"-->
-            <!--&gt;全部导出</el-button-->
-          <!--&gt;-->
-          <el-button
-            :disabled="dataListSelections.length==0"
-            type="warning"
-            @click="ruleExport('one')"
-            :loading="ruleExportLoading"
-            >导出</el-button
-          >
-          <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
-        </div>
-        <el-table
-          :height="tableHeight-tableMinus"
-          :data="dataList"
-          v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle"
-          style="width: 100%;"
-        >
-          <el-table-column
-            type="selection"
-            header-align="center"
-            align="center"
-            width="50"
-          >
-          </el-table-column>
-          <el-table-column prop="policyName" align="center" label="政策名称">
-          </el-table-column>
-          <el-table-column
-            prop="beginTime"
-            header-align="center"
-            align="center"
-            label="开始时间"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="endTime"
-            header-align="center"
-            align="center"
-            label="有效时间"
-          >
-          </el-table-column>
-          <el-table-column
-            header-align="center"
-            align="center"
-            width="150"
-            label="操作"
-          >
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                size="small"
-                @click="addOrUpdateHandle(scope.row.policyId)"
-                >修改
-              </el-button>
-              <el-button
-                type="text"
-                size="small"
-                @click="deleteHandle(scope.row.policyId)"
-                >删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          @size-change="sizeChangeHandle"
-          @current-change="currentChangeHandle"
-          :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]"
-          :page-size="pageSize"
-          :total="totalPage"
-          layout="total, sizes, prev, pager, next, jumper"
-        >
-        </el-pagination>
-      </div>
+        <el-button @click="reset()">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="search-btn">
+      <el-button type="primary" @click="addOrUpdateHandle('')"
+      >新增</el-button
+      >
+      <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
     </div>
-    <el-dialog :title="treeTitle" :visible.sync="treeVisible">
-      <el-form :model="form">
-        <el-form-item label="分类名称">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="treeVisible = false">取 消</el-button>
-        <el-button type="primary" @click="treeVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
+    <el-table
+      :height="tableHeight-50"
+      :data="dataList"
+      v-loading="dataListLoading"
+      @selection-change="selectionChangeHandle"
+      style="width: 100%;"
+    >
+      <el-table-column
+        type="selection"
+        header-align="center"
+        align="center"
+        width="50"
+      >
+      </el-table-column>
+      <el-table-column prop="policyName" align="center" label="方案编号">
+      </el-table-column>
+      <el-table-column
+        prop="beginTime"
+        header-align="center"
+        align="center"
+        label="方案名称"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="endTime"
+        header-align="center"
+        align="center"
+        label="方案附件"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="endTime"
+        header-align="center"
+        align="center"
+        label="创建时间"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="endTime"
+        header-align="center"
+        align="center"
+        label="创建人"
+      >
+      </el-table-column>
+      <el-table-column
+        header-align="center"
+        align="center"
+        width="150"
+        label="操作"
+      >
+        <template slot-scope="scope">
+          <el-button
+            type="text"
+            size="small"
+            @click="addOrUpdateHandle(scope.row.policyId)"
+          >修改
+          </el-button>
+          <el-button
+            type="text"
+            size="small"
+            @click="deleteHandle(scope.row.policyId)"
+          >删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"
+    >
+    </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update
       ref="addOrUpdate"
@@ -161,8 +117,7 @@
 </template>
 
 <script>
-import AddOrUpdate from "./policy-add-or-update";
-import ruleTree from "../../common/rule-tree.vue";
+import AddOrUpdate from "./scheme-add-or-update";
 export default {
   data() {
     return {
@@ -221,38 +176,19 @@ export default {
     }
   },
   components: {
-    ruleTree,
     AddOrUpdate,
   },
   activated() {
 
   },
   mounted() {
-    this.getTreeData();
+    this.getDataList();
   },
   methods: {
     filterNode (value, data) {
       if (!value) return true;
       return data.regionName.indexOf(value) !== -1;
 
-    },
-    //左侧树节点点击
-    nodeClick(data,node,ele){
-      var _list=this.getParentName(node,'regionName');
-      this.dataForm.regionPath=_list.join("-");
-      this.dataForm.regionId=data.regionId;
-      this.getDataList();
-    },
-    getParentName(obj,name){
-      const list=[];
-      function _getName(obj){
-        obj.data[name]&&list.unshift(obj.data[name]);
-        if(obj.parent){
-          _getName(obj.parent,name)
-        }
-      }
-      _getName(obj,name);
-      return list;
     },
     // 新增 / 修改
     addOrUpdateHandle(id) {
@@ -265,17 +201,6 @@ export default {
       }
 
       // })
-    },
-    // 获取左侧树
-    getTreeData() {
-      this.$http({
-        url: this.$http.adornUrl("region/getRegion"),
-        method: "get",
-        params: this.$http.adornParams(),
-        isLoading:false,
-      }).then(({ data }) => {
-        this.treeData = data.result;
-      });
     },
     //重置点击
     reset() {
