@@ -20,8 +20,6 @@
 // import { stringify } from "querystring";
 export default {
   props: { 
-    dataSortIds: { type: String } ,
-    dataSortNames:{type: String},
     editTags:{type: Number}
   },
   data() {
@@ -57,10 +55,10 @@ export default {
     },
     //加载第一级节点 -默认加载树结构
     loadfirstnode(resolve) {
-      // var dataSortId = this.$store.state.dataSort.dataSortId;
-      // var dataSortName = this.$store.state.dataSort.dataSortName;
-      var dataSortId = this.dataSortIds;
-      var dataSortName = this.dataSortNames;
+      var dataSortId = this.$store.state.datasort.dataSortId;
+      var dataSortName = this.$store.state.datasort.dataSortName;
+      // var dataSortId = this.dataSortIds;
+      // var dataSortName = this.dataSortNames;
       var data = [
         {
           codeId: dataSortId,
@@ -71,7 +69,7 @@ export default {
       this.baseCode.codeId = dataSortId;
       this.baseCode.codeName = dataSortName;
       //传递值
-      // this.$store.dispatch("dataSort/setBaseCode", this.baseCode);
+      this.$store.dispatch("setBaseCode", this.baseCode);
     },
     //刷新树组件
     refreshtree() {
@@ -159,7 +157,7 @@ export default {
       this.baseCode.codeName = data.codeName;
       this.baseCode.dataSortId = data.dataSortId;
       //传递值
-      this.$store.dispatch("dataSort/setBaseCode", this.baseCode);
+      this.$store.dispatch("setBaseCode", this.baseCode);
     }
   }
 };

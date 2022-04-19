@@ -65,8 +65,6 @@ export default {
     BaseCodeTreeOperate
   },
   props: { 
-    dataSortIds: { type: String } ,
-    dataSortNames:{type: String},
     editTags:{type: Number}
   },
   data() {
@@ -81,9 +79,9 @@ export default {
     };
   },
   computed: {
-    // ...mapState({
-    //   baseCode: state => state.dataSort.baseCodes
-    // }),
+    ...mapState({
+      baseCode: state => state.datasort.baseCodes
+    }),
     tableHeight: {
       get() {
         return this.$store.state.common.tableHeight;
@@ -186,15 +184,16 @@ export default {
       this.$refs.baseCodeOperate.resetForm();
     },
     returnList() {
-      this.$router.push({
-        path: `/commonmanager/dictinfo/List`
-      });
+        this.$emit('close')
+      // this.$router.push({
+      //   path: `/commonmanager/dictinfo/List`
+      // });
     }
   },
   mounted: function() {
     //字段设置
-    let baseCode = this.$store.state.dataSort.baseCodes;
-    baseCode = JSON.parse(baseCode);
+    let baseCode = this.$store.state.datasort.baseCodes;
+    // baseCode = JSON.parse(baseCode);
     this.dataSortName = baseCode.codeName;
     this.dataSortId = baseCode.dataSortId;
     this.parentCodeId = baseCode.codeId;

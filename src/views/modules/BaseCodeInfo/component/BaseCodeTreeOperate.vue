@@ -96,7 +96,7 @@ export default {
         this.formCodeData.codeName == null ||
         this.formCodeData.codeName == ""
       ) {
-        this.common.alertMsg(2, "请输入类型名称");
+        alert("请输入类型名称");
         return false;
       }
       if (
@@ -104,7 +104,7 @@ export default {
         this.formCodeData.codeValue == null ||
         this.formCodeData.codeValue == ""
       ) {
-        this.common.alertMsg(2, "请输入类型编码");
+        alert("请输入类型编码");
         return false;
       }
       if (
@@ -112,7 +112,7 @@ export default {
         this.formCodeData.codeDesc == null ||
         this.formCodeData.codeDesc == ""
       ) {
-        this.common.alertMsg(2, "请输入类型描述");
+        alert("请输入类型描述");
         return false;
       }
       if (sortUuid === "" || sortUuid === null || sortUuid === undefined) {
@@ -124,9 +124,9 @@ export default {
         .post("/audit/zhBaseCodeInfo/pa/zhBaseCodeInfo/add", this.formCodeData)
         .then(response => {
           if (response.data.code == "2001") {
-            this.common.alertMsg(2, "该编码已存在，请重新输入");
+            alert( "该编码已存在，请重新输入");
           } else {
-            this.common.alertMsg(1, "添加成功");
+            alert("添加成功");
             this.resetForm();
             this.$emit("closeMain");
           }
@@ -142,7 +142,7 @@ export default {
         this.formCodeData.codeName == null ||
         this.formCodeData.codeName == ""
       ) {
-        this.common.alertMsg(2, "请输入类型名称");
+        alert("请输入类型名称");
         return false;
       }
       if (
@@ -150,7 +150,7 @@ export default {
         this.formCodeData.codeDesc == null ||
         this.formCodeData.codeDesc == ""
       ) {
-        this.common.alertMsg(2, "请输入类型描述");
+        alert("请输入类型描述");
         return false;
       }
       this.$confirm(
@@ -173,7 +173,7 @@ export default {
           )
           .then(response => {
             console.log(response);
-            this.common.alertMsg(1, "修改成功");
+            alert("修改成功");
             this.$emit("closeMain");
             this.resetForm();
           })

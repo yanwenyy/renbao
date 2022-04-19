@@ -150,12 +150,12 @@ export default {
                 //     query: { editTag: row.editTag }
                 // });
             } else {
-                // this.$store.dispatch("setDataSortId", row.dataSortId);
-                // this.$store.dispatch("setDataSortName", row.dataSortName);
+                this.$store.dispatch("setDataSortId", row.dataSortId);
+                this.$store.dispatch("setDataSortName", row.dataSortName);
                 this.BaseTreeInfoVisible = true
                 this.editTags = row.editTag
-                this.dataSortIds = row.dataSortId
-                this.dataSortNames = row.dataSortName
+                // this.dataSortIds = row.dataSortId
+                // this.dataSortNames = row.dataSortName
                 // this.$router.push({
                 // path: "/component/BaseCodeTreeInfo",
                 // query: { editTag: row.editTag }

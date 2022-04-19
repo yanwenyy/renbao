@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="tree">
-      <BaseCodeTree :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTree>
+      <!-- <BaseCodeTree :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTree> -->
+      <BaseCodeTree :editTags="editTags"></BaseCodeTree>
     </div>
     <div tyle="width:100%">
       <BaseCodeTreeList ref="listData"></BaseCodeTreeList>
@@ -15,8 +16,6 @@ import BaseCodeTreeList from './BaseCodeTreeList.vue';
 
 export default {
    props: { 
-    dataSortIds: { type: String } ,
-    dataSortNames:{type: String},
     editTags:{type: Number}
   },
   components: {
