@@ -510,6 +510,7 @@
       display: inline-block;
       height: 106px;
       overflow: hidden;
+      word-break:break-all;
       .restore-label{
         margin-right: 10px;
       }
