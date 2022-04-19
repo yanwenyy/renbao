@@ -46,7 +46,7 @@
         <el-button type="warning" @click="templateExport">下载模板</el-button>
         <el-button type="warning" @click="exportData">导出数据</el-button>
         <el-button type="warning" @click="importData">导入数据</el-button> 
-        <el-button type="warning" @click="hspitalExtract">医院信息抽取</el-button>
+        <!-- <el-button type="warning" @click="hspitalExtract">医院信息抽取</el-button> -->
       </el-form-item>
     </el-form>
     <!-- 列表 -->
