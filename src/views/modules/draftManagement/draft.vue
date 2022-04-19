@@ -76,10 +76,17 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="ruleCategory"
+              prop="manuscriptCode"
               header-align="center"
               align="center"
-              label="规则类别"
+              label="底稿编号"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="manuscriptName"
+              header-align="center"
+              align="center"
+              label="底稿名称"
             >
             </el-table-column>
             <el-table-column
@@ -97,22 +104,22 @@
               label="创建人"
             >
             </el-table-column>
-            <el-table-column
-              prop="ruleType"
-              header-align="center"
-              align="center"
-              label="规则类型"
-            >
-              <template slot-scope="scope">
-                {{
-                  scope.row.ruleType == "1"
-                    ? "sql编辑器"
-                    : scope.row.ruleType == "2"
-                    ? "图形化"
-                    : ""
-                }}
-              </template>
-            </el-table-column>
+            <!--<el-table-column-->
+              <!--prop="ruleType"-->
+              <!--header-align="center"-->
+              <!--align="center"-->
+              <!--label="规则类型"-->
+            <!--&gt;-->
+              <!--<template slot-scope="scope">-->
+                <!--{{-->
+                  <!--scope.row.ruleType == "1"-->
+                    <!--? "sql编辑器"-->
+                    <!--: scope.row.ruleType == "2"-->
+                    <!--? "图形化"-->
+                    <!--: ""-->
+                <!--}}-->
+              <!--</template>-->
+            <!--</el-table-column>-->
           </el-table>
         </div>
         <div class="auditRuleConfig-right-bottom">
