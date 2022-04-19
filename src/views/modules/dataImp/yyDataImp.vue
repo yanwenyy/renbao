@@ -757,10 +757,10 @@
       reImpDmp(data){
         this.dmpReSelectBatchVisible = true
         this.getHospital()
-        console.log(data.dmpFileName.split('.')[0])
         this.hosBatchFlag = false
-        this.hospitalName = data.dmpFileName.split('.')[0]
-        this.fileName = data.dmpFileName.split('.')[0]
+        this.hospitalName = data.dmpHospital
+        // 文件夹名称
+        this.fileName = data.dmpHospital
         this.$http({
           url: this.$http.adornUrl(`dmpCollectPlan/startCollectDmp`),
           method: 'get',
