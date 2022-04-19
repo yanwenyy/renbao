@@ -61,7 +61,7 @@
                             <el-progress v-if="scope.row.checkStatus=='0'" :percentage="0"></el-progress>
                             <el-progress v-if="scope.row.checkStatus=='1'" :percentage="50"></el-progress>
                             <el-progress v-if="scope.row.checkStatus=='2'" :percentage="100"></el-progress>
-                            <el-progress v-if="scope.row.checkStatus=='3'" :percentage="0"></el-progress>
+                            <el-progress v-if="scope.row.checkStatus=='3'" :percentage="100"></el-progress>
                         </template>
                         </el-table-column>
                         <el-table-column label="采集人" align="center" prop="collectUserName"> </el-table-column>

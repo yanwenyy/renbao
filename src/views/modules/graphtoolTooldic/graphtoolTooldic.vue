@@ -37,7 +37,10 @@
       </div>
       <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''"
            class="data-canvas mar-l">
-        <div @dragover="allowDrop" id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
+        <div class="mdd-placeHolder" v-if="join.length==0">请将表拖到此处</div>
+        <div @dragover="allowDrop" id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;">
+
+        </div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
@@ -283,6 +286,7 @@
     },
     data() {
       return {
+        from:'',
         myDiagramDivLeft:0,
         resultTableTabs: [],//sql执行返回的动态tab
         resultTableTabsValue: '2',//动态标签显示项
@@ -346,6 +350,27 @@
         succ:this.getDataList
       });
       this.ws.connect();
+
+      // //测试回显
+      // this.form='detail';
+      // var obj={};
+      // obj.join.forEach(item=>{
+      //   this.addNodeData(item);
+      //   item.fields.forEach(utem=>{
+      //     if(utem.group==true){
+      //       this.group=true;
+      //       this.toSql();
+      //     }
+      //   });
+      //   if(item.on&&item.on.length>0){
+      //     item.on.forEach(vtem=>{
+      //       this.myDiagram.model.addLinkData(vtem);
+      //     })
+      //   }
+      // });
+      // this.order=obj.order;
+      // this.initOrder();
+      // this.toSql();
     },
     destroyed(){
       this.ws.close();
@@ -403,7 +428,11 @@
       },
       //点击运行获取websoket数据
       getwsData(sql) {
-       console.log(this.join);
+        var obj={
+          join:this.join,
+          order:this.order
+        };
+        console.log(JSON.stringify( obj));
         if(sql!=''){
             this.resultTableTabs=[];
             var params={
@@ -1030,6 +1059,9 @@
             //节点新增
             else if (e.change === go.ChangedEvent.Insert && e.modelChange === "nodeDataArray") {
               // console.log(e.newValue)
+              if(that.form=='detail'){
+                e.newValue.on=[];
+              }
               that.join.push(e.newValue);
               that.showJoin();
               that.toSql();
@@ -1054,11 +1086,10 @@
         orderdata.column = column;
         orderdata.order = "ASC";
         this.order.push(orderdata);
-
         this.initOrder();
         this.initTableRow();
         this.toSql();
-
+        console.log(this.join)
       },
       //点击倒序
       clickOrderDESC(id, table, name) {
@@ -1152,10 +1183,6 @@
                 // // $("#fun" + field.id).val(field.fun);
                 // _funEle.value = field.fun;
               }
-              //by yw
-              if (group) {
-                field.fun = '';
-              }
             }
           }
         }
@@ -1190,19 +1217,23 @@
         if (node.key == "ml**") {
           return false;
         }
-        node.chineseName = this.createNewAS(node.chineseName);
+        if(this.form=='detail'){
+          node.chineseName = this.createNewAS(node.tableName);
+        }else{
+          node.chineseName = this.createNewAS(node.chineseName);
+        }
         this.tableNames.push(node.chineseName);
         this.keyNames.push(node.key);
         for (var i = 0; i < node.fields.length; i++) {
           node.fields[i].id = node.key + "id" + node.fields[i].name;
           node.fields[i].alias = node.fields[i].name;
-          node.fields[i].fun = "jh";
+          node.fields[i].fun =  node.fields[i].fun||"jh";
           node.fields[i].screen = "";
           node.fields[i].condition = "";
           node.fields[i].more = "";
           node.fields[i].key = node.key;
           node.fields[i].screen = [];
-          node.fields[i].group = false;
+          node.fields[i].group = node.fields[i].group|| false;
         }
         this.myDiagram.model.addNodeData(node);
         // if(node.chineseName=='医院住院结算明细_A'){
@@ -1374,16 +1405,15 @@
       },
       //点击分组
       clickGroup(id, table, name, group) {
-        // var idx = this.indexOfJoin(table);
-        // var data = this.join[idx];
-        //
-        // for (var i = 0; i < data.fields.length; i++) {
-        //   var field = data.fields[i];
-        //   if (field.id == id) {
-        //     this.join[idx].fields[i].group = group;
-        //   }
-        // }
+        var idx = this.indexOfJoin(table);
+        var data = this.join[idx];
 
+        for (var i = 0; i < data.fields.length; i++) {
+          var field = data.fields[i];
+          if (field.id == id) {
+            this.join[idx].fields[i].group = group;
+          }
+        }
         this.groupInit();
         this.initOrder();
         this.initTableRow(null, group);
@@ -1619,6 +1649,7 @@
       }
       .data-canvas {
         /*flex: 1;*/
+        position: relative;
         width: 40%;
         #myDiagramDiv {
           width: 100%;
@@ -1803,5 +1834,11 @@
     position: absolute;
     top:0;
     right:0;
+  }
+  .mdd-placeHolder{
+    color:#999;
+    position: absolute;
+    top:10px;
+    left: 10px;
   }
 </style>
