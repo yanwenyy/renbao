@@ -160,10 +160,7 @@ export default {
       this.$refs.baseCodeOperate.resetForm();
     },
     returnList() {
-       this.$router.push({
-        path: `/baseList`
-      });
-        // this.$emit('close')
+        this.$emit('BaseCodeMethod')
     }
   },
   mounted: function() {

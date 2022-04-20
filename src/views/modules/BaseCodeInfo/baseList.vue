@@ -88,8 +88,8 @@
           <el-dialog title="代码类别详情" :close-on-click-modal="false" width="80%" :modal-append-to-body="false" :visible.sync="addOrUpdateVisible">
              <BaseCodeInfo v-if="addOrUpdateVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeInfo>
           </el-dialog>
-           <el-dialog title="代码类别详情" :close-on-click-modal="false" width="80%" append-to-body :modal-append-to-body="false" :visible.sync="BaseTreeInfoVisible"  :height="tableHeight">
-             <BaseCodeTreeInfo v-if="BaseTreeInfoVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTreeInfo>
+           <el-dialog title="代码类别详情" :close-on-click-modal="false" append-to-body width="80%" :modal-append-to-body="false" :visible.sync="BaseTreeInfoVisible"  :height="tableHeight">
+             <BaseCodeTreeInfo v-if="BaseTreeInfoVisible" @close="closeImportDrawer" @ok="ImportSucceed" :editTags="editTags"  @BaseCodeOne="BaseCodeOne"></BaseCodeTreeInfo>
           </el-dialog>
         </div>
       </el-card>
@@ -129,6 +129,9 @@ export default {
         }
     },
     methods:{
+      BaseCodeOne(){
+           this.BaseTreeInfoVisible = false
+      },
         test() {
             this.disp = !this.disp;
         },

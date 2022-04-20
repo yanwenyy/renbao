@@ -4,7 +4,7 @@
       <BaseCodeTree :editTags="editTags"></BaseCodeTree>
     </div>
     <div tyle="width:100%">
-      <BaseCodeTreeList ref="listData"></BaseCodeTreeList>
+      <BaseCodeTreeList ref="listData" @BaseCodeMethod="BaseCodeMethod"></BaseCodeTreeList>
     </div>
   </div>
 </template>
@@ -24,6 +24,11 @@ export default {
   mounted: function() {
     this.$refs.listData.query();
   },
+  methods:{
+    BaseCodeMethod(){
+       this.$emit('BaseCodeOne');
+    }
+  }
 };
 </script>
 
