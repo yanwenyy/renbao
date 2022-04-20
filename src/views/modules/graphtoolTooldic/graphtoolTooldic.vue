@@ -37,7 +37,10 @@
       </div>
       <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''"
            class="data-canvas mar-l">
-        <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
+        <div class="mdd-placeHolder" v-if="join.length==0">请将表拖到此处</div>
+        <div @dragover="allowDrop" id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;">
+
+        </div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
@@ -58,7 +61,7 @@
             <div class="form-group" id="select" style="display:none;">
 
               <div class="col-sm-8">
-                <select id="comper" onchange="assistSqlEdit.changeCopare()">
+                <select id="comper" @change="changeCopare()">
                   <option value="=">等于</option>
                   <option value="!=">不等于</option>
                   <option value="&gt;">大于</option>
@@ -276,6 +279,12 @@
   const make = go.GraphObject.make;
   export default {
     props:{
+      //当前页面自己的属性,sql编辑传回来的数据
+      sqlEditMsg: {
+        type: String,
+        default: null,
+      },
+      //当前页面自己的属性,用来区分websocket连接
       modelName: {
         type: String,
         default: null,
@@ -283,6 +292,8 @@
     },
     data() {
       return {
+        from:'',
+        myDiagramDivLeft:0,
         resultTableTabs: [],//sql执行返回的动态tab
         resultTableTabsValue: '2',//动态标签显示项
         wsVisiable:false,//websocket执行结果显示状态
@@ -333,6 +344,8 @@
     },
     mounted() {
       this.init();
+      this.getGojsClientXY();
+      window.changeType = this.changeType;
       var diagramDivw = document.getElementById("myDiagramDiv");
       diagramDivw.onmousemove = function (event) {
         this.layeX = event.layerX;
@@ -343,11 +356,62 @@
         succ:this.getDataList
       });
       this.ws.connect();
+
+      // //测试回显
+      // this.form='detail';
+      // var obj={};
+      // obj.join.forEach(item=>{
+      //   this.addNodeData(item);
+      //   item.fields.forEach(utem=>{
+      //     if(utem.group==true){
+      //       this.group=true;
+      //       this.toSql();
+      //     }
+      //   });
+      //   if(item.on&&item.on.length>0){
+      //     item.on.forEach(vtem=>{
+      //       this.myDiagram.model.addLinkData(vtem);
+      //     })
+      //   }
+      // });
+      // this.order=obj.order;
+      // this.initOrder();
+      // this.toSql();
     },
     destroyed(){
       this.ws.close();
     },
     methods: {
+      //改变右上角表关联字段的选项
+      changeCopare(){
+        var fromtab = $("#from").val();
+        var totab = $("#to").val();
+        var fromPort = $("#MainPort").val();
+        var toPort = $("#toPort").val();
+        var copare = $("#comper").val();
+        var i = this.indexOfJoin(fromtab);
+        var j = this.indexOfJoin(totab);
+
+        var idx = Math.max(i, j);
+
+        var editIdx = -1;
+        for (var i = 0; i < this.join[idx].on.length; i++) {
+          if (this.join[idx].on[i].fromPort === fromPort && this.join[idx].on[i].toPort === toPort) {
+            this.join[idx].on[i].compare = copare;
+          }
+        }
+        this.showJoin();
+        this.toSql();
+      },
+      //改变join的类型
+      changeType(i){
+        var slaverTable = $("#slaverTable"+i).val();
+        var type = $("#type"+i).val();
+        var idx = this.indexOfJoin(slaverTable);
+        this.join[idx].type=type;
+        this.showJoin();
+        this.toSql();
+      },
       //sql结果tab切换事件
       tabClick(e){
         var list=this.resultTableTabs[e.index].list;
@@ -370,7 +434,11 @@
       },
       //点击运行获取websoket数据
       getwsData(sql) {
-       console.log(this.join);
+        var obj={
+          join:this.join,
+          order:this.order
+        };
+        console.log(JSON.stringify( obj));
         if(sql!=''){
             this.resultTableTabs=[];
             var params={
@@ -539,6 +607,7 @@
           go.Diagram,
           "myDiagramDiv",
           {
+            allowMove: true, //允许拖动
             allowZoom: true,
             autoScale: go.Diagram.UniformToFill,
             validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
@@ -996,6 +1065,9 @@
             //节点新增
             else if (e.change === go.ChangedEvent.Insert && e.modelChange === "nodeDataArray") {
               // console.log(e.newValue)
+              if(that.form=='detail'){
+                e.newValue.on=[];
+              }
               that.join.push(e.newValue);
               that.showJoin();
               that.toSql();
@@ -1020,11 +1092,10 @@
         orderdata.column = column;
         orderdata.order = "ASC";
         this.order.push(orderdata);
-
         this.initOrder();
         this.initTableRow();
         this.toSql();
-
+        console.log(this.join)
       },
       //点击倒序
       clickOrderDESC(id, table, name) {
@@ -1118,10 +1189,6 @@
                 // // $("#fun" + field.id).val(field.fun);
                 // _funEle.value = field.fun;
               }
-              //by yw
-              if (group) {
-                field.fun = '';
-              }
             }
           }
         }
@@ -1156,19 +1223,23 @@
         if (node.key == "ml**") {
           return false;
         }
-        node.chineseName = this.createNewAS(node.chineseName);
+        if(this.form=='detail'){
+          node.chineseName = this.createNewAS(node.tableName);
+        }else{
+          node.chineseName = this.createNewAS(node.chineseName);
+        }
         this.tableNames.push(node.chineseName);
         this.keyNames.push(node.key);
         for (var i = 0; i < node.fields.length; i++) {
           node.fields[i].id = node.key + "id" + node.fields[i].name;
           node.fields[i].alias = node.fields[i].name;
-          node.fields[i].fun = "jh";
+          node.fields[i].fun =  node.fields[i].fun||"jh";
           node.fields[i].screen = "";
           node.fields[i].condition = "";
           node.fields[i].more = "";
           node.fields[i].key = node.key;
           node.fields[i].screen = [];
-          node.fields[i].group = false;
+          node.fields[i].group = node.fields[i].group|| false;
         }
         this.myDiagram.model.addNodeData(node);
         // if(node.chineseName=='医院住院结算明细_A'){
@@ -1329,7 +1400,7 @@
             $("#MainTable").val(this.join[0].chineseName);
             for (var i = 1; i < this.join.length; i++) {
               var joinData = this.join[i];
-              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="assistSqlEdit.changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
+              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
               $("#join").append(joinHtml);
               $("#type" + i).val(joinData.type);
               $("#slaverTable" + i).val(joinData.chineseName);
@@ -1340,16 +1411,15 @@
       },
       //点击分组
       clickGroup(id, table, name, group) {
-        // var idx = this.indexOfJoin(table);
-        // var data = this.join[idx];
-        //
-        // for (var i = 0; i < data.fields.length; i++) {
-        //   var field = data.fields[i];
-        //   if (field.id == id) {
-        //     this.join[idx].fields[i].group = group;
-        //   }
-        // }
+        var idx = this.indexOfJoin(table);
+        var data = this.join[idx];
 
+        for (var i = 0; i < data.fields.length; i++) {
+          var field = data.fields[i];
+          if (field.id == id) {
+            this.join[idx].fields[i].group = group;
+          }
+        }
         this.groupInit();
         this.initOrder();
         this.initTableRow(null, group);
@@ -1398,7 +1468,7 @@
           // 注意层级 dataType是必须要的,1:一级,2:表,3:列
           var datas = data.result;
           this.dataTreeData = datas ? [datas] : [];
-          this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
+          // this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
         })
       },
       loadNode(node, resolve) {
@@ -1434,7 +1504,12 @@
         // return draggingNode.data.level>2||draggingNode.data.type=='funNode';
         return Number(draggingNode.data.dataType) > 1 || draggingNode.data.type == 'funNode' || draggingNode.data.type == 'params';
       },
+      getGojsClientXY(){
+        var resize = document.getElementById('myDiagramDiv');
+        this.myDiagramDivLeft=resize.offsetLeft;
+      },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        // console.log(ev)
         if (draggingNode.data.title == null /*|| treeNodes[0].isParent*/) {
           return;
         }
@@ -1473,7 +1548,9 @@
 
             }
             table.fields = fieldArr;
-            this.addNodeData(table);
+            if(ev.offsetX>this.myDiagramDivLeft){
+              this.addNodeData(table);
+            }
           } else {
             this.$http({
               url: this.$http.adornUrl('/sqlScript/getColumnList'),
@@ -1498,7 +1575,10 @@
 
               }
               table.fields = fieldArr;
-              this.addNodeData(table);
+              if(ev.offsetX>this.myDiagramDivLeft){
+                this.addNodeData(table);
+              }
+
 
             })
 
@@ -1507,8 +1587,11 @@
         }
 
       },
+      allowDrop(ev){
+        ev.preventDefault();
+      },
       // 树内不可拖拽
-      returnFalse() {
+      returnFalse(draggingNode, dropNode, type) {
         return false;
       },
     },
@@ -1549,6 +1632,15 @@
           }
         },
       },
+      sqlEditMsg: {
+        // 实时监控数据变化
+        immediate: true,
+        deep: true,
+        handler(val) {
+          this.form='detail';
+          this.sqlMsg=val;
+        }
+      },
     }
   };
 </script>
@@ -1572,6 +1664,7 @@
       }
       .data-canvas {
         /*flex: 1;*/
+        position: relative;
         width: 40%;
         #myDiagramDiv {
           width: 100%;
@@ -1756,5 +1849,11 @@
     position: absolute;
     top:0;
     right:0;
+  }
+  .mdd-placeHolder{
+    color:#999;
+    position: absolute;
+    top:10px;
+    left: 10px;
   }
 </style>

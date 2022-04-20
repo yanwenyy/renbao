@@ -115,7 +115,7 @@ export default {
                 dataSortName:this.formOpera.dataSortName,
                 dataSortValue:this.formOpera.dataSortValue,
                 dataSortDesc: this.formOpera.dataSortDesc,
-                extendTag: "0",
+                extendTag: this.formOpera.extendTag,
                 editTag: "0"
             })
             //   this.formOpera

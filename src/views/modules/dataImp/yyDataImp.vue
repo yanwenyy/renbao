@@ -406,7 +406,7 @@
           </el-table-column>
           <el-table-column
             align="center"
-            width="200"
+             width="240"
             label="操作">
             <template slot-scope="scope">
               <el-button
@@ -414,6 +414,12 @@
                 type="text"
                 size="small">
                 移除
+              </el-button>
+              <el-button
+                @click.native.prevent="dmpBakDataView(scope.$index, dmpImp, dmpImp.dmpBakTableInfoMaps)"
+                type="text"
+                size="small">
+                查看数据
               </el-button>
             </template>
           </el-table-column>
@@ -445,6 +451,18 @@
       <data-view :table-name="checkTableName" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
+    <!-- dmp查看数据 -->
+    <el-dialog
+      :title="dmpCheckTableName"
+      :visible.sync="dmpTableDataViewDialogVisible"
+      v-if="dmpTableDataViewDialogVisible"
+      width="70%"
+      :close-on-click-modal="false">
+      <dmp-bak-data-view :table-name="dmpCheckTableName" :dmp-imp="dmpImp" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dmpTableDataViewDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -515,12 +533,46 @@
         <el-button type="primary" @click="dmpReImpDialogVisible = false">取消</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+    title="选择批次"
+      :visible.sync="dmpReSelectBatchVisible"
+      show-overflow-tooltip
+      width="40%"
+    >
+    <el-row  v-if="!hosBatchFlag">
+        医院名称：
+        <el-select v-model="hospitalName" placeholder="" filterable @blur="selectBlur" clearable>
+          <el-option v-for="(item, index) in hospitalList"
+                    :label="item['医疗机构名称']"
+                    :value="item['医疗机构名称']"
+                    :key="index"
+          ></el-option>
+          </el-select>
+          <el-button type="primary" @click="getHosBatch">选择已有批次</el-button>
+      </el-row>
+      <el-row v-if="hosBatchFlag">
+        批次名称：
+        <el-select  v-model="hosBatchId" placeholder="" filterable clearable>
+          <el-option v-for="(item, index) in hosBatchList"
+                    :label="item.hospitalCollectPlanBath"
+                    :value="item.hospitalCollectPlanId"
+                    :key="index"
+          ></el-option>
+        </el-select>
+        <el-button type="primary" @click="getHospital">选择医院</el-button>
+      </el-row>
+      <span slot="footer" class="dialog-footer">        
+        <el-button @click="dmpReSelectBatchVisible = false">返回上一步</el-button>
+        <el-button type="primary" @click="checkDmpFileTableDialogVisible = true">下一步</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import ColumnView from './columnView'
   import DataView from './dataView'
+  import DmpBakDataView from './dmpBakDataView'
   import {PxSocket} from '@/utils'
   export default {
     data () {
@@ -546,6 +598,8 @@
         tableColumnViewDialogVisible: false,
         // 查看数据弹窗
         tableDataViewDialogVisible: false,
+        // dmp查看数据弹窗
+        dmpTableDataViewDialogVisible: false,
         // 匹配表弹窗
         checkFileTableDialogVisible: false,
         // dmp文件匹配表弹窗
@@ -554,6 +608,8 @@
         dmpLogDialogVisible: false,
         // dmp继续采集弹窗
         dmpReImpDialogVisible: false,
+        // dmp继续采集选择批次
+        dmpReSelectBatchVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -574,6 +630,8 @@
         selectTableViewNames: [],
         // 查看表数据，表结构选中的表
         checkTableName: '',
+        // dmp查看表数据，表结构选中的表
+        dmpCheckTableName: '',
         // 导入数据集合
         importDataModelList: [],
         // 文件名
@@ -628,7 +686,7 @@
       },
     },
     components: {
-      ColumnView,DataView
+      ColumnView,DataView,DmpBakDataView
     },
     activated () {
       this.getDataList()
@@ -697,7 +755,12 @@
       },
       // 恢复采集dmp
       reImpDmp(data){
-        this.checkDmpFileTableDialogVisible = true
+        this.dmpReSelectBatchVisible = true
+        this.getHospital()
+        this.hosBatchFlag = false
+        this.hospitalName = data.dmpHospital
+        // 文件夹名称
+        this.fileName = data.dmpHospital
         this.$http({
           url: this.$http.adornUrl(`dmpCollectPlan/startCollectDmp`),
           method: 'get',
@@ -1299,6 +1362,8 @@
         this.checkFileTableDialogVisible = false
         // dmp表匹配弹窗
         this.checkDmpFileTableDialogVisible = false
+        // dmp继续采集选择批次弹窗关闭
+        this.dmpReSelectBatchVisible = false
       },
       // 查看字段
       tableColumnView (tableName) {
@@ -1366,6 +1431,13 @@
               this.selectedFileData.push(item)
             }
           })
+        }
+      },
+      // dmpbak查看数据
+      dmpBakDataView(index,dmpImp,tableinfo) {
+         for (const key in tableinfo[index]) {
+          this.dmpTableDataViewDialogVisible = true
+          this.dmpCheckTableName = key
         }
       }
     }

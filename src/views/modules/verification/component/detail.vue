@@ -15,7 +15,7 @@
                 </template>
             </el-table-column>
             <el-table-column label="校验结果" align="center" prop="checkResult" width="100"></el-table-column>   
-            <el-table-column align="center" label="操作" width='120' prop="affirmStatus">
+            <el-table-column align="center" label="操作" width='100' prop="affirmStatus">
                 <template slot-scope="scope">
                     <el-button @click="tableSqlView(scope.row.dataCeeckTemplateProjectId)" type="text" size="small">查看sql</el-button>
                 </template>
@@ -25,8 +25,8 @@
             <el-button type="primary" @click="downloadClick">下载报告</el-button>
         </div>
         <el-dialog title='查看Sql日志' width="50%" :close-on-click-modal="false" append-to-body :modal-append-to-body="false" :visible.sync="showSqlViewVisible">
-            <div :style="{height:(tableHeight-60)+'px'}" class="sqlView">
-                <el-table v-loading="tableLoading" ref="multipleTable" :data="tableData" :header-cell-style="{ background: '#eef1f6', color: '#606266' }" style="width: 100%;">
+                <div class="sqlView">
+                <el-table v-loading="tableLoading" ref="multipleTable" :height="tableHeight" :data="tableData" :header-cell-style="{ background: '#eef1f6', color: '#606266' }" style="width: 100%;">
                 <el-table-column prop="sqlContent" header-align="center" align="center" label="sql内容">
                 </el-table-column>
                 <el-table-column prop="startTimeString" header-align="center" align="center" label="开始时间">
