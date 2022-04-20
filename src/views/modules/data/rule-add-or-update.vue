@@ -105,12 +105,14 @@
             </div>
           </el-tab-pane>
           <el-tab-pane name="2" label="sql编写">
-            <el-button v-if="type != 'look'" type="primary" @click="openSql()"
+
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='2'" v-if="type != 'look'" type="primary" @click="openSql()"
               >sql编译器</el-button
             >
-            <el-button v-if="type != 'look'" type="primary"
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='1'" v-if="type != 'look'" type="primary" @click="openGra()"
               >图形化工具</el-button
             >
+
             <el-form-item prop="ruleSqlValue" class="no-label">
               <div class="sqlDiv-html" v-html="dataForm.ruleSqlValue"></div>
               <!--<el-input-->
@@ -184,7 +186,7 @@
       <div class="sqlDialog-btn">
         <el-button
           @click="deletCm(), (sqlEditMsg.msg = ''), (sqlVisible = false)"
-          >取消</el-button
+        >取消</el-button
         >
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
@@ -197,16 +199,43 @@
         :modelName="'ruleManager'"
       ></sql-element>
     </el-dialog>
+    <el-dialog
+      custom-class="sql-dialog"
+      width="100%"
+      style="height:100vh;overflow: hidden;box-sizing: border-box"
+      title="sql编译器"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible.sync="graphtoolVisible"
+    >
+      <div class="sqlDialog-btn">
+        <el-button
+          @click="graphtoolVisible = false"
+        >取消</el-button
+        >
+        <el-button type="primary" @click="graphtoolSave">确定</el-button>
+      </div>
+      <div style="margin-top: 10px">
+        <graphtool-element
+          ref="graphtool"
+          :sqlEditMsg="sqlEditMsg.msg"
+          :modelName="'gTruleManager'"
+        ></graphtool-element>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { isInteger } from "@/utils/validate";
 import { transSql } from "@/utils/publicFun";
 import sqlElement from "../projectManage/codemirror";
+import graphtoolElement from "../graphtoolTooldic/graphtoolTooldic";
 import formatDate from "@/utils/formatDate";
 export default {
   components: {
-    sqlElement
+    sqlElement,
+    graphtoolElement,
   },
   props: {
     ruleData: {
@@ -237,6 +266,7 @@ export default {
       }
     };
     return {
+      graphtoolVisible:false,//图形化工具状态
       type: "",
       sqlKey: 0,
       rjMust: {}, //总人次和宗金额必填项
@@ -467,7 +497,39 @@ export default {
         }
       });
     },
+    //新增时图形化工具和sql编译器内容清空
+    clearToolMsg(type){
+      if(!this.dataForm.ruleId&&this.dataForm.ruleType!=type){
+        this.$confirm(`此操作将清空${type=='1'?'图形化工具':'sql编译器'}内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          if(type=='2'){
+            this.paramsSqlSelf=='';
+            this.dataForm.paramRule=[];
+            this.dataForm.ruleSqlValue='';
+          }else if(type=='1'){
+
+          }
+        }).catch(() => {
+
+        });
+      }
+    },
+    //打开图形化工具
+    openGra(){
+      this.graphtoolVisible=true;
+      this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+      this.clearToolMsg("2");
+    },
+    //图形化工具保存
+    graphtoolSave(){
+      console.log(this.$refs.graphtool)
+    },
+    //打开sql编译器
     openSql() {
+      this.clearToolMsg("1");
       this.sqlKey = Math.random();
       this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
       this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);

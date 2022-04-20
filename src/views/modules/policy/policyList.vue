@@ -36,10 +36,25 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="有效时间：">
+            <!--<el-date-picker-->
+              <!--value-format="yyyy-MM-dd"-->
+              <!--v-model="dataForm.endTime"-->
+              <!--type="date"-->
+              <!--placeholder="选择日期">-->
+            <!--</el-date-picker>-->
             <el-date-picker
+              :picker-options="pickerOptionsStart"
+              v-model="dataForm.beginTime"
+              type="date"
               value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+            <span>--</span>
+            <el-date-picker
+              :picker-options="pickerOptionsEnd"
               v-model="dataForm.endTime"
               type="date"
+              value-format="yyyy-MM-dd"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
@@ -166,6 +181,28 @@ import ruleTree from "../../common/rule-tree.vue";
 export default {
   data() {
     return {
+      // 开始日期 :picker-options 中引用
+      pickerOptionsStart: {
+        disabledDate: time => {
+          // 获取结束日期的 v-model 值并赋值给新定义的对象
+          let endDateVal = this.dataForm.endTime;
+          if (endDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() > new Date(endDateVal).getTime();
+          }
+        }
+      },
+      // 结束日期 :picker-options 中引用
+      pickerOptionsEnd: {
+        disabledDate: time => {
+          // 获取开始日期的 v-model 值并赋值给新定义的对象
+          let beginDateVal = this.dataForm.beginTime;
+          if (beginDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
+          }
+        }
+      },
       defaultProps: {
         children: 'children',
         label: 'regionName'
@@ -184,6 +221,7 @@ export default {
       dataForm: {
         policyName: "",
         endTime: "",
+        beginTime: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
       },
@@ -281,6 +319,7 @@ export default {
     reset() {
       this.dataForm.policyName = "";
       this.dataForm.endTime = "";
+      this.dataForm.beginTime = "";
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
@@ -297,6 +336,7 @@ export default {
           pageSize: this.pageSize,
           policyName: this.dataForm.policyName,
           endTime: this.dataForm.endTime,
+          beginTime: this.dataForm.beginTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
         })

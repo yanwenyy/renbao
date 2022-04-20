@@ -279,6 +279,12 @@
   const make = go.GraphObject.make;
   export default {
     props:{
+      //当前页面自己的属性,sql编辑传回来的数据
+      sqlEditMsg: {
+        type: String,
+        default: null,
+      },
+      //当前页面自己的属性,用来区分websocket连接
       modelName: {
         type: String,
         default: null,
@@ -1625,6 +1631,15 @@
             }
           }
         },
+      },
+      sqlEditMsg: {
+        // 实时监控数据变化
+        immediate: true,
+        deep: true,
+        handler(val) {
+          this.form='detail';
+          this.sqlMsg=val;
+        }
       },
     }
   };
