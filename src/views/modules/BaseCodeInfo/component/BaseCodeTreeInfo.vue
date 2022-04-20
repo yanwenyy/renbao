@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="tree">
-      <!-- <BaseCodeTree :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTree> -->
       <BaseCodeTree :editTags="editTags"></BaseCodeTree>
     </div>
     <div tyle="width:100%">
@@ -34,7 +33,7 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  height: 95%;
+  /* height: 95%; */
 }
 .divContent {
   width: 78%;

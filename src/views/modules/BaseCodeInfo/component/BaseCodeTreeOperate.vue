@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div> 
     <div class="title-div">
       <span>操作</span>
     </div>
@@ -224,7 +224,14 @@ export default {
         this.resetForm();
       }
     }
-  }
+  },
+    computed: {
+    tableHeight: {
+      get() {
+        return this.$store.state.common.tableHeight;
+      }
+    }
+  },
 };
 </script>
 <style scoped>

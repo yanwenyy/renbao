@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="box-card" :style="{ height: tableHeight + 100 + 'px' }">
+    <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span class="title">查询结构列表</span>
       </div>
