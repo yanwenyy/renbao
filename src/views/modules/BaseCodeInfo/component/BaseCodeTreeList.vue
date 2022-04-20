@@ -140,19 +140,6 @@ export default {
               this.$message.error(data.msg);
             }
       })
-      // this.axios
-      //   .post(
-      //     "/audit/zhBaseCodeInfo/pd/zhBaseCodeInfo/updateBatchById",
-      //     this.seleteLengthData
-      //   )
-      //   .then(response => {
-      //     console.log(response);
-      //     this.common.alertMsg(1, "删除成功");
-      //     this.query();
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error);
-      //   });
     },
     // 查询列表
     query() {
@@ -168,26 +155,15 @@ export default {
       }).catch(function(error) {
         console.log(error);
       });
-      // this.axios
-      //   .get(
-      //     "/audit/zhBaseCodeInfo/ps/zhBaseCodeInfos/action/search?parentCodeId=" +
-      //       this.parentCodeId
-      //   )
-      //   .then(response => {
-      //     this.tableData = response.data.data.entities;
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error);
-      //   });
     },
     resetForm() {
       this.$refs.baseCodeOperate.resetForm();
     },
     returnList() {
-        this.$emit('close')
-      // this.$router.push({
-      //   path: `/commonmanager/dictinfo/List`
-      // });
+       this.$router.push({
+        path: `/baseList`
+      });
+        // this.$emit('close')
     }
   },
   mounted: function() {
@@ -203,7 +179,8 @@ export default {
   watch: {
     baseCode: {
       handler: function(val) {
-        var baseCode = JSON.parse(val);
+        // var baseCode = JSON.parse(val);
+        var baseCode = val;
         this.dataSortName = baseCode.codeName;
         this.dataSortId = baseCode.dataSortId;
         this.parentCodeId = baseCode.codeId;

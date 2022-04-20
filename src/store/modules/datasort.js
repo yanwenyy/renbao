@@ -5,7 +5,9 @@ export default {
     //table高度
     dataSortName:'', //name
     dataSortId:'',//id
-    baseCodes:{}
+    baseCodes:{
+
+    }
   },
   mutations: {
      SET_DATA_SORTNAME (state, name) {
@@ -14,8 +16,8 @@ export default {
      SET_DATA_SORTID(state, data) {
       state.dataSortId = data
     },
-    SET_BASE_CODE(state,data){
-      state.baseCodes = data
+    SET_BASE_CODE(state,list){
+      state.baseCodes = list
     }
     
   },
@@ -29,18 +31,5 @@ export default {
     setBaseCode({commit},status){
       commit('SET_BASE_CODE', status)
     }
-    // changeProjectList({commit},userId) {
-    //   httpRequest({
-    //     isLoading:false,
-    //     url: httpRequest.adornUrl('/xmProject/projectList'),
-    //     method: 'get',
-    //     params: {userId:userId}
-    //   }).then(({data}) => {
-    //     if (data.code == 200) {
-    //       commit('updateProjectList', data.result)
-    //     }
-    //   })
-
-    // },
   },
 }
