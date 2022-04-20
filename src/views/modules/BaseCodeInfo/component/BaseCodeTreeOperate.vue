@@ -10,8 +10,8 @@
             <el-form-item label="类型名称" prop="codeName" label-width="150px">
               <el-input v-model="formCodeData.codeName" class="input"></el-input>
             </el-form-item>
-            <el-form-item label="uuid" prop="codeUuid" v-if="show=false">
-              <el-input v-model="formCodeData.codeUuid" class="input"></el-input>
+            <el-form-item label="uuid" prop="codeId" v-if="show=false">
+              <el-input v-model="formCodeData.codeId" class="input"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -39,13 +39,13 @@ export default {
   data() {
     return {
       formCodeData: {
-        codeUuid: "",
+        codeId: "",
         codeIndex: "",
         codeName: "",
         codeDesc: "",
         codeValue: "",
-        parentCodeUuid: "",
-        dataSortUuid: "",
+        parentCodeId: "",
+        dataSortId: "",
         delTag: "0"
       },
       editCodeValue: "",
@@ -79,18 +79,18 @@ export default {
     //重置
     resetForm() {
       this.formCodeData = {
-        codeUuid: "",
+        codeId: "",
         codeIndex: "",
         codeName: "",
         codeDesc: "",
         codeValue: "",
-        parentCodeUuid: "",
-        dataSortUuid: "",
+        parentCodeId: "",
+        dataSortId: "",
         delTag: ""
       };
     },
     // 添加
-    saveCedeData(sortUuid, parentCodeUuid) {
+    saveCedeData(sortId, parentCodeId) {
       if (
         this.formCodeData.codeName == undefined ||
         this.formCodeData.codeName == null ||
@@ -115,28 +115,44 @@ export default {
         alert("请输入类型描述");
         return false;
       }
-      if (sortUuid === "" || sortUuid === null || sortUuid === undefined) {
-        sortUuid = parentCodeUuid;
+      if (sortId === "" || sortId === null || sortId === undefined) {
+        sortId = parentCodeId;
       }
-      this.formCodeData.dataSortUuid = sortUuid;
-      this.formCodeData.parentCodeUuid = parentCodeUuid;
-      this.axios
-        .post("/audit/zhBaseCodeInfo/pa/zhBaseCodeInfo/add", this.formCodeData)
-        .then(response => {
-          if (response.data.code == "2001") {
-            alert( "该编码已存在，请重新输入");
-          } else {
-            alert("添加成功");
-            this.resetForm();
-            this.$emit("closeMain");
-          }
-        })
-        .catch(function(error) {
+      this.formCodeData.dataSortId = sortId;
+      this.formCodeData.parentCodeId = parentCodeId;
+      this.$http({
+            url:this.$http.adornUrl("/baseCodeInfo/add"),
+            method: 'post',
+            data: this.$http.adornData({
+                codeId: this.formCodeData.codeId,
+                codeIndex:this.formCodeData.codeIndex,
+                codeName:this.formCodeData.codeName,
+                codeDesc: this.formCodeData.codeDesc,
+                codeValue: this.formCodeData.codeValue,
+                parentCodeId: this.formCodeData.parentCodeId,
+                dataSortId: this.formCodeData.dataSortId,
+                delTag: "0"
+            })
+      }).then(({data}) => {
+        if (data.code === 200) {
+            this.$message({
+                message: '添加成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                    this.$emit("closeMain");
+                    this.resetForm();
+                }
+            })
+        } else {
+            this.$message.error(data.message)
+        }
+        }) .catch(function(error) {
           console.log(error);
         });
     },
     // 修改
-    editCodeData(sortUuid, parentCodeUuid) {
+    editCodeData(sortId, parentCodeId) {
       if (
         this.formCodeData.codeName == undefined ||
         this.formCodeData.codeName == null ||
@@ -162,24 +178,36 @@ export default {
           type: "warning"
         }
       ).then(() => {
-        this.formCodeData.dataSortUuid = sortUuid;
-        this.formCodeData.parentCodeUuid = parentCodeUuid;
-        this.formCodeData.delTag = "0";
-        this.formCodeData.codeValue = this.editCodeValue;
-        this.axios
-          .post(
-            "/audit/zhBaseCodeInfo/pu/zhBaseCodeInfo/updateByUuId",
-            this.formCodeData
-          )
-          .then(response => {
-            console.log(response);
-            alert("修改成功");
-            this.$emit("closeMain");
-            this.resetForm();
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
+         this.$http({
+            url:this.$http.adornUrl("/baseCodeInfo/updateByUuId"),
+            method: 'post',
+            data: this.$http.adornData({
+                codeId: this.formCodeData.codeId,
+                codeIndex:this.formCodeData.codeIndex,
+                codeName:this.formCodeData.codeName,
+                codeDesc: this.formCodeData.codeDesc,
+                dataSortId: sortId,
+                parentCodeId: parentCodeId,
+                delTag: "0",
+                codeValue:this.editCodeValue
+            })
+      }).then(({data}) => {
+        if (data.code === 200) {
+            this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                    this.$emit("closeMain");
+                    this.resetForm();
+                }
+            })
+        } else {
+            this.$message.error(data.message)
+        }
+        }) .catch(function(error) {
+          console.log(error);
+        });
       });
     }
   },
@@ -187,7 +215,7 @@ export default {
   watch: {
     codeOperate(data) {
       if (data.length === 1) {
-        this.formCodeData.codeUuid = data[0].codeUuid;
+        this.formCodeData.codeId = data[0].codeId;
         this.formCodeData.codeName = data[0].codeName;
         this.formCodeData.codeDesc = data[0].codeDesc;
         this.formCodeData.codeValue = data[0].codeValue;

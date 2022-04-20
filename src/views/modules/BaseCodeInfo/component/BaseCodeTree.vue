@@ -57,12 +57,10 @@ export default {
     loadfirstnode(resolve) {
       var dataSortId = this.$store.state.datasort.dataSortId;
       var dataSortName = this.$store.state.datasort.dataSortName;
-      // var dataSortId = this.dataSortIds;
-      // var dataSortName = this.dataSortNames;
       var data = [
         {
           codeId: dataSortId,
-          codeName: dataSortName
+          codeName: dataSortName,
         }
       ];
       resolve(data);
@@ -79,65 +77,35 @@ export default {
     },
     //加载根节点的子节点集合
     loadchildnode(node, resolve) {
-      console.log(node.data.codeId);
       if (node.level === 1) {
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
-              dataSortId: this.dataSortId,
+              dataSortId:  node.data.codeId,
               parentCodeId: node.data.codeId
           })
           }).then(({data}) => {
-           var jsonStr = JSON.stringify(resp.data.data.entities);
+           var jsonStr = JSON.stringify(data.result.records);
            var label = eval("(" + jsonStr + ")");
             resolve(label);
           }).catch(function(error) {
             console.log(error);
           });
-        // this.axios
-        //   .get(
-        //     "/audit/zhBaseCodeInfo/ps/zhBaseCodeInfos/action/search?dataSortId=" +
-        //       node.data.codeId +
-        //       "&parentCodeId=" +
-        //       node.data.codeId
-        //   )
-        //   .then(function(resp) {
-        //     // var dataReturn = resolve(resp.data.data.entities);
-        //     // var data = resp.data.data.entities;
-        //     var jsonStr = JSON.stringify(resp.data.data.entities);
-        //     //jsonStr = jsonStr.replace(/codeName/g, "label");
-        //     var label = eval("(" + jsonStr + ")");
-        //     resolve(label);
-        //   });
       } else {
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
           params: this.$http.adornParams({
-              // dataSortId: this.dataSortId,
               parentCodeId: node.data.codeId
           })
           }).then(({data}) => {
-            var jsonStr = JSON.stringify(resp.data.data.entities);
+            var jsonStr = JSON.stringify(data.result.records);
             var label = eval("(" + jsonStr + ")");
             resolve(label);
           }).catch(function(error) {
             console.log(error);
           });
-        // this.axios
-        //   .get(
-        //     "/audit/zhBaseCodeInfo/ps/zhBaseCodeInfos/action/search?parentCodeId=" +
-        //       node.data.codeId
-        //   )
-        //   .then(function(resp) {
-        //     // var dataReturn = resolve(resp.data.data.entities);
-        //     // var data = resp.data.data.entities;
-        //     var jsonStr = JSON.stringify(resp.data.data.entities);
-        //     //jsonStr = jsonStr.replace(/codeName/g, "label");
-        //     var label = eval("(" + jsonStr + ")");
-        //     resolve(label);
-        //   });
       }
       //   var str = "" ;
       //   for(var i=0;i<data.length;i++){
@@ -152,6 +120,7 @@ export default {
     },
     //点击节点上触发的事件，传递三个参数，数据对象使用第一个参数
     nodeclick(data) {
+      debugger
       //alert(data.label+",id="+data.id);
       this.baseCode.codeId = data.codeId;
       this.baseCode.codeName = data.codeName;
