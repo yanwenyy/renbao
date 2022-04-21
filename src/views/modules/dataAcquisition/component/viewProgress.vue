@@ -1,6 +1,7 @@
 <template>
     <div class='viewProgress'>
         <el-table :data="tableList" border :height="$tableHeight-75" :header-cell-style="{textAlign:'center'}" style="width: 100%">
+            <el-table-column type="index" label="序号" width="60"></el-table-column>
             <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
             <el-table-column label="采集数据文件路径" align="center" prop="filePath"></el-table-column>
             <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>

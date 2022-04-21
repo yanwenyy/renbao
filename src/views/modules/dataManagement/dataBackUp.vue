@@ -21,6 +21,7 @@
             </div>
             <el-table :data="tableList" border  :height="tableHeight-55" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <el-table-column type="index" label="序号" width="60"></el-table-column>
                 <el-table-column prop="fileName" header-align="center" align="center" label="文件名称"></el-table-column>
                 <el-table-column prop="formDate" header-align="center" align="center" label="时间"></el-table-column>
                 <el-table-column prop="fileRoute" header-align="center" align="center" label="路径"> </el-table-column>
