@@ -25,7 +25,7 @@
           >
         </el-upload>
       </el-form-item>
-      <el-form-item label="附件" prop="userPassword" v-if="type=='look'">
+      <el-form-item label="附件" prop="userPassword" v-if="dataForm.id!=''">
         <el-table
           :data="dataForm.multipartFiles"
           border
@@ -59,9 +59,16 @@
           >
             <template slot-scope="scope">
               <el-button
+                v-if="type=='look'"
                 type="text"
                 @click="downLoad(scope.row)"
               >下载</el-button
+              >
+              <el-button
+                v-if="type!='look'"
+                type="text"
+                @click="deleteHandle(scope.$index, dataForm.multipartFiles, scope.row)"
+              >删除</el-button
               >
             </template>
           </el-table-column>
@@ -84,6 +91,7 @@
         visible: false,
         roleList: [],
         fileList:[],
+        removeFileIdList:[],
         dataForm: {
           id: 0,
           planName: '',
@@ -106,6 +114,17 @@
         let url=this.$http.adornUrl(`/plan/downloadAttachment?planId=${data.planId}&fileInfoId=${data.fileInfoId}&token=${this.$cookie.get("token")}`);
         window.open(url);
       },
+      // 删除附件
+      deleteHandle(index, data, row) {
+        this.$confirm(`确定删除${row.fileName}?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.dataForm.multipartFiles.splice(index, 1);
+          this.removeFileIdList.push(row.fileInfoId);
+        });
+      },
      cleanMsg(){
        this.dataForm={
          id: 0,
@@ -114,6 +133,7 @@
          multipartFiles :[],
        }
        this.fileList=[];
+       this.removeFileIdList=[];
      },
       //移除已上传的附件
       handleRemove(file, fileList) {
@@ -183,17 +203,23 @@
               this.dataForm.multipartFiles.forEach(item=>{
                 params.append("multipartFiles", item);
               })
+              if (this.removeFileIdList.length > 0) {
+                params.append("fileInfoIds", this.removeFileIdList);
+              }
             }else{
               var editParmas={
                 planName:this.dataForm.planName,
-                policyId:this.dataForm.id,
+                planId:this.dataForm.id,
                 planCode:this.dataForm.planCode,
+                fileInfoIds:this.removeFileIdList,
+                multipartFiles:this.dataForm.multipartFiles,
               }
             }
             this.$http({
               url: this.$http.adornUrl(`/plan/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
               method: 'post',
               data: !this.dataForm.id ? params:editParmas,
+              // data: params,
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.$message({
