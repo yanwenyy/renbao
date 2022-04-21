@@ -27,7 +27,7 @@ export default {
   methods:{
     BaseCodeMethod(){
        this.$emit('BaseCodeOne');
-    }
+    },
   }
 };
 </script>

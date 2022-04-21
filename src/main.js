@@ -21,7 +21,7 @@ Vue.prototype.$bus = bus;
 import jshint from "jshint";
 //使用gojs
 // import gojs from 'gojs';
-// // import gojs from '@/components/GoJS-master';
+// import gojs from '@/utils/go.js';
 // Vue.prototype.go = gojs;
 //使用codemirror
 window.JSHINT = jshint.JSHINT;

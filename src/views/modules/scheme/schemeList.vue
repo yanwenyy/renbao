@@ -8,12 +8,12 @@
     >
       <el-form-item label="政策名称：">
         <el-input
-          v-model="dataForm.policyName"
+          v-model="dataForm.planName"
           placeholder="方案名称"
           clearable
         ></el-input>
         <el-input
-          v-model="dataForm.policyName"
+          v-model="dataForm.createUserName"
           placeholder="创建人"
           clearable
         ></el-input>
@@ -45,31 +45,39 @@
         width="50"
       >
       </el-table-column>
-      <el-table-column prop="policyName" align="center" label="方案编号">
+      <el-table-column prop="planCode" align="center" label="方案编号">
       </el-table-column>
       <el-table-column
-        prop="beginTime"
+        prop="planName"
         header-align="center"
         align="center"
         label="方案名称"
       >
+        <template slot-scope="scope">
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.planId,'look')">{{
+            scope.row.planName
+            }}</el-button>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="endTime"
+        prop="fileInfos"
         header-align="center"
         align="center"
         label="方案附件"
       >
+        <template slot-scope="scope">
+          {{scope.row.fileInfos&&scope.row.fileInfos.length>0?scope.row.fileInfos[0].fileName:''}}
+        </template>
       </el-table-column>
       <el-table-column
-        prop="endTime"
+        prop="createTime"
         header-align="center"
         align="center"
         label="创建时间"
       >
       </el-table-column>
       <el-table-column
-        prop="endTime"
+        prop="createUserName"
         header-align="center"
         align="center"
         label="创建人"
@@ -85,13 +93,13 @@
           <el-button
             type="text"
             size="small"
-            @click="addOrUpdateHandle(scope.row.policyId)"
+            @click="addOrUpdateHandle(scope.row.planId)"
           >修改
           </el-button>
           <el-button
             type="text"
             size="small"
-            @click="deleteHandle(scope.row.policyId)"
+            @click="deleteHandle(scope.row.planId)"
           >删除
           </el-button>
         </template>
@@ -137,10 +145,8 @@ export default {
 
       path: window.SITE_CONFIG.cdnUrl,
       dataForm: {
-        policyName: "",
-        endTime: "",
-        regionId: "", //行政区划分主键
-        regionPath: "", //行政区划分path
+        planName: "",
+        createUserName: "",
       },
       token: "",
       imgUrlfront: "",
@@ -191,11 +197,11 @@ export default {
 
     },
     // 新增 / 修改
-    addOrUpdateHandle(id) {
+    addOrUpdateHandle(id,type) {
       // this.addOrUpdateVisible = true
       // this.$nextTick(() => {
       if (id) {
-        this.$refs.addOrUpdate.init(id, this.dataForm.regionId);
+        this.$refs.addOrUpdate.init(id, this.dataForm.regionId,null,type);
       } else {
         this.$refs.addOrUpdate.init("", this.dataForm.regionId,this.dataForm.regionPath);
       }
@@ -204,8 +210,7 @@ export default {
     },
     //重置点击
     reset() {
-      this.dataForm.policyName = "";
-      this.dataForm.endTime = "";
+      this.dataForm.planName = "";
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
@@ -215,15 +220,13 @@ export default {
       this.dataListLoading = true;
       this.$http({
         isLoading: false,
-        url: this.$http.adornUrl("/policy/selectPage"),
+        url: this.$http.adornUrl("/plan/selectPage"),
         method: "get",
         params: this.$http.adornParams({
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
-          policyName: this.dataForm.policyName,
-          endTime: this.dataForm.endTime,
-          regionId: this.dataForm.regionId,
-          regionPath: this.dataForm.regionPath,
+          planName: this.dataForm.planName,
+          createUserName: this.dataForm.createUserName,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -306,7 +309,7 @@ export default {
         type: "warning"
       }).then(() => {
           this.$http({
-            url: this.$http.adornUrl("/policy/deleteByIds"),
+            url: this.$http.adornUrl("/plan/deleteByPlanIds"),
             method: "post",
             data: this.$http.adornData(policyIds, false)
           }).then(({ data }) => {
