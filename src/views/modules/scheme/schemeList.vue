@@ -60,14 +60,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="fileInfos"
+        prop="fileName"
         header-align="center"
         align="center"
         label="方案附件"
       >
-        <template slot-scope="scope">
-          {{scope.row.fileInfos&&scope.row.fileInfos.length>0?scope.row.fileInfos[0].fileName:''}}
-        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
