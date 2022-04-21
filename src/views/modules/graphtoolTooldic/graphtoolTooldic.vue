@@ -393,18 +393,11 @@
     methods: {
       //获取父组件传来的参数
       getMsgFromParent(sql,joins,orders){
-        console.log(sql,joins,orders,396)
+        // console.log(sql,joins,orders,396)
         this.join=[];
         this.order=[];
         this.form='detail';
         this.$forceUpdate();
-        var nodes=this.myDiagram.nodes;
-        // this.myDiagram.model.removeNodeDataCollection(nodes);
-        nodes.each(function (node) {
-          // this.myDiagram.model.removeNodeData(node.data);
-          console.log(node.data);
-
-        });
         this.$nextTick(()=>{
           if(joins&&joins!=''){
             console.log(402)
@@ -696,6 +689,7 @@
               item.diagram.skipsUndoManager = true;
               if (item.data.color == "#FFFFFF") {
                 item.data.color = "#707070";
+                item.data.checked = true;
                 var obj = item.data;
                 var key = obj.table;
                 var idx = that.indexOfJoin(key);
@@ -710,6 +704,7 @@
                 that.toSql();
               } else {
                 item.data.color = "#FFFFFF";
+                item.data.checked = false;
                 var obj = item.data;
                 var key = obj.table;
                 var idx = that.indexOfJoin(key);
@@ -730,19 +725,64 @@
               item.diagram.skipsUndoManager = oldskips;
             }
           },
-          make(
-            go.Shape,
+          //黑色复选框
+          // make(
+          //   go.Shape,
+          //   {
+          //     width: 12,
+          //     height: 12,
+          //     column: 0,
+          //     strokeWidth: 2,
+          //     margin: 4,
+          //     fromLinkable: false,
+          //     toLinkable: false,
+          //   },
+          //   new go.Binding("figure", "figure"),
+          //   new go.Binding("fill", "color")
+          // ),
+          make("CheckBox", "checked",
+            new go.Binding("checked", "checked"),
             {
-              width: 12,
-              height: 12,
-              column: 0,
-              strokeWidth: 2,
-              margin: 4,
-              fromLinkable: false,
-              toLinkable: false,
-            },
-            new go.Binding("figure", "figure"),
-            new go.Binding("fill", "color")
+              "_doClick": function(e, item) {
+                var oldskips = item.diagram.skipsUndoManager;
+                item.diagram.skipsUndoManager = true;
+               // console.log(item.panel.data)
+                if(item.panel.data.checked===true){
+                  item.panel.data.color = "#707070";
+                  var obj =item.panel.data;
+                  var key = obj.table;
+                  var idx = that.indexOfJoin(key);
+                  for (var i = 0; i < that.join[idx].fields.length; i++) {
+                    var field = that.join[idx].fields[i];
+                    if (field.name == obj.name) {
+                      field.hidden = false;
+                      break;
+                    }
+                  }
+                  that.initTableRow();
+                  that.toSql();
+                }else{
+                  item.panel.data.color = "#FFFFFF";
+                  var obj = item.panel.data;
+                  var key = obj.table;
+                  var idx = that.indexOfJoin(key);
+                  for (var i = 0; i < that.join[idx].fields.length; i++) {
+                    var field = that.join[idx].fields[i];
+                    if (field.name == obj.name) {
+                      field.hidden = true;
+                      field.more = [];
+                    }
+                  }
+                  if (that.filter[item.panel.data.id]) {
+                    delete that.filter[item.panel.data.id];
+                  }
+                  that.initTableRow(item.panel.data.tableId);
+                  that.toSql();
+                }
+                that.myDiagram.model.updateTargetBindings(item.panel.data);
+                item.diagram.skipsUndoManager = oldskips;
+              }
+            }
           ),
           make(
             go.TextBlock,
@@ -930,6 +970,7 @@
             return;
           }
           txn.changes.each(function (e) {
+            // console.log(e)
             //连线修改
             if (e.change === go.ChangedEvent.Property) {
               if (e.modelChange === "linkFromKey" || e.modelChange === "linkToKey" || e.modelChange === "linkToPortId" || e.modelChange === "linkFromPortId") {
@@ -1592,6 +1633,7 @@
               field.info = nodes[i].data.title;
               field.alias = nodes[i].data.title;
               field.color = "#FFFFFF";
+              field.checked = false;
               field.hidden = true;
               fieldArr.push(field);
 
@@ -1619,6 +1661,7 @@
                 field.info = _nodes[i].title;
                 field.alias = _nodes[i].title;
                 field.color = "#FFFFFF";
+                field.checked = false;
                 field.hidden = true;
                 fieldArr.push(field);
 
