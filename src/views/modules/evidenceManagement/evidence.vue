@@ -322,36 +322,45 @@ export default {
     },
     // 删除
     deleteHandle() {
-      var evidenceIds = [];
+      var evidenceIds = [],candel=true;
       this.multipleSelection.forEach(item => {
         evidenceIds.push(item.evidenceId);
+        if(item.relation=='是'){
+          candel=false;
+          return false;
+        }
       });
-      this.$confirm(`确定进行删除操作?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
-            method: "post",
-            data: this.$http.adornData(evidenceIds, false)
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList();
-                }
-              });
-            } else {
-              this.$message.error("操作失败");
-            }
-          });
+      if(!candel){
+        this.$message.error("被底稿关联的数据不能删除!")
+      }else{
+        this.$confirm(`确定进行删除操作?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
         })
-        .catch(() => {});
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
+              method: "post",
+              data: this.$http.adornData(evidenceIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getDataList();
+                  }
+                });
+              } else {
+                this.$message.error("操作失败");
+              }
+            });
+          })
+          .catch(() => {});
+      }
+
     },
     //附件下载
     downLoadFile() {

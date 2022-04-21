@@ -200,14 +200,16 @@
       ></sql-element>
     </el-dialog>
     <el-dialog
+      @open="grahInt"
       custom-class="sql-dialog"
       width="100%"
       style="height:100vh;overflow: hidden;box-sizing: border-box"
-      title="sql编译器"
+      title="图形化工具"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :show-close="false"
       :visible.sync="graphtoolVisible"
+
     >
       <div class="sqlDialog-btn">
         <el-button
@@ -218,12 +220,16 @@
       </div>
       <div style="margin-top: 10px">
         <graphtool-element
+          :key="grahKey"
           ref="graphtool"
           :sqlEditMsg="sqlEditMsg.msg"
+          :joinEdit="dataForm.ruleGraphicJoins"
+          :orderEdit="dataForm.ruleGraphicOrders"
           :modelName="'gTruleManager'"
         ></graphtool-element>
       </div>
     </el-dialog>
+
   </div>
 </template>
 <script>
@@ -266,6 +272,7 @@ export default {
       }
     };
     return {
+      grahKey:0,
       graphtoolVisible:false,//图形化工具状态
       type: "",
       sqlKey: 0,
@@ -300,7 +307,9 @@ export default {
         ruleId: "",
         paramRule: [],
         ruleRemark: "",
-        ruleSqlStatisticsValue: ""
+        ruleSqlStatisticsValue: "",
+        ruleGraphicJoins: [],
+        ruleGraphicOrders:[],
       },
 
       treedata: [
@@ -497,46 +506,81 @@ export default {
         }
       });
     },
-    //新增时图形化工具和sql编译器内容清空
-    clearToolMsg(type){
-      if(!this.dataForm.ruleId&&this.dataForm.ruleType!=type){
-        this.$confirm(`此操作将清空${type=='1'?'图形化工具':'sql编译器'}内容, 是否继续?`, '提示', {
+    grahInt(){
+      this.$nextTick(()=>{
+
+        this.$refs.graphtool.getMsgFromParent(this.sqlEditMsg,this.dataForm.ruleGraphicJoins,this.dataForm.ruleGraphicOrders);
+      })
+    },
+    //打开图形化工具
+    openGra(){
+      var openTool=false;
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='2'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空sql编译器内容, 是否继续?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          if(type=='2'){
-            this.paramsSqlSelf=='';
-            this.dataForm.paramRule=[];
-            this.dataForm.ruleSqlValue='';
-          }else if(type=='1'){
+          this.grahKey=Math.random();
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.dataForm.paramRule=[];
+          this.dataForm.ruleSqlValue='';
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.graphtoolVisible=true;
 
-          }
         }).catch(() => {
 
         });
+      }else{
+        this.grahKey=Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+        this.graphtoolVisible=true;
       }
-    },
-    //打开图形化工具
-    openGra(){
-      this.graphtoolVisible=true;
-      this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
-      this.clearToolMsg("2");
     },
     //图形化工具保存
     graphtoolSave(){
-      console.log(this.$refs.graphtool)
+      console.log(this.$refs.graphtool.join)
+      this.paramsSqlSelf=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleSqlValue=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleType = "2";
+      this.dataForm.ruleGraphicJoins=this.$refs.graphtool.join;
+      this.dataForm.ruleGraphicOrders=this.$refs.graphtool.order;
+      this.graphtoolVisible=false;
+
     },
     //打开sql编译器
     openSql() {
-      this.clearToolMsg("1");
-      this.sqlKey = Math.random();
-      this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
-      this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='1'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空图形化工具内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dataForm.ruleGraphicJoins=[];
+          this.dataForm.ruleGraphicOrders=[];
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.sqlKey = Math.random();
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.slqTabelEdt = [];
+          this.sqlVisible = true;
+        }).catch(() => {
 
-      // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
-      this.slqTabelEdt = [];
-      this.sqlVisible = true;
+        });
+      }else{
+        this.sqlKey = Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+
+        // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
+        this.slqTabelEdt = [];
+        this.sqlVisible = true;
+      }
+
     },
     //sql编译器点击保存
     sqlSave() {
@@ -630,6 +674,8 @@ export default {
       this.sqlEditMsg.msg = "";
       this.sqlMsgCopy = "";
       this.paramsSqlSelf = "";
+      this.dataForm.ruleGraphicJoins=[];
+      this.dataForm.ruleGraphicOrders=[];
       if (this.$refs["dataForm"]) {
         this.$refs["dataForm"].clearValidate();
       }
@@ -705,6 +751,8 @@ export default {
             this.dataForm.folderPath = datas.folderPath;
             this.dataForm.createUserName = datas.createUserName;
             this.dataForm.createTime = datas.createTime;
+            this.dataForm.ruleGraphicJoins = datas.ruleGraphicJoins;
+            this.dataForm.ruleGraphicOrders = datas.ruleGraphicOrders;
             this.sqlEditMsg.msg = datas.ruleSqlValue;
             this.deletCm();
             this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
@@ -855,7 +903,9 @@ export default {
               ruleSqlValue: this.paramsSqlSelf,
               ruleType: this.dataForm.ruleType,
               folderPath: this.dataForm.folderPath,
-              paramRules: this.dataForm.paramRule
+              paramRules: this.dataForm.paramRule,
+              ruleGraphicJoins: this.dataForm.ruleGraphicJoins,
+              ruleGraphicOrders: this.dataForm.ruleGraphicOrders,
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {
@@ -886,17 +936,23 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     }
+  },
+  watch : {
+    // graphtoolVisible:{
+    //   handler:function(val){
+    //     if(val) {
+    //       this.getMsgFromParent
+    //     }
+    //   }
+    // },
+    // 'dataForm.ruleGraphicJoins':{
+    //   deep: true,
+    //   handler(val) {
+    //     this.dataForm.ruleGraphicJoins=val;
+    //     this.$set(this.dataForm,'ruleGraphicJoins',val)
+    //   }
+    // },
   }
-  // watch : {
-  //   'sqlEditMsg.msg':{
-  //     immediate: true,
-  //     deep: true,
-  //     handler(val) {
-  //       console.log(val, 4444)
-  //       this.$set(this.sqlEditMsg,'msg',val)
-  //     }
-  //   }
-  // }
 };
 </script>
 <style scoped>

@@ -284,6 +284,14 @@
         type: String,
         default: null,
       },
+      joinEdit: {
+        type: Array,
+        default: null,
+      },
+      orderEdit: {
+        type: Array,
+        default: null,
+      },
       //当前页面自己的属性,用来区分websocket连接
       modelName: {
         type: String,
@@ -343,6 +351,7 @@
       this.getSjbData()
     },
     mounted() {
+      this.getSjbData();
       this.init();
       this.getGojsClientXY();
       window.changeType = this.changeType;
@@ -382,6 +391,46 @@
       this.ws.close();
     },
     methods: {
+      //获取父组件传来的参数
+      getMsgFromParent(sql,joins,orders){
+        console.log(sql,joins,orders,396)
+        this.join=[];
+        this.order=[];
+        this.form='detail';
+        this.$forceUpdate();
+        var nodes=this.myDiagram.nodes;
+        // this.myDiagram.model.removeNodeDataCollection(nodes);
+        nodes.each(function (node) {
+          // this.myDiagram.model.removeNodeData(node.data);
+          console.log(node.data);
+
+        });
+        this.$nextTick(()=>{
+          if(joins&&joins!=''){
+            console.log(402)
+            joins.forEach(item=>{
+              this.addNodeData(item);
+              item.fields.forEach(utem=>{
+                if(utem.group==true){
+                  this.group=true;
+                  this.toSql();
+                }
+              });
+              if(item.on&&item.on.length>0){
+                item.on.forEach(vtem=>{
+                  this.myDiagram.model.addLinkData(vtem);
+                })
+              }
+            });
+          }
+          if(orders&&orders!=''){
+            this.order=orders;
+            this.initOrder();
+            this.toSql();
+          }
+        })
+
+      },
       //改变右上角表关联字段的选项
       changeCopare(){
         var fromtab = $("#from").val();
@@ -1632,15 +1681,55 @@
           }
         },
       },
-      sqlEditMsg: {
-        // 实时监控数据变化
-        immediate: true,
-        deep: true,
-        handler(val) {
-          this.form='detail';
-          this.sqlMsg=val;
-        }
-      },
+      // sqlEditMsg: {
+      //   // 实时监控数据变化
+      //   immediate: true,
+      //   deep: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     this.sqlMsg=val;
+      //   }
+      // },
+      // joinEdit: {
+      //   // 实时监控数据变化
+      //   // immediate: true,
+      //   deep: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     this.join=[];
+      //     if(val&&val!=''){
+      //       val.forEach(item=>{
+      //         this.addNodeData(item);
+      //         item.fields.forEach(utem=>{
+      //           if(utem.group==true){
+      //             this.group=true;
+      //             this.toSql();
+      //           }
+      //         });
+      //         if(item.on&&item.on.length>0){
+      //           item.on.forEach(vtem=>{
+      //             this.myDiagram.model.addLinkData(vtem);
+      //           })
+      //         }
+      //       });
+      //     }
+      //   }
+      // },
+      // orderEdit: {
+      //   deep: true,
+      //   // 实时监控数据变化
+      //   // immediate: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     if(val&&val!=''){
+      //       this.order=val;
+      //       this.initOrder();
+      //       this.toSql();
+      //     }else{
+      //       this.order=[];
+      //     }
+      //   }
+      // },
     }
   };
 </script>

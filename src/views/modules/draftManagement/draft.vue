@@ -213,7 +213,7 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl(
-          `/rule/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
+          `/manuscript/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
           // `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
         ),
         method: "get",

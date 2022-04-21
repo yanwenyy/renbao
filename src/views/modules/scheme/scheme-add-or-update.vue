@@ -4,13 +4,13 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="方案名称" prop="policyName">
-        <el-input v-model="dataForm.policyName" placeholder="方案名称" maxlength="255"></el-input>
+      <el-form-item label="方案名称" prop="planName">
+        <el-input v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
-      <el-form-item label="方案编号" prop="policyName">
-        <el-input v-model="dataForm.policyName" placeholder="方案编号" maxlength="255"></el-input>
+      <el-form-item label="方案编号" prop="planCode">
+        <el-input v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
       </el-form-item>
-      <el-form-item label="上传文件" prop="userPassword">
+      <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
           action="#"
@@ -43,22 +43,16 @@
         fileList:[],
         dataForm: {
           id: 0,
-          policyName: '',
-          beginTime: '',
-          endTime: '',
-          regionId: '',
-          regionPath: '',
+          planName: '',
+          planCode: '',
           multipartFiles :[],
         },
         dataRule: {
-          policyName: [
-            { required: true, message: '政策名称不能为空', trigger: 'blur' }
+          planName: [
+            { required: true, message: '方案名称不能为空', trigger: 'blur' }
           ],
-          beginTime: [
-            { required: true, message: '开始时间不能为空', trigger: 'blur' }
-          ],
-          endTime: [
-            { required: true, message: '有效时间能为空', trigger: 'blur' }
+          planCode: [
+            { required: true, message: '方案编号不能为空', trigger: 'blur' }
           ],
         }
       }
@@ -67,11 +61,8 @@
      cleanMsg(){
        this.dataForm={
          id: 0,
-         policyName: '',
-         beginTime: '',
-         endTime: '',
-         regionId: '',
-         regionPath: '',
+         planName: '',
+         planCode: '',
          multipartFiles :[],
        }
        this.fileList=[];
@@ -113,24 +104,20 @@
         this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
-        this.dataForm.regionId=regionId;
-        this.dataForm.regionPath=regionPath;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
         if (this.dataForm.id) {
           this.$http({
-            url: this.$http.adornUrl(`/policy/selectByUuid/${this.dataForm.id}`),
+            url: this.$http.adornUrl(`/plan/selectByUuid/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 200) {
               var datas=data.result;
-              this.dataForm.policyName = datas.policyName;
-              this.dataForm.beginTime = datas.beginTime;
-              this.dataForm.endTime = datas.endTime;
-              this.dataForm.regionId = datas.regionId;
-              this.dataForm.regionPath = datas.regionPath;
+              this.dataForm.planName = datas.planName;
+              this.dataForm.planCode = datas.planCode;
+              this.dataForm.multipartFiles = datas.multipartFiles;
             }
           })
         }
@@ -141,26 +128,21 @@
           if (valid) {
             if(!this.dataForm.id){
               var params = new FormData();
-              params.append("policyName", this.dataForm.policyName);
-              params.append("beginTime", this.dataForm.beginTime);
-              params.append("endTime", this.dataForm.endTime);
-              params.append("regionId", this.dataForm.regionId);
-              params.append("regionPath", this.dataForm.regionPath);
+              params.append("planName", this.dataForm.planName);
+              params.append("planCode", this.dataForm.planCode);
+              params.append("planId", this.dataForm.id);
               this.dataForm.multipartFiles.forEach(item=>{
                 params.append("multipartFiles", item);
               })
             }else{
               var editParmas={
-                policyName:this.dataForm.policyName,
+                planName:this.dataForm.planName,
                 policyId:this.dataForm.id,
-                beginTime:this.dataForm.beginTime,
-                endTime:this.dataForm.endTime,
-                regionId:this.dataForm.regionId,
-                regionPath:this.dataForm.regionPath,
+                planCode:this.dataForm.planCode,
               }
             }
             this.$http({
-              url: this.$http.adornUrl(`/policy/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
+              url: this.$http.adornUrl(`/plan/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
               method: 'post',
               data: !this.dataForm.id ? params:editParmas,
             }).then(({data}) => {
