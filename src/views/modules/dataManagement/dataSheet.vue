@@ -32,7 +32,7 @@
               </el-form>
               <el-table :data="dataList" border v-loading="dataListLoading" :height="tableHeight+32" style="width: 100%;">
                 <!-- <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column> -->
-                <el-table-column type="index" label="序号" width="60"></el-table-column>
+                <el-table-column type="index" label="序号" align="center" width="60"></el-table-column>
                 <el-table-column prop="title" align="center" label="表名"></el-table-column>
                 <el-table-column prop="tableSize" align="center" label="占用空间大小"></el-table-column>
                 <el-table-column prop="createTime" align="center" label="创建时间"></el-table-column>

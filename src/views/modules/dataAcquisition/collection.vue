@@ -37,7 +37,7 @@
             <div v-if="activeName == 'audit'">
                <el-table :data="tableList" border :header-cell-style="{textAlign:'center'}"  :height="tableHeight-120" style="width: 100%" v-loading="dataLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
-                    <el-table-column type="index" label="序号" width="60"></el-table-column>
+                    <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                     <el-table-column prop="collectPlanMonitorBath" label="批次" align="center"></el-table-column>
                     <el-table-column label="文件名称" align="center" prop="fileName"></el-table-column>
                     <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
@@ -98,7 +98,7 @@
                 </div>
                 <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%"  :height="tableHeight-150" v-loading="dataListLoading" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-                    <el-table-column type="index" label="序号" width="60"></el-table-column>
+                    <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                     <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
                     <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
                     <el-table-column label="采集数据文件路径" align="center" prop="collectPath"> </el-table-column>

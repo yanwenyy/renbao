@@ -35,7 +35,7 @@
                 </transition>
             </div>
             <el-table :data="tableList" border   :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                <el-table-column type="index" label="序号" width="60"></el-table-column>
+                <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip ></el-table-column>
                 </template>
@@ -55,7 +55,7 @@
             </div>
              <!-- 医保诊疗项目 -->
             <el-table :data="tableList" border  :height="tableHeight-60" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                 <el-table-column type="index" label="序号" width="60"></el-table-column>
+                 <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                 <template v-for="(item,index) in tableColumns">
                     <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                 </template>
