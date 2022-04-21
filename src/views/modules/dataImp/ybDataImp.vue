@@ -38,6 +38,11 @@
         type="selection"
         width="55">
       </el-table-column>
+      <el-table-column 
+       label="序号" 
+       type="index" 
+       align="center" 
+       width="50"/>
       <el-table-column
         prop="tableName"
         align="center"
@@ -165,6 +170,11 @@
         style="width: 100%;height:45vh; overflow:auto;"
         :row-class-name="tableRowClassName"
         :data="this.selectedFileData">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <!-- fileTableInfos  -->
         <el-table-column
           align="center"
@@ -399,6 +409,11 @@
         border
         style="width: 100%;height:45vh; overflow:auto;"
         :data="dmpImp.dmpBakTableInfoMaps">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <el-table-column
           align="center"
           label="数据表">
@@ -477,13 +492,18 @@
       </span>
     </el-dialog>
     <el-dialog
-    title="查看已导入dmp文件"
+    title="已导入文件"
       :visible.sync="dmpReImpDialogVisible"
       width="60%">
       <el-table
         border
         style="width: 100%;height:45vh; overflow:auto;"
         :data="dmpReImpList">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <el-table-column
           align="center"
           prop="dmpFilePath"
