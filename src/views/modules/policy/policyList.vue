@@ -323,6 +323,7 @@ export default {
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
+      this.getDataList();
     },
     // 获取数据列表
     getDataList() {

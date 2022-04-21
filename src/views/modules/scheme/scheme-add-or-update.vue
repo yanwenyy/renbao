@@ -1,14 +1,14 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="!dataForm.id ? '新增' :type=='look'?'查看': '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="方案名称" prop="planName">
-        <el-input v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
+        <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="方案编号" prop="planCode">
-        <el-input v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
+        <el-input :disabled="type=='look'" v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
         <el-upload
@@ -25,6 +25,48 @@
           >
         </el-upload>
       </el-form-item>
+      <el-form-item label="附件" prop="userPassword" v-if="type=='look'">
+        <el-table
+          :data="dataForm.multipartFiles"
+          border
+          style="width: 100%;"
+        >
+          <el-table-column
+            type="index"
+            header-align="center"
+            align="center"
+            width="50"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="fileName"
+            header-align="center"
+            align="center"
+            label="附件名称"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="uploaderName"
+            header-align="center"
+            align="center"
+            label="上传人"
+          >
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="操作"
+          >
+            <template slot-scope="scope">
+              <el-button
+                type="text"
+                @click="downLoad(scope.row)"
+              >下载</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -38,6 +80,7 @@
   export default {
     data () {
       return {
+        type:'',
         visible: false,
         roleList: [],
         fileList:[],
@@ -58,6 +101,11 @@
       }
     },
     methods: {
+      //下载附件
+      downLoad(data) {
+        let url=this.$http.adornUrl(`/plan/downloadAttachment?planId=${data.planId}&fileInfoId=${data.fileInfoId}&token=${this.$cookie.get("token")}`);
+        window.open(url);
+      },
      cleanMsg(){
        this.dataForm={
          id: 0,
@@ -100,7 +148,8 @@
           });
         }
       },
-      init (id,regionId,regionPath) {
+      init (id,regionId,regionPath,type) {
+       this.type=type;
         this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
@@ -117,7 +166,7 @@
               var datas=data.result;
               this.dataForm.planName = datas.planName;
               this.dataForm.planCode = datas.planCode;
-              this.dataForm.multipartFiles = datas.multipartFiles;
+              this.dataForm.multipartFiles = datas.fileInfos;
             }
           })
         }

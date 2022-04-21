@@ -213,7 +213,7 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl(
-          `/manuscript/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
+          `/manuscript/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}&projectId=${this.projectId}`
           // `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
         ),
         method: "get",
@@ -294,6 +294,10 @@ export default {
     },
     //编写底稿弹窗
     editData() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.title = "编写底稿";
       this.showEditDialog = true;
       this.data = this.multipleTable[0];

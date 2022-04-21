@@ -270,6 +270,10 @@ export default {
     },
     //新增
     addHandle() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.showAddDialog = true;
       this.title = "新增证据";
       this.id = "";

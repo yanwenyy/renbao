@@ -523,6 +523,10 @@ export default {
     },
     //立即运行
     runNow() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       var sql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {
@@ -548,6 +552,10 @@ export default {
     },
     //定时运行
     timeRun() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       var sql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {

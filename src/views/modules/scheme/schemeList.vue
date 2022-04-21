@@ -53,6 +53,11 @@
         align="center"
         label="方案名称"
       >
+        <template slot-scope="scope">
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.planId,'look')">{{
+            scope.row.planName
+            }}</el-button>
+        </template>
       </el-table-column>
       <el-table-column
         prop="fileInfos"
@@ -192,11 +197,11 @@ export default {
 
     },
     // 新增 / 修改
-    addOrUpdateHandle(id) {
+    addOrUpdateHandle(id,type) {
       // this.addOrUpdateVisible = true
       // this.$nextTick(() => {
       if (id) {
-        this.$refs.addOrUpdate.init(id, this.dataForm.regionId);
+        this.$refs.addOrUpdate.init(id, this.dataForm.regionId,null,type);
       } else {
         this.$refs.addOrUpdate.init("", this.dataForm.regionId,this.dataForm.regionPath);
       }
