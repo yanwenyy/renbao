@@ -85,8 +85,13 @@ export default {
                                 message: '删除成功',
                                 type: 'success',
                             })
+                            // 手动清空选中的批次id
+                            this.nodeClick()
                             // 更新批次列表
                             this.$emit('refreshBitchData');
+                            //更新规则列表
+                            this.$emit('refreshRuleData')
+
                         } else {
                             this.$message.error(data.message)
                         }
@@ -106,6 +111,11 @@ export default {
             } else {
                 return data.label.indexOf(value) !== -1;
             }
+        },
+        // 清楚选中的规则列表
+        clearCheckedKeys () {
+            this.$refs.batchList.setCheckedKeys([]);
+            this.$refs.batchList.setCurrentKey(null);
         }
     },
     watch: {

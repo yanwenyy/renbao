@@ -5,6 +5,11 @@
       border
       height="46vh"
       style="width: 100%;">
+      <el-table-column 
+       label="序号" 
+       type="index" 
+       align="center" 
+       width="50"/>
       <el-table-column
         label="字段名称"
         align="center"

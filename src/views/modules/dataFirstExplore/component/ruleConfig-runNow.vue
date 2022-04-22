@@ -84,7 +84,30 @@ export default {
   components: {
     basicInformation
   },
+  computed: {
+    projectId: {
+      get () { return this.$store.state.common.projectId}
+    },
+  },
   data() {
+    var validExpectedBeginTime = (rule, value, callback) => {
+      console.log(value);
+      let date1 = new Date();
+      let date2 = new Date(value);
+      let s1 = date2.getTime();
+      let s2 = date1.getTime();
+      let total = (s2 - s1)/1000;
+      let day = parseInt(total / (24*60*60));//计算整bai数天du数
+      let afterDay = total - day*24*60*60;//取得值算出天数后dao剩余的转秒数shu
+      let  hour = parseInt(afterDay/(60*60));//计算整数小时数
+      let afterHour = total - day*24*60*60 - hour*60*60;//取得算出小时数后剩余的秒数
+      let min = parseInt(afterHour/60);//计算整数分
+      if (min <= 2) {
+        callback(new Error('开始执行时间需要大于当前时间2分钟'));
+      } else {
+        callback();
+      }
+    }
     return {
       dataForm: {
         expectedBeginTime: "",
@@ -95,6 +118,7 @@ export default {
       },
       //   form校验
       rules: {
+        expectedBeginTime: [{ validator: validExpectedBeginTime, trigger: "blur" }],
         hospitalName: [{ required: true, message: "请选择", trigger: "blur" }],
         batchName: [{ required: true, message: "请输入", trigger: "blur" }]
       },
@@ -137,7 +161,8 @@ export default {
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
                   runType: 1,
-                  resultSqlValue: this.resultSqlValue
+                  resultSqlValue: this.resultSqlValue,
+                  projectId:this.projectId
                 },
                 false
               )
@@ -154,7 +179,7 @@ export default {
                 this.$emit("ok");
               } else {
                 this.$message.error(data.message);
-                this.$emit("close");
+                // this.$emit("close");
               }
             });
           }
@@ -177,7 +202,8 @@ export default {
                   hospitalName: this.dataForm.hospitalName,
                   ruleId: this.runIds,
                   runType: 2,
-                  resultSqlValue: this.resultSqlValue
+                  resultSqlValue: this.resultSqlValue,
+                  projectId:this.projectId
                 },
                 false
               )
@@ -194,7 +220,7 @@ export default {
                 this.$emit("close");
               } else {
                 this.$message.error(data.message);
-                this.$emit("close");
+                // this.$emit("close");
               }
             });
           }

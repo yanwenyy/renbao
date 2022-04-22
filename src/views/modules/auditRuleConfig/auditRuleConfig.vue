@@ -440,6 +440,10 @@ export default {
     },
     // 立即执行
     executeImmediatelyClick() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       if (this.multipleTable.length === 0)
         return this.$message({
           message: "请选择至少一条数据",
@@ -465,6 +469,10 @@ export default {
     },
     // 定时执行
     timedExecutionClick() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       if (this.multipleTable.length === 0)
         return this.$message({
           message: "请选择至少一条数据",
@@ -501,7 +509,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 200) {
-              return data.result.projectId;
+              return data.result && data.result.projectId && data.result.projectId || '';
             }
           });
         }

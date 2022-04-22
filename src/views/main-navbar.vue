@@ -51,6 +51,7 @@
           <!--<el-menu-item index="2-2"><a href="https://gitee.com/renrenio/renren-fast" target="_blank">后台</a></el-menu-item>-->
           <!--<el-menu-item index="2-3"><a href="https://gitee.com/renrenio/renren-generator" target="_blank">代码生成器</a></el-menu-item>-->
         <!--</el-submenu>-->
+
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
@@ -63,13 +64,16 @@
           </el-dropdown>
         </el-menu-item>
       </el-menu>
+      <div class="inline-block mychat">
+        <i class="el-icon-chat-line-square" title="我的聊天" @click="openChat()"></i>
+      </div>
       <div class="project-box">
         <el-select :popper-append-to-body="false" v-model="projectCode" placeholder="请选择" class="project-select" @change="selectProject">
           <el-option
             :title="item.projectName"
             class="project-option"
-            v-for="item in projectList"
-            :key="item.projectId"
+            v-for="(item,index) in projectList"
+            :key="index"
             :label="item.projectName"
             :value="item.projectId">
           </el-option>
@@ -79,6 +83,10 @@
     </div>
     <!-- 弹窗, 修改密码 -->
     <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
+
+    <el-dialog title="我的聊天" custom-class="chat-dialog" :visible.sync="chatVisible" @close="closeChat" :append-to-body="true" width="70%" top="40px">
+      <iframe ref="chatIframe" :src="imUrl" frameborder="0" style="width: 100%;height: calc(100vh - 180px); margin: -20px 0"></iframe>
+    </el-dialog>
   </nav>
 </template>
 
@@ -89,8 +97,10 @@
     data () {
       return {
         updatePassowrdVisible: false,
+        chatVisible: false,
         // projectCode: '',
-        userId:sessionStorage.getItem("userId"),//当前用户id
+        userId: sessionStorage.getItem("userId"),//当前用户id
+        imUrl: this.$http.chatUrl("/index/chatBox?token=" + sessionStorage.getItem("userId")),
       }
     },
     components: {
@@ -127,6 +137,7 @@
     },
     created () {
       // alert(11);
+      var that=this;
       this.$store.dispatch('common/changeProjectList',this.userId);
       this.$http({
         url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
@@ -135,17 +146,20 @@
       }).then(({ data }) => {
         if (data && data.code === 200) {
           if(data.result){
-            this.projectList.forEach(item=>{
-              if(item.projectId==data.result.projectId){
-                this.projectCode=data.result.projectId;
-                this.$store.commit('common/updateProjectId', this.projectCode)
-              }
-            })
+            setTimeout(function () {
+              that.projectList.forEach(item=>{
+                if(item.projectId==data.result.projectId){
+                  that.projectCode=data.result.projectId;
+                  that.$store.commit('common/updateProjectId', that.projectCode)
+                }
+              })
+            },100)
           }
           // this.$store.dispatch('common/changeProjectId', this.projectCode)
         }
       });
     },
+    mounted(){},
     methods: {
       // 修改密码
       updatePasswordHandle () {
@@ -186,22 +200,37 @@
            }
          })
        }
-
-      }
+      },
+      // 打开聊天窗口
+      openChat() {
+        this.chatVisible = true;
+      },
+      // 关闭聊天窗口
+      closeChat() {
+        // iframe跨域通信，向聊天界面传递关闭的消息
+        this.$refs["chatIframe"].contentWindow.postMessage("close", "*");
+      },
     }
   }
 </script>
 <style scoped>
-.project-box {
-  height: 50px;
-  line-height: 50px;
-  float: right;
-  width:40%
-}
-.project-box .el-select{
-  width: 100%;
+  .mychat{
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 50px;
+    cursor: pointer;
+    float: right;
+  }
+  .project-box {
+    height: 50px;
+    line-height: 50px;
+    float: right;
+    width:40%
+  }
+  .project-box .el-select{
+    width: 100%;
 
-}
+  }
   .project-box >>>.el-input input{
     border:none;
     text-align: right;

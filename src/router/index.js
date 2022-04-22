@@ -51,6 +51,9 @@ const mainRoutes = {
     { path: '/ruleMoniter', component: _import('modules/dataFirstExplore/ruleMoniter'), name: 'ruleMoniter', meta: { title: '初探规则监控', isTab: true } },
     { path: '/detailExport', component: _import('modules/dataFirstExplore/detailExport'), name: 'detailExport', meta: { title: '结果明细导出', isTab: true } },
     { path: '/reportExport', component: _import('modules/dataFirstExplore/reportExport'), name: 'reportExport', meta: { title: '初探报告导出', isTab: true } },
+    { path: '/baseList', component: _import('modules/BaseCodeInfo/baseList'), name: 'baseList', meta: { title: '字典管理', isTab: true } },
+    { path: '/component/BaseCodeInfo/:dataSortId/:dataSortName', component: _import('modules/BaseCodeInfo/component/BaseCodeInfo'), name: 'BaseCodeInfo', meta: { title: '基础数据', isTab: true } },
+    // { path: '/component/BaseCodeTreeInfo', component: _import('modules/BaseCodeInfo/component/BaseCodeTreeInfo'), name: 'BaseCodeTreeInfo', meta: { title: '基础数据', isTab: true } },
   ],
     beforeEnter (to, from, next) {
       let token = Vue.cookie.get('token')

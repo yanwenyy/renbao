@@ -104,13 +104,15 @@
               </el-form-item>
             </div>
           </el-tab-pane>
-          <el-tab-pane name="2" label="sql编写">
-            <el-button v-if="type != 'look'" type="primary" @click="openSql()"
-              >sql编译器</el-button
+          <el-tab-pane name="2" label="规则编写">
+
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='2'" v-if="type != 'look'" type="primary" @click="openSql()"
+              >SQL编译器</el-button
             >
-            <el-button v-if="type != 'look'" type="primary"
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='1'" v-if="type != 'look'" type="primary" @click="openGra()"
               >图形化工具</el-button
             >
+
             <el-form-item prop="ruleSqlValue" class="no-label">
               <div class="sqlDiv-html" v-html="dataForm.ruleSqlValue"></div>
               <!--<el-input-->
@@ -123,10 +125,10 @@
               <!--</el-input>-->
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane name="3" label="统计sql编写">
-            <div class="tabs3-notice">此结果来自sql编译器</div>
+          <el-tab-pane name="3" label="统计结果编写">
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
+                <div class="tabs3-notice">此结果来自SQL编译器</div>
                 <el-tree
                   :disabled="type == 'look'"
                   :props="defaultProps"
@@ -145,8 +147,10 @@
                 >
                 </el-tree>
               </div>
-              <div class="tabs3-right inline-block">
+              <div class="tabs3-right inline-block" @dragover="allowDropInput">
+                <div class="tabs3-notice">统计结果SQL</div>
                 <el-input
+                  placeholder='例：统计sql编写，涉及"总人次","总金额"字段'
                   :disabled="type == 'look'"
                   class="self-input"
                   type="textarea"
@@ -184,7 +188,7 @@
       <div class="sqlDialog-btn">
         <el-button
           @click="deletCm(), (sqlEditMsg.msg = ''), (sqlVisible = false)"
-          >取消</el-button
+        >取消</el-button
         >
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
@@ -197,16 +201,49 @@
         :modelName="'ruleManager'"
       ></sql-element>
     </el-dialog>
+    <el-dialog
+      @open="grahInt"
+      custom-class="sql-dialog"
+      width="100%"
+      style="height:100vh;overflow: hidden;box-sizing: border-box"
+      title="图形化工具"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible.sync="graphtoolVisible"
+
+    >
+      <div class="sqlDialog-btn">
+        <el-button
+          @click="graphtoolVisible = false"
+        >取消</el-button
+        >
+        <el-button type="primary" @click="graphtoolSave">确定</el-button>
+      </div>
+      <div style="margin-top: 10px">
+        <graphtool-element
+          :key="grahKey"
+          ref="graphtool"
+          :sqlEditMsg="sqlEditMsg.msg"
+          :joinEdit="dataForm.ruleGraphicJoins"
+          :orderEdit="dataForm.ruleGraphicOrders"
+          :modelName="'gTruleManager'"
+        ></graphtool-element>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
 import { isInteger } from "@/utils/validate";
 import { transSql } from "@/utils/publicFun";
 import sqlElement from "../projectManage/codemirror";
+import graphtoolElement from "../graphtoolTooldic/graphtoolTooldic";
 import formatDate from "@/utils/formatDate";
 export default {
   components: {
-    sqlElement
+    sqlElement,
+    graphtoolElement,
   },
   props: {
     ruleData: {
@@ -237,6 +274,8 @@ export default {
       }
     };
     return {
+      grahKey:0,
+      graphtoolVisible:false,//图形化工具状态
       type: "",
       sqlKey: 0,
       rjMust: {}, //总人次和宗金额必填项
@@ -270,7 +309,9 @@ export default {
         ruleId: "",
         paramRule: [],
         ruleRemark: "",
-        ruleSqlStatisticsValue: ""
+        ruleSqlStatisticsValue: "",
+        ruleGraphicJoins: [],
+        ruleGraphicOrders:[],
       },
 
       treedata: [
@@ -338,6 +379,9 @@ export default {
     this.deletCm();
   },
   methods: {
+    allowDropInput(e){
+      e.preventDefault();
+    },
     handleDragStart(node, ev) {
       // console.log('drag start', node);
     },
@@ -464,14 +508,81 @@ export default {
         }
       });
     },
-    openSql() {
-      this.sqlKey = Math.random();
-      this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
-      this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+    grahInt(){
+      this.$nextTick(()=>{
 
-      // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
-      this.slqTabelEdt = [];
-      this.sqlVisible = true;
+        this.$refs.graphtool.getMsgFromParent(this.sqlEditMsg,this.dataForm.ruleGraphicJoins,this.dataForm.ruleGraphicOrders);
+      })
+    },
+    //打开图形化工具
+    openGra(){
+      var openTool=false;
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='2'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空sql编译器内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.grahKey=Math.random();
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.dataForm.paramRule=[];
+          this.dataForm.ruleSqlValue='';
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.graphtoolVisible=true;
+
+        }).catch(() => {
+
+        });
+      }else{
+        this.grahKey=Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+        this.graphtoolVisible=true;
+      }
+    },
+    //图形化工具保存
+    graphtoolSave(){
+      console.log(this.$refs.graphtool.join)
+      this.paramsSqlSelf=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleSqlValue=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleType = "2";
+      this.dataForm.ruleGraphicJoins=this.$refs.graphtool.join;
+      this.dataForm.ruleGraphicOrders=this.$refs.graphtool.order;
+      this.graphtoolVisible=false;
+
+    },
+    //打开sql编译器
+    openSql() {
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='1'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空图形化工具内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dataForm.ruleGraphicJoins=[];
+          this.dataForm.ruleGraphicOrders=[];
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.sqlKey = Math.random();
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.slqTabelEdt = [];
+          this.sqlVisible = true;
+        }).catch(() => {
+
+        });
+      }else{
+        this.sqlKey = Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+
+        // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
+        this.slqTabelEdt = [];
+        this.sqlVisible = true;
+      }
+
     },
     //sql编译器点击保存
     sqlSave() {
@@ -565,6 +676,8 @@ export default {
       this.sqlEditMsg.msg = "";
       this.sqlMsgCopy = "";
       this.paramsSqlSelf = "";
+      this.dataForm.ruleGraphicJoins=[];
+      this.dataForm.ruleGraphicOrders=[];
       if (this.$refs["dataForm"]) {
         this.$refs["dataForm"].clearValidate();
       }
@@ -641,6 +754,8 @@ export default {
             this.dataForm.folderPath = datas.folderPath;
             this.dataForm.createUserName = datas.createUserName;
             this.dataForm.createTime = datas.createTime;
+            this.dataForm.ruleGraphicJoins = datas.ruleGraphicJoins;
+            this.dataForm.ruleGraphicOrders = datas.ruleGraphicOrders;
             this.sqlEditMsg.msg = datas.ruleSqlValue;
             this.deletCm();
             this.sqlMsgCopy = JSON.parse(JSON.stringify(datas.ruleSqlValue));
@@ -738,17 +853,8 @@ export default {
         var v = { ruleStatisticsColumnName: item.columnName };
         ruleStatisticsColumns.push(v);
       });
-      if (
-        this.dataForm.ruleSqlStatisticsValue &&
-        this.dataForm.ruleSqlStatisticsValue != ""
-      ) {
-        if (
-          this.dataForm.ruleSqlStatisticsValue.indexOf(
-            this.rjMust["personTime"]
-          ) == -1 ||
-          this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
-            -1
-        ) {
+      if (this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!=null && this.dataForm.ruleSqlStatisticsValue != "") {
+        if (this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["personTime"]) == -1 || this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) == -1) {
           this.$message.error(
             `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
           );
@@ -769,9 +875,16 @@ export default {
         //   );
         //   return false;
         // }
-        if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+        if(this.dataForm.ruleRemark){
+          if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+            return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
+          }
+        }
+
+        if((this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!='')&&(!this.dataForm.ruleRemark||this.dataForm.ruleRemark == "")){
           return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
         }
+
       }
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
@@ -793,7 +906,9 @@ export default {
               ruleSqlValue: this.paramsSqlSelf,
               ruleType: this.dataForm.ruleType,
               folderPath: this.dataForm.folderPath,
-              paramRules: this.dataForm.paramRule
+              paramRules: this.dataForm.paramRule,
+              ruleGraphicJoins: this.dataForm.ruleGraphicJoins,
+              ruleGraphicOrders: this.dataForm.ruleGraphicOrders,
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {
@@ -824,17 +939,23 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     }
+  },
+  watch : {
+    // graphtoolVisible:{
+    //   handler:function(val){
+    //     if(val) {
+    //       this.getMsgFromParent
+    //     }
+    //   }
+    // },
+    // 'dataForm.ruleGraphicJoins':{
+    //   deep: true,
+    //   handler(val) {
+    //     this.dataForm.ruleGraphicJoins=val;
+    //     this.$set(this.dataForm,'ruleGraphicJoins',val)
+    //   }
+    // },
   }
-  // watch : {
-  //   'sqlEditMsg.msg':{
-  //     immediate: true,
-  //     deep: true,
-  //     handler(val) {
-  //       console.log(val, 4444)
-  //       this.$set(this.sqlEditMsg,'msg',val)
-  //     }
-  //   }
-  // }
 };
 </script>
 <style scoped>

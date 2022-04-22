@@ -55,7 +55,7 @@
         prop="projectCode"
         header-align="center"
         align="center"
-        width="80"
+        width="120"
         label="项目编号">
       </el-table-column>
       <el-table-column
@@ -64,7 +64,8 @@
         label="项目名称"
         min-width="160">
         <template slot-scope="scope">
-          <div :title="scope.row.projectName" class="show-ellipsis">{{scope.row.projectName}}</div>
+          <!--<div :title="scope.row.projectName" class="show-ellipsis">{{scope.row.projectName}}</div>-->
+          <el-button :title="scope.row.projectName" type="text" size="small" @click="addOrUpdateHandle(scope.row.projectId,'look')">{{scope.row.projectName}}</el-button>
         </template>
       </el-table-column>
 
@@ -238,10 +239,10 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (id,type) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(id,type)
         })
       },
       // 删除
@@ -292,3 +293,8 @@
     }
   }
 </script>
+<style scoped lang="scss">
+  .show-ellipsis{
+    color:#17B3A3;
+  }
+</style>

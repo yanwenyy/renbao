@@ -4,16 +4,19 @@
       <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
         <div class="custom-tree-container">
          <el-input
+            class="filter-text"
             placeholder="输入关键字进行过滤"
             v-model="filterText">
           </el-input>
            <el-tree
+            ref="tree"
             class="treeClass"
             :data="treeData"
             :props="defaultProps"
             node-key="regionId"
             default-expand-all
             @node-click="nodeClick"
+            :filter-node-method="filterNode"
             :expand-on-click-node="false">
           </el-tree>
         </div>
@@ -33,19 +36,35 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="有效时间：">
+            <!--<el-date-picker-->
+              <!--value-format="yyyy-MM-dd"-->
+              <!--v-model="dataForm.endTime"-->
+              <!--type="date"-->
+              <!--placeholder="选择日期">-->
+            <!--</el-date-picker>-->
             <el-date-picker
+              :picker-options="pickerOptionsStart"
+              v-model="dataForm.beginTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+            <span>--</span>
+            <el-date-picker
+              :picker-options="pickerOptionsEnd"
               v-model="dataForm.endTime"
               type="date"
+              value-format="yyyy-MM-dd"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="文件内容：">
-            <el-input
-              v-model="dataForm.createUserName"
-              placeholder="文件内容"
-              clearable
-            ></el-input>
-          </el-form-item>
+          <!--<el-form-item label="文件内容：">-->
+            <!--<el-input-->
+              <!--v-model="dataForm.createUserName"-->
+              <!--placeholder="文件内容"-->
+              <!--clearable-->
+            <!--&gt;</el-input>-->
+          <!--</el-form-item>-->
           <el-form-item>
             <el-button type="primary" @click="(pageIndex = 1), getDataList()"
               >查询</el-button
@@ -162,6 +181,28 @@ import ruleTree from "../../common/rule-tree.vue";
 export default {
   data() {
     return {
+      // 开始日期 :picker-options 中引用
+      pickerOptionsStart: {
+        disabledDate: time => {
+          // 获取结束日期的 v-model 值并赋值给新定义的对象
+          let endDateVal = this.dataForm.endTime;
+          if (endDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() > new Date(endDateVal).getTime();
+          }
+        }
+      },
+      // 结束日期 :picker-options 中引用
+      pickerOptionsEnd: {
+        disabledDate: time => {
+          // 获取开始日期的 v-model 值并赋值给新定义的对象
+          let beginDateVal = this.dataForm.beginTime;
+          if (beginDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
+          }
+        }
+      },
       defaultProps: {
         children: 'children',
         label: 'regionName'
@@ -180,6 +221,7 @@ export default {
       dataForm: {
         policyName: "",
         endTime: "",
+        beginTime: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
       },
@@ -227,6 +269,11 @@ export default {
     this.getTreeData();
   },
   methods: {
+    filterNode (value, data) {
+      if (!value) return true;
+      return data.regionName.indexOf(value) !== -1;
+
+    },
     //左侧树节点点击
     nodeClick(data,node,ele){
       var _list=this.getParentName(node,'regionName');
@@ -270,10 +317,13 @@ export default {
     },
     //重置点击
     reset() {
-      this.dataForm.ruleName = "";
+      this.dataForm.policyName = "";
+      this.dataForm.endTime = "";
+      this.dataForm.beginTime = "";
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
+      this.getDataList();
     },
     // 获取数据列表
     getDataList() {
@@ -287,6 +337,7 @@ export default {
           pageSize: this.pageSize,
           policyName: this.dataForm.policyName,
           endTime: this.dataForm.endTime,
+          beginTime: this.dataForm.beginTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
         })
@@ -489,5 +540,9 @@ export default {
 }
 .dr-notice-body > div {
   margin-bottom: 20px;
+}
+.filter-text {
+  width: 80%;
+  margin-bottom: 5px;
 }
 </style>

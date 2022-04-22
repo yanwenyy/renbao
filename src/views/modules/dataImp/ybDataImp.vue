@@ -38,6 +38,11 @@
         type="selection"
         width="55">
       </el-table-column>
+      <el-table-column 
+       label="序号" 
+       type="index" 
+       align="center" 
+       width="50"/>
       <el-table-column
         prop="tableName"
         align="center"
@@ -165,6 +170,11 @@
         style="width: 100%;height:45vh; overflow:auto;"
         :row-class-name="tableRowClassName"
         :data="this.selectedFileData">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <!-- fileTableInfos  -->
         <el-table-column
           align="center"
@@ -377,6 +387,18 @@
         <el-button @click="tableDataViewDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
+    <!-- dmp查看数据 -->
+    <el-dialog
+      :title="dmpCheckTableName"
+      :visible.sync="dmpTableDataViewDialogVisible"
+      v-if="dmpTableDataViewDialogVisible"
+      width="70%"
+      :close-on-click-modal="false">
+      <dmp-bak-data-view :table-name="dmpCheckTableName" :dmp-imp="dmpImp" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dmpTableDataViewDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
     <!-- dmp数据表匹配 -->
     <el-dialog
       title="数据表匹配"
@@ -387,6 +409,11 @@
         border
         style="width: 100%;height:45vh; overflow:auto;"
         :data="dmpImp.dmpBakTableInfoMaps">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <el-table-column
           align="center"
           label="数据表">
@@ -417,7 +444,7 @@
           </el-table-column>
           <el-table-column
             align="center"
-            width="200"
+            width="240"
             label="操作">
             <template slot-scope="scope">
               <el-button
@@ -425,6 +452,12 @@
                 type="text"
                 size="small">
                 移除
+              </el-button>
+               <el-button
+                @click.native.prevent="dmpBakDataView(scope.$index, dmpImp, dmpImp.dmpBakTableInfoMaps)"
+                type="text"
+                size="small">
+                查看数据
               </el-button>
             </template>
           </el-table-column>
@@ -459,13 +492,18 @@
       </span>
     </el-dialog>
     <el-dialog
-    title="查看已导入dmp文件"
+    title="已导入文件"
       :visible.sync="dmpReImpDialogVisible"
       width="60%">
       <el-table
         border
         style="width: 100%;height:45vh; overflow:auto;"
         :data="dmpReImpList">
+        <el-table-column 
+          label="序号" 
+          type="index" 
+          align="center" 
+          width="50"/>
         <el-table-column
           align="center"
           prop="dmpFilePath"
@@ -507,6 +545,7 @@
 <script>
   import ColumnView from './columnView'
   import DataView from './dataView'
+  import DmpBakDataView from './dmpBakDataView'
   import {PxSocket} from '@/utils'
   export default {
     data () {
@@ -532,6 +571,8 @@
         tableColumnViewDialogVisible: false,
         // 查看数据弹窗
         tableDataViewDialogVisible: false,
+        // dmp查看数据弹窗
+        dmpTableDataViewDialogVisible: false,
         // 匹配表弹窗
         checkFileTableDialogVisible: false,
         // dmp文件匹配表弹窗
@@ -560,6 +601,8 @@
         selectTableViewNames: [],
         // 查看表数据，表结构选中的表
         checkTableName: '',
+        // dmp查看表数据，表结构选中的表
+        dmpCheckTableName: '',
         // 导入数据集合
         importDataModelList: [],
         // 文件表对应关系
@@ -598,7 +641,7 @@
       },
     },
     components: {
-      ColumnView,DataView
+      ColumnView,DataView,DmpBakDataView
     },
     activated () {
       this.getDataList()
@@ -1347,6 +1390,13 @@
               break
           }
           return false
+      },
+      // dmpbak查看数据
+      dmpBakDataView(index,dmpImp,tableinfo) {
+         for (const key in tableinfo[index]) {
+          this.dmpTableDataViewDialogVisible = true
+          this.dmpCheckTableName = key
+        }
       }
     }
   }

@@ -167,6 +167,7 @@ export default {
       this.listLoading = true;
       var getSql = this.$refs.myquerybuilder.getSelectSql();
       this.sqlData = getSql.sql;
+      console.log(this.sqlData)
       this.initList();
     },
     //导出
@@ -204,12 +205,12 @@ export default {
           }
         } catch (err) {
           // 解析成对象失败，说明是正常的文件流
-          const blob = new Blob([response.data], { type: "application/x-xls" });
+          const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
           const filename = response.headers["content-disposition"];
           const downloadElement = document.createElement("a");
           const href = window.URL.createObjectURL(blob); //创建下载的链接
           downloadElement.href = href;
-          [downloadElement.download] = [fileName + ".xls"];
+          [downloadElement.download] = [fileName + ".xlsx"];
           document.body.appendChild(downloadElement);
           downloadElement.click(); //点击下载
           document.body.removeChild(downloadElement); //下载完成移除元素

@@ -9,6 +9,7 @@
           :batchTreeList="batchTreeList"
           @getbatchData="getbatchData"
           v-on:refreshBitchData="initTree"
+          v-on:refreshRuleData="initData"
           :isParent="false"
         ></batch-list>
         <!-- </div> -->
@@ -301,7 +302,10 @@ export default {
       get() {
         return this.$store.state.common.tableHeight;
       }
-    }
+    },
+    projectId: {
+      get () { return this.$store.state.common.projectId}
+    },
   },
   activated() {
     this.initTree();
@@ -347,7 +351,8 @@ export default {
         method: "get",
         params: this.$http.adornParams(
           {
-            batchType: 1
+            batchType: 1,
+            projectId:this.projectId
           },
           false
         )
@@ -486,7 +491,7 @@ export default {
     },
     //左点右显
     getbatchData(data, node) {
-      this.batchId = data.batchId;
+      this.batchId = data && data.batchId && data.batchId || '';
       this.initData();
     },
     //结果明细导出

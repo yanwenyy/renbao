@@ -83,18 +83,18 @@
         width="50"
       >
       </el-table-column>
-      <el-table-column
-        type="index"
-        header-align="center"
-        align="center"
-        width="80"
-        label="ID"
-        :index="indexMethod"
-      >
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>
-        </template> -->
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--type="index"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--width="80"-->
+        <!--label="ID"-->
+        <!--:index="indexMethod"-->
+      <!--&gt;-->
+        <!--&lt;!&ndash; <template slot-scope="scope">-->
+          <!--<span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>-->
+        <!--</template> &ndash;&gt;-->
+      <!--</el-table-column>-->
       <el-table-column
         prop="userName"
         header-align="center"

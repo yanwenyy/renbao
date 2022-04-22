@@ -85,6 +85,11 @@ http.wsUrl = (actionName) => {
   // 非生产环境 && 开启代理, 接口前缀统一使用[/proxyApi/]前缀做代理拦截!
   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/wsApi/' : window.SITE_CONFIG.wsUrl) + actionName
 }
+//chat
+http.chatUrl = (actionName) => {
+  // 非生产环境 && 开启代理, 接口前缀统一使用[/proxyApi/]前缀做代理拦截!
+  return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/chatApi/' : window.SITE_CONFIG.chatUrl) + actionName
+}
 
 
 /**

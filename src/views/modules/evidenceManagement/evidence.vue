@@ -199,6 +199,23 @@ export default {
       get() {
         return this.$store.state.common.tableHeight;
       }
+    },
+    projectId: {
+      get() {
+        if (this.$store.state.common.projectId) {
+          return this.$store.state.common.projectId;
+        } else {
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+            method: "get",
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              return data.result.projectId;
+            }
+          });
+        }
+      }
     }
   },
   mounted() {
@@ -215,7 +232,8 @@ export default {
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
           evidenceName: this.dataForm.evidenceName,
-          createUserName: this.dataForm.createUserName
+          createUserName: this.dataForm.createUserName,
+          projectId: this.projectId
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -252,6 +270,10 @@ export default {
     },
     //新增
     addHandle() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.showAddDialog = true;
       this.title = "新增证据";
       this.id = "";
@@ -304,36 +326,45 @@ export default {
     },
     // 删除
     deleteHandle() {
-      var evidenceIds = [];
+      var evidenceIds = [],candel=true;
       this.multipleSelection.forEach(item => {
         evidenceIds.push(item.evidenceId);
+        if(item.relation=='是'){
+          candel=false;
+          return false;
+        }
       });
-      this.$confirm(`确定进行删除操作?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
-            method: "post",
-            data: this.$http.adornData(evidenceIds, false)
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList();
-                }
-              });
-            } else {
-              this.$message.error("操作失败");
-            }
-          });
+      if(!candel){
+        this.$message.error("被底稿关联的数据不能删除!")
+      }else{
+        this.$confirm(`确定进行删除操作?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
         })
-        .catch(() => {});
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl(`/evidence/deleteByEvidenceIds`),
+              method: "post",
+              data: this.$http.adornData(evidenceIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getDataList();
+                  }
+                });
+              } else {
+                this.$message.error("操作失败");
+              }
+            });
+          })
+          .catch(() => {});
+      }
+
     },
     //附件下载
     downLoadFile() {

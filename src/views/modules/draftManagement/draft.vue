@@ -76,10 +76,17 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="ruleCategory"
+              prop="manuscriptCode"
               header-align="center"
               align="center"
-              label="规则类别"
+              label="底稿编号"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="manuscriptName"
+              header-align="center"
+              align="center"
+              label="底稿名称"
             >
             </el-table-column>
             <el-table-column
@@ -97,22 +104,22 @@
               label="创建人"
             >
             </el-table-column>
-            <el-table-column
-              prop="ruleType"
-              header-align="center"
-              align="center"
-              label="规则类型"
-            >
-              <template slot-scope="scope">
-                {{
-                  scope.row.ruleType == "1"
-                    ? "sql编辑器"
-                    : scope.row.ruleType == "2"
-                    ? "图形化"
-                    : ""
-                }}
-              </template>
-            </el-table-column>
+            <!--<el-table-column-->
+              <!--prop="ruleType"-->
+              <!--header-align="center"-->
+              <!--align="center"-->
+              <!--label="规则类型"-->
+            <!--&gt;-->
+              <!--<template slot-scope="scope">-->
+                <!--{{-->
+                  <!--scope.row.ruleType == "1"-->
+                    <!--? "sql编辑器"-->
+                    <!--: scope.row.ruleType == "2"-->
+                    <!--? "图形化"-->
+                    <!--: ""-->
+                <!--}}-->
+              <!--</template>-->
+            <!--</el-table-column>-->
           </el-table>
         </div>
         <div class="auditRuleConfig-right-bottom">
@@ -174,7 +181,7 @@ export default {
       },
       multipleTable: [],
       treeData: [],
-      folderSorts: "",
+      folderSorts: "3",
       ruleCheckData: {},
       showEditDialog: false,
       dataListLoading: false,
@@ -206,7 +213,8 @@ export default {
       this.$http({
         isLoading: false,
         url: this.$http.adornUrl(
-          `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
+          `/manuscript/selectPageByManuscript?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}&projectId=${this.projectId}`
+          // `/rule/selectPage?pageNo=${this.Pager.pageIndex}&pageSize=${this.Pager.pageSize}`
         ),
         method: "get",
         params: this.$http.adornParams(this.searchForm, false)
@@ -286,6 +294,10 @@ export default {
     },
     //编写底稿弹窗
     editData() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.title = "编写底稿";
       this.showEditDialog = true;
       this.data = this.multipleTable[0];

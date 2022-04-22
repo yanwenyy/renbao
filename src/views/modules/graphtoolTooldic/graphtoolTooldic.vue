@@ -2,7 +2,8 @@
   <div class="graphtool-tooldic">
     <div class="graphtool-top">
       <div class="data-left" :class="leftHidden?'data-left-hidden':''">
-        <div @click="getCanvas(),leftHidden=!leftHidden" class="data-left-tab inline-block" :class="!leftHidden?'data-left-tab-act':''">
+        <div @click="getCanvas(),leftHidden=!leftHidden" class="data-left-tab inline-block"
+             :class="!leftHidden?'data-left-tab-act':''">
           数据表
         </div>
         <div v-show="!leftHidden" class="data-tree inline-block">
@@ -34,16 +35,20 @@
           </el-tree>
         </div>
       </div>
-      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''" class="data-canvas mar-l">
-        <div id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;"></div>
+      <div :class="leftHidden&&rightHidden?'data-canvas-noLeftRight':leftHidden||rightHidden?'data-canvas-noLeft':''"
+           class="data-canvas mar-l">
+        <div class="mdd-placeHolder" v-if="join.length==0">请将表拖到此处</div>
+        <div @dragover="allowDrop" id="myDiagramDiv" style="border: solid 1px #F3F3F3;height:100%;">
+
+        </div>
         <!-- <img width="15" id="fd" height="15" title="画布放大" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 250px;top: 12px;"  onclick="assistSqlEdit.hb()"/>
         <img width="15" id="sx" height="15" title="画布缩小" src="../assistSqlEdit/images/fangda.png" style="z-index:9999;position: absolute;right: 10px;top: 12px;"  onclick="assistSqlEdit.hbsx()"/> -->
       </div>
+      <div v-show="!rightHidden" class="run-btn"><el-button type="primary" @click="getwsData(sqlMsg)">立即运行</el-button></div>
       <div class="data-right mar-l" :class="rightHidden?'data-right-hidden':''">
         <div v-show="!rightHidden" id="joins" class="data-option-box inline-block">
           <div class="tstext">表连接</div>
           <div id="form" class="box-bg"></div>
-
         </div>
         <div v-show="!rightHidden" id="tjHidden" class="data-option-box  inline-block">
           <div class="tstext">连接条件</div>
@@ -56,7 +61,7 @@
             <div class="form-group" id="select" style="display:none;">
 
               <div class="col-sm-8">
-                <select id="comper" onchange="assistSqlEdit.changeCopare()">
+                <select id="comper" @change="changeCopare()">
                   <option value="=">等于</option>
                   <option value="!=">不等于</option>
                   <option value="&gt;">大于</option>
@@ -75,7 +80,8 @@
             </div>
           </div>
         </div>
-        <div @click="getCanvas(),rightHidden=!rightHidden" class="data-right-tab inline-block" :class="!rightHidden?'data-right-tab-act':''">
+        <div @click="getCanvas(),rightHidden=!rightHidden" class="data-right-tab inline-block"
+             :class="!rightHidden?'data-right-tab-act':''">
           表关系
         </div>
 
@@ -87,7 +93,8 @@
         <div id="order" class="box-bg form-group" style="overflow: auto;"></div>
       </div>
       <div class="data-list mar-l" id="sqlHidden">
-        <div id="attr" class="data-list-item data-list-table" style="margin-top:34px;margin-bottom:10px">
+        <div id="attr" class="data-list-table" style="margin-top:34px;margin-bottom:10px">
+          <!--<div id="attr" class="data-list-item" style="margin-top:34px;margin-bottom:10px">-->
           <div class="table-view">
             <!-- <table class="table table-striped" id="gridTable"></table> -->
             <el-table
@@ -182,7 +189,7 @@
                 label="筛选"
               >
                 <template slot-scope="scope">
-                  <el-button type="primary">筛选</el-button>
+                  <el-button type="primary" @click="screen(scope.row)">筛选</el-button>
                 </template>
               </el-table-column>
               <el-table-column
@@ -193,44 +200,123 @@
                 width="150"
               >
                 <template slot-scope="scope">
-                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,true)"
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,true),scope.row.group=true"
                              v-if="!scope.row.group">加入分组
                   </el-button>
-                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,false)"
+                  <el-button type="primary" @click="clickGroup(scope.row.id,scope.row.table,scope.row.name,false),scope.row.group=false"
                              v-if="scope.row.group">取消分组
                   </el-button>
                 </template>
               </el-table-column>
-              <!--<el-table-column-->
-              <!--v-for="(items, index) in tablePositionKey"-->
-              <!--:prop="items.dataname"-->
-              <!--:key="index"-->
-              <!--:label="items.label"-->
-              <!--:sortable="items.issortable"-->
-              <!--:align="items.align ? items.align : 'center'"-->
-
-              <!--&gt;-->
-              <!--</el-table-column>-->
             </el-table>
           </div>
         </div>
-        <div id="sql" class="box-bg data-list-item sql-box"></div>
+        <div id="sql" class="box-bg1 sql-box">
+          {{sqlMsg}}
+        </div>
+        <!--<div id="sql" class="box-bg"></div>-->
       </div>
-
-
     </div>
+    <el-dialog :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
+      <div class="screen-body">
+        <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false,cleanQueryRules()">取 消</el-button>
+        <el-button type="primary" @click="saveScreen()">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
+      <el-tabs @tab-click="tabClick" v-if="resultTableTabs.length>0" v-model="resultTableTabsValue" type="border-card">
+        <el-tab-pane
+          :key="String(index)"
+          v-for="(item, index) in resultTableTabs"
+          v-if="item"
+          :label="'结果'+(index+1)"
+          :name="String(index)"
+        >
+          <div v-if="item.list==''">
+            <div v-if="!item.columnList">{{item.msg}}</div>
+            <el-table height="52vh" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
+              <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
+
+              </el-table-column>
+            </el-table>
+          </div>
+          <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
+          <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
+          <el-table height="52vh" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
+            <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+              <template slot-scope="scope">
+                <div>
+                  <span>{{scope.row[key]}}</span>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="(val)=>{sizeChangeTable(val,item,index)}"
+            @current-change="(val)=>{currentChangeTable(val,item,index)}"
+            :current-page="item.pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="item.pageSize"
+            :total="item.totalPage"
+            layout="total, sizes, prev, pager, next, jumper"
+          >
+          </el-pagination>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
+
   </div>
 </template>
 <script>
+  import {PxSocket,randomString} from '@/utils'
+  import SelfLoading from '@/utils/selfLoading'
+  import queryBuilder from "@/views/modules/dataAcquisition/VueQueryBuilder.vue";
+
   require("../../../utils/jquery/jquery-3.3.1");
   const make = go.GraphObject.make;
   export default {
+    props:{
+      //当前页面自己的属性,sql编辑传回来的数据
+      sqlEditMsg: {
+        type: String,
+        default: null,
+      },
+      joinEdit: {
+        type: Array,
+        default: null,
+      },
+      orderEdit: {
+        type: Array,
+        default: null,
+      },
+      //当前页面自己的属性,用来区分websocket连接
+      modelName: {
+        type: String,
+        default: null,
+      },
+    },
     data() {
       return {
+        from:'',
+        myDiagramDivLeft:0,
+        resultTableTabs: [],//sql执行返回的动态tab
+        resultTableTabsValue: '2',//动态标签显示项
+        wsVisiable:false,//websocket执行结果显示状态
+        ws:{},//websoket对象
+        userId:sessionStorage.getItem("userId")+"-"+(this.modelName!=null&&this.modelName!=''?this.modelName:'graphtool'),
+        screenKey:0,
+        screenRow: {},//筛选的当前行
+        queryRules: [], // querybuilder的规则数据
+        queryJson: {}, // queryBuilder上动态绑定的json数据
+        dialogFormVisible: false,//筛选弹框状态
+        sqlMsg: '',//sql语句
         //是否隐藏数据表
-        leftHidden:false,
+        leftHidden: false,
         //是否隐藏表关系
-        rightHidden:false,
+        rightHidden: false,
 
         filter: {},
         layeX: -1,
@@ -258,44 +344,302 @@
         loadTree: [],//左边树懒加载的数据
         dataTreeData: [],//左边树数据表初始的数据
         treeExpandData: [], // 通过接口获取的需要默认打开的节点
-        tablePositionKey: [ // 表头
-          {dataname: "order", label: "", issortable: false, type: ""},
-          {dataname: "tableName", label: "来源", issortable: false, type: ""},
-          {dataname: "name", label: "英文字段名", issortable: false, type: ""},
-          {dataname: "info", label: "中文字段名", issortable: false, type: ""},
-          {dataname: "gridTable_alias", label: "别名", issortable: false, type: ""},
-          {dataname: "gridTable_fun", label: "聚合函数", issortable: false, type: ""},
-          {dataname: "gridTable_order", label: "排序", issortable: false, type: ""},
-          {dataname: "gridTable_screen", label: "筛选", issortable: false, type: ""},
-          {dataname: "gridTable_group", label: "分组", issortable: false, type: ""},
-        ],
         tableData: []
-
       };
     },
     activated() {
       this.getSjbData()
     },
     mounted() {
+      this.getSjbData();
       this.init();
+      this.getGojsClientXY();
+      window.changeType = this.changeType;
       var diagramDivw = document.getElementById("myDiagramDiv");
       diagramDivw.onmousemove = function (event) {
         this.layeX = event.layerX;
         this.layeY = event.layerY;
       };
+      this.ws=new PxSocket({
+        url:this.$http.wsUrl('websocket?'+this.userId),
+        succ:this.getDataList
+      });
+      this.ws.connect();
 
-
+      // //测试回显
+      // this.form='detail';
+      // var obj={};
+      // obj.join.forEach(item=>{
+      //   this.addNodeData(item);
+      //   item.fields.forEach(utem=>{
+      //     if(utem.group==true){
+      //       this.group=true;
+      //       this.toSql();
+      //     }
+      //   });
+      //   if(item.on&&item.on.length>0){
+      //     item.on.forEach(vtem=>{
+      //       this.myDiagram.model.addLinkData(vtem);
+      //     })
+      //   }
+      // });
+      // this.order=obj.order;
+      // this.initOrder();
+      // this.toSql();
     },
-
+    destroyed(){
+      this.ws.close();
+    },
     methods: {
-      getCanvas(){
+      //获取父组件传来的参数
+      getMsgFromParent(sql,joins,orders){
+        // console.log(sql,joins,orders,396)
+        this.join=[];
+        this.order=[];
+        this.form='detail';
+        this.$forceUpdate();
+        this.$nextTick(()=>{
+          if(joins&&joins!=''){
+            console.log(402)
+            joins.forEach(item=>{
+              this.addNodeData(item);
+              item.fields.forEach(utem=>{
+                if(utem.group==true){
+                  this.group=true;
+                  this.toSql();
+                }
+              });
+              if(item.on&&item.on.length>0){
+                item.on.forEach(vtem=>{
+                  this.myDiagram.model.addLinkData(vtem);
+                })
+              }
+            });
+          }
+          if(orders&&orders!=''){
+            this.order=orders;
+            this.initOrder();
+            this.toSql();
+          }
+        })
+
+      },
+      //改变右上角表关联字段的选项
+      changeCopare(){
+        var fromtab = $("#from").val();
+        var totab = $("#to").val();
+        var fromPort = $("#MainPort").val();
+        var toPort = $("#toPort").val();
+        var copare = $("#comper").val();
+        var i = this.indexOfJoin(fromtab);
+        var j = this.indexOfJoin(totab);
+
+        var idx = Math.max(i, j);
+
+        var editIdx = -1;
+        for (var i = 0; i < this.join[idx].on.length; i++) {
+          if (this.join[idx].on[i].fromPort === fromPort && this.join[idx].on[i].toPort === toPort) {
+            this.join[idx].on[i].compare = copare;
+          }
+        }
+        this.showJoin();
+        this.toSql();
+      },
+      //改变join的类型
+      changeType(i){
+        var slaverTable = $("#slaverTable"+i).val();
+        var type = $("#type"+i).val();
+        var idx = this.indexOfJoin(slaverTable);
+        this.join[idx].type=type;
+        this.showJoin();
+        this.toSql();
+      },
+      //sql结果tab切换事件
+      tabClick(e){
+        var list=this.resultTableTabs[e.index].list;
+        this.resultTabClick(list)
+      },
+      //执行结果页码点击
+      currentChangeTable(val,item,index){
+        item.pageIndex=val;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
+      //执行结果页数改变
+      sizeChangeTable(val,item){
+        item.pageSize=val;
+        item.pageIndex = 1;
+        item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+        this.$forceUpdate();
+        this.$set(this.resultTableTabs,this.resultTableTabs);
+      },
+      //点击运行获取websoket数据
+      getwsData(sql) {
+        var obj={
+          join:this.join,
+          order:this.order
+        };
+        console.log(JSON.stringify( obj));
+        if(sql!=''){
+            this.resultTableTabs=[];
+            var params={
+              sqlScript:sql,
+              loadOnce:false,
+              dataSize:"500",
+              webSocketId:this.userId,
+            };
+            SelfLoading.show({
+              buttonClass:'el-button el-button--primary',
+              buttonText:'取消执行',
+              buttonFun:function(){SelfLoading.hide()}
+            });
+            this.$http({
+              url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+              method: 'post',
+              data: this.$http.adornData(params),
+              isLoading:false
+            }).then(({data}) => {
+              SelfLoading.hide();
+              if(data.code==200){
+
+              }else{
+                // this.$message.error(data.message);
+                this.$alert(data.message, '注意', {
+                  cancelButtonText: '关闭',
+                  showConfirmButton: false,
+                  showCancelButton: true,
+                  type: 'error',
+                });
+              }
+            })
+        }else{
+          this.$message.error("sql语句不能为空")
+        }
+      },
+      //获取sql运行websocket返回的数据
+      getDataList(datas){
+        this.key+=1;
+        if(datas&&datas!='ping'){
+          datas=JSON.parse(datas);
+          console.log(datas);
+          var v={};
+          if(datas.data&&datas.data.result){
+            v={
+              list:datas.data.result||[],
+              columnList:datas.data.columnList,
+              msg:datas.message,
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
+            };
+          }else{
+            v={
+              list:[],
+              columnList:datas.data.columnList,
+              msg:datas.message,
+              codeName:datas.codeName,
+              isLast:datas.data.isLast
+            };
+          }
+          this.resultTableTabs.push(v);
+          console.log(this.resultTableTabs);
+          this.wsVisiable=true;
+        }
+      },
+      //筛选弹框确定点击
+      saveScreen() {
+        this.dialogFormVisible = false;
+        var sql = this.queryToSql(this.queryJson);
+        var idx =  this.indexOfJoin(this.screenRow.table);
+        var datajoin =  this.join[idx];
+        for(var i=0;i<datajoin.fields.length;i++){
+          var field = datajoin.fields[i];
+          if(field.id == this.screenRow.id){
+            this.join[idx].fields[i].more=sql;
+          }
+        }
+        this.initTableRow();
+        this.toSql();
+        this.$refs.queryBuilder.query.children=[];
+        // console.log(this.$refs.queryBuilder);
+      },
+      //通过返显的Json字符串拼出返显的sql
+      queryToSql(query) {
+        const sql = [];
+        const that = this;
+        const logicalOperator = query.logicalOperator;
+        const children = query.children;
+        children.forEach((child) => {
+          const type = child.type;
+          if (type === "query-builder-rule") {
+            var dataTypeObj ='';
+            if (dataTypeObj=='') {
+              if (child.query.operator == "like" || child.query.operator == "not like") {
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("'%" + child.query.value + "%'");
+              } else if (child.query.operator == "is null" || child.query.operator == "is not null") {
+                let arr = ''
+                child.query.value = arr
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("" + child.query.value + "");
+              } else {
+                sql.push(child.query.operand);
+                sql.push(child.query.operator);
+                sql.push("'" + child.query.value + "'");
+              }
+
+            } else {
+              sql.push(child.query.operand);
+              sql.push(child.query.operator);
+              sql.push(child.query.value);
+            }
+          } else {
+            sql.push("(");
+            sql.push(that.queryToSql(child.query));
+            sql.push(")");
+          }
+          sql.push(logicalOperator);
+        });
+        sql.splice(sql.length - 1, sql.length);
+        return sql.join(" ");
+      },
+      //重置querybuilder的规则数据
+      cleanQueryRules() {
+        this.queryRules = [];
+      },
+      //筛选按钮点击
+      screen(row) {
+        this.screenKey=Math.random();
+        this.screenRow = row;
+        this.queryRules = [];
+        var v = {
+          type: 'inputselect',
+          label:row.key+"."+ row.info,
+          value:row.key+"."+ row.info,
+          operators: [{'id': "=", "label": "等于"}, {'id': "!=", "label": "不等于"}, {
+            'id': "like",
+            "label": "包含以下内容"
+          }, {'id': "not like", "label": "不包含以下内容"}, {'id': "is null", "label": "为空值"}, {
+            'id': "is not null",
+            "label": "不为空值"
+          },]
+        };
+        this.queryRules.push(v);
+        this.dialogFormVisible = true;
+
+      },
+      getCanvas() {
         this.upDateDiagramAnimationFrame(0)
       },
-      upDateDiagramAnimationFrame(count){
+      upDateDiagramAnimationFrame(count) {
         count++;
         requestAnimationFrame(() => {
           this.myDiagram.requestUpdate();
-          if(count<60){ this.upDateDiagramAnimationFrame(count); }
+          if (count < 60) {
+            this.upDateDiagramAnimationFrame(count);
+          }
         });
       },
       init() {
@@ -305,8 +649,9 @@
           go.Diagram,
           "myDiagramDiv",
           {
+            allowMove: true, //允许拖动
             allowZoom: true,
-            autoScale:go.Diagram.UniformToFill,
+            autoScale: go.Diagram.UniformToFill,
             validCycle: go.Diagram.CycleNotDirected,  // don't allow loops不允许循环
             // For this sample, automatically show the state of the diagram's model on the page
             "ModelChanged": function (e) {
@@ -344,6 +689,7 @@
               item.diagram.skipsUndoManager = true;
               if (item.data.color == "#FFFFFF") {
                 item.data.color = "#707070";
+                item.data.checked = true;
                 var obj = item.data;
                 var key = obj.table;
                 var idx = that.indexOfJoin(key);
@@ -358,6 +704,7 @@
                 that.toSql();
               } else {
                 item.data.color = "#FFFFFF";
+                item.data.checked = false;
                 var obj = item.data;
                 var key = obj.table;
                 var idx = that.indexOfJoin(key);
@@ -378,19 +725,64 @@
               item.diagram.skipsUndoManager = oldskips;
             }
           },
-          make(
-            go.Shape,
+          //黑色复选框
+          // make(
+          //   go.Shape,
+          //   {
+          //     width: 12,
+          //     height: 12,
+          //     column: 0,
+          //     strokeWidth: 2,
+          //     margin: 4,
+          //     fromLinkable: false,
+          //     toLinkable: false,
+          //   },
+          //   new go.Binding("figure", "figure"),
+          //   new go.Binding("fill", "color")
+          // ),
+          make("CheckBox", "checked",
+            new go.Binding("checked", "checked"),
             {
-              width: 12,
-              height: 12,
-              column: 0,
-              strokeWidth: 2,
-              margin: 4,
-              fromLinkable: false,
-              toLinkable: false,
-            },
-            new go.Binding("figure", "figure"),
-            new go.Binding("fill", "color")
+              "_doClick": function(e, item) {
+                var oldskips = item.diagram.skipsUndoManager;
+                item.diagram.skipsUndoManager = true;
+               // console.log(item.panel.data)
+                if(item.panel.data.checked===true){
+                  item.panel.data.color = "#707070";
+                  var obj =item.panel.data;
+                  var key = obj.table;
+                  var idx = that.indexOfJoin(key);
+                  for (var i = 0; i < that.join[idx].fields.length; i++) {
+                    var field = that.join[idx].fields[i];
+                    if (field.name == obj.name) {
+                      field.hidden = false;
+                      break;
+                    }
+                  }
+                  that.initTableRow();
+                  that.toSql();
+                }else{
+                  item.panel.data.color = "#FFFFFF";
+                  var obj = item.panel.data;
+                  var key = obj.table;
+                  var idx = that.indexOfJoin(key);
+                  for (var i = 0; i < that.join[idx].fields.length; i++) {
+                    var field = that.join[idx].fields[i];
+                    if (field.name == obj.name) {
+                      field.hidden = true;
+                      field.more = [];
+                    }
+                  }
+                  if (that.filter[item.panel.data.id]) {
+                    delete that.filter[item.panel.data.id];
+                  }
+                  that.initTableRow(item.panel.data.tableId);
+                  that.toSql();
+                }
+                that.myDiagram.model.updateTargetBindings(item.panel.data);
+                item.diagram.skipsUndoManager = oldskips;
+              }
+            }
           ),
           make(
             go.TextBlock,
@@ -402,15 +794,16 @@
             },
             new go.Binding("text", "name")
           ),
-          make(
-            go.TextBlock,
-            {
-              margin: new go.Margin(0, 2),
-              column: 2,
-              font: "13px sans-serif"
-            },
-            new go.Binding("text", "info")
-          )
+          //右边info
+          //   make(
+          //     go.TextBlock,
+          //     {
+          //       margin: new go.Margin(0, 2),
+          //       column: 2,
+          //       font: "13px sans-serif"
+          //     },
+          //     new go.Binding("text", "info")
+          //   )
         );
 
         // This template represents a whole "record".此模板代表整个“记录”。
@@ -419,7 +812,7 @@
           "Auto",
           new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
           // this rectangular shape surrounds the content of the node:这个矩形形状围绕着节点的内容
-          make(go.Shape, {fill: "#EEEEEE"}),
+          make(go.Shape, {fill: "#fff",stroke: "#C1C1C1"}),
           // the content consists of a header and a list of items  内容由标题和项目列表组成
           make(
             go.Panel,
@@ -429,13 +822,13 @@
               go.Panel,
               "Auto",
               {stretch: go.GraphObject.Horizontal}, // as wide as the whole node  和整个节点一样宽
-              make(go.Shape, {fill: "#3d80c4", stroke: null}),
+              make(go.Shape, {fill: "#E8ECEF", stroke: null}),
               make(
                 go.TextBlock,
                 {
                   alignment: go.Spot.Center,
                   margin: 3,
-                  stroke: "white",
+                  stroke: "#000",
                   textAlign: "center",
                   font: "bold 12pt sans-serif"
                 },
@@ -577,6 +970,7 @@
             return;
           }
           txn.changes.each(function (e) {
+            // console.log(e)
             //连线修改
             if (e.change === go.ChangedEvent.Property) {
               if (e.modelChange === "linkFromKey" || e.modelChange === "linkToKey" || e.modelChange === "linkToPortId" || e.modelChange === "linkFromPortId") {
@@ -670,6 +1064,7 @@
               try {
               } catch (e) {
               }
+
               var obj = e.newValue;
               var i = that.indexOfJoin(obj.from);
               var j = that.indexOfJoin(obj.to);
@@ -759,7 +1154,10 @@
             }
             //节点新增
             else if (e.change === go.ChangedEvent.Insert && e.modelChange === "nodeDataArray") {
-              console.log(e.newValue)
+              // console.log(e.newValue)
+              if(that.form=='detail'){
+                e.newValue.on=[];
+              }
               that.join.push(e.newValue);
               that.showJoin();
               that.toSql();
@@ -784,11 +1182,10 @@
         orderdata.column = column;
         orderdata.order = "ASC";
         this.order.push(orderdata);
-
         this.initOrder();
         this.initTableRow();
         this.toSql();
-
+        console.log(this.join)
       },
       //点击倒序
       clickOrderDESC(id, table, name) {
@@ -840,16 +1237,17 @@
       },
       //改变聚合函数
       changeGruop(id, table, name) {
-        var idx = this.indexOfJoin(table);
-        var data = this.join[idx];
-        var selectData = $("#fun" + id).val();
-        for (var i = 0; i < data.fields.length; i++) {
-          var field = data.fields[i];
-          if (field.id == id) {
-            this.join[idx].fields[i].fun = selectData;
-            //join[idx].fields[i].group=true;
-          }
-        }
+        // var idx = this.indexOfJoin(table);
+        // var data = this.join[idx];
+        // // var selectData = $("#fun" + id).val();
+        // var selectData = data.fun;
+        // for (var i = 0; i < data.fields.length; i++) {
+        //   var field = data.fields[i];
+        //   if (field.id == id) {
+        //     // this.join[idx].fields[i].fun = selectData;
+        //     // this.join[idx].fields[i].group=true;
+        //   }
+        // }
         this.groupInit();
         this.initOrder();
         this.initTableRow();
@@ -857,15 +1255,15 @@
       },
       //改变别名
       changeAlisa(id, table) {
-        var idx = this.indexOfJoin(table);
-        var data = this.join[idx];
-        var val = $("#" + id).val();
-        for (var i = 0; i < data.fields.length; i++) {
-          var field = data.fields[i];
-          if (field.id == id) {
-            this.join[idx].fields[i].alias = val;
-          }
-        }
+        // var idx = this.indexOfJoin(table);
+        // var data = this.join[idx];
+        // var val = $("#" + id).val();
+        // for (var i = 0; i < data.fields.length; i++) {
+        //   var field = data.fields[i];
+        //   if (field.id == id) {
+        //     this.join[idx].fields[i].alias = val;
+        //   }
+        // }
         this.initTableRow();
         this.toSql();
       },
@@ -880,10 +1278,6 @@
                 // var _funEle = document.getElementById("#fun" + field.id);
                 // // $("#fun" + field.id).val(field.fun);
                 // _funEle.value = field.fun;
-              }
-              //by yw
-              if (group) {
-                field.fun = '';
               }
             }
           }
@@ -919,21 +1313,31 @@
         if (node.key == "ml**") {
           return false;
         }
-        node.chineseName = this.createNewAS(node.chineseName);
+        if(this.form=='detail'){
+          node.chineseName = this.createNewAS(node.tableName);
+        }else{
+          node.chineseName = this.createNewAS(node.chineseName);
+        }
         this.tableNames.push(node.chineseName);
         this.keyNames.push(node.key);
         for (var i = 0; i < node.fields.length; i++) {
           node.fields[i].id = node.key + "id" + node.fields[i].name;
           node.fields[i].alias = node.fields[i].name;
-          node.fields[i].fun = "jh";
+          node.fields[i].fun =  node.fields[i].fun||"jh";
           node.fields[i].screen = "";
           node.fields[i].condition = "";
           node.fields[i].more = "";
           node.fields[i].key = node.key;
           node.fields[i].screen = [];
-          node.fields[i].group = false;
+          node.fields[i].group = node.fields[i].group|| false;
         }
         this.myDiagram.model.addNodeData(node);
+        // if(node.chineseName=='医院住院结算明细_A'){
+        //   console.log(node.chineseName)
+        //   // 添加线数据
+        //   var link_obj= { "from": "A","fromPort": '主诊医师姓名',"to": "B", "toPort": '住院号' };
+        //   this.myDiagram.model.addLinkData(link_obj);;//增加单个线
+        // }
       },
       //生成sql
       toSql() {
@@ -1040,9 +1444,11 @@
           sql = sql + orderSql;
         }
         if (this.join.length == 0) {
-          document.getElementById("sql").innerHTML = "";
+          this.sqlMsg = '';
+          // document.getElementById("sql").innerHTML = "";
         } else {
-          document.getElementById("sql").innerHTML = sql;
+          this.sqlMsg = sql;
+          // document.getElementById("sql").innerHTML = sql;
         }
         return sql;
       },
@@ -1084,7 +1490,7 @@
             $("#MainTable").val(this.join[0].chineseName);
             for (var i = 1; i < this.join.length; i++) {
               var joinData = this.join[i];
-              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="assistSqlEdit.changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
+              var joinHtml = '<div class="form-group"><label for="" class="col-sm-5 control-label">关联关系：</label><div class="col-sm-7"><select id="type' + i + '" onchange="changeType(' + i + ')"><option value=",">,</option><option value="LEFT JOIN">左连接</option><option value="RIGHT JOIN">右连接</option><option value="INNER JOIN">内连接</option><option value="FULL JOIN">外连接</option></select></div></div><div class="form-group"><div class="col-sm-12"><input name="slaverTable' + i + '" type="text" class="form-control" id="slaverTable' + i + '" disabled="disabled"></input></div></div>';
               $("#join").append(joinHtml);
               $("#type" + i).val(joinData.type);
               $("#slaverTable" + i).val(joinData.chineseName);
@@ -1104,7 +1510,6 @@
             this.join[idx].fields[i].group = group;
           }
         }
-
         this.groupInit();
         this.initOrder();
         this.initTableRow(null, group);
@@ -1153,7 +1558,7 @@
           // 注意层级 dataType是必须要的,1:一级,2:表,3:列
           var datas = data.result;
           this.dataTreeData = datas ? [datas] : [];
-          this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
+          // this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
         })
       },
       loadNode(node, resolve) {
@@ -1189,7 +1594,12 @@
         // return draggingNode.data.level>2||draggingNode.data.type=='funNode';
         return Number(draggingNode.data.dataType) > 1 || draggingNode.data.type == 'funNode' || draggingNode.data.type == 'params';
       },
+      getGojsClientXY(){
+        var resize = document.getElementById('myDiagramDiv');
+        this.myDiagramDivLeft=resize.offsetLeft;
+      },
       handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        // console.log(ev)
         if (draggingNode.data.title == null /*|| treeNodes[0].isParent*/) {
           return;
         }
@@ -1223,12 +1633,15 @@
               field.info = nodes[i].data.title;
               field.alias = nodes[i].data.title;
               field.color = "#FFFFFF";
+              field.checked = false;
               field.hidden = true;
               fieldArr.push(field);
 
             }
             table.fields = fieldArr;
-            this.addNodeData(table);
+            if(ev.offsetX>this.myDiagramDivLeft){
+              this.addNodeData(table);
+            }
           } else {
             this.$http({
               url: this.$http.adornUrl('/sqlScript/getColumnList'),
@@ -1248,12 +1661,17 @@
                 field.info = _nodes[i].title;
                 field.alias = _nodes[i].title;
                 field.color = "#FFFFFF";
+                field.checked = false;
                 field.hidden = true;
                 fieldArr.push(field);
 
               }
               table.fields = fieldArr;
-              this.addNodeData(table);
+              if(ev.offsetX>this.myDiagramDivLeft){
+                this.addNodeData(table);
+              }
+
+
             })
 
           }
@@ -1261,8 +1679,11 @@
         }
 
       },
+      allowDrop(ev){
+        ev.preventDefault();
+      },
       // 树内不可拖拽
-      returnFalse() {
+      returnFalse(draggingNode, dropNode, type) {
         return false;
       },
     },
@@ -1273,14 +1694,93 @@
         }
       },
     },
-    components: {},
-    watch: {}
+    components: {
+      queryBuilder
+    },
+    watch: {
+      resultTableTabs: {
+        // 实时监控数据变化
+        deep: true,
+        handler(val) {
+          if (val != "") {
+            if (val !== "") {
+              this.resultTableTabsValue=this.resultTableTabs.length>0?String(this.resultTableTabs.length-1):'0';
+              this.resultTableTabs=val;
+              this.resultTableTabs.forEach(item=>{
+                item.totalPage=item.list.length;
+                item.pageIndex=1;
+                item.pageSize=10;
+                item.dataPageList=item.list.slice((item.pageIndex-1)*item.pageSize,item.pageIndex*item.pageSize);
+                if(item.columnList){
+                  var v={};
+                  item.columnList.forEach(vtem=>{
+                    v[vtem.columnName]='';
+                  });
+                  item.columnListSelf=[v];
+                }
+              })
+              // console.log( this.resultTableTabsValue)
+            }
+          }
+        },
+      },
+      // sqlEditMsg: {
+      //   // 实时监控数据变化
+      //   immediate: true,
+      //   deep: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     this.sqlMsg=val;
+      //   }
+      // },
+      // joinEdit: {
+      //   // 实时监控数据变化
+      //   // immediate: true,
+      //   deep: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     this.join=[];
+      //     if(val&&val!=''){
+      //       val.forEach(item=>{
+      //         this.addNodeData(item);
+      //         item.fields.forEach(utem=>{
+      //           if(utem.group==true){
+      //             this.group=true;
+      //             this.toSql();
+      //           }
+      //         });
+      //         if(item.on&&item.on.length>0){
+      //           item.on.forEach(vtem=>{
+      //             this.myDiagram.model.addLinkData(vtem);
+      //           })
+      //         }
+      //       });
+      //     }
+      //   }
+      // },
+      // orderEdit: {
+      //   deep: true,
+      //   // 实时监控数据变化
+      //   // immediate: true,
+      //   handler(val) {
+      //     this.form='detail';
+      //     if(val&&val!=''){
+      //       this.order=val;
+      //       this.initOrder();
+      //       this.toSql();
+      //     }else{
+      //       this.order=[];
+      //     }
+      //   }
+      // },
+    }
   };
 </script>
 <style scoped lang="scss">
   .graphtool-tooldic {
     width: 100%;
-    height: 100vh;
+    position: relative;
+    /*height: 100vh;*/
     .graphtool-top {
       width: 100%;
       // height: ;
@@ -1290,31 +1790,34 @@
         width: 30%;
         overflow: scroll;
       }
-      .data-left-hidden{
+      .data-left-hidden {
         width: auto;
         overflow: hidden;
       }
       .data-canvas {
         /*flex: 1;*/
+        position: relative;
         width: 40%;
-        #myDiagramDiv{
+        #myDiagramDiv {
           width: 100%;
         }
       }
-      .data-canvas-noLeft{
+      .data-canvas-noLeft {
         width: 70%;
       }
-      .data-canvas-noLeftRight{
+      .data-canvas-noLeftRight {
         width: 95%;
       }
       .data-right {
-        width:30%;
-        height: 100%;
+        margin-top: 4%;
+        width: 30%;
+        height: 88%;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
         position: relative;
         .data-option-box {
+
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -1325,9 +1828,9 @@
 
         }
 
-        .data-right-tab{
-          top:0;
-          right:0;
+        .data-right-tab {
+          top: 10px;
+          right: 0;
           position: absolute;
           cursor: pointer;
           width: 20px;
@@ -1343,13 +1846,13 @@
           border-bottom-right-radius: 5px;
           margin: 5px 0;
         }
-        .data-right-tab-act{
-          color:#333;
+        .data-right-tab-act {
+          color: #333;
         }
       }
-      .data-right-hidden{
+      .data-right-hidden {
         overflow: hidden;
-        display:block;
+        display: block;
         width: 30px;
       }
     }
@@ -1360,34 +1863,45 @@
       margin-right: 5px;
     }
     .graphtool-bottom {
-      height: 50vh;
-      display: flex;
+      /*height: 50vh;*/
+      height: auto;
+      /*display: flex;*/
       .data-sort {
-        width: 300px;
-        display: flex;
-        flex-direction: column;
+        display: inline-block;
+        width: 30%;
+        height: 50vh;
+        /*display: flex;*/
+        /*flex-direction: column;*/
         .box-bg {
-          flex: 1;
+          /*flex: 1;*/
+          width: 100%;
+          height: 90%;
         }
       }
       .data-list {
-        flex: 1;
+        /*flex: 1;*/
+        width: 68%;
+        vertical-align: top;
         height: 100%;
-        display: flex;
+        display: inline-block;
+        /*display: flex;*/
         flex-direction: column;
         .data-list-item {
           width: 100%;
           position: relative;
         }
         .data-list-table {
-          flex: 1;
+          /*flex: 1;*/
+          width: 100%;
         }
         .sql-box {
-          /*height: 100px;*/
+          /*min-height: 100px;*/
+          height: auto;
           overflow: auto;
+          padding: 10px;
         }
         .table-view {
-          position: absolute;
+          /*position: absolute;*/
           /*height: 100%;*/
           width: 100%;
         }
@@ -1398,9 +1912,15 @@
       border: 1px solid #F3F3F3;
       overflow: auto;
     }
+    .box-bg1 {
+      background: #F7F7F7;
+      border: 1px solid #F3F3F3;
+      overflow: auto;
+      width: 100%;
+    }
     .tstext {
       height: 26px;
-      color: #5887B3;
+      /*color: #5887B3;*/
       margin-top: 5px;
       font-size: 14px;
     }
@@ -1420,12 +1940,13 @@
     font-weight: bold;
     cursor: pointer;
   }
-  .data-left{
-    .data-tree{
+
+  .data-left {
+    .data-tree {
       vertical-align: top;
       width: 90%;
     }
-    .data-left-tab{
+    .data-left-tab {
       cursor: pointer;
       width: 20px;
       word-break: break-all;
@@ -1438,11 +1959,33 @@
       border-top-right-radius: 20px;
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 20px;
-      margin: 5px 0;
+      margin-top:60px;
     }
-    .data-left-tab-act{
-      color:#333;
+    .data-left-tab-act {
+      color: #333;
     }
   }
 
+  >>> .form-control {
+    width: 150px !important;
+  }
+
+  .vqb-rule >>> .el-autocomplete {
+    width: 150px !important;
+  }
+  #order{
+    padding: 10px;
+  }
+  .run-btn{
+    text-align: right;
+    position: absolute;
+    top:0;
+    right:0;
+  }
+  .mdd-placeHolder{
+    color:#999;
+    position: absolute;
+    top:10px;
+    left: 10px;
+  }
 </style>

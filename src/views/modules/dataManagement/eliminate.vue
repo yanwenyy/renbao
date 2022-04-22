@@ -17,6 +17,7 @@
         <div class="listDisplay">
             <el-table :data="tableData" border style="100%" :height="tableHeight-10" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="listLoading">
                 <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+                <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                 <el-table-column prop="projectName" header-align="center" align="center" label="项目名称"></el-table-column>
                 <el-table-column prop="status" header-align="center" align="center" width="150" label="状态">
                    <template slot-scope="scope">
