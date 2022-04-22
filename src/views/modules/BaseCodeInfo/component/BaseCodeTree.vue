@@ -1,6 +1,6 @@
 <template>
   <div class="centerDiv">
-    <el-card class="box-card" :style="{ height: tableHeight + 100 + 'px' }">
+    <el-card class="box-card">
       <div class="text item treeDiv">
         <el-tree
           ref="tree"
@@ -120,7 +120,6 @@ export default {
     },
     //点击节点上触发的事件，传递三个参数，数据对象使用第一个参数
     nodeclick(data) {
-      debugger
       //alert(data.label+",id="+data.id);
       this.baseCode.codeId = data.codeId;
       this.baseCode.codeName = data.codeName;
@@ -132,8 +131,8 @@ export default {
 };
 </script>
 
-<style  scoped>
+<style lang="scss" scoped>
 .treeDiv {
-  height: 600px;
+  height: 510px;
 }
 </style>

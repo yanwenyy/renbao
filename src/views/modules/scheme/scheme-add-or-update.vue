@@ -1,16 +1,16 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="!dataForm.id ? '新增' :type=='look'?'查看': '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="方案名称" prop="policyName">
-        <el-input v-model="dataForm.policyName" placeholder="方案名称" maxlength="255"></el-input>
+      <el-form-item label="方案名称" prop="planName">
+        <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
-      <el-form-item label="方案编号" prop="policyName">
-        <el-input v-model="dataForm.policyName" placeholder="方案编号" maxlength="255"></el-input>
+      <el-form-item label="方案编号" prop="planCode">
+        <el-input :disabled="type=='look'" v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
       </el-form-item>
-      <el-form-item label="上传文件" prop="userPassword">
+      <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
           action="#"
@@ -25,6 +25,55 @@
           >
         </el-upload>
       </el-form-item>
+      <el-form-item label="附件" prop="userPassword" v-if="dataForm.id!=''">
+        <el-table
+          :data="dataForm.multipartFiles"
+          border
+          style="width: 100%;"
+        >
+          <el-table-column
+            type="index"
+            header-align="center"
+            align="center"
+            width="50"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="fileName"
+            header-align="center"
+            align="center"
+            label="附件名称"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="uploaderName"
+            header-align="center"
+            align="center"
+            label="上传人"
+          >
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="操作"
+          >
+            <template slot-scope="scope">
+              <el-button
+                v-if="type=='look'"
+                type="text"
+                @click="downLoad(scope.row)"
+              >下载</el-button
+              >
+              <el-button
+                v-if="type!='look'"
+                type="text"
+                @click="deleteHandle(scope.$index, dataForm.multipartFiles, scope.row)"
+              >删除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -38,43 +87,53 @@
   export default {
     data () {
       return {
+        type:'',
         visible: false,
         roleList: [],
         fileList:[],
+        removeFileIdList:[],
         dataForm: {
           id: 0,
-          policyName: '',
-          beginTime: '',
-          endTime: '',
-          regionId: '',
-          regionPath: '',
+          planName: '',
+          planCode: '',
           multipartFiles :[],
         },
         dataRule: {
-          policyName: [
-            { required: true, message: '政策名称不能为空', trigger: 'blur' }
+          planName: [
+            { required: true, message: '方案名称不能为空', trigger: 'blur' }
           ],
-          beginTime: [
-            { required: true, message: '开始时间不能为空', trigger: 'blur' }
-          ],
-          endTime: [
-            { required: true, message: '有效时间能为空', trigger: 'blur' }
+          planCode: [
+            { required: true, message: '方案编号不能为空', trigger: 'blur' }
           ],
         }
       }
     },
     methods: {
+      //下载附件
+      downLoad(data) {
+        let url=this.$http.adornUrl(`/plan/downloadAttachment?planId=${data.planId}&fileInfoId=${data.fileInfoId}&token=${this.$cookie.get("token")}`);
+        window.open(url);
+      },
+      // 删除附件
+      deleteHandle(index, data, row) {
+        this.$confirm(`确定删除${row.fileName}?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.dataForm.multipartFiles.splice(index, 1);
+          this.removeFileIdList.push(row.fileInfoId);
+        });
+      },
      cleanMsg(){
        this.dataForm={
          id: 0,
-         policyName: '',
-         beginTime: '',
-         endTime: '',
-         regionId: '',
-         regionPath: '',
+         planName: '',
+         planCode: '',
          multipartFiles :[],
        }
        this.fileList=[];
+       this.removeFileIdList=[];
      },
       //移除已上传的附件
       handleRemove(file, fileList) {
@@ -109,28 +168,25 @@
           });
         }
       },
-      init (id,regionId,regionPath) {
+      init (id,regionId,regionPath,type) {
+       this.type=type;
         this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
-        this.dataForm.regionId=regionId;
-        this.dataForm.regionPath=regionPath;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
         if (this.dataForm.id) {
           this.$http({
-            url: this.$http.adornUrl(`/policy/selectByUuid/${this.dataForm.id}`),
+            url: this.$http.adornUrl(`/plan/selectByUuid/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 200) {
               var datas=data.result;
-              this.dataForm.policyName = datas.policyName;
-              this.dataForm.beginTime = datas.beginTime;
-              this.dataForm.endTime = datas.endTime;
-              this.dataForm.regionId = datas.regionId;
-              this.dataForm.regionPath = datas.regionPath;
+              this.dataForm.planName = datas.planName;
+              this.dataForm.planCode = datas.planCode;
+              this.dataForm.multipartFiles = datas.fileInfos;
             }
           })
         }
@@ -141,28 +197,29 @@
           if (valid) {
             if(!this.dataForm.id){
               var params = new FormData();
-              params.append("policyName", this.dataForm.policyName);
-              params.append("beginTime", this.dataForm.beginTime);
-              params.append("endTime", this.dataForm.endTime);
-              params.append("regionId", this.dataForm.regionId);
-              params.append("regionPath", this.dataForm.regionPath);
+              params.append("planName", this.dataForm.planName);
+              params.append("planCode", this.dataForm.planCode);
+              params.append("planId", this.dataForm.id);
               this.dataForm.multipartFiles.forEach(item=>{
                 params.append("multipartFiles", item);
               })
+              if (this.removeFileIdList.length > 0) {
+                params.append("fileInfoIds", this.removeFileIdList);
+              }
             }else{
               var editParmas={
-                policyName:this.dataForm.policyName,
-                policyId:this.dataForm.id,
-                beginTime:this.dataForm.beginTime,
-                endTime:this.dataForm.endTime,
-                regionId:this.dataForm.regionId,
-                regionPath:this.dataForm.regionPath,
+                planName:this.dataForm.planName,
+                planId:this.dataForm.id,
+                planCode:this.dataForm.planCode,
+                fileInfoIds:this.removeFileIdList,
+                multipartFiles:this.dataForm.multipartFiles,
               }
             }
             this.$http({
-              url: this.$http.adornUrl(`/policy/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
+              url: this.$http.adornUrl(`/plan/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
               method: 'post',
               data: !this.dataForm.id ? params:editParmas,
+              // data: params,
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.$message({

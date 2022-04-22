@@ -670,6 +670,17 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false;
+                    this.$http({
+                      url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+                      method: "get",
+                      params: this.$http.adornParams()
+                    }).then(({ data }) => {
+                      if (data && data.code === 200) {
+                        if(data.result){
+                          this.$store.commit('common/updateProjectId', data.result.projectId||'')
+                        }
+                      }
+                    });
                     this.$store.dispatch('common/changeProjectList', this.userId);
                     this.$emit('refreshDataList')
                   }

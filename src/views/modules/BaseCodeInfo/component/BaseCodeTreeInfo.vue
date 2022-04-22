@@ -1,11 +1,10 @@
 <template>
   <div>
     <div class="tree">
-      <!-- <BaseCodeTree :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTree> -->
       <BaseCodeTree :editTags="editTags"></BaseCodeTree>
     </div>
     <div tyle="width:100%">
-      <BaseCodeTreeList ref="listData"></BaseCodeTreeList>
+      <BaseCodeTreeList ref="listData" @BaseCodeMethod="BaseCodeMethod"></BaseCodeTreeList>
     </div>
   </div>
 </template>
@@ -25,6 +24,11 @@ export default {
   mounted: function() {
     this.$refs.listData.query();
   },
+  methods:{
+    BaseCodeMethod(){
+       this.$emit('BaseCodeOne');
+    },
+  }
 };
 </script>
 
@@ -34,7 +38,7 @@ export default {
   width: 300px;
   float: left;
   margin-right: 10px;
-  height: 95%;
+  /* height: 95%; */
 }
 .divContent {
   width: 78%;

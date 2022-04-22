@@ -20,21 +20,23 @@
                 <el-table :data="tableList0" v-if="selectNum == 0" border style="100%"  :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
                 </el-table>
                 <!-- 医保药品目录 -->
-                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm" v-loading="dataLoading">
+                <el-table :data="tableList" v-if="selectNum == 1" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
+                    <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
                     <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
-
                 </el-table>
                 <!-- 医保诊疗项目目录 -->
                 <el-table :data="tableList" v-if="selectNum == 2" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                     <template v-for="(item,index) in tableColumns">
+                    <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
+                    <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
                 </el-table>
                 <!-- 医保耗材目录 -->
                 <el-table :data="tableList" v-if="selectNum == 3" border style="100%" :height="tableHeight" :header-cell-style="{textAlign:'center'}" class="demo-ruleForm">
-                     <template v-for="(item,index) in tableColumns">
+                    <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
+                    <template v-for="(item,index) in tableColumns">
                         <el-table-column :prop="item" :label="item" :key="index" width show-overflow-tooltip></el-table-column>
                     </template>
                 </el-table>
@@ -98,7 +100,7 @@ export default {
             //分页
             apComServerData:{
                 current: 1,
-                size: 10,
+                size: 30,
                 pageNum:1,
                 total:0,
                 pageIndex:1

@@ -2,6 +2,7 @@
 <template>
     <div class='template'>
         <el-table :data="tableData" border style="100%" :header-cell-style="{textAlign:'center'}" :height="tableHeight+60" class="demo-ruleForm" v-loading="listLoading">
+            <el-table-column  label="序号"  type="index"   align="center"  width="50"/>
             <el-table-column prop="templateName" align="center" label="模板名称"></el-table-column>
             <el-table-column align="center" label="上传时间">
                  <template slot-scope="scope">{{scope.row.uploadTime | datetimeformat}}</template>
@@ -185,49 +186,48 @@ export default {
         },
         //导出模板
         getExportClick(id,name){
-          this.dataForm1.fileInfoId = id;
-            if(id){
-                this.$http({
-                    url:this.$http.adornUrl('/fileInfo/pa/fileIfor/download'),
-                    method: "get",
-                    headers: {
-                    token: this.$cookie.get('token')
-                    },
-                    responseType: "blob",
-                    params: this.$http.adornParams({
-                    fileInfoId:id,
-                    token:this.$cookie.get('token')
-                    })
-                }).then(({data}) =>{
-                    console.log(data)
-                    // if (data.code == 200) {
-                        // 文件下载
-                        const blob = new Blob([data], {
-                        type: "application/vnd.ms-excel"
-                        });
-                        let link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.setAttribute('download',name + '.xlsx');
-                        link.click();
-                        link = null;
-                        this.$message.success('导出成功');
-                    // } else {
-                    //     debugger
-                    //     // 返回json
-                    //     this.$message.warning(data.message);
-                    //     }
-                }).catch(data => {
-                    this.$message.error("下载失败");
-                    this.$message({
-                    message: '请先导入模板在进行导出模板',
-                    type: 'success',
-                })
-                });   
-            }else{
-                this.$message({
-                    message: '请先导入模板在进行导出模板',
-                    type: 'success',})
-            }      
+            this.dataForm1.fileInfoId = id;
+            this.$http({
+                url:this.$http.adornUrl('/fileInfo/pa/fileIfor/fileExists'),
+                method: "get",
+                params: this.$http.adornParams({fileInfoId:id,})
+                }).then(({data}) => {
+                    if(data.result == true){
+                        if(id){
+                             let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
+            //     // console.log(url)
+                             window.open(url)
+                            // this.$http({
+                            //     url:this.$http.adornUrl('/fileInfo/pa/fileIfor/download'),
+                            //     method: "get",
+                            //     headers: {
+                            //     token: this.$cookie.get('token')
+                            //     },
+                            //     responseType: "blob",
+                            //     params: this.$http.adornParams({
+                            //     fileInfoId:id,
+                            //     token:this.$cookie.get('token')
+                            //     })
+                            // }).then(({data}) =>{
+                                    // 文件下载
+                                // const blob = new Blob([data], {
+                                // type: "application/vnd.ms-excel"
+                                // });
+                                // let link = document.createElement('a');
+                                // link.href = URL.createObjectURL(blob);
+                                // link.setAttribute('download',name + '.xlsx');
+                                // link.click();
+                                // link = null;
+                                // this.$message.success('导出成功');
+                            // }).catch(data => {});   
+                        }
+                        }else{
+                            this.$message({
+                                message: '请先导入模板在进行导出模板',
+                                type: 'success',
+                            })
+                        }
+                }).catch(function(error) {    })     
             // if(id){
             //     let url = this.$http.adornUrl('/fileInfo/pa/fileIfor/download?fileInfoId='+id +'&token=') + this.$cookie.get('token')
             //     // console.log(url)

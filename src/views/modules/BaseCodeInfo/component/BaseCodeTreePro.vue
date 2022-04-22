@@ -29,8 +29,9 @@ export default {
     };
   },
   mounted(){
+    // debugger
      this.$http({
-          url:this.$http.adornUrl('baseCodeInfo/ps/zhBaseCodeInfos/selectWholeTree'),
+          url:this.$http.adornUrl('baseCodeInfo/selectWholeTree'),
           method: 'get',
           params: this.$http.adornParams({
               codeSortValue: this.codeSortValue,

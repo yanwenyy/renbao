@@ -6,7 +6,6 @@ export default {
     dataSortName:'', //name
     dataSortId:'',//id
     baseCodes:{
-
     }
   },
   mutations: {
