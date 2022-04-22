@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="boxTree">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span class="title">查询结构列表</span>
@@ -10,7 +10,7 @@
           :data="tableData"
           tooltip-effect="dark"
           @selection-change="handleSelectionChange"
-          border
+          border 
         >
           <el-table-column type="selection" width="45"></el-table-column>
           <el-table-column type="index" label="序号" width="60"></el-table-column>
@@ -22,7 +22,7 @@
           <BaseCodeTreeOperate
             ref="baseCodeOperate"
             :codeOperate="seleteLengthData"
-            @closeMain="query"
+            @closeMain="query" @BaseCodeTreeTwo="BaseCodeTreeTwo"
           ></BaseCodeTreeOperate>
           <div class="divBtn">
             <el-button
@@ -64,9 +64,6 @@ export default {
   components: {
     BaseCodeTreeOperate
   },
-  props: { 
-    editTags:{type: Number}
-  },
   data() {
     return {
       dataSortId: "",
@@ -79,9 +76,12 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      baseCode: state => state.datasort.baseCodes
-    }),
+    // ...mapState({
+    //   baseCodes: state => state.datasort.baseCodes
+    // }),
+    baseCode(){
+          return this.$store.state.datasort.baseCodes
+    },
     tableHeight: {
       get() {
         return this.$store.state.common.tableHeight;
@@ -89,6 +89,9 @@ export default {
     }
   },
   methods: {
+    BaseCodeTreeTwo(){
+
+    },
     handleSelectionChange(val) {
       this.seleteLengthData = val;
     },
@@ -134,6 +137,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.query();
+                  // this.$emit('loadnode')
                 }
               });
             } else {
@@ -143,6 +147,10 @@ export default {
     },
     // 查询列表
     query() {
+    let baseCode = this.$store.state.datasort.baseCodes;
+    this.parentCodeId = baseCode.codeId;
+    this.dataSortName = baseCode.codeName;
+    this.dataSortId = baseCode.dataSortId;
        this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
@@ -160,28 +168,29 @@ export default {
       this.$refs.baseCodeOperate.resetForm();
     },
     returnList() {
-        this.$emit('BaseCodeMethod')
+      this.$router.push({
+        path: `/baseList`
+      });
+      // this.$emit('BaseCodeMethod')
     }
   },
-  mounted: function() {
+  mounted(){
     //字段设置
     let baseCode = this.$store.state.datasort.baseCodes;
-    // baseCode = JSON.parse(baseCode);
+    baseCode = baseCode;
     this.dataSortName = baseCode.codeName;
     this.dataSortId = baseCode.dataSortId;
     this.parentCodeId = baseCode.codeId;
-    this.editTag = this.$route.query.editTag;
-    console.log(baseCode);
+    this.editTag = this.$route.query.editTag;;
   },
   watch: {
-    baseCode: {
-      handler: function(val) {
-        // var baseCode = JSON.parse(val);
-        var baseCode = val;
+    baseCode:{
+      handler: function(newval,old) {
+        var baseCode = newval;
         this.dataSortName = baseCode.codeName;
         this.dataSortId = baseCode.dataSortId;
         this.parentCodeId = baseCode.codeId;
-        this.editTag = this.$route.query.editTag;
+        this.editTag = this.$route.query.editTag;;
         this.query();
       },
       deep: true
@@ -211,4 +220,9 @@ export default {
   border-radius: 4px;
   border-color: #909399;
 } */
+.boxTree{
+    height: 550px;
+    min-height: 550px;
+    overflow: auto;
+}
 </style>

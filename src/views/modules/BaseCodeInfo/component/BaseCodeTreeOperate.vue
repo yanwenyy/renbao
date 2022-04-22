@@ -141,6 +141,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                     this.$emit("closeMain");
+                    this.$emit('BaseCodeTreeTwo')
                     this.resetForm();
                 }
             })
@@ -199,6 +200,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                     this.$emit("closeMain");
+                    this.$emit('BaseCodeTreeTwo')
                     this.resetForm();
                 }
             })
@@ -225,7 +227,7 @@ export default {
       }
     }
   },
-    computed: {
+  computed: {
     tableHeight: {
       get() {
         return this.$store.state.common.tableHeight;

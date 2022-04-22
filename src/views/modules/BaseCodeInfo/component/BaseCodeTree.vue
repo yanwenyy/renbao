@@ -10,7 +10,7 @@
           check-strictly
           :load="loadnode"
           :props="defaultProps"
-          @node-click="nodeclick"
+          @node-click="nodeclick" :default-expand-all="ifExpand"
         ></el-tree>
       </div>
     </el-card>
@@ -19,9 +19,7 @@
 <script>
 // import { stringify } from "querystring";
 export default {
-  props: { 
-    editTags:{type: Number}
-  },
+
   data() {
     return {
       data: [],
@@ -32,7 +30,8 @@ export default {
       treeFistNode: "",
       dataSortId: "",
       dataSortName: "",
-      baseCode: {}
+      baseCode: {},
+      ifExpand:true,
     };
   },  
   computed: {
@@ -78,6 +77,7 @@ export default {
     //加载根节点的子节点集合
     loadchildnode(node, resolve) {
       if (node.level === 1) {
+        this.treeLoading = true;
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
@@ -86,13 +86,13 @@ export default {
               parentCodeId: node.data.codeId
           })
           }).then(({data}) => {
-           var jsonStr = JSON.stringify(data.result.records);
-           var label = eval("(" + jsonStr + ")");
+            var jsonStr = JSON.stringify(data.result.records);
+            var label = eval("(" + jsonStr + ")");
+            this.ifExpand=false;
             resolve(label);
-          }).catch(function(error) {
-            console.log(error);
-          });
+          })
       } else {
+        this.treeLoading = true;
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
@@ -100,12 +100,12 @@ export default {
               parentCodeId: node.data.codeId
           })
           }).then(({data}) => {
-            var jsonStr = JSON.stringify(data.result.records);
+            var jsonStr =  JSON.stringify(data.result.records)
             var label = eval("(" + jsonStr + ")");
+            this.ifExpand=false;
+            // this.$emit('query',true)
             resolve(label);
-          }).catch(function(error) {
-            console.log(error);
-          });
+          })
       }
       //   var str = "" ;
       //   for(var i=0;i<data.length;i++){
@@ -120,12 +120,13 @@ export default {
     },
     //点击节点上触发的事件，传递三个参数，数据对象使用第一个参数
     nodeclick(data) {
-      //alert(data.label+",id="+data.id);
+    //   alert(data.label+",id="+data.id);
       this.baseCode.codeId = data.codeId;
       this.baseCode.codeName = data.codeName;
       this.baseCode.dataSortId = data.dataSortId;
-      //传递值
+      // 传递值
       this.$store.dispatch("setBaseCode", this.baseCode);
+      this.$emit('treeQuery')
     }
   }
 };
@@ -133,6 +134,8 @@ export default {
 
 <style lang="scss" scoped>
 .treeDiv {
-  height: 510px;
+  height: 550px;
+  min-height:550px;
+  overflow: auto;
 }
 </style>

@@ -89,7 +89,7 @@
              <BaseCodeInfo v-if="addOrUpdateVisible" @close="closeImportDrawer" @ok="ImportSucceed" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeInfo>
           </el-dialog>
            <el-dialog title="代码类别详情" :close-on-click-modal="false" append-to-body width="80%" :modal-append-to-body="false" :visible.sync="BaseTreeInfoVisible">
-             <BaseCodeTreeInfo v-if="BaseTreeInfoVisible" @close="closeImportDrawer" @ok="ImportSucceed"  @BaseCodeOne="BaseCodeOne" :dataSortIds="dataSortIds" :dataSortNames="dataSortNames" :editTags="editTags"></BaseCodeTreeInfo>
+             <BaseCodeTreeInfo v-if="BaseTreeInfoVisible" @close="closeImportDrawer" @ok="ImportSucceed"  @BaseCodeOne="BaseCodeOne" :dataSortId="dataSortIds" :dataSortName="dataSortNames" :editTag="editTags"></BaseCodeTreeInfo>
           </el-dialog>
         </div>
       </el-card>
@@ -120,7 +120,7 @@ export default {
         BaseTreeInfoVisible:false,
         dataSortIds:'',
         dataSortNames:'',
-        editTags:''
+        editTags:'',
         };
     },
     computed:{
@@ -153,17 +153,14 @@ export default {
                 //     query: { editTag: row.editTag }
                 // });
             } else {
-                // this.$store.dispatch("setDataSortId", row.dataSortId);
-                // this.$store.dispatch("setDataSortName", row.dataSortName);
+                this.$store.dispatch("setDataSortId", row.dataSortId);
+                this.$store.dispatch("setDataSortName", row.dataSortName);
                 // this.$store.dispatch("setEditTag", row.editTag);
-                this.BaseTreeInfoVisible = true
-                this.editTags = row.editTag
-                this.dataSortIds = row.dataSortId
-                this.dataSortNames = row.dataSortName
-                // this.$router.push({
-                // path: "/component/BaseCodeTreeInfo",
-                // query: { editTag: row.editTag }
-                // });
+                // this.BaseTreeInfoVisible = true
+                this.$router.push({
+                path: "/component/BaseCodeTreeInfo",
+                query: { editTag: row.editTag }
+                });
             }
         },
         clearForm() {
