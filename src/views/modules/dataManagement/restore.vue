@@ -94,7 +94,7 @@
         <el-dialog title="还原" :visible.sync="ShowAddVisible">
             <el-form :model="addMemberForm" ref="addMemberForm" label-width="150px">
                 <el-form-item label="请选择该项目备份">
-                    <el-input class="input-hasBtn" v-model="addMemberForm.dataAmount" placeholder="选择" style="width:75%"></el-input>
+                    <el-input class="input-hasBtn" v-model="addMemberForm.dataAmount" readonly placeholder="选择" style="width:75%"></el-input>
                     <el-button type="primary" @click="chooseListVisible=true" style="margin-left:10px">选择</el-button>
                 </el-form-item>
             </el-form>
@@ -283,7 +283,7 @@ export default {
       },
       //备份
       examine(){
-        this.ShowProjectVisible = true
+        this.ShowProjectVisible = true;
         this.getDataList();
       },
       //关闭
@@ -300,14 +300,14 @@ export default {
           type: 'warning',
         }).then(() => {
 
-          this.dataListLoading = true
+          this.dataListLoading = true;
           this.$http({
             url: this.$http.adornUrl(`/dataBackupInfo/projectBackupDB/${this.dataListSelections[0].projectId}`),
             method: 'post',
           }).then(({data}) => {
             if (data && data.code === 200) {
               this.dataList = data.result.records;
-              this.totalPage = data.result.total
+              this.totalPage = data.result.total;
               this.$message({
                 type: 'success',
                 message: '备份成功!'
@@ -334,6 +334,11 @@ export default {
         })
       },
       dataFormSubmits(){
+        if (this.selectedFileData.length != 1)
+          return this.$message({
+            message: "请选择文件进行操作",
+            type: "warning"
+          });
         this.$confirm('是否确认将所选项目备份?','提示',{
           confirmButtonText:'确定',
           cancelButtonText: '取消',
@@ -353,8 +358,10 @@ export default {
                 type: 'success',
                 message: '还原成功!'
               });
+              this.getInitList();
+              this.ShowAddVisible = false;
             } else {
-              this.dataList = []
+              this.dataList = [];
               this.totalPage = 0
             }
             this.dataListLoading = false
