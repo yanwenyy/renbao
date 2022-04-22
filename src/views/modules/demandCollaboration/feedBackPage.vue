@@ -24,12 +24,14 @@
                 <el-input
                   :disabled="type == 'look'"
                   v-model="dataForm.ruleName"
-                  placeholder="规则名称"
+                  :readonly="true"
+                  placeholder="需求名称"
                 ></el-input>
               </el-form-item>
               <el-form-item label="规则类别" prop="ruleCategory">
                 <el-select
                   v-model="dataForm.ruleCategory"
+                  :readonly="true"
                   :disabled="type == 'look'"
                 >
                   <el-option label="请选择" value=""></el-option>
@@ -44,6 +46,7 @@
                   placement="bottom-start"
                   trigger="click"
                   v-model="treeVisible"
+                  :readonly="true"
                 >
                   <el-tree
                     class="rule-tree"
@@ -77,30 +80,12 @@
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
                 <el-input
                   :disabled="type == 'look'"
+                  :readonly="true"
                   type="textarea"
                   :rows="6"
                   v-model="dataForm.ruleRemark"
                   placeholder="例：规则名称（规则名称中所填写的内容），涉及{总人次}总人次，{总金额}总金额。"
                 ></el-input>
-              </el-form-item>
-              <el-form-item label="创建人">
-                <el-input
-                  :disabled="type == 'look'"
-                  readonly
-                  v-model="dataForm.createUserName"
-                  placeholder="创建人"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="创建时间">
-                <el-date-picker
-                  :disabled="type == 'look'"
-                  readonly
-                  v-model="dataForm.createTime"
-                  type="datetime"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  placeholder="请选择时间"
-                >
-                </el-date-picker>
               </el-form-item>
             </div>
           </el-tab-pane>
@@ -205,14 +190,15 @@ import { transSql } from "@/utils/publicFun";
 import sqlElement from "../projectManage/codemirror";
 import formatDate from "@/utils/formatDate";
 export default {
+  name: "FeedBack",
   components: {
     sqlElement
   },
-  props: {
-    ruleData: {
-      default: []
-    }
-  },
+//   props: {
+//     ruleData: {
+//       default: []
+//     }
+//   },
   data() {
     var validateInteger = (rule, value, callback) => {
       if (value === "") {
@@ -237,6 +223,7 @@ export default {
       }
     };
     return {
+        ruleData:[],
       type: "",
       sqlKey: 0,
       rjMust: {}, //总人次和宗金额必填项
@@ -288,16 +275,16 @@ export default {
       inputValue: "",
 
       dataRule: {
-        ruleName: [
-          { required: true, message: "规则名称不能为空", trigger: "blur" }
-        ],
-        ruleCategory: [
-          {
-            required: true,
-            message: "规则类别不能为空",
-            trigger: ["blur", "change"]
-          }
-        ],
+        // ruleName: [
+        //   { required: true, message: "规则名称不能为空", trigger: "blur" }
+        // ],
+        // ruleCategory: [
+        //   {
+        //     required: true,
+        //     message: "规则类别不能为空",
+        //     trigger: ["blur", "change"]
+        //   }
+        // ],
         /* ruleRemark: [
           {
             required: true,
@@ -305,12 +292,12 @@ export default {
             trigger: ["blur", "change"]
           }
         ], */
-        folderId: [
-          { required: true, message: "规则分类不能为空", trigger: "change" }
-        ],
-        dataTime: [
-          { required: true, message: "规则分类不能为空", trigger: "blur" }
-        ],
+        // folderId: [
+        //   { required: true, message: "规则分类不能为空", trigger: "change" }
+        // ],
+        // dataTime: [
+        //   { required: true, message: "规则分类不能为空", trigger: "blur" }
+        // ],
         ruleSqlValue: [
           {
             required: true,
@@ -601,25 +588,26 @@ export default {
       }
     },
     init(id, ruleCheckData, type) {
-      debugger
+    //   debugger
+      this.getRuleFolder();
       this.deletCm();
       this.getMustList();
       this.getRJMust();
       this.cleanMsg();
       this.visible = true;
       this.type = type;
-      this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
+      //this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
       this.dataForm.ruleId = id;
-      this.dataForm.folderId = this.ruleCheckData.folderId;
-      this.dataForm.folderPath = this.ruleCheckData.folderPath;
+    //   this.dataForm.folderId = this.ruleCheckData.folderId;
+    //   this.dataForm.folderPath = this.ruleCheckData.folderPath;
       this.sqlMsgCopy = "";
       this.getUserInfo();
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
         this.$refs["dataForm"].clearValidate();
         // 初始化规则树
-        this.$refs.menuListTree.setCheckedKeys([]);
-        this.$refs.menuListTree.setCurrentKey(null);
+        // this.$refs.menuListTree.setCheckedKeys([]);
+        // this.$refs.menuListTree.setCurrentKey(null);
       });
 
       if (this.dataForm.ruleId) {
@@ -631,6 +619,7 @@ export default {
           params: this.$http.adornParams()
         }).then(({ data }) => {
           if (data && data.code === 200) {
+            
             var datas = data.result;
             this.dataForm.ruleId = datas.ruleId;
             this.dataForm.ruleName = datas.ruleName;
@@ -674,7 +663,7 @@ export default {
               datas.ruleSqlValue
             );
 
-            // this.menuListTreeSetCurrentNode();
+            this.menuListTreeSetCurrentNode();
             this.deletCm();
           }
         });
@@ -691,6 +680,7 @@ export default {
     },
     // 规则树设置当前选中节点
     menuListTreeSetCurrentNode() {
+    
       if (this.dataForm.folderId) {
         if (this.$refs.menuListTree) {
           this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
@@ -714,6 +704,16 @@ export default {
       //   // }
       //   // this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.folderId)[0].folderName;
       // }
+    },
+    // 获取规则树
+    getRuleFolder() {
+      this.$http({
+        url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+        method: "get",
+        params: this.$http.adornParams({ folderSorts: "" })
+      }).then(({ data }) => {
+        this.ruleData = data.result;
+      });
     },
     // 通过folderId 获取对应的item
     getTreeData(treeData, folderId) {

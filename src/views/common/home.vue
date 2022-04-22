@@ -46,27 +46,108 @@
               <el-tab-pane label="我的待办" name="todo">
                 <div>
                   <el-table :data="todoList" width="85%">
-                      <el-table-column prop="title" label="需求标题" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="roleType" label="规则类型" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="role" align="center" label="规则属性"></el-table-column>
-                      <el-table-column prop="isTrue" align="center" label="是否已反馈"></el-table-column>
-                      <el-table-column prop="status" align="center" label="状态"></el-table-column>
-                      <el-table-column prop="createUser" align="center" label="创建人"></el-table-column>
-                      <el-table-column prop="createTime" align="center" show-overflow-tooltip label="创建时间"></el-table-column>
+                      <el-table-column prop="DEMANDNAME" label="需求标题" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="RULECATEGORY" align="center" label="规则属性">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.RULECATEGORY == "1"
+                              ? "门诊规则"
+                              : scope.row.RULECATEGORY == "2"
+                              ? "住院规则"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="ISFEEDBACK" align="center" label="是否已反馈">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.ISFEEDBACK == "0"
+                              ? "是"
+                              : scope.row.ISFEEDBACK == "1"
+                              ? "否"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="EXAMINESTATUS" align="center" label="状态">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.EXAMINESTATUS == "0"
+                              ? "编制中"
+                              : scope.row.EXAMINESTATUS == "1"
+                              ? "待医学组长审批"
+                              : scope.row.EXAMINESTATUS == "2"
+                              ? "待信息组长分派"
+                              : scope.row.EXAMINESTATUS == "3"
+                              ? "待信息组员反馈"
+                              : scope.row.EXAMINESTATUS == "4"
+                              ? "已完成"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="CREATEUSERNAME" align="center" label="创建人"></el-table-column>
+                      <el-table-column prop="CREATETIME" align="center" show-overflow-tooltip label="创建时间"></el-table-column>
                   </el-table>
                 </div>
               </el-tab-pane>
               <el-tab-pane label="我的已办" name="done">
                 <div>
-                  <el-table :data="todoList" width="85%" class="demo-ruleForm">
-                      <el-table-column prop="title" label="需求标题" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="roleType" label="规则类型" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="role" align="center" label="规则属性"></el-table-column>
-                      <el-table-column prop="isTrue" align="center" label="是否已反馈"></el-table-column>
-                      <el-table-column prop="status" align="center" label="状态"></el-table-column>
-                      <el-table-column prop="createUser" align="center" label="创建人"></el-table-column>
-                      <el-table-column prop="createTime" align="center" show-overflow-tooltip label="创建时间"></el-table-column>
+                  <el-table :data="doneList" width="85%" class="demo-ruleForm">
+                      <el-table-column prop="DEMANDNAME" label="需求标题" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="RULECATEGORY" align="center" label="规则属性">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.RULECATEGORY == "1"
+                              ? "门诊规则"
+                              : scope.row.RULECATEGORY == "2"
+                              ? "住院规则"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="ISFEEDBACK" align="center" label="是否已反馈">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.ISFEEDBACK == "0"
+                              ? "是"
+                              : scope.row.ISFEEDBACK == "1"
+                              ? "否"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="EXAMINESTATUS" align="center" label="状态">
+                        <template slot-scope="scope">
+                          {{
+                            scope.row.EXAMINESTATUS == "0"
+                              ? "编制中"
+                              : scope.row.EXAMINESTATUS == "1"
+                              ? "待医学组长审批"
+                              : scope.row.EXAMINESTATUS == "2"
+                              ? "待信息组长分派"
+                              : scope.row.EXAMINESTATUS == "3"
+                              ? "待信息组员反馈"
+                              : scope.row.EXAMINESTATUS == "4"
+                              ? "已完成"
+                              : ""
+                          }}
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="CREATEUSERNAME" align="center" label="创建人"></el-table-column>
+                      <el-table-column prop="CREATETIME" align="center" show-overflow-tooltip label="创建时间"></el-table-column>
                   </el-table>
+                  <el-pagination
+                    @size-change="sizeChangeHandle"
+                    @current-change="currentChangeHandle"
+                    :current-page="pageIndex"
+                    :page-sizes="[10, 20, 50, 100]"
+                    :page-size="pageSize"
+                    :total="totalPage"
+                    layout="total, sizes, prev, pager, next, jumper">
+                  </el-pagination>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -270,6 +351,10 @@
             'createTime': '2022-03-24'
           }
         ],
+        doneList: [],
+        pageIndex: 1,
+        pageSize: 10,
+        totalPage: 0,
         // 待办页签
         activeName: 'todo',
         // 按钮样式
@@ -325,6 +410,9 @@
       this.getCollectYbList()
       this.getProjectTable(2)
       this.getProjectMsg()
+      //获取待办、已办
+      this.getToDoDataList()
+      this.getDoneDataList()
     },
     methods: {
       // 获取项目信息
@@ -350,6 +438,67 @@
       // 待办页签切换
       handleClick(tab, event) {
 
+      },
+      sizeChangeHandle (val) {
+        this.pageSize = val
+        this.pageIndex = 1
+        this.getToDoDataList()
+      },
+      // 当前页
+      currentChangeHandle (val) {
+        this.pageIndex = val
+        this.getToDoDataList()
+      },
+
+      // 获取待办数据列表
+      getToDoDataList () {
+        
+        this.isShow=true
+        this.doneListShow=false
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/demandCollaboration/homeToDoList'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'pageNo': this.pageIndex,
+            'pageSize': this.pageSize,
+            'projectId': this.projectId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            debugger
+            this.todoList = data.result.records;
+            this.totalPage = data.result.total
+          } else {
+            this.todoList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+      // 获取已办数据列表
+      getDoneDataList () {
+        this.isShow=false
+        this.doneListShow=true
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/demandCollaboration/homeDoneList'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'pageNo': this.pageIndex,
+            'pageSize': this.pageSize,
+            'projectId': this.projectId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.doneList = data.result.records;
+            this.totalPage = data.result.total
+          } else {
+            this.doneList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
       },
       // 采集监控选择医保
       collectCheckYb(){
