@@ -83,18 +83,18 @@
         width="50"
       >
       </el-table-column>
-      <!--<el-table-column-->
-        <!--type="index"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--width="80"-->
-        <!--label="ID"-->
-        <!--:index="indexMethod"-->
-      <!--&gt;-->
-        <!--&lt;!&ndash; <template slot-scope="scope">-->
-          <!--<span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>-->
-        <!--</template> &ndash;&gt;-->
-      <!--</el-table-column>-->
+      <el-table-column
+        type="index"
+        header-align="center"
+        align="center"
+        width="80"
+        label="序号"
+        :index="indexMethod"
+      >
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>
+        </template> -->
+      </el-table-column>
       <el-table-column
         prop="userName"
         header-align="center"
@@ -381,7 +381,7 @@ export default {
       let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
       let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
       return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
-    }
+    },
   }
 };
 </script>
