@@ -201,12 +201,12 @@ export default {
     };
   },
   activated() {
-    this.getRuleFolder();
+    // this.getRuleFolder();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   methods: {
     // 序号翻页递增
@@ -217,6 +217,7 @@ export default {
       return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
     },
     getSelectPage() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });

@@ -372,12 +372,12 @@ export default {
     // this.initData();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   activated () {
-    this.getRuleFolder()
+    // this.getRuleFolder()
   },
   methods: {
     // 序号翻页递增
@@ -389,6 +389,7 @@ export default {
     },
     //获取列表数据
     initData() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });

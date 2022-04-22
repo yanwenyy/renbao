@@ -342,13 +342,14 @@ export default {
   },
   activated() {
     // this.getDataList();
-    this.getRuleFolder();
+    // this.getRuleFolder();
     this.$refs.addOrUpdate.deletCm();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
+
   },
   methods: {
     // 序号翻页递增
@@ -389,6 +390,7 @@ export default {
     },
     // 获取数据列表
     getDataList() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });

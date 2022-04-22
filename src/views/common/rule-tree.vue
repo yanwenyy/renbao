@@ -158,11 +158,15 @@ export default {
         }
     },
     mounted () {
+      if(this.treeData.length==0){
         this.getRuleFolder();
+      }
     },
-    activated () {
-        this.getRuleFolder();
-    },
+    // activated () {
+    //   if(this.treeData==[]){
+    //     this.getRuleFolder();
+    //   }
+    // },
     methods: {
         // 获取规则树
         getRuleFolder (callBack,from) {
