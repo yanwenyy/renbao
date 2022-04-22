@@ -71,7 +71,6 @@
                 class="upload-demo"
                 :http-request="((file)=>{uploadData(file,scope.$index,scope.row)})"
                 :show-file-list="false"
-                :limit="1"
               >
                 <!--<el-button type="text" @click="deleteHandle(scope.$index, dataForm.multipartFiles, scope.row)">修改</el-button>-->
                 <el-button type="text">修改</el-button>
@@ -156,7 +155,7 @@
           this.removeFileIdList.push(row.fileInfoId);
         }
         this.dataForm.multipartFiles=[];
-        file.file.uploaderName=this.dataForm.updateUserName;
+        file.file.uploaderName=sessionStorage.getItem("userName");
         file.file.fileName=file.file.name;
         this.dataForm.multipartFiles.push(file.file);
       },
@@ -202,7 +201,6 @@
               this.dataForm.planName = datas.planName;
               this.dataForm.planCode = datas.planCode;
               this.dataForm.multipartFiles = datas.fileInfos;
-              this.dataForm.uploaderName = datas.uploaderName;
             }
           })
         }

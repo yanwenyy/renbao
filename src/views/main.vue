@@ -93,6 +93,7 @@
             this.userId = data.result.userId;
             this.userName = data.result.userName;
             sessionStorage.setItem("userId",this.userId)
+            sessionStorage.setItem("userName",this.userName)
           }
         })
       }

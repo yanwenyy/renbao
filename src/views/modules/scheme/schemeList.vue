@@ -6,7 +6,7 @@
       @keyup.enter.native="getDataList()"
       class="search-form-new"
     >
-      <el-form-item label="政策名称：">
+      <el-form-item>
         <el-input
           v-model="dataForm.planName"
           placeholder="方案名称"
@@ -15,6 +15,11 @@
         <el-input
           v-model="dataForm.createUserName"
           placeholder="创建人"
+          clearable
+        ></el-input>
+        <el-input
+          v-model="dataForm.planCode"
+          placeholder="方案编码"
           clearable
         ></el-input>
       </el-form-item>
@@ -144,6 +149,7 @@ export default {
       dataForm: {
         planName: "",
         createUserName: "",
+        planCode: "",
       },
       token: "",
       imgUrlfront: "",
@@ -209,6 +215,7 @@ export default {
     reset() {
       this.dataForm.planName = "";
       this.dataForm.createUserName = "";
+      this.dataForm.planCode = "";
       this.pageIndex = 1;
       this.pageSize = 10;
     },
@@ -224,6 +231,7 @@ export default {
           pageSize: this.pageSize,
           planName: this.dataForm.planName,
           createUserName: this.dataForm.createUserName,
+          planCode: this.dataForm.planCode,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
