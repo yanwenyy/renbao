@@ -714,7 +714,6 @@ export default {
       }
     },
     init(id, ruleCheckData, type) {
-      debugger
       this.deletCm();
       this.getMustList();
       this.getRJMust();
@@ -723,8 +722,8 @@ export default {
       this.type = type;
       this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
       this.dataForm.ruleId = id;
-      this.dataForm.folderId = this.ruleCheckData.folderId;
-      this.dataForm.folderPath = this.ruleCheckData.folderPath;
+      this.dataForm.folderId = !this.dataForm.ruleId?this.ruleCheckData.folderId:'';
+      this.dataForm.folderPath = !this.dataForm.ruleId?this.ruleCheckData.folderPath:'';
       this.sqlMsgCopy = "";
       this.getUserInfo();
       this.$nextTick(() => {
@@ -789,7 +788,7 @@ export default {
               datas.ruleSqlValue
             );
 
-            // this.menuListTreeSetCurrentNode();
+            this.menuListTreeSetCurrentNode();
             this.deletCm();
           }
         });

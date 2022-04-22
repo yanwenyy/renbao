@@ -8,7 +8,7 @@
         <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="方案编号" prop="planCode">
-        <el-input :disabled="type=='look'" v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
+        <el-input :disabled="dataForm.id!=''" v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
         <el-upload
@@ -64,12 +64,19 @@
                 @click="downLoad(scope.row)"
               >下载</el-button
               >
-              <el-button
+              <el-upload
                 v-if="type!='look'"
-                type="text"
-                @click="deleteHandle(scope.$index, dataForm.multipartFiles, scope.row)"
-              >删除</el-button
+                ref="ruleFileUpload"
+                action="#"
+                class="upload-demo"
+                :http-request="((file)=>{uploadData(file,scope.$index,scope.row)})"
+                :show-file-list="false"
+                :limit="1"
               >
+                <!--<el-button type="text" @click="deleteHandle(scope.$index, dataForm.multipartFiles, scope.row)">修改</el-button>-->
+                <el-button type="text">修改</el-button>
+              </el-upload>
+
             </template>
           </el-table-column>
         </el-table>
@@ -141,8 +148,16 @@
         this.dataForm.multipartFiles=fileList;
       },
       //获取上传的文件
-      uploadData(file) {
+      uploadData(file,index,row) {
         // console.log(file);
+
+        if(this.dataForm.id!=''&&this.removeFileIdList.length==0){
+          this.dataForm.multipartFiles.splice(index, 1);
+          this.removeFileIdList.push(row.fileInfoId);
+        }
+        this.dataForm.multipartFiles=[];
+        file.file.uploaderName=this.dataForm.updateUserName;
+        file.file.fileName=file.file.name;
         this.dataForm.multipartFiles.push(file.file);
       },
       //验证唯一性
@@ -187,6 +202,7 @@
               this.dataForm.planName = datas.planName;
               this.dataForm.planCode = datas.planCode;
               this.dataForm.multipartFiles = datas.fileInfos;
+              this.dataForm.uploaderName = datas.uploaderName;
             }
           })
         }
@@ -195,31 +211,41 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            if(!this.dataForm.id){
-              var params = new FormData();
-              params.append("planName", this.dataForm.planName);
-              params.append("planCode", this.dataForm.planCode);
-              params.append("planId", this.dataForm.id);
-              this.dataForm.multipartFiles.forEach(item=>{
-                params.append("multipartFiles", item);
-              })
-              if (this.removeFileIdList.length > 0) {
-                params.append("fileInfoIds", this.removeFileIdList);
-              }
-            }else{
-              var editParmas={
-                planName:this.dataForm.planName,
-                planId:this.dataForm.id,
-                planCode:this.dataForm.planCode,
-                fileInfoIds:this.removeFileIdList,
-                multipartFiles:this.dataForm.multipartFiles,
-              }
+            var params = new FormData();
+            params.append("planName", this.dataForm.planName);
+            params.append("planCode", this.dataForm.planCode);
+            params.append("planId", this.dataForm.id);
+            this.dataForm.multipartFiles.forEach(item=>{
+              params.append("multipartFiles", item);
+            })
+            if (this.removeFileIdList.length > 0) {
+              params.append("fileInfoIds", this.removeFileIdList);
             }
+            // if(!this.dataForm.id){
+            //   var params = new FormData();
+            //   params.append("planName", this.dataForm.planName);
+            //   params.append("planCode", this.dataForm.planCode);
+            //   params.append("planId", this.dataForm.id);
+            //   this.dataForm.multipartFiles.forEach(item=>{
+            //     params.append("multipartFiles", item);
+            //   })
+            //   if (this.removeFileIdList.length > 0) {
+            //     params.append("fileInfoIds", this.removeFileIdList);
+            //   }
+            // }else{
+            //   var editParmas={
+            //     planName:this.dataForm.planName,
+            //     planId:this.dataForm.id,
+            //     planCode:this.dataForm.planCode,
+            //     fileInfoIds:this.removeFileIdList,
+            //     multipartFiles:this.dataForm.multipartFiles,
+            //   }
+            // }
             this.$http({
               url: this.$http.adornUrl(`/plan/${!this.dataForm.id ? 'add' : 'updateByUuId'}`),
               method: 'post',
-              data: !this.dataForm.id ? params:editParmas,
-              // data: params,
+              // data: !this.dataForm.id ? params:editParmas,
+              data: params,
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.$message({
