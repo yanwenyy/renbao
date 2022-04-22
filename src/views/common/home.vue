@@ -452,7 +452,7 @@
 
       // 获取待办数据列表
       getToDoDataList () {
-        
+
         this.isShow=true
         this.doneListShow=false
         this.dataListLoading = true
@@ -466,7 +466,6 @@
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
-            debugger
             this.todoList = data.result.records;
             this.totalPage = data.result.total
           } else {

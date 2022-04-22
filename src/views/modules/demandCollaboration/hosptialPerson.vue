@@ -68,11 +68,12 @@
       :data="dataList"
       v-loading="dataListLoading"
       ref="multipleTable"
+      :row-key="getRowKeys"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
       <el-table-column
         type="selection"
-        
+
         :reserve-selection="true"
        ></el-table-column>
       <el-table-column
@@ -95,9 +96,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="FOLDERID"
         align="center"
         label="规则分类">
+        <template slot-scope="scope">
+          {{getTreeData2(ruleData,scope.row.FOLDERID)}}
+        </template>
       </el-table-column>
 
       <el-table-column
@@ -292,9 +295,28 @@
     activated () {
       this.getDataList();
       this.getRuleFolder();
-      
+
     },
     methods: {
+      // 通过folderId 获取对应的item
+      getTreeData2(treeData, folderId) {
+        const getTreeDataItem = [];
+        const traverse = function(treeData, folderId) {
+          treeData.map(i => {
+            if (i.folderId == folderId) {
+              getTreeDataItem.push(i);
+            }
+            if (i.children) {
+              traverse(i.children, folderId);
+            }
+          });
+        };
+        traverse(treeData, folderId);
+        return getTreeDataItem.length>0?getTreeDataItem[0].folderName:"";
+      },
+      getRowKeys(row) {
+        return row.demandCollaborationId;
+      },
       //重置
       reset() {
         this.dataForm= {
@@ -324,7 +346,7 @@
         // this.getSelectPage();
       }
     },
-    
+
     // 获取规则树
     getRuleFolder() {
       this.$http({
@@ -339,7 +361,6 @@
       })
         .then(({ data }) => {
           if (data.code == 200) {
-            debugger
             this.treeData = data.result;
             this.ruleData = data.result;
             // this.dataForm.folderId = data.result[0].folderId;
@@ -350,7 +371,6 @@
     },
     // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        debugger
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.dataForm.folderPath =  data.folderPath;
@@ -359,7 +379,6 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        debugger
         if (this.dataForm.folderId) {
           if (this.$refs.menuListTree) {
             this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
@@ -370,11 +389,9 @@
       },
       // 通过folderId 获取对应的item
       getTreeData (treeData,folderId) {
-        debugger
           const getTreeDataItem = [];
           const traverse = function(treeData,folderId) {
               treeData.map(i => {
-                debugger
                   if (i.folderId == folderId) {
                       getTreeDataItem.push(i);
                   }
@@ -477,14 +494,13 @@
         this.id = data.DEMANDCOLLABORATIONID;
         this.showBtn = false;
         this.readonly = true;
-        debugger
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData)
         })
       },
-      // 新增 
+      // 新增
       addHandle () {
         this.showBtn = true;
         this.readonly = false;
@@ -507,7 +523,6 @@
         });
         this.showBtn = true;
         this.readonly = false;
-        debugger
         this.demandCollaboration = this.multipleTable[0];
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
@@ -522,17 +537,16 @@
           message: "请选择至少一条数据",
           type: "warning"
         });
-        
-        debugger
+
         let flag = false
         this.multipleTable.forEach(item => {
           if (item.EXAMINESTATUS != "0"){
             flag = true
-          }          
+          }
 
           this.demandCollaborationIds.push(item.DEMANDCOLLABORATIONID)
         })
-        
+
         if(flag === false){
           this.submitPersonVisible = true
         }else{
@@ -541,7 +555,7 @@
           type: "warning"
         });
         }
-        
+
         this.$nextTick(() => {
           this.$refs.submitPerson.init()
         })
