@@ -215,6 +215,7 @@ export default {
                   this.$emit("ok");
                 }
               });
+              this.$emit('refreshDataList')
             } else {
               this.$message.error(data.message);
             }

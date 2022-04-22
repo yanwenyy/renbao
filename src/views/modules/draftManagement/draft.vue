@@ -144,6 +144,7 @@
             :title="title"
           >
             <editDraft
+              @refreshDataList="getSelectPage"
               @close="closeAddDrawer"
               @ok="addSucceed"
               v-if="showEditDialog"
