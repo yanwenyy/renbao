@@ -1,22 +1,17 @@
 <template>
-  <div>
-    <div class="tree">
-      <BaseCodeTree :editTags="editTags"></BaseCodeTree>
+<div style="height:600px;">
+  <div class="tree">
+      <BaseCodeTree  @treeQuery="treeQuery"></BaseCodeTree>
     </div>
     <div tyle="width:100%">
       <BaseCodeTreeList ref="listData" @BaseCodeMethod="BaseCodeMethod"></BaseCodeTreeList>
-    </div>
   </div>
+</div>
 </template>
-
 <script>
 import BaseCodeTree from './BaseCodeTree.vue';
 import BaseCodeTreeList from './BaseCodeTreeList.vue';
-
 export default {
-   props: { 
-    editTags:{type: Number}
-  },
   components: {
     BaseCodeTree,
     BaseCodeTreeList
@@ -25,14 +20,15 @@ export default {
     this.$refs.listData.query();
   },
   methods:{
+    treeQuery(){
+        this.$refs.listData.query();
+    },
     BaseCodeMethod(){
        this.$emit('BaseCodeOne');
     },
   }
 };
 </script>
-
-
 <style scoped>
 .tree {
   width: 300px;

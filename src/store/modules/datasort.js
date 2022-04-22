@@ -5,8 +5,8 @@ export default {
     //table高度
     dataSortName:'', //name
     dataSortId:'',//id
-    baseCodes:{
-    }
+    editTag:'',
+    baseCodes:''
   },
   mutations: {
      SET_DATA_SORTNAME (state, name) {
@@ -17,6 +17,10 @@ export default {
     },
     SET_BASE_CODE(state,list){
       state.baseCodes = list
+      console.log(list)
+    },
+    SET_EDITAG(state,data){
+      state.editTag = data
     }
     
   },
@@ -29,6 +33,9 @@ export default {
     },
     setBaseCode({commit},status){
       commit('SET_BASE_CODE', status)
+    },
+    setEditTag({commit},status){
+      commit('SET_EDITAG', status)
     }
   },
 }
