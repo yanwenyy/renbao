@@ -175,7 +175,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
+                params:  this.$http.adornParams({folderTypes: this.folderSorts,projectId:this.projectId}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false;
