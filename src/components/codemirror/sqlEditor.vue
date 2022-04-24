@@ -81,7 +81,7 @@
               ref="tree3"
               node-key="id"
               :default-expand-all="false"
-              @node-contextmenu="rightClick"
+            
               @node-drag-start="handleDragStart"
               @node-drag-enter="handleDragEnter"
               @node-drag-leave="handleDragLeave"
