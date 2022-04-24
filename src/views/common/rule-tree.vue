@@ -98,6 +98,9 @@ export default {
         folderSorts: { // 规则树查询参数
             default: ''
         },
+        projectId: { // 规则树查询参数
+            default: ''
+        },
         isShowIcon: {
             type: Boolean, // 是否显示文件夹
             default: true
@@ -108,24 +111,24 @@ export default {
 
     },
     computed: {
-      projectId: {
-        get () {
-          if(this.$store.state.common.projectId){
-            return this.$store.state.common.projectId
-          }else{
-            this.$http({
-              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
-              method: "get",
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              if (data && data.code === 200) {
-                return data.result && data.result.projectId && data.result.projectId || '';
-              }
-            });
-          }
-
-        }
-      },
+      // projectId: {
+      //   get () {
+      //     if(this.$store.state.common.projectId){
+      //       return this.$store.state.common.projectId
+      //     }else{
+      //       this.$http({
+      //         url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+      //         method: "get",
+      //         params: this.$http.adornParams()
+      //       }).then(({ data }) => {
+      //         if (data && data.code === 200) {
+      //           return data.result && data.result.projectId && data.result.projectId || '';
+      //         }
+      //       });
+      //     }
+      //
+      //   }
+      // },
     },
     data () {
         return {
