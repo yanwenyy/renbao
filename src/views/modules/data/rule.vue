@@ -42,6 +42,7 @@
             </span>
           </el-tree> -->
           <ruleTree
+            :folderSorts="folderSorts"
             ref="ruleTree"
             :isShowSearch="true"
             :isShowCheckBox="false"
@@ -256,6 +257,7 @@ import ImportFile from "./Import-file.vue";
 export default {
   data() {
     return {
+      folderSorts: "1,2",
       tableMinus: 75,
       ruleData: {}, //组件规则数数据
       form: {

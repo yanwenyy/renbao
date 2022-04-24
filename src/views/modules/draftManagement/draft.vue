@@ -8,6 +8,7 @@
         :isShowCheckBox="false"
         :isShowEdit="true"
         :folderSorts="folderSorts"
+        :projectId="projectId"
         @getTreeId="getTreeId"
         :isParent="false"
       ></rule-tree>
