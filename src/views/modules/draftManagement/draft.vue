@@ -191,7 +191,7 @@ export default {
       },
       multipleTable: [],
       treeData: [],
-      folderSorts: "3",
+      folderSorts: "1,2",
       ruleCheckData: {},
       showEditDialog: false,
       dataListLoading: false,

@@ -261,7 +261,7 @@ export default {
         return row.ruleId;
       },
       treeData: [],
-      folderSorts: 3,
+      folderSorts: '',
       ruleCheckData: {}
     };
   },
