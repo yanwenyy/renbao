@@ -198,6 +198,7 @@
     </span>
     </el-dialog>
     <el-dialog
+      :append-to-body='true'
       title="查看SQL规则"
       :visible.sync="sqlRuleVisible"
       width="40%">
