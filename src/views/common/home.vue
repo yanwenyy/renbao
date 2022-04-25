@@ -40,7 +40,7 @@
       <!-- 流程中心  -->
       <el-col :span="16">
         <div class="todoList">
-          <div class="cardTitle"><el-row style="margin-left:10px">流程中心<div class="cardMore" @click="toDetailPage()">查看更多</div></el-row></div>
+          <div class="cardTitle"><el-row style="margin-left:10px">流程中心<div class="cardMore" @click="toDetailPage(workFlowDetailPath)">查看更多</div></el-row></div>
           <div>
              <el-tabs v-model="activeName" @tab-click="handleClick">
               <el-tab-pane label="我的待办" name="todo">
@@ -365,6 +365,7 @@
         ],
         doneList: [],
         ruleData: [],
+        workFlowDetailPath: "",
         folderSorts: "",
         pageIndex: 1,
         pageSize: 10,
@@ -428,6 +429,7 @@
       this.getToDoDataList()
       this.getDoneDataList()
       this.getRuleFolder()
+      this.getWorkFlowDetailPath()
     },
     methods: {
       // 通过folderId 获取对应的item
@@ -460,7 +462,6 @@
         })
           .then(({ data }) => {
             if (data.code == 200) {
-              debugger
               this.treeData = data.result;
               this.ruleData = data.result;
               // this.dataForm.folderId = data.result[0].folderId;
@@ -468,6 +469,21 @@
             }
           })
           .catch(() => {});
+      },
+      getWorkFlowDetailPath() {
+        this.$http({
+          url: this.$http.adornUrl(`/demandCollaboration/selectWorkFlowDetailPath`),
+          method: 'get',
+          params: this.$http.adornParams({
+            'projectId': this.projectId
+          })
+        }).then(({data}) => {
+          debugger
+          if (data && data.code === 200) {
+            this.workFlowDetailPath = data.result
+
+          }
+        })
       },
       // 获取项目信息
       getProjectMsg(){
