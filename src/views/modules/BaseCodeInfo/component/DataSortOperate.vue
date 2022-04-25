@@ -88,7 +88,8 @@ export default {
         this.formOpera.dataSortName == null ||
         this.formOpera.dataSortName == ""
       ) {
-        alert("请输入代码类型名称");
+        this.$message.error("请输入代码类型名称")
+        // alert("请输入代码类型名称");
         return false;
       }
       if (
@@ -96,7 +97,8 @@ export default {
         this.formOpera.dataSortValue == null ||
         this.formOpera.dataSortValue == ""
       ) {
-        alert("请输入代码类型编码");
+        this.$message.error("请输入代码类型编码")
+        // alert("请输入代码类型编码");
         return false;
       }
       if (
@@ -104,7 +106,8 @@ export default {
         this.formOpera.dataSortDesc == null ||
         this.formOpera.dataSortDesc == ""
       ) {
-        alert("请输入代码类型描述");
+        this.$message.error("请输入代码类型描述")
+        // alert("请输入代码类型描述");
         return false;
       }
       this.$http({
@@ -143,7 +146,8 @@ export default {
         this.formOpera.dataSortName == null ||
         this.formOpera.dataSortName == ""
       ) {
-        this.$alert(2, "请输入代码类型名称");
+        this.$message.error("请输入代码类型名称")
+        // this.$alert(2, "请输入代码类型名称");
         return false;
       }
       if (
@@ -151,7 +155,8 @@ export default {
         this.formOpera.dataSortDesc == null ||
         this.formOpera.dataSortDesc == ""
       ) {
-        alert(2, "请输入代码类型描述");
+        this.$message.error("请输入代码类型描述")
+        // alert(2, "请输入代码类型描述");
         return false;
       }
       this.$confirm(
