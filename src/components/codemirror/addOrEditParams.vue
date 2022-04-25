@@ -1,55 +1,56 @@
 <template>
   <div>
     <el-dialog
+      width="70vw"
       :title="!dataForm.id ? '新增' :type=='look'?'查看': '修改'"
       :close-on-click-modal="false"
       :visible.sync="visible">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="110px">
         <el-tabs type="border-card" class="self-tabs" v-model="activeName">
           <el-tab-pane name="1" label="基本信息">
             <div class="tabs1-div">
-              <el-form-item label="参数名称" prop="planName">
-                <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="参数名称" maxlength="255"></el-input>
+              <el-form-item label="参数名称" prop="param.paramName">
+                <el-input :disabled="type=='look'" v-model="dataForm.param.paramName" placeholder="参数名称" maxlength="255"></el-input>
               </el-form-item>
-              <el-form-item label="数据类型" prop="planName">
-                <el-select v-model="dataForm.planName" placeholder="请选择">
-                  <el-option label="数字" value="数字"></el-option>
-                  <el-option label="文本" value="文本"></el-option>
+              <el-form-item label="数据类型" prop="param.dataType">
+                <el-select v-model="dataForm.param.dataType" placeholder="请选择">
+                  <el-option label="数字" value="num"></el-option>
+                  <el-option label="文本" value="str"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="输入方式" prop="planName">
-                <el-select v-model="dataForm.planCode" placeholder="请选择">
-                  <el-option label="文本框" value="文本框"></el-option>
-                  <el-option label="列表" value="列表"></el-option>
-                  <el-option label="树" value="树"></el-option>
+              <el-form-item label="输入方式" prop="param.inputType">
+                <el-select v-model="dataForm.param.inputType" placeholder="请选择">
+                  <el-option label="文本框" value="textinp"></el-option>
+                  <el-option label="列表" value="lineinp"></el-option>
+                  <el-option label="树" value="treeinp"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="示例" prop="planName">
-                <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="示例" maxlength="255"></el-input>
+              <el-form-item label="示例" prop="param.example">
+                <el-input :disabled="type=='look'" v-model="dataForm.param.example" placeholder="示例" maxlength="255"></el-input>
               </el-form-item>
               <el-form-item label="允许为空">
-                <el-radio-group v-model="dataForm.planName">
+                <el-radio-group v-model="dataForm.paramChoice.allowedNull">
                   <el-radio :label="1">是</el-radio>
-                  <el-radio :label="2">否</el-radio>
+                  <el-radio :label="0">否</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="形式类型" v-if="dataForm.planCode=='列表'||dataForm.planCode=='树'">
-                <el-radio-group v-model="dataForm.planName">
+              <el-form-item label="形式类型" v-if="dataForm.param.inputType=='lineinp'||dataForm.param.inputType=='treeinp'">
+                <el-radio-group v-model="dataForm.paramChoice.choiceType">
                   <el-radio :label="1">单选</el-radio>
-                  <el-radio :label="2">多选</el-radio>
+                  <el-radio :label="0">多选</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="参数值长度" v-if="dataForm.planCode=='文本框'">
-                <el-input type="Number" :disabled="type=='look'" v-model="dataForm.planName" placeholder="参数值长度"></el-input>
+              <el-form-item label="参数值长度" v-if="dataForm.param.inputType=='textinp'">
+                <el-input type="Number" :disabled="type=='look'" v-model="dataForm.param.dataLength" placeholder="参数值长度"></el-input>
               </el-form-item>
-              <el-form-item label="备选值设置"  v-if="dataForm.planCode=='列表'||dataForm.planCode=='树'">
+              <el-form-item label="备选值设置"  v-if="dataForm.param.inputType=='lineinp'||dataForm.param.inputType=='treeinp'">
                 <el-tabs v-model="activeName2">
-                  <el-tab-pane label="自定义动态" name="first" v-if="dataForm.planCode=='列表'">
+                  <el-tab-pane label="自定义动态" name="first" v-if="dataForm.param.inputType=='lineinp'">
                     <ul class="sa-list">
                       <li v-for="(item,index) in selfActionsList">
-                        <el-input placeholder="名称"></el-input>
-                        <el-input placeholder="值"></el-input>
-                        <el-button v-if="index==0" type="primary" size="small" @click="selfActionsList.push({})">加</el-button>
+                        <el-input placeholder="名称" v-model="item.names"></el-input>
+                        <el-input placeholder="值" v-model="item.value1"></el-input>
+                        <el-button v-if="index==0" type="primary" size="small" @click="selfActionsList.push({ names:'',value1:''})">加</el-button>
                         <el-button v-if="index>0" type="primary" size="small" @click="selfActionsList.splice(index,1)">减</el-button>
                       </li>
                     </ul>
@@ -60,7 +61,7 @@
                       type="textarea"
                       :rows="6"
                       placeholder="请输入SQL"
-                      v-model="dataForm.planName">
+                      v-model="dataForm.paramChoice.optionsSql">
                     </el-input>
                     <el-button type="primary" @click="sqlRuleVisible = true">查看SQL规则</el-button>
                     <el-button type="primary">预览</el-button>
@@ -72,13 +73,120 @@
                   type="textarea"
                   :rows="6"
                   placeholder="请输入SQL"
-                  v-model="dataForm.planName">
+                  v-model="dataForm.param.description">
                 </el-input>
               </el-form-item>
             </div>
           </el-tab-pane>
-          <el-tab-pane v-if="dataForm.planCode=='树'" name="2" label="关联参数配置">
+          <el-tab-pane v-if="dataForm.param.inputType=='treeinp'" name="2" label="关联参数配置">
             <div class="tabs1-div">
+              <el-table
+                class="table-list"
+                border
+                :data="relationParamList"
+                stripe
+                style="width: 100%">
+                <el-table-column
+                  type="index"
+                  header-align="center"
+                  align="center"
+                  width="80"
+                  label="序号"
+                >
+                </el-table-column>
+                <el-table-column
+                  prop="associatedParamName"
+                  label="被关联参数名称"
+                  header-align="center"
+                  align="center"
+                >
+                </el-table-column>
+                <el-table-column
+                  prop="associatedParamCol"
+                  label="被关联参数值"
+                  header-align="center"
+                  align="center"
+                >
+
+                </el-table-column>
+                <el-table-column
+                  prop="paramValueType"
+                  label="关联参数值"
+                  header-align="center"
+                  align="center"
+                >
+                  <template slot-scope="scope">
+                    {{scope.row.paramValueType=='realValue'?'真实值':scope.row.paramValueType=='displayValue'?'显示值':''}}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  header-align="center"
+                  align="center"
+                  width="150"
+                  label="操作">
+                  <template slot-scope="scope">
+                    <!--<el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.rowId)">修改</el-button>-->
+                    <!--<el-button type="text" size="small" @click="deleteHandle(scope.row.rowId)">删除</el-button>-->
+                    <el-button type="text" size="small" @click="">修改</el-button>
+                    <el-button type="text" size="small" @click="relationParamList.splice(scope.$index,1)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-form-item label="被关联参数名称" class="item-three">
+                <el-popover
+                  :disabled="type == 'look'"
+                  ref="menuListPopover"
+                  placement="bottom-start"
+                  trigger="click"
+                  v-model="treeVisible"
+                >
+                  <el-tree
+                    class="rule-tree"
+                    :data="relationParamTree"
+                    :props="menuListTreeProps"
+                    node-key="folderId"
+                    ref="menuListTree"
+                    @current-change="menuListTreeCurrentChangeHandle"
+                    :default-expand-all="false"
+                    :highlight-current="true"
+                    :expand-on-click-node="false"
+                  >
+                    <span slot-scope="{ node }">
+                      <span class="tree-label">
+                        <span class="folder-icon"></span>
+                        <span :title="node.label"> {{ node.label }}</span>
+                      </span>
+                    </span>
+                  </el-tree>
+                </el-popover>
+                <el-input
+                  :disabled="type == 'look'"
+                  @click="treeVisible = true"
+                  v-popover:menuListPopover
+                  v-model="relationForm.associatedParamName"
+                  :readonly="true"
+                  placeholder="点击选择"
+                  class="menu-list__input"
+                ></el-input>
+              </el-form-item>
+              <el-form-item label="被关联参数值" class="item-three">
+                <el-select v-model="relationForm.associatedParamCol" placeholder="请选择">
+
+                </el-select>
+              </el-form-item>
+              <el-form-item label="对应参数值" class="item-three">
+                <el-select v-model="relationForm.paramValueType" placeholder="请选择">
+                  <el-option label="真实值" value="realValue"></el-option>
+                  <el-option label="显示值" value="displayValue"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-button type="primary" size="small" @click="relationFromSave">保存</el-button>
+              <div class="relationFormMsg">
+                <div>说明：</div>
+                <div>1、一个【参数A】可以选择多个【参数B】作为其被关联参数，当【参数A】值发生变化时，会将它的对应值（真实值或显示值）传给【被关联参数B】</div>
+                <div>2、【被关联参数B】接收到【参数A】传递的对应值后，将该对应值作为条件从而筛选【被关联参数B】中的数据</div>
+                <div>3、在修改被关联参数时，若发现反显的信息与列表展示信息不符，则该被关联参数已被修改，以反显的信息为主</div>
+              </div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -93,11 +201,11 @@
       title="查看SQL规则"
       :visible.sync="sqlRuleVisible"
       width="40%">
-      <div v-if="dataForm.planCode=='列表'">
+      <div v-if="dataForm.param.inputType=='lineinp'">
         <div>1、SQL语句的格式为：SELECT A,B FROM C</div>
         <div>2、其中【A】字段为真实值，【B】字段为显示值，若字段过多（或者存在【*】），则默认只使用前两列进行真实值与显示值的匹配</div>
       </div>
-      <div v-if="dataForm.planCode=='树'">
+      <div v-if="dataForm.param.inputType=='treeinp'">
         <div>1、SQL语句的格式为：SELECT A,B,C FROM D</div>
         <div>2、其中【A】字段为子项真实值，【B】字段为子项显示值，【C】字段为父项真实值，将使用【A】字段与【C】字段进行父子节点关系匹配，若字段过多（或者存在【*】），则默认只使用前三列进行匹配</div>
       </div>
@@ -118,35 +226,144 @@
         activeName2: "first", //tab页切换时的状态值
         type:'',
         visible: false,
-        selfActionsList:[{}],
+        selfActionsList:[{
+          names:'',
+          value1:'',
+        }],
+        relationParamTree:[],
+        treeVisible: false,
+        relationForm:{
+          associatedParamName:'',//被关联参数名称
+          associatedParamId:'',//被关联参数id
+          associatedParamCol:'',//被关联参数值
+          paramValueType:'',//对应参数值
+        },
+        menuListTreeProps: {
+          label: "name",
+          children: "children"
+        },
+        relationParamList:[],
         dataForm: {
           id: 0,
-          planName: '',
-          planCode: '',
-          multipartFiles :[],
+          param:{
+            paramName:'',
+            paramAlias:'',
+            dataType:'',
+            inputType:'',
+            example:'',
+            dataLength:'',
+            description:'',
+            ammParamTypeUuid:'',
+            signForSql:'',
+          },
+          paramChoice:{
+            allowedNull: 1,
+            choiceType: 1,
+            optionsSql:'',
+          },
+          paramOptions:{
+            optionsNames:'',
+            optionsVals:'',
+          },
+          associatedParamJsonStr:'',
+          scopeType: '',
+          folderId: '',
         },
         dataRule: {
-          planName: [
-            { required: true, message: '方案名称不能为空', trigger: 'blur' }
+          'param.paramName': [
+            { required: true, message: '参数名称不能为空', trigger: 'blur' }
           ],
-          planCode: [
-            { required: true, message: '方案编号不能为空', trigger: 'blur' }
+          'param.dataType': [
+            { required: true, message: '数据类型不能为空', trigger:['blur','change'] }
+          ],
+          'param.inputType': [
+            { required: true, message: '输入方式不能为空', trigger: 'blur' }
+          ],
+          'param.example': [
+            { required: true, message: '示例不能为空', trigger: 'blur' }
           ],
         }
       }
     },
     methods: {
+      //关联参数配置保存
+      relationFromSave(){
+        this.relationParamList.push(this.relationForm);
+        this.relationForm={
+          associatedParamName:'',//被关联参数名称
+          associatedParamId:'',//被关联参数id
+          associatedParamCol:'',//被关联参数值
+          paramValueType:'',//对应参数值
+        };
+      },
+      // 通过folderId 获取对应的item
+      getTreeData(treeData, folderId) {
+        const getTreeDataItem = [];
+        const traverse = function(treeData, folderId) {
+          treeData.map(i => {
+            if (i.id == folderId) {
+              getTreeDataItem.push(i);
+            }
+            if (i.children) {
+              traverse(i.children, folderId);
+            }
+          });
+        };
+        traverse(treeData, folderId);
+        return getTreeDataItem;
+      },
+      // 规则树选中
+      menuListTreeCurrentChangeHandle(data, node) {
+        this.relationForm.associatedParamId = data.id;
+        this.relationForm.associatedParamName = data.name;
+        this.treeVisible = false;
+      },
+      // 规则树设置当前选中节点
+      menuListTreeSetCurrentNode() {
+        if (this.relationForm.associatedParamId) {
+          if (this.$refs.menuListTree) {
+            this.$refs.menuListTree.setCurrentKey(this.relationForm.associatedParamId);
+          }
+          this.relationForm.associatedParamName = this.getTreeData(
+            this.relationParamTree,
+            this.relationForm.associatedParamId
+          )[0].name;
+        }
+      },
       cleanMsg(){
         this.dataForm={
           id: 0,
-          planName: '',
-          planCode: '',
-          multipartFiles :[],
-        }
-        this.fileList=[];
-        this.removeFileIdList=[];
+          param:{
+            paramName:'',
+            paramAlias:'',
+            dataType:'',
+            inputType:'',
+            example:'',
+            dataLength:'',
+            description:'',
+            ammParamTypeUuid:'',
+            signForSql:'',
+          },
+          paramChoice:{
+            allowedNull: 1,
+            choiceType: 1,
+            optionsSql:'',
+          },
+          paramOptions:{
+            optionsNames:'',
+            optionsVals:'',
+          },
+          associatedParamJsonStr:'',
+          scopeType: '',
+          folderId: '',
+        };
+        this.selfActionsList=[{
+          names:'',
+          value1:'',
+        }];
       },
-      init (id,type) {
+      init (id,type,paramsData) {
+        this.relationParamTree=paramsData;
         this.type=type;
         this.cleanMsg();
         this.visible = true;
@@ -154,7 +371,7 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
-        if (this.dataForm.id) {
+        if (this.dataForm.id!='') {
           this.$http({
             url: this.$http.adornUrl(`/plan/selectByUuid/${this.dataForm.id}`),
             method: 'get',
@@ -163,7 +380,7 @@
             if (data && data.code === 200) {
               var datas=data.result;
               this.dataForm.planName = datas.planName;
-              this.dataForm.planCode = datas.planCode;
+              this.dataForm.param.inputType = datas.planCode;
               this.dataForm.multipartFiles = datas.fileInfos;
             }
           })
@@ -173,9 +390,30 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            var nameStr=[],valueStr=[];
+            this.selfActionsList.forEach(item=>{
+              nameStr.push(item.names);
+              valueStr.push(item.value1);
+            });
+            this.dataForm.paramOptions.optionsNames=nameStr.join("-");
+            this.dataForm.paramOptions.optionsVals=valueStr.join("-");
+            this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList)
+            const formData = new FormData();
+            formData.append('param', this.dataForm.param);
 
           }
         })
+      }
+    },
+    watch:{
+      'dataForm.param.inputType':{
+        handler(newVal, oldVal) {
+          if(newVal=='treeinp'){
+            this.activeName2='second';
+          }else{
+            this.activeName2='first';
+          }
+        },
       }
     }
   }
@@ -200,5 +438,15 @@
   }
   .sa-list .el-input{
     width: 40%;
+  }
+  .table-list{
+    margin-bottom: 10px;
+  }
+  .item-three{
+    width: 30%;
+    display: inline-block;
+  }
+  .relationFormMsg{
+    color:red;
   }
 </style>

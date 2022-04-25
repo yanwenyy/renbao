@@ -81,6 +81,7 @@
               ref="tree3"
               node-key="id"
               :default-expand-all="false"
+              @node-contextmenu="rightClick"
               @node-drag-start="handleDragStart"
               @node-drag-enter="handleDragEnter"
               @node-drag-leave="handleDragLeave"
@@ -110,10 +111,10 @@
               </ul>
               <ul v-if="treeType==='3'" id="menu"
                   class="right-menu">
-                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">查看参数关联</li>
+                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">查看参数关联</li>
               </ul>
             </div>
           </div>
@@ -911,7 +912,7 @@
       // 新增 / 修改参数
       addOrUpdateParmas(id,type) {
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id,type);
+          this.$refs.addOrUpdate.init(id||'',type,this.paramsData);
         })
       },
       //数据表左侧右击事件
