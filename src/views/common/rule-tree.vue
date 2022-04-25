@@ -99,7 +99,7 @@ export default {
             default: ''
         },
         projectId: { // 规则树查询参数
-            default: null
+            default: ''
         },
         isShowIcon: {
             type: Boolean, // 是否显示文件夹
