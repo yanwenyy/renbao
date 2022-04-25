@@ -72,6 +72,7 @@
     <el-table
       :height="tableHeight-75"
       :data="dataList"
+      :row-key="getRowKeys"
       v-loading="dataListLoading"
       ref="multipleTable"
       @selection-change="selectionChangeHandle"
@@ -308,6 +309,10 @@
       this.getRuleFolder();
     },
     methods: {
+      //获取每行数据id
+      getRowKeys(row) {
+        return row.DEMANDCOLLABORATIONID;
+      },
       //重置
       reset() {
         this.dataForm= {

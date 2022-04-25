@@ -151,15 +151,6 @@
                       <el-table-column prop="CREATEUSERNAME" align="center" label="创建人"></el-table-column>
                       <el-table-column prop="CREATETIME" align="center" show-overflow-tooltip label="创建时间"></el-table-column>
                   </el-table>
-                  <el-pagination
-                    @size-change="sizeChangeHandle"
-                    @current-change="currentChangeHandle"
-                    :current-page="pageIndex"
-                    :page-sizes="[10, 20, 50, 100]"
-                    :page-size="pageSize"
-                    :total="totalPage"
-                    layout="total, sizes, prev, pager, next, jumper">
-                  </el-pagination>
                 </div>
               </el-tab-pane>
             </el-tabs>

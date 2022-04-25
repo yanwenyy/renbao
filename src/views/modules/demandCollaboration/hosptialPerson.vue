@@ -301,6 +301,10 @@
 
     },
     methods: {
+      //获取每行数据id
+      getRowKeys(row) {
+        return row.DEMANDCOLLABORATIONID;
+      },
       // 通过folderId 获取对应的item
       getTreeData2(treeData, folderId) {
         const getTreeDataItem = [];
