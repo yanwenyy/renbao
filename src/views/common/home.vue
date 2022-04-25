@@ -47,7 +47,11 @@
                 <div>
                   <el-table :data="todoList" width="85%">
                       <el-table-column prop="DEMANDNAME" label="需求标题" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                          {{getTreeData2(ruleData,scope.row.FOLDERID)}}
+                        </template>
+                      </el-table-column>
                       <el-table-column prop="RULECATEGORY" align="center" label="规则属性">
                         <template slot-scope="scope">
                           {{
@@ -82,6 +86,8 @@
                               : scope.row.EXAMINESTATUS == "3"
                               ? "待信息组员反馈"
                               : scope.row.EXAMINESTATUS == "4"
+                              ? "已反馈"
+                              : scope.row.EXAMINESTATUS == "5"
                               ? "已完成"
                               : ""
                           }}
@@ -96,7 +102,11 @@
                 <div>
                   <el-table :data="doneList" width="85%" class="demo-ruleForm">
                       <el-table-column prop="DEMANDNAME" label="需求标题" show-overflow-tooltip></el-table-column>
-                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip></el-table-column>
+                      <el-table-column prop="FOLDERID" label="规则类型" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                          {{getTreeData2(ruleData,scope.row.FOLDERID)}}
+                        </template>
+                      </el-table-column>
                       <el-table-column prop="RULECATEGORY" align="center" label="规则属性">
                         <template slot-scope="scope">
                           {{
@@ -131,6 +141,8 @@
                               : scope.row.EXAMINESTATUS == "3"
                               ? "待信息组员反馈"
                               : scope.row.EXAMINESTATUS == "4"
+                              ? "已反馈"
+                              : scope.row.EXAMINESTATUS == "5"
                               ? "已完成"
                               : ""
                           }}
@@ -352,6 +364,8 @@
           }
         ],
         doneList: [],
+        ruleData: [],
+        folderSorts: "",
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -413,8 +427,48 @@
       //获取待办、已办
       this.getToDoDataList()
       this.getDoneDataList()
+      this.getRuleFolder()
     },
     methods: {
+      // 通过folderId 获取对应的item
+      getTreeData2(treeData, folderId) {
+        const getTreeDataItem = [];
+        const traverse = function(treeData, folderId) {
+          treeData.map(i => {
+            if (i.folderId == folderId) {
+              getTreeDataItem.push(i);
+            }
+            if (i.children) {
+              traverse(i.children, folderId);
+            }
+          });
+        };
+        traverse(treeData, folderId);
+        return getTreeDataItem.length>0?getTreeDataItem[0].folderName:"";
+      },
+      // 获取规则树
+      getRuleFolder() {
+        this.$http({
+          isLoading: false,
+          url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
+          method: "get",
+          params: this.$http.adornParams(
+            { folderTypes: this.folderSorts, projectId: this.projectId },
+            false
+          )
+          // params:  this.$http.adornParams({}, false)
+        })
+          .then(({ data }) => {
+            if (data.code == 200) {
+              debugger
+              this.treeData = data.result;
+              this.ruleData = data.result;
+              // this.dataForm.folderId = data.result[0].folderId;
+              // this.menuListTreeSetCurrentNode();
+            }
+          })
+          .catch(() => {});
+      },
       // 获取项目信息
       getProjectMsg(){
         if(this.projectId != '')

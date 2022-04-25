@@ -105,6 +105,9 @@
         prop="ruleType"
         align="center"
         label="规则分类">
+        <template slot-scope="scope">
+          {{getTreeData2(ruleData,scope.row.FOLDERID)}}
+        </template>
       </el-table-column>
 
       <el-table-column
@@ -153,6 +156,8 @@
                     : scope.row.EXAMINESTATUS == "3"
                     ? "待信息组员反馈"
                     : scope.row.EXAMINESTATUS == "4"
+                    ? "已反馈"
+                    : scope.row.EXAMINESTATUS == "5"
                     ? "已完成"
                     : ""
                 }}
@@ -179,7 +184,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="ruleResultDetail(scope.row.demandCollaborationId)">查看规则结果</el-button>
+          <el-button type="text" size="small" @click="ruleResultDetail(scope.row.RULEID)">查看规则结果</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -257,7 +262,7 @@
         dataList: [],
         multipleTable: [],
         treeData: [],
-        folderSorts: 3,
+        folderSorts: "",
         ruleCheckData: {},
         pageIndex: 1,
         pageSize: 10,
@@ -316,6 +321,22 @@
       this.getRuleFolder();
     },
     methods: {
+      // 通过folderId 获取对应的item
+      getTreeData2(treeData, folderId) {
+        const getTreeDataItem = [];
+        const traverse = function(treeData, folderId) {
+          treeData.map(i => {
+            if (i.folderId == folderId) {
+              getTreeDataItem.push(i);
+            }
+            if (i.children) {
+              traverse(i.children, folderId);
+            }
+          });
+        };
+        traverse(treeData, folderId);
+        return getTreeDataItem.length>0?getTreeDataItem[0].folderName:"";
+      },
       //重置
       reset() {
         this.dataForm= {
@@ -343,7 +364,6 @@
         this.id = data.DEMANDCOLLABORATIONID;
         this.showBtn = false;
         this.readonly = true;
-        debugger
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
@@ -448,14 +468,13 @@
           url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
           method: "get",
           params: this.$http.adornParams(
-            { folderSorts: this.folderSorts, projectId: this.projectId },
+            { folderTypes: this.folderSorts, projectId: this.projectId },
             false
           )
           // params:  this.$http.adornParams({}, false)
         })
           .then(({ data }) => {
             if (data.code == 200) {
-              debugger
               this.treeData = data.result;
               this.ruleData = data.result;
               // this.dataForm.folderId = data.result[0].folderId;
@@ -466,7 +485,6 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        debugger
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.dataForm.folderPath =  data.folderPath;
@@ -475,7 +493,6 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        debugger
         if (this.dataForm.folderId) {
           if (this.$refs.menuListTree) {
             this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
@@ -486,11 +503,9 @@
       },
       // 通过folderId 获取对应的item
       getTreeData (treeData,folderId) {
-        debugger
           const getTreeDataItem = [];
           const traverse = function(treeData,folderId) {
               treeData.map(i => {
-                debugger
                   if (i.folderId == folderId) {
                       getTreeDataItem.push(i);
                   }
@@ -511,7 +526,6 @@
           message: "请选择一条数据进行编辑",
           type: "warning"
         });
-        
         this.feedBackVisible = true
         let ids = this.multipleTable[0].RULEID;
         this.$nextTick(() => {
@@ -529,7 +543,6 @@
         //   type: "warning"
         // });
         
-        debugger
         this.submitFeedVisible = true
         // let ids = this.multipleTable[0].DEMANDCOLLABORATIONID;
         this.$nextTick(() => {
@@ -546,13 +559,15 @@
           message: "请至少选择一条数据进行提交",
           type: "warning"
         });
-    //   var deleteList = [];
-    //   this.multipleTable.forEach(item => {
-    //     deleteList.push(item.resultId);
-    //   });
+      var demandCollaborationIds = [];
+      var ruleIds = [];
+      this.multipleTable.forEach(item => {
+        demandCollaborationIds.push(item.DEMANDCOLLABORATIONID);
+        ruleIds.push(item.RULEID);
+      });
         let fd = new FormData();
-        fd.append("demandCollaborationId", this.demandCollaborationId);
-        fd.append("resultId", this.multipleTable[0].resultId);
+        fd.append("demandCollaborationIds", demandCollaborationIds);
+        fd.append("ruleIds", ruleIds);
 
       this.$confirm(`是否确认提交反馈`, "提示", {
         confirmButtonText: "确定",
@@ -566,7 +581,6 @@
             method: "DELETE",
             data: fd
           }).then(({ data }) => {
-              debugger
             if (data && data.code === 200) {
               this.$message({ message: "反馈成功", type: "success" });
             //   this.Pager.pageIndex = 1;
@@ -574,7 +588,7 @@
               //this.getTableData();
               this.setTableChecked();
             } else {
-              this.$message.error(data.msg);
+              this.$message.error(data.message);
             }
           });
         })
