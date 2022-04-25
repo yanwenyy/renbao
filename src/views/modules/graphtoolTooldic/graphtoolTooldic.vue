@@ -217,7 +217,7 @@
         <!--<div id="sql" class="box-bg"></div>-->
       </div>
     </div>
-    <el-dialog :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
+    <el-dialog :append-to-body='true' :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
       <div class="screen-body">
         <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
       </div>
@@ -226,7 +226,7 @@
         <el-button type="primary" @click="saveScreen()">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
+    <el-dialog :append-to-body='true' :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
       <el-tabs @tab-click="tabClick" v-if="resultTableTabs.length>0" v-model="resultTableTabsValue" type="border-card">
         <el-tab-pane
           :key="String(index)"
