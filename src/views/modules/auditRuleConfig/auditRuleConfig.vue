@@ -10,6 +10,7 @@
           @getTreeId="getTreeId"
           :isParent="false"
           :folderSorts="folderSorts"
+          :projectId="projectId"
         ></rule-tree>
       </el-card>
     </div>

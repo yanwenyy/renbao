@@ -7,6 +7,7 @@
         :style="{ height: tableHeight + 100 + 'px' }"
       >
         <rule-tree
+          :projectId="0"
           :isShowSearch="true"
           :isShowCheckBox="false"
           @getTreeId="getTreeId"
