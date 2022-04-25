@@ -6,7 +6,7 @@
         ref="ruleTree"
         :isShowSearch="true"
         :isShowCheckBox="false"
-        :isShowEdit="true"
+        :isShowEdit="false"
         :folderSorts="folderSorts"
         :projectId="projectId"
         @getTreeId="getTreeId"
@@ -35,6 +35,13 @@
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
           <el-button
+            style="float:right;margin-left: 10px"
+            @click="deleteHandle()"
+            type="primary"
+            :disabled="this.multipleTable.length <= 0"
+          >删除
+          </el-button>
+          <el-button
             style="float:right"
             type="primary"
             :disabled="
@@ -43,6 +50,7 @@
             @click="editData"
             >编写底稿</el-button
           >
+
         </el-form>
       </div>
       <div class="rule-table">
@@ -130,6 +138,18 @@
                 <!--}}-->
               <!--</template>-->
             <!--</el-table-column>-->
+            <el-table-column
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button type="text" @click="deleteHandle(scope.row.ruleId)"
+                >删除
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="auditRuleConfig-right-bottom">
@@ -216,6 +236,40 @@ export default {
       let nowPage = this.Pager.pageIndex; //当前第几页，根据组件取值即可
       let nowLimit = this.Pager.pageSize; //当前每页显示几条，根据组件取值即可
       return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
+    // 删除
+    deleteHandle(id) {
+      var userIds = id
+        ? [id]
+        : this.multipleTable.map(item => {
+          return item.userId;
+        });
+      this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/manuscript/deleteByIds"),
+            method: "delete",
+            data: this.$http.adornData(userIds, false)
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList();
+                }
+              });
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        })
+        .catch(() => {});
     },
     getSelectPage() {
       this.ruleData=this.$refs.ruleTree.treeData;
