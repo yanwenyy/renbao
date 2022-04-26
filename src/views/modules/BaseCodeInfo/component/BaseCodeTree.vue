@@ -1,7 +1,7 @@
 <template>
   <div class="centerDiv">
     <el-card class="box-card">
-      <div class="text item treeDiv">
+      <div class="text item treeDiv" >
         <el-tree
           ref="tree"
           :data="data"
@@ -77,7 +77,6 @@ export default {
     //加载根节点的子节点集合
     loadchildnode(node, resolve) {
       if (node.level === 1) {
-        this.treeLoading = true;
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',
@@ -92,7 +91,7 @@ export default {
             resolve(label);
           })
       } else {
-        this.treeLoading = true;
+
         this.$http({
           url:this.$http.adornUrl('/baseCodeInfo/selectPage'),
           method: 'get',

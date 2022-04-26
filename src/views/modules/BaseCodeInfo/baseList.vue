@@ -155,12 +155,12 @@ export default {
             } else {
                 this.$store.dispatch("setDataSortId", row.dataSortId);
                 this.$store.dispatch("setDataSortName", row.dataSortName);
-                // this.$store.dispatch("setEditTag", row.editTag);
-                // this.BaseTreeInfoVisible = true
-                this.$router.push({
-                path: "/component/BaseCodeTreeInfo",
-                query: { editTag: row.editTag }
-                });
+                this.$store.dispatch("setEditTag", row.editTag);
+                this.BaseTreeInfoVisible = true
+                // this.$router.push({
+                // path: "/component/BaseCodeTreeInfo",
+                // query: { editTag: row.editTag }
+                // });
             }
         },
         clearForm() {
