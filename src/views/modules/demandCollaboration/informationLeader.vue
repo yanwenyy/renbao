@@ -501,6 +501,7 @@
           type: "warning"
         });
 
+        this.demandCollaborationIds = [];
         this.multipleTable.forEach(item => {
           this.demandCollaborationIds.push(item.DEMANDCOLLABORATIONID)
         })

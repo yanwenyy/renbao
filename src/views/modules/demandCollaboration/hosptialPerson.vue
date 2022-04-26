@@ -545,6 +545,7 @@
           type: "warning"
         });
 
+        this.demandCollaborationIds = [];
         let flag = false
         this.multipleTable.forEach(item => {
           if (item.EXAMINESTATUS != "0"){

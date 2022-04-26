@@ -605,7 +605,8 @@
           message: "请选择至少一条数据",
           type: "warning"
         });
-
+        debugger
+        this.demandCollaborationIds = [];
         this.multipleTable.forEach(item => {
           this.demandCollaborationIds.push(item.DEMANDCOLLABORATIONID)
         })
