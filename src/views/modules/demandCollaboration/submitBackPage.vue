@@ -269,7 +269,6 @@ export default {
 
     //获取角色结果
     getRoleResult(id) {
-      debugger
       this.roleId = id;
       if (id) {
         this.$http({
@@ -283,7 +282,6 @@ export default {
           }),
         }).then(({ data }) => {
           if (data && data.code === 200) {
-            debugger;
             this.userList = data.result;
           } else {
             this.userList = [];
@@ -301,16 +299,13 @@ export default {
         });
         this.$set(this.meberList, this.meberList);
       }
-      debugger;
     },
     filterMemberList() {
       var list = [];
       this.dataForm.xmProjectRoleUsers.forEach((item) => {
-        debugger
         list = this.MergeArray(list, item.userIds);
         this.userIds = item.userIds;
       });
-      debugger;
 
       return list;
     },
@@ -344,9 +339,7 @@ export default {
           demandCollaborationId: this.demandCollaborationId,
         }),
       }).then(({ data }) => {
-        debugger;
         if (data && data.code === 200) {
-          debugger;
           this.roleList = data.result;
         } else {
           this.roleList = [];
@@ -365,7 +358,6 @@ export default {
 
     // 表单提交
     dataFormSubmit() {
-      debugger;
       let fd = new FormData();
       this.loading = true;
       fd.append("demandCollaborationId", this.demandCollaborationId);
@@ -394,7 +386,6 @@ export default {
             },
           });
         } else {
-          debugger;
           this.$message.error(data.msg);
         }
       });

@@ -243,7 +243,6 @@
         };
       },
       init (id, ruleCheckData) {
-        debugger
         this.deletCm();
         this.getMustList();
         this.cleanMsg();
@@ -263,7 +262,6 @@
         });
 
         if (this.dataForm.ruleId) {
-          debugger
           this.$http({
             url: this.$http.adornUrl(`/rule/selectByUuid/${this.dataForm.ruleId}`),
             method: 'get',
@@ -354,7 +352,6 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        debugger
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.dataForm.folderPath =  data.folderPath;
@@ -363,7 +360,6 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        debugger
         if (this.demandCollaboration.FOLDERID) {
           if (this.$refs.menuListTree) {
             this.$refs.menuListTree.setCurrentKey(this.demandCollaboration.FOLDERID);
@@ -374,11 +370,9 @@
       },
       // 通过folderId 获取对应的item
       getTreeData (treeData,folderId) {
-        debugger
           const getTreeDataItem = [];
           const traverse = function(treeData,folderId) {
               treeData.map(i => {
-                debugger
                   if (i.folderId == folderId) {
                       getTreeDataItem.push(i);
                   }
@@ -417,6 +411,7 @@
                 'ruleCategory': this.demandCollaboration.RULECATEGORY,
                 'ruleRemark': this.demandCollaboration.RULEREMARK,
                 'folderId': this.dataForm.folderId,
+                'folderPath' : this.dataForm.folderPath,
                 'demandCollaborationId': this.demandCollaborationId,
                 'projectId': this.projectId,
               })

@@ -72,6 +72,7 @@
     <el-table
       :height="tableHeight-75"
       :data="dataList"
+      :row-key="getRowKeys"
       v-loading="dataListLoading"
       ref="multipleTable"
       @selection-change="selectionChangeHandle"
@@ -151,6 +152,8 @@
                     : scope.row.EXAMINESTATUS == "3"
                     ? "待信息组员反馈"
                     : scope.row.EXAMINESTATUS == "4"
+                    ? "已反馈"
+                    : scope.row.EXAMINESTATUS == "5"
                     ? "已完成"
                     : ""
                 }}
@@ -251,7 +254,7 @@
         dataList: [],
         multipleTable: [],
         treeData: [],
-        folderSorts: 3,
+        folderSorts: "",
         ruleCheckData: {},
         pageIndex: 1,
         pageSize: 10,
@@ -306,6 +309,10 @@
       this.getRuleFolder();
     },
     methods: {
+      //获取每行数据id
+      getRowKeys(row) {
+        return row.DEMANDCOLLABORATIONID;
+      },
       //重置
       reset() {
         this.dataForm= {
@@ -393,14 +400,13 @@
           url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
           method: "get",
           params: this.$http.adornParams(
-            { folderSorts: this.folderSorts, projectId: this.projectId },
+            { folderTypes: this.folderSorts, projectId: this.projectId },
             false
           )
           // params:  this.$http.adornParams({}, false)
         })
           .then(({ data }) => {
             if (data.code == 200) {
-              debugger
               this.treeData = data.result;
               this.ruleData = data.result;
               // this.dataForm.folderId = data.result[0].folderId;
@@ -411,7 +417,6 @@
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        debugger
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.dataForm.folderPath =  data.folderPath;
@@ -420,7 +425,6 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        debugger
         if (this.dataForm.folderId) {
           if (this.$refs.menuListTree) {
             this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
@@ -431,11 +435,9 @@
       },
       // 通过folderId 获取对应的item
       getTreeData (treeData,folderId) {
-        debugger
           const getTreeDataItem = [];
           const traverse = function(treeData,folderId) {
               treeData.map(i => {
-                debugger
                   if (i.folderId == folderId) {
                       getTreeDataItem.push(i);
                   }
@@ -469,7 +471,6 @@
         this.id = data.DEMANDCOLLABORATIONID;
         this.showBtn = false;
         this.readonly = true;
-        debugger
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {

@@ -148,7 +148,9 @@
                     ? "待信息组长分派"
                     : scope.row.EXAMINESTATUS == "3"
                     ? "待信息组员反馈"
-                    : scope.row.EXAMINESTATUS == "4"
+                   : scope.row.EXAMINESTATUS == "4"
+                    ? "已反馈"
+                    : scope.row.EXAMINESTATUS == "5"
                     ? "已完成"
                     : ""
                 }}
@@ -238,6 +240,7 @@
           ruleType: '',
           ruleCategory: '',
           folderId: '',
+          folderPath: '',
         },
         dataList: [],
         multipleTable: [],
@@ -252,7 +255,7 @@
         value1: '',
         userId:sessionStorage.getItem("userId"),//当前用户id
         treeData: [],
-        folderSorts: 3,
+        folderSorts: "",
         ruleCheckData: {},
         treeVisible:false,//规则分类显示名称
         ruleData: [],
@@ -298,6 +301,10 @@
 
     },
     methods: {
+      //获取每行数据id
+      getRowKeys(row) {
+        return row.DEMANDCOLLABORATIONID;
+      },
       // 通过folderId 获取对应的item
       getTreeData2(treeData, folderId) {
         const getTreeDataItem = [];
@@ -354,7 +361,7 @@
         url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
         method: "get",
         params: this.$http.adornParams(
-          { folderSorts: this.folderSorts, projectId: this.projectId },
+          { folderTypes: this.folderSorts, projectId: this.projectId },
           false
         )
         // params:  this.$http.adornParams({}, false)
