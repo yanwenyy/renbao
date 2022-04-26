@@ -232,7 +232,7 @@ export default {
           addMemberForm:{
             dataAmount:''
           },
-          tableList:[],//医保数据 医院基本信息
+          tableList:[],//表格数据
           editShowVisible:false,  //弹框显示
           apComServerData:{
             current: 1,
@@ -273,7 +273,6 @@ export default {
     methods:{
       //获取项目备份内容
       satDatalist(data){
-        console.log(data)
           this.addMemberForm.dataAmount = data[0].name;
           this.selectedFileData = data
       },
@@ -315,7 +314,6 @@ export default {
               this.getInitList();
               this.ShowProjectVisible = false;
             } else if(data && data.code === 20000){
-              console.log(data);
               this.$message({
                 type: 'success',
                 message: data.message,
@@ -344,7 +342,6 @@ export default {
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-
           this.dataListLoading = true
           this.$http({
             url: this.$http.adornUrl('/dataBackupInfo/projectRestoreDB'),
@@ -360,7 +357,12 @@ export default {
               });
               this.getInitList();
               this.ShowAddVisible = false;
-            } else {
+            } else if(data && data.code === 20000){
+              this.$message({
+                type: 'success',
+                message: data.message,
+              });
+            }else {
               this.dataList = [];
               this.totalPage = 0
             }
@@ -427,10 +429,6 @@ export default {
           params: this.$http.adornParams({
             'pageNo': this.pageIndex,
             'pageSize': this.pageSize,
-            'projectCode': this.dataForm.projectCode||null,
-            'projectName': this.dataForm.projectName||null,
-            'createTimeBegin': this.dataForm.createTimeBegin||null,
-            'createTimeEnd': this.dataForm.createTimeEnd||null
           })
         }).then(({data}) => {
           if (data && data.code === 200) {

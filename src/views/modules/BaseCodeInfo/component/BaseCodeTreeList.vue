@@ -22,7 +22,7 @@
           <BaseCodeTreeOperate
             ref="baseCodeOperate"
             :codeOperate="seleteLengthData"
-            @closeMain="query" @BaseCodeTreeTwo="BaseCodeTreeTwo"
+            @closeMain="query" @BaseCodeTreeTwo ='BaseCodeTreeTwo'
           ></BaseCodeTreeOperate>
           <div class="divBtn">
             <el-button
@@ -66,6 +66,7 @@ export default {
   },
   data() {
     return {
+      // dataListLoading:false,
       dataSortId: "",
       dataSortName: "",
       codeId: "",
@@ -90,7 +91,7 @@ export default {
   },
   methods: {
     BaseCodeTreeTwo(){
-
+        this.$emit('updateDate')
     },
     handleSelectionChange(val) {
       this.seleteLengthData = val;
@@ -147,6 +148,7 @@ export default {
     },
     // 查询列表
     query() {
+    // this.dataListLoading = true
     let baseCode = this.$store.state.datasort.baseCodes;
     this.parentCodeId = baseCode.codeId;
     this.dataSortName = baseCode.codeName;
@@ -159,7 +161,7 @@ export default {
           })
       }).then(({data}) => {
         this.tableData = data.result.records
-        this.dataListLoading = false;
+        // this.dataListLoading = false;
       }).catch(function(error) {
         console.log(error);
       });
@@ -168,10 +170,10 @@ export default {
       this.$refs.baseCodeOperate.resetForm();
     },
     returnList() {
-      this.$router.push({
-        path: `/baseList`
-      });
-      // this.$emit('BaseCodeMethod')
+      // this.$router.push({
+      //   path: `/baseList`
+      // });
+      this.$emit('BaseCodeMethod')
     }
   },
   mounted(){
@@ -181,7 +183,8 @@ export default {
     this.dataSortName = baseCode.codeName;
     this.dataSortId = baseCode.dataSortId;
     this.parentCodeId = baseCode.codeId;
-    this.editTag = this.$route.query.editTag;;
+    this.editTag = baseCode.editTag;
+    // this.editTag = this.$route.query.editTag;
   },
   watch: {
     baseCode:{
@@ -190,7 +193,8 @@ export default {
         this.dataSortName = baseCode.codeName;
         this.dataSortId = baseCode.dataSortId;
         this.parentCodeId = baseCode.codeId;
-        this.editTag = this.$route.query.editTag;;
+           this.editTag = baseCode.editTag;
+        // this.editTag = this.$route.query.editTag;
         this.query();
       },
       deep: true
