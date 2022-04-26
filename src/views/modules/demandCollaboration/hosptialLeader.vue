@@ -79,7 +79,6 @@
       style="width: 100%;">
       <el-table-column
         type="selection"
-        :reserve-selection="true"
        ></el-table-column>
       <el-table-column
         type="index"
@@ -554,3 +553,13 @@
     }
   }
 </script>
+<style scoped>
+.folder-icon {
+  background: url(../../../assets/img/folder.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 13px;
+  height: 16px;
+  }
+</style>

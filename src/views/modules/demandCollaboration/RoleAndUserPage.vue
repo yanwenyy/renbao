@@ -460,7 +460,7 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false;
-                    this.$store.dispatch('common/changeProjectList',this.userId);
+                    // this.$store.dispatch('common/changeProjectList',this.userId);
                     this.$emit('refreshDataList')
                   }
                 })

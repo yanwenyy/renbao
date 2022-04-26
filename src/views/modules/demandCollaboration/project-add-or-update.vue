@@ -166,9 +166,9 @@
           RULECATEGORY: [
             { required: true, message: '规则类别不能为空', trigger: ['blur',"change"] }
           ],
-          // ruleRemark: [
-          //   { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
-          // ],
+          RULEREMARK: [
+            { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
+          ],
           treeVisible: [
             { required: true, message: '规则分类不能为空', trigger: 'change' }
           ],

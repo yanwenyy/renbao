@@ -74,7 +74,6 @@
       <el-table-column
         type="selection"
 
-        :reserve-selection="true"
        ></el-table-column>
       <el-table-column
         type="index"
@@ -470,6 +469,7 @@
             'ruleCategory': this.dataForm.ruleCategory||null
           })
         }).then(({data}) => {
+          debugger
           if (data && data.code === 200) {
             this.dataList = data.result.records;
             this.totalPage = data.result.total
@@ -611,3 +611,13 @@
     }
   }
 </script>
+<style scoped>
+.folder-icon {
+  background: url(../../../assets/img/folder.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 13px;
+  height: 16px;
+  }
+</style>
