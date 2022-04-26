@@ -68,7 +68,7 @@
             @selection-change="handleSelectionChange"
             v-loading="loading"
             style="width: 100%"
-            :height="tableHeight - 85"
+            :height="tableHeight - 105"
           >
             <el-table-column type="selection" width="55" align="center">
             </el-table-column>

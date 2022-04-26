@@ -134,7 +134,7 @@
             >
               <template slot-scope="scope">
                 <el-form-item class="tabelForm" :prop="'xmProjectRoleUsers.' + scope.$index + '.userIds'" :rules="scope.row.roleName.indexOf('组长')!=-1?{
-      required: true, message: '组长不能为空', trigger: 'change'
+      required: true, message: '组长不能为空', trigger:['blur', 'change']
     }:null">
                   <el-select
                     :disabled="type=='look'"
@@ -147,7 +147,7 @@
                     <el-option
                       v-for="(item,index) in userList"
                       :key="index"
-                      :label="item.userName"
+                      :label="item.userName+(item.userLoginName)"
                       :value="item.userId">
                       <span style="float: left">{{ item.userName }}({{item.userLoginName}})</span>
                     </el-option>
@@ -375,7 +375,9 @@
         dialogVisible: false,
         dataFormCopy: {
           project: {},
-          projectCosts: [],
+          projectCosts: [
+            {projectItem:'',costMoney:'',costRemark:''},
+          ],
           xmProjectGroupUsers: [],
           xmProjectRoleUsers: [],
         },
@@ -390,7 +392,9 @@
             projectPeriodBegin: '',
             projectPeriodEnd: '',
           },
-          projectCosts: [],
+          projectCosts: [
+            {projectItem:'',costMoney:'',costRemark:''},
+          ],
           xmProjectGroupUsers: [],
           xmProjectRoleUsers: [],
         },
@@ -548,13 +552,13 @@
             projectPeriodBegin: '',
             projectPeriodEnd: '',
           },
-          projectCosts: [],
+          projectCosts: [{projectItem:'',costMoney:'',costRemark:''}],
           xmProjectGroupUsers: [],
           xmProjectRoleUsers: []
         };
         this.dataFormCopy = {
           project: {},
-          projectCosts: [],
+          projectCosts: [{projectItem:'',costMoney:'',costRemark:''}],
           xmProjectGroupUsers: [],
           xmProjectRoleUsers: [],
         };

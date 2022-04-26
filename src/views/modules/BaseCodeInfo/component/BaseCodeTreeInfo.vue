@@ -1,10 +1,10 @@
 <template>
 <div style="height:600px;">
   <div class="tree">
-      <BaseCodeTree  @treeQuery="treeQuery"></BaseCodeTree>
+      <BaseCodeTree @treeQuery="treeQuery" ref='treeData'></BaseCodeTree>
     </div>
     <div tyle="width:100%">
-      <BaseCodeTreeList ref="listData" @BaseCodeMethod="BaseCodeMethod"></BaseCodeTreeList>
+      <BaseCodeTreeList ref="listData" @BaseCodeMethod="BaseCodeMethod" @updateDate='updateDate'></BaseCodeTreeList>
   </div>
 </div>
 </template>
@@ -26,6 +26,9 @@ export default {
     BaseCodeMethod(){
        this.$emit('BaseCodeOne');
     },
+    updateDate(){
+      //  this.$refs.treeData.lazy()
+    }
   }
 };
 </script>

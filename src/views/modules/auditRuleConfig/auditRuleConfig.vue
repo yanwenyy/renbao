@@ -43,9 +43,7 @@
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
-        </el-form>
-        <el-form style="float:right">
-          <el-form-item>
+          <el-form-item style="float: right">
             <el-button type="primary" @click="addFun">新增</el-button>
             <el-button
               type="primary"
@@ -54,7 +52,7 @@
               :disabled="
                 this.multipleTable.length == 0 || this.multipleTable.length > 1
               "
-              >提交至地区个性化规则</el-button
+            >提交至地区个性化规则</el-button
             >
 
             <!--<el-button-->
@@ -72,17 +70,16 @@
             >
           </el-form-item>
         </el-form>
-
         <div>
           <el-table
             v-loading="tableLoading"
             ref="multipleTable"
             :data="tableData"
             tooltip-effect="dark"
-            style="width: 100%;margin-top: 20px"
+            style="width: 100%"
             :row-key="getRowKeys"
             @selection-change="handleSelectionChange"
-            :height="tableHeight - 190"
+            :height="tableHeight - 150"
           >
             <el-table-column
               type="selection"
@@ -380,6 +377,10 @@ export default {
     },
     //新增
     addFun() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
     },
