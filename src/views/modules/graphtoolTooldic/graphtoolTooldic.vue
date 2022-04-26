@@ -777,6 +777,7 @@
                     delete that.filter[item.panel.data.id];
                   }
                   that.initTableRow(item.panel.data.tableId);
+                  that.initOrder();
                   that.toSql();
                 }
                 that.myDiagram.model.updateTargetBindings(item.panel.data);

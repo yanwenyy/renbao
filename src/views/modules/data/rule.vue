@@ -246,7 +246,7 @@
       @refreshDataList="getDataList"
       :ruleData="ruleData"
     ></add-or-update>
-    <Import-file ref="ImportFile"></Import-file>
+    <Import-file ref="ImportFile" :ruleData="ruleData" :ruleCheckData="ruleCheckData"></Import-file>
   </div>
 </template>
 
@@ -478,7 +478,7 @@ export default {
     },
     // 导入
     ruleImport() {
-      this.$refs.ImportFile.showDialog();
+      this.$refs.ImportFile.showDialog(this.ruleCheckData,this.$refs.ruleTree.treeData);
     },
     // 每页数
     sizeChangeHandle(val) {

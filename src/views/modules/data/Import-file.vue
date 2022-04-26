@@ -8,17 +8,38 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :before-close="handleClose"
+      @open="IPInt"
     >
       <div class="import-file">
         <div class="import-file-left">
-          <ruleTree
-            ref="ruleTree"
-            :isShowSearch="false"
-            :isParent="false"
-            :isShowCheckBox="false"
-            :isShowEdit="false"
-            v-on:getTreeId="getTreeData"
-          ></ruleTree>
+          <el-tree
+            class="rule-tree"
+            :data="ruleData"
+            :props="menuListTreeProps"
+            node-key="folderId"
+            ref="menuListTree"
+            @current-change="menuListTreeCurrentChangeHandle"
+            :default-expanded-keys="defaultshowKeys"
+            :default-expand-all="true"
+            :highlight-current="true"
+            :expand-on-click-node="false"
+          >
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+
+                <span class="tree-label">
+                    <span class="folder-icon" :title="node.label"></span>
+                    <span :title="node.label" class="cut-width custom-tree-label"> {{node.label}}</span>
+                </span>
+            </span>
+          </el-tree>
+          <!--<ruleTree-->
+            <!--ref="ruleTree"-->
+            <!--:isShowSearch="false"-->
+            <!--:isParent="false"-->
+            <!--:isShowCheckBox="false"-->
+            <!--:isShowEdit="false"-->
+            <!--v-on:getTreeId="getTreeData"-->
+          <!--&gt;</ruleTree>-->
         </div>
         <el-form
           size="small"
@@ -64,7 +85,18 @@
 <script>
 import ruleTree from "../../common/rule-tree.vue";
 export default {
-  props: ["getData"],
+  // props: ["getData"],
+  props: {
+    ruleData: {
+      default: []
+    },
+    ruleCheckData: {
+      default: []
+    },
+    getData: {
+      default: null
+    },
+  },
   data() {
     return {
       loading: false,
@@ -72,7 +104,13 @@ export default {
       //文件上传成功状态
       fileUploadStatus: "",
       ruleExportForm: {},
-
+      // ruleCheckData:{},
+      // ruleData:[],
+      defaultshowKeys:[],
+      menuListTreeProps: {
+        label: "folderName",
+        children: "children"
+      },
       ruleExportFormRules: {},
       fileList: [],
       rule: {
@@ -84,11 +122,34 @@ export default {
   },
   methods: {
     //默认打开页面
-    showDialog() {
+    showDialog(ruleCheckData,ruleData) {
       this.dialogVisible = true;
       this.resetForm();
     },
-
+    IPInt(){
+      this.$nextTick(()=>{
+        this.menuListTreeSetCurrentNode();
+      })
+    },
+    // 规则树选中
+    menuListTreeCurrentChangeHandle(data, node) {
+      this.rule.folderId = data.folderId;
+      this.rule.parentName = data.folderName;
+      this.rule.folderPath = data.folderPath;
+      this.ruleCheckData = data;
+    },
+    // 规则树设置当前选中节点
+    menuListTreeSetCurrentNode() {
+      if (this.ruleCheckData.folderId) {
+        this.rule.folderId = this.ruleCheckData.folderId;
+        this.rule.parentName = this.ruleCheckData.folderName;
+        this.rule.folderPath = this.ruleCheckData.folderPath;
+        if (this.$refs.menuListTree){
+          this.defaultshowKeys=[this.ruleCheckData.folderId];
+          this.$refs.menuListTree.setCurrentKey(this.ruleCheckData.folderId);
+        }
+      }
+    },
     handleClose() {
       this.dialogVisible = false;
       this.resetForm();
@@ -151,7 +212,6 @@ export default {
         this.rule.folderId = "";
         this.rule.folderPath = "";
         this.rule.folderName = "";
-        this.$refs.ruleTree.clearCheckedKeys();
       });
     },
     //文件上传成功时的钩子
@@ -219,6 +279,17 @@ export default {
   }
   /deep/ .el-upload-list__item {
     margin-top: 0;
+  }
+  .el-upload__tip{
+    color:red;
+  }
+  .folder-icon {
+    background: url(../../../assets/img/folder.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 13px;
+    height: 16px;
   }
 }
 </style>
