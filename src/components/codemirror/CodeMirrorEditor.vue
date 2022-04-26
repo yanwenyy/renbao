@@ -114,7 +114,7 @@
             <div v-if="item.list==''">
               <div v-if="!item.columnList">{{item.msg}}</div>
               <el-table :height="tableHeight*0.35" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
-                <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
+                <el-table-column :width="key.length*22" v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
                 </el-table-column>
               </el-table>
@@ -122,7 +122,7 @@
             <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
             <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
             <el-table :height="fullScreen?'70vh':tableHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
-              <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+              <el-table-column :width="key.length*22" v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
                 <template slot-scope="scope">
                   <div>
                     <span>{{scope.row[key]}}</span>
@@ -1407,7 +1407,7 @@
 </style>
 <style>
   .CodeMirror-selected {
-    background-color: blue !important;
+    background-color: #11C1EE !important;
   }
   .CodeMirror-selectedtext {
     color: white !important;

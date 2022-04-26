@@ -60,17 +60,15 @@
               <el-button type="primary" @click="onQuery">查询</el-button>
               <el-button @click="onReset">重置</el-button>
             </el-form-item>
+            <el-form-item  style="float: right">
+              <el-button
+                @click="deleteData"
+                type="danger"
+                :disabled="this.multipleTable.length <= 0"
+              >删除</el-button>
+            </el-form-item>
           </el-form>
-          <div style="float:right;margin-bottom:22px">
-            <el-button
-              @click="deleteData"
-              type="danger"
-              :disabled="this.multipleTable.length <= 0"
-              >删除</el-button
-            >
-          </div>
         </div>
-
         <div class="table-box">
           <el-table
             v-loading="tableLoading"
@@ -79,7 +77,7 @@
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="handleSelectionChange"
-            :height="tableHeight - 150"
+            :height="tableHeight - 110"
             :row-key="getRowKeys"
           >
             <el-table-column

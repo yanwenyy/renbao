@@ -327,7 +327,24 @@ export default {
       get() {
         return this.$store.state.common.documentClientHeight;
       }
-    }
+    },
+    projectId: {
+      get() {
+        if (this.$store.state.common.projectId) {
+          return this.$store.state.common.projectId;
+        } else {
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+            method: "get",
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              return data.result.projectId;
+            }
+          });
+        }
+      }
+    },
   },
   watch: {
     filterText(val) {
@@ -351,7 +368,6 @@ export default {
     // this.$bus.$on("updateRuleData", () => {
     //   this.getRuleFolder();
     // });
-
   },
   methods: {
     // 序号翻页递增
@@ -364,7 +380,11 @@ export default {
     // 新增 / 修改
     addOrUpdateHandle(id, type) {
       // this.addOrUpdateVisible = true
-
+      this.ruleData = this.$refs.ruleTree.treeData;
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.$nextTick(() => {
         if (id) {
           this.$refs.addOrUpdate.init(id, this.ruleCheckData, type);
@@ -389,6 +409,7 @@ export default {
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
+      this.getDataList();
     },
     // 获取数据列表
     getDataList() {
@@ -489,7 +510,7 @@ export default {
       var userIds = id
         ? [id]
         : this.dataListSelections.map(item => {
-            return item.userId;
+            return item.ruleId;
           });
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",
