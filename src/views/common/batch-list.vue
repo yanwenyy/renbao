@@ -1,6 +1,7 @@
 <template>
     <div class="batch-list-box">
         <el-input
+            clearable
             class="filter-text"
             placeholder="输入关键字进行过滤"
             v-model="filterText">
