@@ -469,7 +469,6 @@
             'projectId': this.projectId
           })
         }).then(({data}) => {
-          debugger
           if (data && data.code === 200) {
             this.workFlowDetailPath = data.result
 
