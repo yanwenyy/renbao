@@ -54,7 +54,7 @@
             :data="tableData"
             tooltip-effect="dark"
             style="width: 100%"
-            :height="tableHeight - 85"
+            :height="tableHeight - 105"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"></el-table-column>

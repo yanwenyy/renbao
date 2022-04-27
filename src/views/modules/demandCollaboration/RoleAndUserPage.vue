@@ -227,7 +227,6 @@
           });
           this.$set(this.meberList,this.meberList)
         }
-        debugger
       },
       filterMemberList(){
         var list=[];
@@ -235,7 +234,6 @@
           list=this.MergeArray(list,item.userIds);
           this.userIds=item.userIds;
         })
-        debugger
         
         return list;
       },
@@ -294,7 +292,6 @@
           })
         }).then(({ data }) => {
           if (data && data.code === 200) {
-            debugger
             this.userList = data.result;
           } else {
             this.userList = [];
@@ -378,7 +375,6 @@
       },
       init (id) {
         this.clearMsg();
-        debugger
         this.dataForm.project.projectId = id||0;
         this.visible = true;
         this.getRoleList(id);
@@ -438,7 +434,6 @@
             this.dataForm.projectCosts.forEach((item,index)=>{
               item.costSort=index;
             });
-            debugger
             console.log(this.userIds)
 
             let fd = new FormData();
@@ -465,12 +460,11 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false;
-                    this.$store.dispatch('common/changeProjectList',this.userId);
+                    // this.$store.dispatch('common/changeProjectList',this.userId);
                     this.$emit('refreshDataList')
                   }
                 })
               } else {
-                  debugger
                 this.$message.error(data.msg)
               }
             })

@@ -4,20 +4,20 @@
       @close="deletCm"
       custom-class="rule-dialog"
       width="80%"
-      :title="!demandCollaboration.DEMANDCOLLABORATIONID ? '新增' : '修改'"
+      :title="!dataForm.DEMANDCOLLABORATIONID ? '新增' : '修改'"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="visible">
-      <el-form class="infoForm" :model="demandCollaboration" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
+      <el-form class="infoForm" :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
                label-width="80px">
         <el-tabs type="border-card" class="self-tabs" v-model="activeName">
         <el-tab-pane name="1" label="基本信息">
             <div class="tabs1-div">
               <el-form-item label="规则名称" prop="ruleName">
-                <el-input v-model="demandCollaboration.DEMANDNAME" :readonly="readonly" placeholder="规则名称"></el-input>
+                <el-input v-model="dataForm.DEMANDNAME" :readonly="readonly" placeholder="规则名称"></el-input>
               </el-form-item>
               <el-form-item label="规则类别" prop="ruleCategory">
-                <el-select :disabled="readonly" v-model="demandCollaboration.RULECATEGORY">
+                <el-select :disabled="readonly" v-model="dataForm.RULECATEGORY">
                   <el-option label="请选择" value=""></el-option>
                   <el-option label="门诊规则" :value="1"></el-option>
                   <el-option label="住院规则" :value="2"></el-option>
@@ -25,6 +25,7 @@
               </el-form-item>
               <el-form-item label="规则分类"  prop="folderId">
                 <el-popover
+                  :disabled="readonly"
                   ref="menuListPopover"
                   placement="bottom-start"
                   trigger="click"
@@ -51,7 +52,7 @@
                           placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
               </el-form-item>
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
-                <el-input type="textarea" :rows="6" :readonly="readonly" v-model="demandCollaboration.RULEREMARK" placeholder="规则备注"></el-input>
+                <el-input type="textarea" :rows="6" :readonly="readonly" v-model="dataForm.RULEREMARK" placeholder="规则备注"></el-input>
               </el-form-item>
               
             </div>
@@ -85,7 +86,7 @@
         default: [],
       },
       projectId:"",
-      demandCollaboration: {},
+      dataForm:{},
       demandCollaborationId:"",
       showBtn: { type: Boolean },
       readonly: { type: Boolean }
@@ -166,9 +167,9 @@
           RULECATEGORY: [
             { required: true, message: '规则类别不能为空', trigger: ['blur',"change"] }
           ],
-          // ruleRemark: [
-          //   { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
-          // ],
+          RULEREMARK: [
+            { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
+          ],
           treeVisible: [
             { required: true, message: '规则分类不能为空', trigger: 'change' }
           ],
@@ -243,10 +244,9 @@
         };
       },
       init (id, ruleCheckData) {
-        debugger
-        this.deletCm();
+        //this.deletCm();
         this.getMustList();
-        this.cleanMsg();
+        //this.cleanMsg();
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
         this.projectId = id;
@@ -256,7 +256,7 @@
         //this.getUserInfo();
         this.$nextTick(() => {
           //this.$refs['dataForm'].resetFields();
-          this.$refs['dataForm'].clearValidate();
+          //this.$refs['dataForm'].clearValidate();
           // 初始化规则树
           this.$refs.menuListTree.setCheckedKeys([]);
           this.$refs.menuListTree.setCurrentKey(null);
@@ -319,20 +319,20 @@
 
         this.activeName='1';
         this.dataForm.id = 0;
-        this.dataForm.ruleName = '';
-        this.dataForm.ruleCategory = '';
+        this.dataForm.DEMANDNAME = '';
+        this.dataForm.RULECATEGORY = '';
         this.treedata[0].children =[];
         this.dataForm.ruleSqlStatisticsValue = '';
-        this.dataForm.ruleRemark = '';
+        this.dataForm.RULEREMARK = '';
         this.dataForm.folderId = '';
         this.dataForm.parentName = '';
         this.dataForm.ruleSqlValue = '';
         this.dataForm.ruleType = '';
         this.dataForm.folderPath = '';
         this.dataForm.ruleId = '';
-        if (this.$refs['dataForm']) {
-          this.$refs['dataForm'].clearValidate()
-        }
+        // if (this.$refs['dataForm']) {
+        //   this.$refs['dataForm'].clearValidate()
+        // }
       },
       getMustList(){
         this.$http({
@@ -351,10 +351,10 @@
         if(cm_complete[0]){
           cm_complete[0].parentNode.removeChild(cm_complete[0])
         }
+        //this.cleanMsg();
       },
       // 规则树选中
       menuListTreeCurrentChangeHandle (data, node) {
-        debugger
         this.dataForm.folderId = data.folderId;
         this.dataForm.parentName = data.folderName;
         this.dataForm.folderPath =  data.folderPath;
@@ -363,22 +363,19 @@
       },
       // 规则树设置当前选中节点
       menuListTreeSetCurrentNode () {
-        debugger
-        if (this.demandCollaboration.FOLDERID) {
+        if (this.dataForm.FOLDERID) {
           if (this.$refs.menuListTree) {
-            this.$refs.menuListTree.setCurrentKey(this.demandCollaboration.FOLDERID);
+            this.$refs.menuListTree.setCurrentKey(this.dataForm.FOLDERID);
           }
-          this.dataForm.parentName = this.getTreeData(this.ruleData,this.demandCollaboration.FOLDERID)[0].folderName;
+          this.dataForm.parentName = this.getTreeData(this.ruleData,this.dataForm.FOLDERID)[0].folderName;
         }
 
       },
       // 通过folderId 获取对应的item
       getTreeData (treeData,folderId) {
-        debugger
           const getTreeDataItem = [];
           const traverse = function(treeData,folderId) {
               treeData.map(i => {
-                debugger
                   if (i.folderId == folderId) {
                       getTreeDataItem.push(i);
                   }
@@ -413,10 +410,11 @@
               method: 'post',
               data: this.$http.adornData({
                 'ruleId': this.dataForm.ruleId || undefined,
-                'ruleName': this.demandCollaboration.DEMANDNAME,
-                'ruleCategory': this.demandCollaboration.RULECATEGORY,
-                'ruleRemark': this.demandCollaboration.RULEREMARK,
+                'ruleName': this.dataForm.DEMANDNAME,
+                'ruleCategory': this.dataForm.RULECATEGORY,
+                'ruleRemark': this.dataForm.RULEREMARK,
                 'folderId': this.dataForm.folderId,
+                'folderPath' : this.dataForm.folderPath,
                 'demandCollaborationId': this.demandCollaborationId,
                 'projectId': this.projectId,
               })
@@ -427,6 +425,7 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
+                    debugger
                     this.visible = false;
                     this.cleanMsg();
                     this.$emit('refreshDataList');

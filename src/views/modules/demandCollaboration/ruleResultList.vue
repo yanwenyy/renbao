@@ -13,7 +13,7 @@
     <el-dialog      
       custom-class="rule-dialog"
       width="80%"
-      :title="'结果列表'"
+      :title="'执行监控'"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="visible"
@@ -49,13 +49,13 @@
               <el-button @click="onReset">重置</el-button>
             </el-form-item>
             <el-form-item style="float:right">
-                <el-button @click="visible = false">取消</el-button>
-              <el-button
+                <el-button @click="visible = false">关闭</el-button>
+              <!-- <el-button
                 type="danger"
                 @click="deleteFn"
                 :disabled="this.multipleTable.length <= 0"
                 >反馈</el-button
-              >
+              > -->
             </el-form-item>
           </el-form>
         </div>
@@ -276,7 +276,7 @@ export default {
       //   };
       // },
     getTableData(id) {
-      this.demandCollaborationId = id;
+      this.ruleId = id;
       this.visible = true;
       this.tableLoading = true;
       this.$http({
@@ -305,7 +305,6 @@ export default {
         .then(({ data }) => {
           this.tableLoading = false;
           if (data.code == 200) {
-              debugger
             data.result.map(i => {
               i.ruleName = i.ruleName;
               i.dealRuleType = this.dealRuleType(i.ruleCategory);
@@ -321,7 +320,6 @@ export default {
               i.runStatusName = this.dealRunStatus(i.runStatus);
               i.option = i.runStatus;
             });
-            debugger
             this.tableData = data.result;
             this.Pager.pageSize = data.result.size;
             this.Pager.pageIndex = data.result.current;
@@ -339,46 +337,45 @@ export default {
         });
     },
     // 反馈
-    deleteFn() {
-      if (this.multipleTable.length != 1)
-        return this.$message({
-          message: "请选择一条数据进行提交",
-          type: "warning"
-        });
-    //   var deleteList = [];
-    //   this.multipleTable.forEach(item => {
-    //     deleteList.push(item.resultId);
-    //   });
-        let fd = new FormData();
-        fd.append("demandCollaborationId", this.demandCollaborationId);
-        fd.append("resultId", this.multipleTable[0].resultId);
+    // deleteFn() {
+    //   if (this.multipleTable.length != 1)
+    //     return this.$message({
+    //       message: "请选择一条数据进行提交",
+    //       type: "warning"
+    //     });
+    // //   var deleteList = [];
+    // //   this.multipleTable.forEach(item => {
+    // //     deleteList.push(item.resultId);
+    // //   });
+    //     let fd = new FormData();
+    //     fd.append("demandCollaborationId", this.demandCollaborationId);
+    //     fd.append("resultId", this.multipleTable[0].resultId);
 
-      this.$confirm(`是否确认提交反馈`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            isLoading: false,
-            url: this.$http.adornUrl("demandCollaboration/updateRuleResult"),
-            method: "DELETE",
-            data: fd
-          }).then(({ data }) => {
-              debugger
-            if (data && data.code === 200) {
-              this.$message({ message: "反馈成功", type: "success" });
-            //   this.Pager.pageIndex = 1;
-            //   this.Pager.pageSize = 10;
-              //this.getTableData();
-              this.setTableChecked();
-            } else {
-              this.$message.error(data.msg);
-            }
-          });
-        })
-        .catch(() => {});
-    },
+    //   this.$confirm(`是否确认提交反馈`, "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning"
+    //   })
+    //     .then(() => {
+    //       this.$http({
+    //         isLoading: false,
+    //         url: this.$http.adornUrl("demandCollaboration/updateRuleResult"),
+    //         method: "DELETE",
+    //         data: fd
+    //       }).then(({ data }) => {
+    //         if (data && data.code === 200) {
+    //           this.$message({ message: "反馈成功", type: "success" });
+    //         //   this.Pager.pageIndex = 1;
+    //         //   this.Pager.pageSize = 10;
+    //           //this.getTableData();
+    //           this.setTableChecked();
+    //         } else {
+    //           this.$message.error(data.msg);
+    //         }
+    //       });
+    //     })
+    //     .catch(() => {});
+    // },
 
     // getbatchData(data, node) {
     //   this.batchItem = data;

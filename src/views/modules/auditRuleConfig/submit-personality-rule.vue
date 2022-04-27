@@ -90,6 +90,8 @@ export default {
 
                 ruleSqlValue: this.multipleTable[0].ruleSqlValue||'',
                 paramRules: this.multipleTable[0].params||[],
+                ruleGraphicJoins: this.multipleTable[0].ruleGraphicJoins||[],
+                ruleGraphicOrders: this.multipleTable[0].ruleGraphicOrders||[],
             }
             this.loading = true
             this.$http({

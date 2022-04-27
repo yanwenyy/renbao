@@ -1,6 +1,7 @@
 <template>
     <div class="rule-tree-box">
         <el-input
+            clearable
             class="filter-text"
             placeholder="输入关键字进行过滤"
             v-if="isShowSearch"

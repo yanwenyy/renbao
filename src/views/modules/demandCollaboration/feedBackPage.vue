@@ -4,7 +4,7 @@
       @close="deletCm"
       custom-class="rule-dialog"
       width="80%"
-      :title="!dataForm.ruleId ? '新增' : type == 'look' ? '查看' : '修改'"
+      :title="'规则编写'"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="visible"
@@ -22,17 +22,15 @@
             <div class="tabs1-div">
               <el-form-item label="规则名称" prop="ruleName">
                 <el-input
-                  :disabled="type == 'look'"
+                  :disabled="true"
                   v-model="dataForm.ruleName"
-                  :readonly="true"
-                  placeholder="需求名称"
+                  placeholder="规则名称"
                 ></el-input>
               </el-form-item>
               <el-form-item label="规则类别" prop="ruleCategory">
                 <el-select
                   v-model="dataForm.ruleCategory"
-                  :readonly="true"
-                  :disabled="type == 'look'"
+                  :disabled="true"
                 >
                   <el-option label="请选择" value=""></el-option>
                   <el-option label="门诊规则" :value="1"></el-option>
@@ -41,12 +39,11 @@
               </el-form-item>
               <el-form-item label="规则分类" prop="folderId">
                 <el-popover
-                  :disabled="type == 'look'"
+                  :disabled="true"
                   ref="menuListPopover"
                   placement="bottom-start"
                   trigger="click"
                   v-model="treeVisible"
-                  :readonly="true"
                 >
                   <el-tree
                     class="rule-tree"
@@ -68,7 +65,7 @@
                   </el-tree>
                 </el-popover>
                 <el-input
-                  :disabled="type == 'look'"
+                  :disabled="true"
                   @click="treeVisible = true"
                   v-popover:menuListPopover
                   v-model="dataForm.parentName"
@@ -80,7 +77,6 @@
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
                 <el-input
                   :disabled="type == 'look'"
-                  :readonly="true"
                   type="textarea"
                   :rows="6"
                   v-model="dataForm.ruleRemark"
@@ -89,13 +85,15 @@
               </el-form-item>
             </div>
           </el-tab-pane>
-          <el-tab-pane name="2" label="sql编写">
-            <el-button v-if="type != 'look'" type="primary" @click="openSql()"
-              >sql编译器</el-button
+          <el-tab-pane name="2" label="规则编写">
+
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='2'" v-if="type != 'look'" type="primary" @click="openSql()"
+              >SQL编译器</el-button
             >
-            <el-button v-if="type != 'look'" type="primary"
+            <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='1'" v-if="type != 'look'" type="primary" @click="openGra()"
               >图形化工具</el-button
             >
+
             <el-form-item prop="ruleSqlValue" class="no-label">
               <div class="sqlDiv-html" v-html="dataForm.ruleSqlValue"></div>
               <!--<el-input-->
@@ -108,10 +106,10 @@
               <!--</el-input>-->
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane name="3" label="统计sql编写">
-            <div class="tabs3-notice">此结果来自sql编译器</div>
+          <el-tab-pane name="3" label="统计结果编写">
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
+                <div class="tabs3-notice">此结果来自SQL编译器</div>
                 <el-tree
                   :disabled="type == 'look'"
                   :props="defaultProps"
@@ -130,8 +128,10 @@
                 >
                 </el-tree>
               </div>
-              <div class="tabs3-right inline-block">
+              <div class="tabs3-right inline-block" @dragover="allowDropInput">
+                <div class="tabs3-notice">统计结果SQL</div>
                 <el-input
+                  placeholder='例：统计sql编写，涉及"总人次","总金额"字段'
                   :disabled="type == 'look'"
                   class="self-input"
                   type="textarea"
@@ -169,7 +169,7 @@
       <div class="sqlDialog-btn">
         <el-button
           @click="deletCm(), (sqlEditMsg.msg = ''), (sqlVisible = false)"
-          >取消</el-button
+        >取消</el-button
         >
         <el-button type="primary" @click="sqlSave">确定</el-button>
       </div>
@@ -182,17 +182,62 @@
         :modelName="'ruleManager'"
       ></sql-element>
     </el-dialog>
+    <el-dialog
+      @open="grahInt"
+      custom-class="sql-dialog"
+      width="100%"
+      style="height:100vh;overflow: hidden;box-sizing: border-box"
+      title="图形化工具"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible.sync="graphtoolVisible"
+
+    >
+      <div class="sqlDialog-btn">
+        <el-button
+          @click="graphtoolVisible = false"
+        >取消</el-button
+        >
+        <el-button type="primary" @click="graphtoolSave">确定</el-button>
+      </div>
+      <div style="margin-top: 10px">
+        <graphtool-element
+          :key="grahKey"
+          ref="graphtool"
+          :sqlEditMsg="sqlEditMsg.msg"
+          :joinEdit="dataForm.ruleGraphicJoins"
+          :orderEdit="dataForm.ruleGraphicOrders"
+          :modelName="'gTruleManager'"
+        ></graphtool-element>
+      </div>
+    </el-dialog>
+    <el-dialog
+          :visible.sync="showRunDialog"
+          title="规则运行"
+          :close-on-click-modal="false"
+          :modal-append-to-body="false"
+          width="40%"
+          :close-on-press-escape="false"
+        >
+    <runNow  @close="closeRun"  @ok="succeedRun"  :info="info"  :runIds="runIds"  :sql="sql"  v-if="showRunDialog"></runNow>
+    </el-dialog>
+
   </div>
 </template>
 <script>
+import runNow from "./ruleConfig-runNow.vue";
 import { isInteger } from "@/utils/validate";
 import { transSql } from "@/utils/publicFun";
 import sqlElement from "../projectManage/codemirror";
+import graphtoolElement from "../graphtoolTooldic/graphtoolTooldic";
 import formatDate from "@/utils/formatDate";
 export default {
-  name: "FeedBack",
+    name: "FeedBack",
   components: {
-    sqlElement
+      runNow,
+    sqlElement,
+    graphtoolElement,
   },
 //   props: {
 //     ruleData: {
@@ -223,7 +268,17 @@ export default {
       }
     };
     return {
-        ruleData:[],
+        //运行id
+      runIds: "",
+      //运行弹窗区分字段 true:定时运行 false:立即运行
+      info: "",
+      //sql语句
+      sql: [],
+      //立即运行弹窗是否显示
+      showRunDialog: false,
+      ruleData:[],
+      grahKey:0,
+      graphtoolVisible:false,//图形化工具状态
       type: "",
       sqlKey: 0,
       rjMust: {}, //总人次和宗金额必填项
@@ -257,7 +312,9 @@ export default {
         ruleId: "",
         paramRule: [],
         ruleRemark: "",
-        ruleSqlStatisticsValue: ""
+        ruleSqlStatisticsValue: "",
+        ruleGraphicJoins: [],
+        ruleGraphicOrders:[],
       },
 
       treedata: [
@@ -325,6 +382,9 @@ export default {
     this.deletCm();
   },
   methods: {
+    allowDropInput(e){
+      e.preventDefault();
+    },
     handleDragStart(node, ev) {
       // console.log('drag start', node);
     },
@@ -451,14 +511,81 @@ export default {
         }
       });
     },
-    openSql() {
-      this.sqlKey = Math.random();
-      this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
-      this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+    grahInt(){
+      this.$nextTick(()=>{
 
-      // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
-      this.slqTabelEdt = [];
-      this.sqlVisible = true;
+        this.$refs.graphtool.getMsgFromParent(this.sqlEditMsg,this.dataForm.ruleGraphicJoins,this.dataForm.ruleGraphicOrders);
+      })
+    },
+    //打开图形化工具
+    openGra(){
+      var openTool=false;
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='2'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空sql编译器内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.grahKey=Math.random();
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.dataForm.paramRule=[];
+          this.dataForm.ruleSqlValue='';
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.graphtoolVisible=true;
+
+        }).catch(() => {
+
+        });
+      }else{
+        this.grahKey=Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+        this.graphtoolVisible=true;
+      }
+    },
+    //图形化工具保存
+    graphtoolSave(){
+      console.log(this.$refs.graphtool.join)
+      this.paramsSqlSelf=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleSqlValue=this.$refs.graphtool.sqlMsg;
+      this.dataForm.ruleType = "2";
+      this.dataForm.ruleGraphicJoins=this.$refs.graphtool.join;
+      this.dataForm.ruleGraphicOrders=this.$refs.graphtool.order;
+      this.graphtoolVisible=false;
+
+    },
+    //打开sql编译器
+    openSql() {
+      if(this.dataForm.ruleId==''&&this.dataForm.ruleType!='1'&&this.paramsSqlSelf!=''){
+        this.$confirm(`此操作将清空图形化工具内容, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dataForm.ruleGraphicJoins=[];
+          this.dataForm.ruleGraphicOrders=[];
+          this.dataForm.ruleSqlValue='';
+          this.paramsSqlSelf ='';
+          this.sqlKey = Math.random();
+          this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+          this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+          this.slqTabelEdt = [];
+          this.sqlVisible = true;
+        }).catch(() => {
+
+        });
+      }else{
+        this.sqlKey = Math.random();
+        this.sqlEditMsg.msg = JSON.parse(JSON.stringify(this.paramsSqlSelf));
+        this.$set(this.sqlEditMsg, "msg", this.paramsSqlSelf);
+
+        // this.sqlEditMsg='select 医疗机构编码 id, 医疗机构编码 idName from 医院基本信息{#yljgbm#}';
+        this.slqTabelEdt = [];
+        this.sqlVisible = true;
+      }
+
     },
     //sql编译器点击保存
     sqlSave() {
@@ -514,6 +641,27 @@ export default {
         this.dataForm.folderId = this.ruleCheckData.folderId;
         this.dataForm.folderPath = this.ruleCheckData.folderPath;
       }
+       //this.updateRuleStatus()
+    },
+    updateRuleStatus() {
+        this.$http({
+        url: this.$http.adornUrl(
+          `/demandCollaboration/updateRuleStatus`
+        ),
+        method: "post",
+        data: this.$http.adornData({
+          ruleId: this.dataForm.ruleId || undefined,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 200) {
+          this.$message({
+            message: "规则状态已更新",
+            type: "success",
+          });
+        } else {
+          this.$message.error(data.message);
+        }
+      });
     },
     stringToBtn(list, str) {
       list.forEach(item => {
@@ -552,6 +700,8 @@ export default {
       this.sqlEditMsg.msg = "";
       this.sqlMsgCopy = "";
       this.paramsSqlSelf = "";
+      this.dataForm.ruleGraphicJoins=[];
+      this.dataForm.ruleGraphicOrders=[];
       if (this.$refs["dataForm"]) {
         this.$refs["dataForm"].clearValidate();
       }
@@ -588,7 +738,6 @@ export default {
       }
     },
     init(id, ruleCheckData, type) {
-    //   debugger
       this.getRuleFolder();
       this.deletCm();
       this.getMustList();
@@ -613,11 +762,12 @@ export default {
       if (this.dataForm.ruleId) {
         this.$http({
           url: this.$http.adornUrl(
-            `/rule/selectByUuid/${this.dataForm.ruleId}`
+            `/demandCollaboration/selectRuleByUuid/${this.dataForm.ruleId}`
           ),
           method: "get",
           params: this.$http.adornParams()
         }).then(({ data }) => {
+          debugger
           if (data && data.code === 200) {
             
             var datas = data.result;
@@ -680,7 +830,6 @@ export default {
     },
     // 规则树设置当前选中节点
     menuListTreeSetCurrentNode() {
-    
       if (this.dataForm.folderId) {
         if (this.$refs.menuListTree) {
           this.$refs.menuListTree.setCurrentKey(this.dataForm.folderId);
@@ -710,7 +859,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
         method: "get",
-        params: this.$http.adornParams({ folderSorts: "" })
+        params: this.$http.adornParams({ folderTypes: "" })
       }).then(({ data }) => {
         this.ruleData = data.result;
       });
@@ -738,17 +887,8 @@ export default {
         var v = { ruleStatisticsColumnName: item.columnName };
         ruleStatisticsColumns.push(v);
       });
-      if (
-        this.dataForm.ruleSqlStatisticsValue &&
-        this.dataForm.ruleSqlStatisticsValue != ""
-      ) {
-        if (
-          this.dataForm.ruleSqlStatisticsValue.indexOf(
-            this.rjMust["personTime"]
-          ) == -1 ||
-          this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) ==
-            -1
-        ) {
+      if (this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!=null && this.dataForm.ruleSqlStatisticsValue != "") {
+        if (this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["personTime"]) == -1 || this.dataForm.ruleSqlStatisticsValue.indexOf(this.rjMust["money"]) == -1) {
           this.$message.error(
             `统计sql编写的${this.rjMust["personTime"]}和${this.rjMust["money"]}是必填`
           );
@@ -769,15 +909,22 @@ export default {
         //   );
         //   return false;
         // }
-        if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+        if(this.dataForm.ruleRemark){
+          if (this.dataForm.ruleRemark == "" || ( this.dataForm.ruleRemark.indexOf(`{${this.rjMust["personTime"]}}`) == -1 ||this.dataForm.ruleRemark.indexOf(`{${this.rjMust["money"]}}`) == -1)) {
+            return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
+          }
+        }
+
+        if((this.dataForm.ruleSqlStatisticsValue&&this.dataForm.ruleSqlStatisticsValue!='')&&(!this.dataForm.ruleRemark||this.dataForm.ruleRemark == "")){
           return this.$message.error(`规则备注不能为空，且{${this.rjMust["personTime"]}}和{${this.rjMust["money"]}}是必填！`);
         }
+
       }
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
           this.$http({
             url: this.$http.adornUrl(
-              `/rule/${!this.dataForm.ruleId ? "add" : "updateByUuId"}`
+              `/demandCollaboration/addOrUpdateRule`
             ),
             method: "post",
             data: this.$http.adornData({
@@ -793,10 +940,13 @@ export default {
               ruleSqlValue: this.paramsSqlSelf,
               ruleType: this.dataForm.ruleType,
               folderPath: this.dataForm.folderPath,
-              paramRules: this.dataForm.paramRule
+              paramRules: this.dataForm.paramRule,
+              ruleGraphicJoins: this.dataForm.ruleGraphicJoins,
+              ruleGraphicOrders: this.dataForm.ruleGraphicOrders,
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {
+              this.runNow();
               this.$message({
                 message: "操作成功",
                 type: "success",
@@ -816,7 +966,89 @@ export default {
           this.$message.error("请完善信息!");
         }
       });
+
+      this.$refs["dataForm"].validate(valid => {
+        if (valid) {
+          this.$http({
+            url: this.$http.adornUrl(
+              `/demandCollaboration/addOrUpdateRuleTemporary`
+            ),
+            method: "post",
+            data: this.$http.adornData({
+              ruleId: this.dataForm.ruleId || undefined,
+              ruleName: this.dataForm.ruleName,
+              ruleCategory: this.dataForm.ruleCategory,
+              ruleStatisticsColumns: ruleStatisticsColumns,
+              ruleSqlStatisticsValue: this.dataForm.ruleSqlStatisticsValue,
+              ruleRemark: this.dataForm.ruleRemark,
+              folderId: this.dataForm.folderId,
+              createUserName: this.dataForm.createUserName,
+              createTime: this.dataForm.createTime,
+              ruleSqlValue: this.paramsSqlSelf,
+              ruleType: this.dataForm.ruleType,
+              folderPath: this.dataForm.folderPath,
+              paramRules: this.dataForm.paramRule,
+              ruleGraphicJoins: this.dataForm.ruleGraphicJoins,
+              ruleGraphicOrders: this.dataForm.ruleGraphicOrders,
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              this.runNow();
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                
+              });
+            } else {
+              this.$message.error(data.message);
+            }
+          });
+        } else {
+          this.$message.error("请完善信息!");
+        }
+      });
     },
+    //立即运行
+    runNow() {
+      // if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+      //   this.$message.error("请先在右上角选择项目!");
+      //   return false;
+      // }
+      var sql = [];
+      // for (var i = 0; i < this.multipleSelection.length; i++) {
+      //   if (this.multipleSelection[i].ruleSqlValue != null) {
+      //     sql.push(this.multipleSelection[i].ruleSqlValue);
+      //   }
+      // }
+      sql.push(this.paramsSqlSelf);
+      if (sql.length == 0) {
+        this.$message.error("选择的规则下没有sql，无法运行");
+      } else {
+        // var arrIds = "";
+        // for (var j = 0; j < this.multipleSelection.length; j++) {
+        //   arrIds += this.multipleSelection[j].ruleId + ",";
+        // }
+        // if (arrIds != null && arrIds != "" && arrIds != undefined) {
+        //   arrIds = arrIds.substr(0, arrIds.length - 1);
+        // }
+
+        this.runIds = this.dataForm.ruleId;
+        this.sql = sql;
+        this.showRunDialog = true;
+        this.info = false;
+      }
+    },
+    //关闭规则运行弹窗
+    closeRun() {
+      this.showRunDialog = false;
+    },
+    //运行成功后关闭页面并刷新
+    succeedRun() {
+      this.closeRun();
+      this.initData();
+      this.clearTableChecked();
+    },
+
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -824,17 +1056,23 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     }
+  },
+  watch : {
+    // graphtoolVisible:{
+    //   handler:function(val){
+    //     if(val) {
+    //       this.getMsgFromParent
+    //     }
+    //   }
+    // },
+    // 'dataForm.ruleGraphicJoins':{
+    //   deep: true,
+    //   handler(val) {
+    //     this.dataForm.ruleGraphicJoins=val;
+    //     this.$set(this.dataForm,'ruleGraphicJoins',val)
+    //   }
+    // },
   }
-  // watch : {
-  //   'sqlEditMsg.msg':{
-  //     immediate: true,
-  //     deep: true,
-  //     handler(val) {
-  //       console.log(val, 4444)
-  //       this.$set(this.sqlEditMsg,'msg',val)
-  //     }
-  //   }
-  // }
 };
 </script>
 <style scoped>

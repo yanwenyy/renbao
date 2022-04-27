@@ -74,7 +74,6 @@
       <el-table-column
         type="selection"
 
-        :reserve-selection="true"
        ></el-table-column>
       <el-table-column
         type="index"
@@ -148,7 +147,9 @@
                     ? "待信息组长分派"
                     : scope.row.EXAMINESTATUS == "3"
                     ? "待信息组员反馈"
-                    : scope.row.EXAMINESTATUS == "4"
+                   : scope.row.EXAMINESTATUS == "4"
+                    ? "已反馈"
+                    : scope.row.EXAMINESTATUS == "5"
                     ? "已完成"
                     : ""
                 }}
@@ -190,7 +191,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :demandCollaboration="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
+    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :dataForm="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
         :readonly="readonly" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <!-- 弹窗, 提交选人 -->
     <submit-person v-if="submitPersonVisible" :projectId = "projectId" :currentNode="currentNode" :roleId="roleId" :flowNode="1" ref="submitPerson" :demandCollaborationIds="demandCollaborationIds" @refreshDataList="getDataList"></submit-person>
@@ -238,6 +239,7 @@
           ruleType: '',
           ruleCategory: '',
           folderId: '',
+          folderPath: '',
         },
         dataList: [],
         multipleTable: [],
@@ -252,7 +254,7 @@
         value1: '',
         userId:sessionStorage.getItem("userId"),//当前用户id
         treeData: [],
-        folderSorts: 3,
+        folderSorts: "",
         ruleCheckData: {},
         treeVisible:false,//规则分类显示名称
         ruleData: [],
@@ -298,6 +300,10 @@
 
     },
     methods: {
+      //获取每行数据id
+      getRowKeys(row) {
+        return row.DEMANDCOLLABORATIONID;
+      },
       // 通过folderId 获取对应的item
       getTreeData2(treeData, folderId) {
         const getTreeDataItem = [];
@@ -354,7 +360,7 @@
         url: this.$http.adornUrl("/ruleFolder/getRuleFolder"),
         method: "get",
         params: this.$http.adornParams(
-          { folderSorts: this.folderSorts, projectId: this.projectId },
+          { folderTypes: this.folderSorts, projectId: this.projectId },
           false
         )
         // params:  this.$http.adornParams({}, false)
@@ -463,6 +469,7 @@
             'ruleCategory': this.dataForm.ruleCategory||null
           })
         }).then(({data}) => {
+          debugger
           if (data && data.code === 200) {
             this.dataList = data.result.records;
             this.totalPage = data.result.total
@@ -494,6 +501,7 @@
         this.id = data.DEMANDCOLLABORATIONID;
         this.showBtn = false;
         this.readonly = true;
+        debugger
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
@@ -502,6 +510,7 @@
       },
       // 新增
       addHandle () {
+        this.demandCollaboration =[];
         this.showBtn = true;
         this.readonly = false;
         this.addOrUpdateVisible = true
@@ -538,6 +547,7 @@
           type: "warning"
         });
 
+        this.demandCollaborationIds = [];
         let flag = false
         this.multipleTable.forEach(item => {
           if (item.EXAMINESTATUS != "0"){
@@ -588,6 +598,7 @@
               // this.Pager.pageIndex = 1;
               // this.Pager.pageSize = 10;
               // this.getSelectPage();
+              this.getDataList();
               this.setTableChecked();
               this.multipleTable = []
             } else {
@@ -604,3 +615,13 @@
     }
   }
 </script>
+<style scoped>
+.folder-icon {
+  background: url(../../../assets/img/folder.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 13px;
+  height: 16px;
+  }
+</style>
