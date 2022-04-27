@@ -191,7 +191,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :demandCollaboration="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
+    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :dataForm="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
         :readonly="readonly" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <!-- 弹窗, 提交选人 -->
     <submit-person v-if="submitPersonVisible" :projectId = "projectId" :currentNode="currentNode" :roleId="roleId" :flowNode="1" ref="submitPerson" :demandCollaborationIds="demandCollaborationIds" @refreshDataList="getDataList"></submit-person>
@@ -501,6 +501,7 @@
         this.id = data.DEMANDCOLLABORATIONID;
         this.showBtn = false;
         this.readonly = true;
+        debugger
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
@@ -509,6 +510,7 @@
       },
       // 新增
       addHandle () {
+        this.demandCollaboration =[];
         this.showBtn = true;
         this.readonly = false;
         this.addOrUpdateVisible = true
@@ -596,6 +598,7 @@
               // this.Pager.pageIndex = 1;
               // this.Pager.pageSize = 10;
               // this.getSelectPage();
+              this.getDataList();
               this.setTableChecked();
               this.multipleTable = []
             } else {

@@ -197,7 +197,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :demandCollaboration="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
+    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :dataForm="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
         :readonly="readonly" ref="addOrUpdate" @refreshDataList="getToDoDataList"></add-or-update>
     <!-- 弹窗, 退回 -->
     <submit-back v-if="submitBackVisible" :projectId = "projectId" :demandCollaborationIds="demandCollaborationIds" :backNode="backNode" ref="submitBack" @refreshDataList="getToDoDataList" ></submit-back>
@@ -206,7 +206,7 @@
     <!-- 弹窗, 反馈 -->
     <submit-feed v-if="submitFeedVisible" :ruleId="ruleId" ref="submitFeed" ></submit-feed>
     <!-- 弹窗, 提交选人 -->
-    <submit-person v-if="submitPersonVisible" :projectId = "projectId" :currentNode="currentNode" :roleId="roleId" :flowNode="2" ref="submitPerson" :demandCollaborationIds="demandCollaborationIds" @refreshDataList="getToDoDataList"></submit-person>
+    <submit-person v-if="submitPersonVisible" :projectId = "projectId" :currentNode="currentNode" :roleId="roleId" :flowNode="3" ref="submitPerson" :demandCollaborationIds="demandCollaborationIds" @refreshDataList="getToDoDataList"></submit-person>
 
   </div>
 </template>
