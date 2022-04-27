@@ -79,7 +79,11 @@ export default {
   props: {
     info: { type: Boolean },
     runIds: { type: String },
-    sql: { type: Array }
+    sql: { type: Array },
+    ruleSql: { 
+      type: Array, 
+      default: () => []
+    }
   },
   components: {
     basicInformation
@@ -91,17 +95,17 @@ export default {
   },
   data() {
     var validExpectedBeginTime = (rule, value, callback) => {
-      console.log(value);
       let date1 = new Date();
       let date2 = new Date(value);
-      let s1 = date2.getTime();
-      let s2 = date1.getTime();
-      let total = (s2 - s1)/1000;
-      let day = parseInt(total / (24*60*60));//计算整bai数天du数
-      let afterDay = total - day*24*60*60;//取得值算出天数后dao剩余的转秒数shu
-      let  hour = parseInt(afterDay/(60*60));//计算整数小时数
-      let afterHour = total - day*24*60*60 - hour*60*60;//取得算出小时数后剩余的秒数
-      let min = parseInt(afterHour/60);//计算整数分
+      let s1 = date1.getTime();
+      let s2 = date2.getTime();
+      let total = (s2 - s1) / 1000;
+      let day = parseInt(total / (24 * 60 * 60)); //计算整bai数天du数
+      let afterDay = total - day * 24 * 60 * 60; //取得值算出天数后dao剩余的转秒数shu
+      let hour = parseInt(afterDay/(60 * 60)); //计算整数小时数
+      let afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60; //取得算出小时数后剩余的秒数
+      let min = parseInt(afterHour / 60); //计算整数分
+      console.log(min);
       if (min <= 2) {
         callback(new Error('开始执行时间需要大于当前时间2分钟'));
       } else {
@@ -136,7 +140,6 @@ export default {
           return [`${hour}:${minute}:${second} - 23:59:59`];
         })()
       },
-      resultSqlValue: [],
       showHospitalDialog: false
     };
   },
@@ -148,7 +151,7 @@ export default {
         this.$refs["dataForm"].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`rule/ruleRun`),
+              url: this.$http.adornUrl(`/rule/ruleRun`),
               method: "post",
               data: this.$http.adornData(
                 {
@@ -159,10 +162,9 @@ export default {
                   hospital: this.dataForm.hospitalName,
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
-                  ruleId: this.runIds,
                   runType: 1,
-                  resultSqlValue: this.resultSqlValue,
-                  projectId:this.projectId
+                  projectId: this.projectId,
+                  ruleSql: this.ruleSql
                 },
                 false
               )
@@ -200,10 +202,9 @@ export default {
                   hospital: this.dataForm.hospitalName,
                   hospitalCode: this.dataForm.hospitalCode,
                   hospitalName: this.dataForm.hospitalName,
-                  ruleId: this.runIds,
                   runType: 2,
-                  resultSqlValue: this.resultSqlValue,
-                  projectId:this.projectId
+                  projectId: this.projectId,
+                  ruleSql: this.ruleSql
                 },
                 false
               )
@@ -247,14 +248,13 @@ export default {
     },
     //选择医院确定
     getData() {
-      this.resultSqlValue = [];
       //获取已选医院数据
       let data = this.$refs.hospital.multipleSelection;
       //转换sql处理
-      for (var i = 0; i < this.sql.length; i++) {
-        this.resultSqlValue.push(transSql(this.sql[i], data));
-      }
-      // console.log(this.resultSqlValue);
+      this.ruleSql.forEach(item => {
+        item.sql = transSql(item.sql, data);
+      });
+      console.log("ruleSql:", this.ruleSql);
       //处理医院数据并反显
       var hospitalCodes = "";
       var hospitalNames = "";
