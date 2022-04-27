@@ -194,7 +194,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 详情 -->
-    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :demandCollaboration="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
+    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :dataForm="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
         :readonly="readonly" ref="addOrUpdate" @refreshDataList="getToDoDataList"></add-or-update>
     <!-- 弹窗, 退回 -->
     <submit-back v-if="submitBackVisible" :projectId = "projectId" :demandCollaborationIds="demandCollaborationIds" :backNode="backNode" ref="submitBack" @refreshDataList="getToDoDataList" ></submit-back>

@@ -195,7 +195,7 @@
     </el-pagination>
     
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :demandCollaboration="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
+    <add-or-update v-if="addOrUpdateVisible" :projectId = "projectId" :dataForm="demandCollaboration" :ruleData="treeData" :showBtn="showBtn"
         :readonly="readonly" ref="addOrUpdate" @refreshDataList="getToDoDataList"></add-or-update>
     <!-- 弹窗, 退回 -->
     <submit-back v-if="submitBackVisible" :projectId = "projectId" :demandCollaborationIds="demandCollaborationIds" :backNode="backNode" ref="submitBack" @refreshDataList="getToDoDataList" ></submit-back>
@@ -500,7 +500,7 @@
           message: "请选择至少一条数据",
           type: "warning"
         });
-        
+
         this.demandCollaborationIds = [];
         this.multipleTable.forEach(item => {
           this.demandCollaborationIds.push(item.DEMANDCOLLABORATIONID)
