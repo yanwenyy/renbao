@@ -81,6 +81,9 @@
               ref="tree3"
               node-key="id"
               :default-expand-all="false"
+              :load="loadNodeParams"
+              lazy
+              @node-expand="handleNodeClickParams"
               @node-contextmenu="rightClick"
               @node-drag-start="handleDragStart"
               @node-drag-enter="handleDragEnter"
@@ -111,8 +114,8 @@
               </ul>
               <ul v-if="treeType==='3'" id="menu"
                   class="right-menu">
-                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">查看参数关联</li>
               </ul>
@@ -182,7 +185,10 @@
     </div>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update
+      :paramsType="paramsType"
+      :paramsDetail="paramsDetail"
       ref="addOrUpdate"
+      :addParamsClick="addParamsClick"
     ></add-or-update>
   </div>
 </template>
@@ -196,6 +202,21 @@
       AddOrUpdate
     },
     props:{
+      //添加参数确定点击事件
+      addParamsClick: {
+        type: Function,
+        default: null,
+      },
+      //参数详情
+      paramsDetail: {
+        type: Object,
+        default: null,
+      },
+      //获取参数详情
+      getParamsDetail: {
+        type: Function,
+        default: null,
+      },
       //参数设置确定点击事件
       paramsSub: {
         type: Function,
@@ -228,6 +249,10 @@
       //   default: null,
       // },
       getLoadTree: {
+        type: Function,
+        default: null,
+      },
+      getLoadTreeParams: {
         type: Function,
         default: null,
       },
@@ -290,6 +315,7 @@
     },
     data() {
       return {
+        paramsType:'add',//参数弹框的类型
         paramsTreeClickNode:{},//右击参数列表的数据
         hideLeftTree:false,//是否隐左边的区域
         treeTabelNode:'',
@@ -910,15 +936,21 @@
     },
     methods: {
       // 新增 / 修改参数
-      addOrUpdateParmas(id,type) {
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id||'',type,this.paramsData);
-        })
+      addOrUpdateParmas(data,type) {
+        this.paramsType=type;
+        if(type!='add'){
+         this.getParamsDetail(data);
+        }else{
+          this.$nextTick(() => {
+            this.$refs.addOrUpdate.init(data.id||'',type,this.paramsData);
+          })
+        }
+
       },
       //数据表左侧右击事件
       rightClick(event, data, node, obj) {
         //只有表可以点击
-        if(data.dataType==2||data.type=='funFolder'||data.type=='params'){
+        if(data.dataType==2||data.ParamsType=='publicParam'||data.ParamsType=='personalParam'){
           this.paramsTreeClickNode=data;
           this.showRightMenu = false; // 先把模态框关死，目的是：第二次或者第n次右键鼠标的时候 它默认的是true
           this.showRightMenu = true;
@@ -1019,11 +1051,31 @@
         }
 
       },
+      //参数树懒加载
+      loadNodeParams(node, resolve) {
+        if (node.level === 0) {
+          return resolve(this.paramsData);
+        }
+        // if (node.level > 1) return resolve([]);
+        if(node.data.children&&node.data.children!=''){
+          return resolve(node.data.children);
+        }else{
+          setTimeout(() => {
+            resolve(this.loadTree);
+          }, 500);
+
+        }
+
+      },
+
       // treeToHint(list){
       //   list.for
       // },
       handleNodeClick(data,obj,node){
         this.getLoadTree(data,obj,node)
+      },
+      handleNodeClickParams(data,obj,node){
+        this.getLoadTreeParams(data,obj,node)
       },
       getFullScreen(data){
         this.fullScreen=data;

@@ -25,6 +25,10 @@
       :paramsSub="paramsSub"
       :from="from"
       :treeTableClick="treeTableClick"
+      :addParamsClick="addParamsClick"
+      :paramsDetail="paramsDetail"
+      :getParamsDetail="getParamsDetail"
+      :getLoadTreeParams="getLoadTreeParams"
     ></sql-edit>
   </div>
 
@@ -85,7 +89,7 @@
         ],//左边树参数初始的数据
         useChinese:true,//是否汉字化
         userId:sessionStorage.getItem("userId")+"-"+(this.modelName!=null&&this.modelName!=''?this.modelName:'sqlEditor'),
-        // userId:sessionStorage.getItem("userId"),
+        paramsDetail:{},//参数详情
       }
     },
     watch: {
@@ -154,6 +158,50 @@
       this.ws.close();
     },
     methods: {
+      //获取参数详情
+      getParamsDetail(data){
+        //data 点击的参数节点
+
+        this.$http({
+          url: this.$http.adornUrl(`/ammParam/selectByUuid/${data.id}`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            var datas=data.result;
+            console.log(datas);
+          }else{
+            this.$message.error(data.message)
+          }
+        })
+      },
+      //添加参数确定按钮点击
+      addParamsClick(data,type){
+        //data from表单的内容,type:(add/新增,edit/修改)
+        // var params = new FormData();
+        // for(let i in data){
+        //   if(i=='param'||i=='paramChoice'||i=='paramOptions'){
+        //     for(let j in data[i]){
+        //       params.append(i+"."+j,data[i][j]);
+        //     }
+        //   }else{
+        //     params.append(i,data[i]);
+        //   }
+        // };
+        this.$http({
+          url: this.$http.adornUrl(`/ammParam/${type=='add' ? 'add' : 'updateByUuId'}`),
+          method: 'post',
+          // data: params,
+          data: data,
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.$message.success(data.message);
+            this.getParmasData();
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      },
       //右侧数据树表右击事件 data传过来的node节点
       treeTableClick(data){
         var params={
@@ -175,20 +223,24 @@
       //获取参数树数据
       getParmasData(){
         this.$http({
-          url: this.$http.adornUrl('/param/selectAll'),
+          url: this.$http.adornUrl('/ammParam/selectAll'),
           method: 'get',
           isLoading:false,
           params: this.$http.adornParams()
         }).then(({data}) => {
           var datas=data.result;
           if(datas){
-            datas.forEach(item=>{
-              item.id=item.paramId;//参数树需要的id
-              item.name=item.paramName;//参数树需要的name
-              item.sql=item.paramSql;//参数树需要的sql
-              item.type=item.paramType=='2'?'params':'';//参数树需要的type 图标类型 参数:params
+            datas.ParamsType=JSON.parse(JSON.stringify(datas.type));
+            datas.type='funFolder'
+            datas.children.forEach(item=>{
+              item.ParamsType=JSON.parse(JSON.stringify(item.type));//参数的类型 必须的publicParam:公共参数 personalParam:个人参数
+              // item.id=item.paramId;//参数树需要的id
+              // item.name=item.paramName;//参数树需要的name
+              // item.sql=item.paramSql;//参数树需要的sql
+              item.type='funFolder';//参数树需要的type 图标类型 参数:params
             });
-            this.paramsData[0].children=datas;
+            // this.paramsData[0].children=datas;
+            this.paramsData=[datas];
             this.$set(this.paramsData,this.paramsData)
           }
         })
@@ -384,7 +436,7 @@
       changeTree(type){
         console.log(type)
       },
-      //展开树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
+      //展开数据表树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
       getLoadTree(datas, obj, node) {
         // console.log(datas,obj,node,222);
         if(datas.children.length==0){
@@ -394,6 +446,27 @@
             params: this.$http.adornParams({
               id:datas.id,
               tableName:datas.title,
+            })
+          }).then(({data}) => {
+            var _data=data.result;
+            this.loadTree =_data||[];
+          })
+        }
+
+
+      },
+      //展开参数树形结构进行懒加载的方法 data该节点所对应的对象、obj节点对应的 Node、node节点组件本身
+      getLoadTreeParams(datas, obj, node) {
+        // console.log(datas,obj,node,222);
+        if(datas.children.length==0){
+          this.$http({
+            url: this.$http.adornUrl('/ammParam/getFolderAndParams'),
+            method: 'get',
+            params: this.$http.adornParams({
+              id:datas.id,
+              isPersonalParam:datas.ParamsType=='personalParam'?true:false,
+              level:datas.level,
+              type:datas.ParamsType,
             })
           }).then(({data}) => {
             var _data=data.result;

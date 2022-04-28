@@ -72,7 +72,7 @@
                 <el-input
                   type="textarea"
                   :rows="6"
-                  placeholder="请输入SQL"
+                  placeholder="说明"
                   v-model="dataForm.param.description">
                 </el-input>
               </el-form-item>
@@ -193,7 +193,7 @@
 
       </el-form>
       <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="visible = false,cleanMsg()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
     </el-dialog>
@@ -220,12 +220,29 @@
 
 <script>
   export default {
+    props:{
+      //添加参数确定点击事件
+      addParamsClick: {
+        type: Function,
+        default: null,
+      },
+      //参数详情
+      paramsDetail: {
+        type: Object,
+        default: null,
+      },
+      //参数的类型
+      paramsType: {
+        type: String,
+        default: null,
+      },
+    },
     data () {
       return {
         sqlRuleVisible:false,//查看sql规则状态
         activeName: "1", //tab页切换时的状态值
         activeName2: "first", //tab页切换时的状态值
-        type:'',
+        type:'add',
         visible: false,
         selfActionsList:[{
           names:'',
@@ -267,7 +284,7 @@
             optionsVals:'',
           },
           associatedParamJsonStr:'',
-          scopeType: '',
+          // scopeType: '',
           folderId: '',
         },
         dataRule: {
@@ -355,7 +372,7 @@
             optionsVals:'',
           },
           associatedParamJsonStr:'',
-          scopeType: '',
+          // scopeType: '',
           folderId: '',
         };
         this.selfActionsList=[{
@@ -365,27 +382,14 @@
       },
       init (id,type,paramsData) {
         this.relationParamTree=paramsData;
-        this.type=type;
+        // this.type=type;
         this.cleanMsg();
         this.visible = true;
         this.dataForm.id=id;
+        this.dataForm.folderId=id;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         });
-        if (this.dataForm.id!='') {
-          this.$http({
-            url: this.$http.adornUrl(`/plan/selectByUuid/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.code === 200) {
-              var datas=data.result;
-              this.dataForm.planName = datas.planName;
-              this.dataForm.param.inputType = datas.planCode;
-              this.dataForm.multipartFiles = datas.fileInfos;
-            }
-          })
-        }
       },
       // 表单提交
       dataFormSubmit () {
@@ -398,10 +402,9 @@
             });
             this.dataForm.paramOptions.optionsNames=nameStr.join("-");
             this.dataForm.paramOptions.optionsVals=valueStr.join("-");
-            this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList)
-            const formData = new FormData();
-            formData.append('param', this.dataForm.param);
-
+            this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList);
+            this.addParamsClick(this.dataForm,this.type);
+            this.visible=false;
           }
         })
       }
@@ -415,7 +418,21 @@
             this.activeName2='first';
           }
         },
-      }
+      },
+      paramsDetail: {
+        deep: true,
+        handler(newVal, oldVal) {
+          console.log(newVal)
+        },
+      },
+      paramsType: {
+        deep: true,
+        handler(newVal, oldVal) {
+          this.type=newVal;
+          console.log(this.type,445)
+        },
+      },
+
     }
   }
 </script>
