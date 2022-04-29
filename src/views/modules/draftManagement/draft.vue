@@ -162,7 +162,7 @@
                 <el-button type="text" @click="editData(scope.row)"
                 >编写底稿
                 </el-button>
-                <el-button type="text" @click="deleteHandle(scope.row.manuscriptIds)"
+                <el-button type="text" @click="deleteHandle(scope.row.manuscriptId)"
                 >删除
                 </el-button>
               </template>
@@ -260,7 +260,7 @@ export default {
       var userIds = id
         ? [id]
         : this.multipleTable.map(item => {
-          return item.manuscriptIds;
+          return item.manuscriptId;
         });
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",
