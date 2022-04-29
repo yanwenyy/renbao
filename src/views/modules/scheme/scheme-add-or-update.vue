@@ -11,7 +11,7 @@
         <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
 
-      <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
+      <el-form-item label="上传文件" prop="multipartFiles" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
           action="#"
@@ -26,7 +26,7 @@
           >
         </el-upload>
       </el-form-item>
-      <el-form-item label="附件" prop="userPassword" v-if="dataForm.id!=''">
+      <el-form-item  label="附件" prop="multipartFiles" v-if="dataForm.id!=''">
         <el-table
           :data="dataForm.multipartFiles"
           border
@@ -111,6 +111,9 @@
           ],
           planCode: [
             { required: true, message: '方案编号不能为空', trigger: 'blur' }
+          ],
+          multipartFiles: [
+            { required: true, message: '上传文件不能为空', trigger: 'blur' }
           ],
         }
       }

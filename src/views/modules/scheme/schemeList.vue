@@ -6,6 +6,13 @@
       @keyup.enter.native="getDataList()"
       class="search-form-new"
     >
+      <el-form-item label="方案编码:">
+        <el-input
+          v-model="dataForm.planCode"
+          placeholder="方案编码"
+          clearable
+        ></el-input>
+      </el-form-item>
       <el-form-item label="方案名称:">
         <el-input
           v-model="dataForm.planName"
@@ -20,13 +27,7 @@
           clearable
         ></el-input>
       </el-form-item>
-      <el-form-item label="方案编码:">
-        <el-input
-          v-model="dataForm.planCode"
-          placeholder="方案编码"
-          clearable
-        ></el-input>
-      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="(pageIndex = 1), getDataList()"
         >查询</el-button
