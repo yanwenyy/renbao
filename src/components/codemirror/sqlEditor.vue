@@ -115,6 +115,9 @@
               <ul v-if="treeType==='3'" id="menu"
                   class="right-menu">
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
+                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加分类</li>
+                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='funFolder'">修改分类</li>
+                <li class="menu-item" @click="selDelParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">删除分类</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
                 <li class="menu-item" @click="selfDelParmas(paramsTreeClickNode)" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'look')" v-if="paramsTreeClickNode.type=='params'">查看属性</li>
@@ -952,6 +955,17 @@
         }).catch(() => {});
 
       },
+      //删除分类
+      selDelParmasClass(data){
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.delParams(data);
+        }).catch(() => {});
+
+      },
       // 新增 / 修改参数
       addOrUpdateParmas(data,type) {
         this.paramsType=type;
@@ -960,6 +974,18 @@
         }else{
           this.$nextTick(() => {
             this.$refs.addOrUpdate.init(data.id||'',type,this.paramsData);
+          })
+        }
+
+      },
+      //新增/修改分类
+      addOrUpdateParmasClass(data,type) {
+        this.paramsType=type;
+        if(type!='add'){
+         this.getParamsClassDetail(data);
+        }else{
+          this.$nextTick(() => {
+            this.$refs.addOrUpdate.initClass(data.id||'',type,this.paramsData);
           })
         }
 
