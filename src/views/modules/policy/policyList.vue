@@ -45,7 +45,7 @@
             <!--</el-date-picker>-->
             <el-date-picker
               :picker-options="pickerOptionsStart"
-              v-model="dataForm.beginTime"
+              v-model="dataForm.endStartTime"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期">
@@ -53,7 +53,7 @@
             <span>--</span>
             <el-date-picker
               :picker-options="pickerOptionsEnd"
-              v-model="dataForm.endTime"
+              v-model="dataForm.endStopTime"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期">
@@ -195,7 +195,7 @@ export default {
       pickerOptionsStart: {
         disabledDate: time => {
           // 获取结束日期的 v-model 值并赋值给新定义的对象
-          let endDateVal = this.dataForm.endTime;
+          let endDateVal = this.dataForm.endStopTime;
           if (endDateVal) {
             // 比较 距 1970 年 1 月 1 日之间的毫秒数：
             return time.getTime() > new Date(endDateVal).getTime();
@@ -206,7 +206,7 @@ export default {
       pickerOptionsEnd: {
         disabledDate: time => {
           // 获取开始日期的 v-model 值并赋值给新定义的对象
-          let beginDateVal = this.dataForm.beginTime;
+          let beginDateVal = this.dataForm.endStartTime;
           if (beginDateVal) {
             // 比较 距 1970 年 1 月 1 日之间的毫秒数：
             return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
@@ -230,8 +230,8 @@ export default {
       path: window.SITE_CONFIG.cdnUrl,
       dataForm: {
         policyName: "",
-        endTime: "",
-        beginTime: "",
+        endStopTime: "",
+        endStartTime: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
       },
@@ -335,8 +335,8 @@ export default {
     //重置点击
     reset() {
       this.dataForm.policyName = "";
-      this.dataForm.endTime = "";
-      this.dataForm.beginTime = "";
+      this.dataForm.endStopTime = "";
+      this.dataForm.endStartTime = "";
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
@@ -353,8 +353,8 @@ export default {
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
           policyName: this.dataForm.policyName,
-          endTime: this.dataForm.endTime,
-          beginTime: this.dataForm.beginTime,
+          endTime: this.dataForm.endStopTime,
+          beginTime: this.dataForm.endStartTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
         })
@@ -479,9 +479,9 @@ export default {
     down() {
       var url =
         "/jinding/outcar/port?timeStart=" +
-        this.dataForm.timeStart +
+        this.dataForm.endStartTime +
         "&timeEnd=" +
-        this.dataForm.timeEnd +
+        this.dataForm.endStopTime +
         "&tranType=&emissionStand=" +
         this.dataForm.emissionStand +
         "&fuelType=" +

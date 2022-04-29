@@ -314,7 +314,7 @@ export default {
           this.tableLoading = false;
           if (data.code == 200) {
             data.result.records.map(i => {
-              i.createTime = i.createTime;
+              // i.createTime = i.createTime;
               i.ruleCategory =
                 i.ruleCategory == 1
                   ? "门诊规则"
