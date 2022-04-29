@@ -80,117 +80,117 @@
               </el-form-item>
             </div>
           </el-tab-pane>
-          <el-tab-pane v-if="dataForm.param.inputType=='treeinp'" name="2" label="关联参数配置">
-            <div class="tabs1-div">
-              <el-table
-                class="table-list"
-                border
-                :data="relationParamList"
-                stripe
-                style="width: 100%">
-                <el-table-column
-                  type="index"
-                  header-align="center"
-                  align="center"
-                  width="80"
-                  label="序号"
-                >
-                </el-table-column>
-                <el-table-column
-                  prop="associatedParamName"
-                  label="被关联参数名称"
-                  header-align="center"
-                  align="center"
-                >
-                </el-table-column>
-                <el-table-column
-                  prop="associatedParamCol"
-                  label="被关联参数值"
-                  header-align="center"
-                  align="center"
-                >
+          <!--<el-tab-pane v-if="dataForm.param.inputType=='treeinp'" name="2" label="关联参数配置">-->
+            <!--<div class="tabs1-div">-->
+              <!--<el-table-->
+                <!--class="table-list"-->
+                <!--border-->
+                <!--:data="relationParamList"-->
+                <!--stripe-->
+                <!--style="width: 100%">-->
+                <!--<el-table-column-->
+                  <!--type="index"-->
+                  <!--header-align="center"-->
+                  <!--align="center"-->
+                  <!--width="80"-->
+                  <!--label="序号"-->
+                <!--&gt;-->
+                <!--</el-table-column>-->
+                <!--<el-table-column-->
+                  <!--prop="associatedParamName"-->
+                  <!--label="被关联参数名称"-->
+                  <!--header-align="center"-->
+                  <!--align="center"-->
+                <!--&gt;-->
+                <!--</el-table-column>-->
+                <!--<el-table-column-->
+                  <!--prop="associatedParamCol"-->
+                  <!--label="被关联参数值"-->
+                  <!--header-align="center"-->
+                  <!--align="center"-->
+                <!--&gt;-->
 
-                </el-table-column>
-                <el-table-column
-                  prop="paramValueType"
-                  label="关联参数值"
-                  header-align="center"
-                  align="center"
-                >
-                  <template slot-scope="scope">
-                    {{scope.row.paramValueType=='realValue'?'真实值':scope.row.paramValueType=='displayValue'?'显示值':''}}
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  header-align="center"
-                  align="center"
-                  width="150"
-                  label="操作">
-                  <template slot-scope="scope">
-                    <!--<el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.rowId)">修改</el-button>-->
-                    <!--<el-button type="text" size="small" @click="deleteHandle(scope.row.rowId)">删除</el-button>-->
-                    <el-button type="text" size="small" @click="">修改</el-button>
-                    <el-button type="text" size="small" @click="relationParamList.splice(scope.$index,1)">删除</el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-form-item label="被关联参数名称" class="item-three">
-                <el-popover
-                  :disabled="type == 'look'"
-                  ref="menuListPopover"
-                  placement="bottom-start"
-                  trigger="click"
-                  v-model="treeVisible"
-                >
-                  <el-tree
-                    class="rule-tree"
-                    :data="relationParamTree"
-                    :props="menuListTreeProps"
-                    node-key="folderId"
-                    ref="menuListTree"
-                    @current-change="menuListTreeCurrentChangeHandle"
-                    :default-expand-all="false"
-                    :highlight-current="true"
-                    :expand-on-click-node="false"
-                  >
-                    <span slot-scope="{ node }">
-                      <span class="tree-label">
-                        <span class="folder-icon"></span>
-                        <span :title="node.label"> {{ node.label }}</span>
-                      </span>
-                    </span>
-                  </el-tree>
-                </el-popover>
-                <el-input
-                  :disabled="type == 'look'"
-                  @click="treeVisible = true"
-                  v-popover:menuListPopover
-                  v-model="relationForm.associatedParamName"
-                  :readonly="true"
-                  placeholder="点击选择"
-                  class="menu-list__input"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="被关联参数值" class="item-three">
-                <el-select v-model="relationForm.associatedParamCol" placeholder="请选择">
+                <!--</el-table-column>-->
+                <!--<el-table-column-->
+                  <!--prop="paramValueType"-->
+                  <!--label="关联参数值"-->
+                  <!--header-align="center"-->
+                  <!--align="center"-->
+                <!--&gt;-->
+                  <!--<template slot-scope="scope">-->
+                    <!--{{scope.row.paramValueType=='realValue'?'真实值':scope.row.paramValueType=='displayValue'?'显示值':''}}-->
+                  <!--</template>-->
+                <!--</el-table-column>-->
+                <!--<el-table-column-->
+                  <!--header-align="center"-->
+                  <!--align="center"-->
+                  <!--width="150"-->
+                  <!--label="操作">-->
+                  <!--<template slot-scope="scope">-->
+                    <!--&lt;!&ndash;<el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.rowId)">修改</el-button>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<el-button type="text" size="small" @click="deleteHandle(scope.row.rowId)">删除</el-button>&ndash;&gt;-->
+                    <!--<el-button type="text" size="small" @click="">修改</el-button>-->
+                    <!--<el-button type="text" size="small" @click="relationParamList.splice(scope.$index,1)">删除</el-button>-->
+                  <!--</template>-->
+                <!--</el-table-column>-->
+              <!--</el-table>-->
+              <!--<el-form-item label="被关联参数名称" class="item-three">-->
+                <!--<el-popover-->
+                  <!--:disabled="type == 'look'"-->
+                  <!--ref="menuListPopover"-->
+                  <!--placement="bottom-start"-->
+                  <!--trigger="click"-->
+                  <!--v-model="treeVisible"-->
+                <!--&gt;-->
+                  <!--<el-tree-->
+                    <!--class="rule-tree"-->
+                    <!--:data="relationParamTree"-->
+                    <!--:props="menuListTreeProps"-->
+                    <!--node-key="folderId"-->
+                    <!--ref="menuListTree"-->
+                    <!--@current-change="menuListTreeCurrentChangeHandle"-->
+                    <!--:default-expand-all="false"-->
+                    <!--:highlight-current="true"-->
+                    <!--:expand-on-click-node="false"-->
+                  <!--&gt;-->
+                    <!--<span slot-scope="{ node }">-->
+                      <!--<span class="tree-label">-->
+                        <!--<span class="folder-icon"></span>-->
+                        <!--<span :title="node.label"> {{ node.label }}</span>-->
+                      <!--</span>-->
+                    <!--</span>-->
+                  <!--</el-tree>-->
+                <!--</el-popover>-->
+                <!--<el-input-->
+                  <!--:disabled="type == 'look'"-->
+                  <!--@click="treeVisible = true"-->
+                  <!--v-popover:menuListPopover-->
+                  <!--v-model="relationForm.associatedParamName"-->
+                  <!--:readonly="true"-->
+                  <!--placeholder="点击选择"-->
+                  <!--class="menu-list__input"-->
+                <!--&gt;</el-input>-->
+              <!--</el-form-item>-->
+              <!--<el-form-item label="被关联参数值" class="item-three">-->
+                <!--<el-select v-model="relationForm.associatedParamCol" placeholder="请选择">-->
 
-                </el-select>
-              </el-form-item>
-              <el-form-item label="对应参数值" class="item-three">
-                <el-select v-model="relationForm.paramValueType" placeholder="请选择">
-                  <el-option label="真实值" value="realValue"></el-option>
-                  <el-option label="显示值" value="displayValue"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-button type="primary" size="small" @click="relationFromSave">保存</el-button>
-              <div class="relationFormMsg">
-                <div>说明：</div>
-                <div>1、一个【参数A】可以选择多个【参数B】作为其被关联参数，当【参数A】值发生变化时，会将它的对应值（真实值或显示值）传给【被关联参数B】</div>
-                <div>2、【被关联参数B】接收到【参数A】传递的对应值后，将该对应值作为条件从而筛选【被关联参数B】中的数据</div>
-                <div>3、在修改被关联参数时，若发现反显的信息与列表展示信息不符，则该被关联参数已被修改，以反显的信息为主</div>
-              </div>
-            </div>
-          </el-tab-pane>
+                <!--</el-select>-->
+              <!--</el-form-item>-->
+              <!--<el-form-item label="对应参数值" class="item-three">-->
+                <!--<el-select v-model="relationForm.paramValueType" placeholder="请选择">-->
+                  <!--<el-option label="真实值" value="realValue"></el-option>-->
+                  <!--<el-option label="显示值" value="displayValue"></el-option>-->
+                <!--</el-select>-->
+              <!--</el-form-item>-->
+              <!--<el-button type="primary" size="small" @click="relationFromSave">保存</el-button>-->
+              <!--<div class="relationFormMsg">-->
+                <!--<div>说明：</div>-->
+                <!--<div>1、一个【参数A】可以选择多个【参数B】作为其被关联参数，当【参数A】值发生变化时，会将它的对应值（真实值或显示值）传给【被关联参数B】</div>-->
+                <!--<div>2、【被关联参数B】接收到【参数A】传递的对应值后，将该对应值作为条件从而筛选【被关联参数B】中的数据</div>-->
+                <!--<div>3、在修改被关联参数时，若发现反显的信息与列表展示信息不符，则该被关联参数已被修改，以反显的信息为主</div>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</el-tab-pane>-->
         </el-tabs>
 
       </el-form>

@@ -943,7 +943,14 @@
     methods: {
       //删除参数
       selfDelParmas(data){
-        this.delParams(data);
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.delParams(data);
+        }).catch(() => {});
+
       },
       // 新增 / 修改参数
       addOrUpdateParmas(data,type) {

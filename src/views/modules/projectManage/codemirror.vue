@@ -162,7 +162,24 @@
     methods: {
       //删除参数点击
       delParams(data){
-
+        console.log(data);
+        this.$http({
+          url: this.$http.adornUrl(`/ammParam/delete/${data.id}`),
+          method: "post",
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {
+                this.getParmasData();
+              }
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
       },
       //获取参数详情
       getParamsDetail(data){
