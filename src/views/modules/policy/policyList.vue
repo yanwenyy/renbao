@@ -353,8 +353,8 @@ export default {
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
           policyName: this.dataForm.policyName,
-          endTime: this.dataForm.endStopTime,
-          beginTime: this.dataForm.endStartTime,
+          endStopTime: this.dataForm.endStopTime,
+          endStartTime: this.dataForm.endStartTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
         })
