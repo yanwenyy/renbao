@@ -257,37 +257,53 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var userIds = id
-        ? [id]
-        : this.multipleTable.map(item => {
-          return item.manuscriptId;
-        });
-      this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl("/manuscript/deleteByIds"),
-            method: "delete",
-            data: this.$http.adornData(userIds, false)
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getSelectPage();
-                }
-              });
-            } else {
-              this.$message.error(data.msg);
-            }
-          });
+      let canDel=true;
+      if(this.multipleTable.length>0){
+        this.multipleTable.forEach(item=>{
+          if(!item.manuscriptId){
+            canDel=false;
+            this.$message.error("只能删除有底稿的数据")
+            return false;
+          }
         })
-        .catch(() => {});
+      }
+      if(canDel){
+        var userIds = id
+          ? [id]
+          : this.multipleTable.map(item => {
+            return item.manuscriptId;
+          });
+        if(userIds.length==0){
+          this.$message.error("只能删除有底稿的数据")
+          return false;
+        }
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl("/manuscript/deleteByIds"),
+              method: "delete",
+              data: this.$http.adornData(userIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getSelectPage();
+                  }
+                });
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+          })
+          .catch(() => {});
+      }
     },
     getSelectPage() {
       this.ruleData=this.$refs.ruleTree.treeData;
