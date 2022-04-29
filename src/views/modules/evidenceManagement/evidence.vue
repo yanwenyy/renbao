@@ -329,7 +329,7 @@ export default {
     },
     //查询
     search() {
-      this.pageIndex = "";
+      this.pageIndex = 1;
       this.getDataList();
     },
     //重置

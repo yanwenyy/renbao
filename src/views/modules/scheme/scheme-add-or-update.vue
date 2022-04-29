@@ -4,12 +4,13 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="方案名称" prop="planName">
-        <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
-      </el-form-item>
-      <el-form-item label="方案编号" prop="planCode">
+      <el-form-item class="scheme-form-item" label="方案编号" prop="planCode">
         <el-input :disabled="dataForm.id!=''" v-model="dataForm.planCode" placeholder="方案编号" maxlength="255"></el-input>
       </el-form-item>
+      <el-form-item class="scheme-form-item" label="方案名称" prop="planName">
+        <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
+      </el-form-item>
+
       <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
@@ -268,5 +269,8 @@
 <style scoped>
   >>>.no-autofill-pwd .el-input__inner{
     -webkit-text-security:disc!important;
+  }
+  .scheme-form-item{
+    width: 70%;
   }
 </style>
