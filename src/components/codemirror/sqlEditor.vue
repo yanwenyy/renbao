@@ -116,8 +116,8 @@
                   class="right-menu">
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
-                <li class="menu-item" @click="addOrUpdateParmas()" v-if="paramsTreeClickNode.type=='params'">查看参数关联</li>
+                <li class="menu-item" @click="selfDelParmas(paramsTreeClickNode)" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'look')" v-if="paramsTreeClickNode.type=='params'">查看属性</li>
               </ul>
             </div>
           </div>
@@ -204,6 +204,11 @@
     props:{
       //添加参数确定点击事件
       addParamsClick: {
+        type: Function,
+        default: null,
+      },
+      //删除参数
+      delParams: {
         type: Function,
         default: null,
       },
@@ -782,11 +787,12 @@
         defaultPropsParams: {
           children: 'children',
           label: this.parmsDefaultProps.label?this.parmsDefaultProps.label:'label',
-          isLeaf:(data,node) => {
-            if (node.level >2) {// 根据需要进行条件判断添加is-leaf类名
-              return true
-            }
-          }
+          isLeaf: this.parmsDefaultProps.isLeaf?this.parmsDefaultProps.isLeaf:'isLeaf',
+          // isLeaf:(data,node) => {
+          //   if (node.level >2) {// 根据需要进行条件判断添加is-leaf类名
+          //     return true
+          //   }
+          // }
         },
         visible:true,
         cmTheme: "default", // codeMirror主题
@@ -935,6 +941,10 @@
       this.dragControllerDiv();
     },
     methods: {
+      //删除参数
+      selfDelParmas(data){
+        this.delParams(data);
+      },
       // 新增 / 修改参数
       addOrUpdateParmas(data,type) {
         this.paramsType=type;
@@ -1058,10 +1068,8 @@
         }
         // if (node.level > 1) return resolve([]);
         if(node.data.children&&node.data.children!=''){
-          console.log(1061)
           return resolve(node.data.children);
         }else if(node.data.type!='params'){
-          console.log(1064)
           setTimeout(() => {
             resolve(this.loadTree);
           }, 500);

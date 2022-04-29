@@ -13,13 +13,13 @@
                 <el-input :disabled="type=='look'" v-model="dataForm.param.paramName" placeholder="参数名称" maxlength="255"></el-input>
               </el-form-item>
               <el-form-item label="数据类型" prop="param.dataType">
-                <el-select v-model="dataForm.param.dataType" placeholder="请选择">
+                <el-select :disabled="type=='look'" v-model="dataForm.param.dataType" placeholder="请选择">
                   <el-option label="数字" value="num"></el-option>
                   <el-option label="文本" value="str"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="输入方式" prop="param.inputType">
-                <el-select v-model="dataForm.param.inputType" placeholder="请选择">
+                <el-select :disabled="type=='look'" v-model="dataForm.param.inputType" placeholder="请选择">
                   <el-option label="文本框" value="textinp"></el-option>
                   <el-option label="列表" value="lineinp"></el-option>
                   <el-option label="树" value="treeinp"></el-option>
@@ -30,14 +30,14 @@
               </el-form-item>
               <el-form-item label="允许为空">
                 <el-radio-group v-model="dataForm.paramChoice.allowedNull">
-                  <el-radio :label="1">是</el-radio>
-                  <el-radio :label="0">否</el-radio>
+                  <el-radio :disabled="type=='look'" :label="1">是</el-radio>
+                  <el-radio :disabled="type=='look'" :label="0">否</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="形式类型" v-if="dataForm.param.inputType=='lineinp'||dataForm.param.inputType=='treeinp'">
                 <el-radio-group v-model="dataForm.paramChoice.choiceType">
-                  <el-radio :label="1">单选</el-radio>
-                  <el-radio :label="0">多选</el-radio>
+                  <el-radio :disabled="type=='look'" :label="1">单选</el-radio>
+                  <el-radio :disabled="type=='look'" :label="0">多选</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="参数值长度" v-if="dataForm.param.inputType=='textinp'">
@@ -47,29 +47,31 @@
                 <el-tabs v-model="activeName2">
                   <el-tab-pane label="自定义动态" name="first" v-if="dataForm.param.inputType=='lineinp'">
                     <ul class="sa-list">
-                      <li v-for="(item,index) in selfActionsList">
-                        <el-input placeholder="名称" v-model="item.names"></el-input>
-                        <el-input placeholder="值" v-model="item.value1"></el-input>
-                        <el-button v-if="index==0" type="primary" size="small" @click="selfActionsList.push({ names:'',value1:''})">加</el-button>
-                        <el-button v-if="index>0" type="primary" size="small" @click="selfActionsList.splice(index,1)">减</el-button>
+                      <li v-for="(item,index) in dataForm.paramOptions">
+                        <el-input :disabled="type=='look'" placeholder="名称" v-model="item.optionsName"></el-input>
+                        <el-input :disabled="type=='look'" placeholder="值" v-model="item.optionsVal"></el-input>
+                        <el-button v-if="index==0&&type!='look'" type="primary" size="small" @click="dataForm.paramOptions.push({ optionsName:'',optionsVal:''})">加</el-button>
+                        <el-button v-if="index>0&&type!='look'" type="primary" size="small" @click="dataForm.paramOptions.splice(index,1)">减</el-button>
                       </li>
                     </ul>
                   </el-tab-pane>
                   <el-tab-pane label="SQL动态" name="second">
                     <el-input
+                      :disabled="type=='look'"
                       style="margin-bottom: 10px"
                       type="textarea"
                       :rows="6"
                       placeholder="请输入SQL"
                       v-model="dataForm.paramChoice.optionsSql">
                     </el-input>
-                    <el-button type="primary" @click="sqlRuleVisible = true">查看SQL规则</el-button>
-                    <el-button type="primary">预览</el-button>
+                    <el-button v-if="type!='look'" type="primary" @click="sqlRuleVisible = true">查看SQL规则</el-button>
+                    <el-button v-if="type!='look'" type="primary">预览</el-button>
                   </el-tab-pane>
                 </el-tabs>
               </el-form-item>
               <el-form-item label="说明">
                 <el-input
+                  :disabled="type=='look'"
                   type="textarea"
                   :rows="6"
                   placeholder="说明"
@@ -279,10 +281,7 @@
             choiceType: 1,
             optionsSql:'',
           },
-          paramOptions:{
-            optionsNames:'',
-            optionsVals:'',
-          },
+          paramOptions:[],
           associatedParamJsonStr:'',
           // scopeType: '',
           folderId: '',
@@ -304,6 +303,19 @@
       }
     },
     methods: {
+      clone(myObj,newObj){
+        if(typeof(myObj) != 'object'||typeof(newObj) != 'object'){
+          return myObj;
+        }
+        if(myObj == null){
+          return newObj;
+        }
+        for(let i in myObj){
+          newObj[i] =myObj[i]?JSON.parse(JSON.stringify(myObj[i])):newObj[i];
+        }
+        console.log(newObj)
+        return newObj;
+      },
       //关联参数配置保存
       relationFromSave(){
         this.relationParamList.push(this.relationForm);
@@ -367,10 +379,7 @@
             choiceType: 1,
             optionsSql:'',
           },
-          paramOptions:{
-            optionsNames:'',
-            optionsVals:'',
-          },
+          paramOptions:[],
           associatedParamJsonStr:'',
           // scopeType: '',
           folderId: '',
@@ -395,13 +404,13 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            var nameStr=[],valueStr=[];
-            this.selfActionsList.forEach(item=>{
-              nameStr.push(item.names);
-              valueStr.push(item.value1);
-            });
-            this.dataForm.paramOptions.optionsNames=nameStr.join("-");
-            this.dataForm.paramOptions.optionsVals=valueStr.join("-");
+            // var nameStr=[],valueStr=[];
+            // this.selfActionsList.forEach(item=>{
+            //   nameStr.push(item.names);
+            //   valueStr.push(item.value1);
+            // });
+            // this.dataForm.paramOptions.optionsNames=nameStr.join("-");
+            // this.dataForm.paramOptions.optionsVals=valueStr.join("-");
             this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList);
             this.addParamsClick(this.dataForm,this.type);
             this.visible=false;
@@ -422,7 +431,10 @@
       paramsDetail: {
         deep: true,
         handler(newVal, oldVal) {
-          console.log(newVal)
+          console.log(newVal,425);
+          this.dataForm=this.clone(newVal,this.dataForm);
+          this.dataForm.paramChoice.choiceType=Number(this.dataForm.paramChoice.choiceType);
+          this.visible=true;
         },
       },
       paramsType: {

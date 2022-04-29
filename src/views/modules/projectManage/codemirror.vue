@@ -29,6 +29,7 @@
       :paramsDetail="paramsDetail"
       :getParamsDetail="getParamsDetail"
       :getLoadTreeParams="getLoadTreeParams"
+      :delParams="delParams"
     ></sql-edit>
   </div>
 
@@ -72,6 +73,7 @@
         },//左侧数据表tree显示数据绑定的名字
         parmsDefaultProps:{
           label:'name',
+          isLeaf: 'isLeaf'
         },//左侧参数tree显示数据绑定的名字
         sqlListData:[],//sql列表data
         sqlListTotal:0,//sql列表data
@@ -158,18 +160,21 @@
       this.ws.close();
     },
     methods: {
+      //删除参数点击
+      delParams(data){
+
+      },
       //获取参数详情
       getParamsDetail(data){
         //data 点击的参数节点
-
         this.$http({
           url: this.$http.adornUrl(`/ammParam/selectByUuid/${data.id}`),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {
           if (data && data.code === 200) {
-            var datas=data.result;
-            console.log(datas);
+            //paramsDetail 需要跟新增或修改传过来的数据格式保持一致
+            this.paramsDetail=data.result;
           }else{
             this.$message.error(data.message)
           }
@@ -472,11 +477,12 @@
             var _data=data.result;
             _data.forEach(item=>{
               item.ParamsType=JSON.parse(JSON.stringify(item.type));//参数的类型 必须的publicParam:公共参数 personalParam:个人参数
-              item.children=item.chidren||[];
               // item.id=item.paramId;//参数树需要的id
               // item.name=item.paramName;//参数树需要的name
               // item.sql=item.paramSql;//参数树需要的sql
-              item.type='params';//参数树需要的type 图标类型 参数:params
+              item.type=item.isParent?'funFolder':'params';//参数树需要的type 图标类型 参数:params
+              item.isLeaf=item.isParent? false:true;//参数树需要的type 图标类型 参数:params
+              item.children=item.children||[];
             });
             this.loadTree =_data||[];
           })
