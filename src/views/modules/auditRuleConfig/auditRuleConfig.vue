@@ -3,6 +3,7 @@
     <div class="left">
       <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <rule-tree
+          :key="treeKey"
           ref="ruleTree"
           :isShowSearch="true"
           :isShowCheckBox="false"
@@ -239,6 +240,7 @@ import AddOrUpdate from "../../modules/data/rule-add-or-update.vue";
 export default {
   data() {
     return {
+      treeKey:0,
       treeLoading: false,
       tableLoading: false,
       searchForm: {
@@ -267,6 +269,7 @@ export default {
     // this.getSelectPage();
     // this.getRuleFolder();
     // this.getRuleFolder();
+    this.treeKey=Math.random();
   },
   created() {
     // this.getRuleFolder();
