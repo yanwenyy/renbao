@@ -33,6 +33,7 @@
           </el-form-item>
           <el-form-item label="选择医院" prop="hospital">
             <el-input
+              :title="ruleOperationForm.hospital"
               class="size"
               :disabled="true"
               placeholder="请选择医院"

@@ -25,6 +25,7 @@
       <el-form-item prop="hospitalName" label="医院：">
         <el-input
           style="width:80%"
+          :title="dataForm.hospitalName"
           v-model="dataForm.hospitalName"
           placeholder="请选择"
           disabled

@@ -23,6 +23,7 @@
       </el-form-item>
       <el-form-item label="选择医院" prop="hospitalName">
         <el-input
+          :title="dataForm.hospitalName"
           disabled
           v-model="dataForm.hospitalName"
           style="width:80%"
@@ -80,8 +81,8 @@ export default {
     info: { type: Boolean },
     runIds: { type: String },
     sql: { type: Array },
-    ruleSql: { 
-      type: Array, 
+    ruleSql: {
+      type: Array,
       default: () => []
     }
   },
