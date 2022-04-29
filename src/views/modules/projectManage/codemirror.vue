@@ -470,6 +470,14 @@
             })
           }).then(({data}) => {
             var _data=data.result;
+            _data.forEach(item=>{
+              item.ParamsType=JSON.parse(JSON.stringify(item.type));//参数的类型 必须的publicParam:公共参数 personalParam:个人参数
+              item.children=item.chidren||[];
+              // item.id=item.paramId;//参数树需要的id
+              // item.name=item.paramName;//参数树需要的name
+              // item.sql=item.paramSql;//参数树需要的sql
+              item.type='params';//参数树需要的type 图标类型 参数:params
+            });
             this.loadTree =_data||[];
           })
         }

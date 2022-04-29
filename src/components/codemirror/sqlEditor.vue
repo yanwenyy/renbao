@@ -950,7 +950,7 @@
       //数据表左侧右击事件
       rightClick(event, data, node, obj) {
         //只有表可以点击
-        if(data.dataType==2||data.ParamsType=='publicParam'||data.ParamsType=='personalParam'){
+        if(data.dataType==2||data.ParamsType=='publicParam'||data.ParamsType=='personalParam'||data.ParamsType=='paramNode'){
           this.paramsTreeClickNode=data;
           this.showRightMenu = false; // 先把模态框关死，目的是：第二次或者第n次右键鼠标的时候 它默认的是true
           this.showRightMenu = true;
@@ -1058,12 +1058,16 @@
         }
         // if (node.level > 1) return resolve([]);
         if(node.data.children&&node.data.children!=''){
+          console.log(1061)
           return resolve(node.data.children);
-        }else{
+        }else if(node.data.type!='params'){
+          console.log(1064)
           setTimeout(() => {
             resolve(this.loadTree);
           }, 500);
 
+        }else{
+          resolve([])
         }
 
       },
