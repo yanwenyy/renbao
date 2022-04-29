@@ -30,6 +30,20 @@
               placeholder="创建人"
             ></el-input>
           </el-form-item>
+          <el-form-item label="底稿编号：">
+            <el-input
+              v-model="searchForm.manuscriptCode"
+              clearable
+              placeholder="底稿编号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="底稿名称：">
+            <el-input
+              v-model="searchForm.manuscriptName"
+              clearable
+              placeholder="底稿名称"
+            ></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
@@ -41,15 +55,15 @@
             :disabled="this.multipleTable.length <= 0"
           >删除
           </el-button>
-          <el-button
-            style="float:right"
-            type="primary"
-            :disabled="
-              this.multipleTable.length <= 0 || this.multipleTable.length > 1
-            "
-            @click="editData"
-            >编写底稿</el-button
-          >
+          <!--<el-button-->
+            <!--style="float:right"-->
+            <!--type="primary"-->
+            <!--:disabled="-->
+              <!--this.multipleTable.length <= 0 || this.multipleTable.length > 1-->
+            <!--"-->
+            <!--@click="editData"-->
+            <!--&gt;编写底稿</el-button-->
+          <!--&gt;-->
 
         </el-form>
       </div>
@@ -60,9 +74,9 @@
             border
             v-loading="tableLoading"
             @selection-change="handleSelectionChange"
-            style="width: 100%;"
+            style="width: 100%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;"
             ref="multipleTable"
-            :height="tableHeight - 80"
+            :height="tableHeight - 150"
           >
             <el-table-column
               type="selection"
@@ -145,6 +159,9 @@
               label="操作"
             >
               <template slot-scope="scope">
+                <el-button type="text" @click="editData(scope.row)"
+                >编写底稿
+                </el-button>
                 <el-button type="text" @click="deleteHandle(scope.row.ruleId)"
                 >删除
                 </el-button>
@@ -154,7 +171,6 @@
         </div>
         <div class="auditRuleConfig-right-bottom">
           <el-pagination
-            v-if="Pager.total >= 1"
             @size-change="sizeChangeHandle"
             @current-change="currentChangeHandle"
             :current-page="Pager.pageIndex"
@@ -202,7 +218,9 @@ export default {
         ruleName: "",
         createUserName: "",
         folderPath: "",
-        folderId: ""
+        folderId: "",
+        manuscriptCode: "",
+        manuscriptName: "",
       },
       tableData: [],
       Pager: {
@@ -357,6 +375,8 @@ export default {
     //重置
     onReset() {
       this.searchForm.ruleName='';
+      this.searchForm.manuscriptCode='';
+      this.searchForm.manuscriptName='';
       this.searchForm.createUserName='';
       this.Pager.pageIndex = 1;
       this.getSelectPage();
@@ -366,14 +386,14 @@ export default {
       // this.searchForm.folderId = '';
     },
     //编写底稿弹窗
-    editData() {
+    editData(row) {
       if(this.projectId==''||this.projectId==null||this.projectId==undefined){
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
       this.title = "编写底稿";
       this.showEditDialog = true;
-      this.data = this.multipleTable[0];
+      this.data = row;
       this.readonly = false;
     },
     //查看底稿弹窗
@@ -481,7 +501,7 @@ export default {
   min-width: 800px;
   // overflow-x: auto;
   .auditRuleConfig-left {
-    width: 300px;
+    width: 29%;
     // min-height: 100vh;
     // min-height: calc(100vh - 165px);
     // margin-right: 20px;
@@ -495,7 +515,8 @@ export default {
     }
   }
   .auditRuleConfig-right {
-    flex: 1;
+    width: 71%;
+    /*flex: 1;*/
     border: none;
     /*height: 75vh;*/
     overflow: auto;

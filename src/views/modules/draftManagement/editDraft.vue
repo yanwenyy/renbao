@@ -46,6 +46,7 @@
       </el-form-item>
       <el-form-item prop="manuscriptRemark" label="违规信息描述：">
         <el-input
+          :readonly="readonly"
           v-model="dataForm.manuscriptRemark"
           type="textarea"
           :rows="6"

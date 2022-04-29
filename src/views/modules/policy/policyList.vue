@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="box" >
-      <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
+      <div class="left list-left-tree" :style="{height:(tableHeight+100)+'px'}">
         <div class="custom-tree-container">
          <el-input
            clearable
@@ -90,10 +90,10 @@
             :loading="ruleExportLoading"
             >导出</el-button
           >
-          <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
+          <el-button type="danger" @click="deleteHandle()"  :disabled="dataListSelections.length <= 0">删除</el-button>
         </div>
         <el-table
-          :height="tableHeight-tableMinus"
+          :height="tableHeight-140"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -428,11 +428,10 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var policyIds = id
-        ? [id]
-        : this.dataListSelections.map(item => {
-            return item.userId;
+      var policyIds = id ? [id] : this.dataListSelections.map(item => {
+            return item.policyId;
           });
+      console.log(policyIds)
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -562,4 +561,7 @@ export default {
   width: 80%;
   margin-bottom: 5px;
 }
+  >>>.el-tree-node:focus > .el-tree-node__content ,>>>.el-tree-node.is-current{
+    background: #E0EDFA;
+  }
 </style>

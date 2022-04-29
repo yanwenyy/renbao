@@ -1,5 +1,6 @@
 <template>
   <el-dialog
+    width="40vw"
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
@@ -7,7 +8,7 @@
       <el-form-item label="政策名称" prop="policyName">
         <el-input v-model="dataForm.policyName" placeholder="政策名称" maxlength="255"></el-input>
       </el-form-item>
-      <el-form-item label="开始时间">
+      <el-form-item label="开始时间" prop="beginTime">
         <el-date-picker
           value-format="yyyy-MM-dd HH:mm:ss"
           v-model="dataForm.beginTime"
@@ -15,7 +16,7 @@
           placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="有效时间">
+      <el-form-item label="有效时间" prop="endTime">
         <el-date-picker
           value-format="yyyy-MM-dd HH:mm:ss"
           v-model="dataForm.endTime"
@@ -23,7 +24,7 @@
           placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
+      <el-form-item label="上传文件" prop="multipartFiles" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
           action="#"
@@ -71,7 +72,10 @@
             { required: true, message: '开始时间不能为空', trigger: 'blur' }
           ],
           endTime: [
-            { required: true, message: '有效时间能为空', trigger: 'blur' }
+            { required: true, message: '有效时间不能为空', trigger: 'blur' }
+          ],
+          multipartFiles: [
+            { required: true, message: '上传文件不能为空', trigger: 'blur' }
           ],
         }
       }
