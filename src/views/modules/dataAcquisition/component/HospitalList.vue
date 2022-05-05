@@ -1,13 +1,14 @@
 
 <template>
     <div>
-         <div class='listDisplay'>
+        <div class='listDisplay'>
              <el-button type="warning" @click="getStopCollection()">查看未导入医院</el-button>
         </div>
         <el-table :data="tableData" ref="tableData" border :header-cell-style="{textAlign:'center'}" style="width: 100%" height="60vh" v-loading="dataListLoading" @selection-change="handleSelectionChange">
             <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
             <el-table-column label="批次" align="center" prop="hospitalCollectPlanBath"> </el-table-column>
             <el-table-column label="医院名称" align="center" prop="hospitalName"></el-table-column>
+            <el-table-column label="采集表名称" align="center" prop="collectTableName"></el-table-column>
             <el-table-column label="采集数据文件路径" align="center" prop="collectPath"> </el-table-column>
             <el-table-column label="数据类型" align="center">
                     <template slot-scope="scope">
@@ -70,7 +71,9 @@ export default {
         NotImport,
         ViewProgress
     },
-    props:{ dataList: { type: Object } },
+    props:{dataList:{
+         type: String,
+    }},
     data(){
         return{
             tableData:[],
@@ -92,11 +95,19 @@ export default {
             },
         }
     },
+    created(){
+
+    },
     mounted(){
-        this.getInitList()
         console.log(this.dataList)
+        this.getInitList()
+     
     },
     methods:{
+        // dataList(val){
+        //     debugger
+        //     console.log(val)
+        // },
         getInitList(){
             this.dataListLoading = true;
             this.$http({

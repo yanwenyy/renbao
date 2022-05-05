@@ -104,10 +104,10 @@
               </el-form-item>
             </div>
           </el-tab-pane>
-          <el-tab-pane name="2" label="sql编写">
+          <el-tab-pane name="2" label="规则编写">
 
             <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='2'" v-if="type != 'look'" type="primary" @click="openSql()"
-              >sql编译器</el-button
+              >SQL编译器</el-button
             >
             <el-button :disabled="dataForm.ruleId!=''&&dataForm.ruleType=='1'" v-if="type != 'look'" type="primary" @click="openGra()"
               >图形化工具</el-button
@@ -125,10 +125,10 @@
               <!--</el-input>-->
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane name="3" label="统计sql编写">
-            <div class="tabs3-notice">此结果来自sql编译器</div>
+          <el-tab-pane name="3" label="统计结果编写">
             <div class="tabs-div">
               <div class="tabs3-left inline-block">
+                <div class="tabs3-notice">此结果来自SQL编译器</div>
                 <el-tree
                   :disabled="type == 'look'"
                   :props="defaultProps"
@@ -148,7 +148,9 @@
                 </el-tree>
               </div>
               <div class="tabs3-right inline-block" @dragover="allowDropInput">
+                <div class="tabs3-notice">统计结果SQL</div>
                 <el-input
+                  placeholder='例：统计sql编写，涉及"总人次","总金额"字段'
                   :disabled="type == 'look'"
                   class="self-input"
                   type="textarea"
@@ -720,8 +722,8 @@ export default {
       this.type = type;
       this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
       this.dataForm.ruleId = id;
-      this.dataForm.folderId = this.ruleCheckData.folderId;
-      this.dataForm.folderPath = this.ruleCheckData.folderPath;
+      this.dataForm.folderId = !this.dataForm.ruleId?this.ruleCheckData.folderId:'';
+      this.dataForm.folderPath = !this.dataForm.ruleId?this.ruleCheckData.folderPath:'';
       this.sqlMsgCopy = "";
       this.getUserInfo();
       this.$nextTick(() => {
@@ -786,7 +788,7 @@ export default {
               datas.ruleSqlValue
             );
 
-            // this.menuListTreeSetCurrentNode();
+            this.menuListTreeSetCurrentNode();
             this.deletCm();
           }
         });

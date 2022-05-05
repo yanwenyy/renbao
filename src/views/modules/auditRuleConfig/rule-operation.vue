@@ -33,6 +33,7 @@
           </el-form-item>
           <el-form-item label="选择医院" prop="hospital">
             <el-input
+              :title="ruleOperationForm.hospital"
               class="size"
               :disabled="true"
               placeholder="请选择医院"
@@ -68,7 +69,7 @@
           :loading="loading"
           >确 定</el-button
         >
-        <el-button @click="cancel">取 消</el-button>
+        <el-button @click="handleClose">取 消</el-button>
       </span>
     </el-dialog>
     <hospital-selection ref="hospitalSelection"></hospital-selection>
@@ -79,6 +80,23 @@ import hospitalSelection from "./hospital-selection.vue"; // 选择医院弹框
 export default {
   props: ["getData"],
   data() {
+    let validExpectedBeginTime = (rule, value, callback) => {
+      let date1 = new Date();
+      let date2 = new Date(value);
+      let s1 = date1.getTime();
+      let s2 = date2.getTime();
+      let total = (s2 - s1) / 1000;
+      let day = parseInt(total / (24 * 60 * 60)); //计算整bai数天du数
+      let afterDay = total - day * 24 * 60 * 60; //取得值算出天数后dao剩余的转秒数shu
+      let hour = parseInt(afterDay / (60 * 60)); //计算整数小时数
+      let afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60; //取得算出小时数后剩余的秒数
+      let min = parseInt(afterHour / 60); //计算整数分
+      if (min <= 2) {
+        callback(new Error('开始执行时间需要大于当前时间2分钟'));
+      } else {
+        callback();
+      }
+    }
     return {
       loading: false,
       dialogVisible: false,
@@ -89,16 +107,16 @@ export default {
         batchRemark: "",
         hospitalCode: "",
         hospitalName: "",
-        ruleId: "",
         runType: "",
-        resultSqlValue: []
+        resultSqlValue: [],
+        ruleSql: []
       },
       ruleOperationFormRules: {
+        expectedBeginTime: [{ validator: validExpectedBeginTime, trigger: "blur" }],
         batchName: [{ required: true, message: "请输入批次名称" }],
         hospital: [{ required: true, message: "请选择医院" }]
       },
       type: "",
-      checkRuleData: [],
       pickerOptions: {
         disabledDate(time) {
           const date = new Date();
@@ -117,36 +135,15 @@ export default {
   },
   methods: {
     //默认打开页面
-    showDialog(
-      checkRuleData,
-      type,
-      checkHospitalList,
-      ruleOperationForm,
-      hospitalBack
-    ) {
+    showDialog(checkRuleData, type) {
       this.reset();
       this.dialogVisible = true;
       this.type = type;
-      this.checkRuleData = checkRuleData;
-
-      // 判断从医院弹框返回重新给表单内容赋值
-      if (hospitalBack) {
-        this.ruleOperationForm = ruleOperationForm;
-      }
-      let ruleId = [];
-      this.checkRuleData.map(i => {
-        ruleId.push(i.ruleId);
-      });
-      this.ruleOperationForm.ruleId = ruleId.join(",");
+      this.ruleOperationForm.ruleSql = JSON.parse(JSON.stringify(checkRuleData));
       this.ruleOperationForm.runType = this.type == "timing" ? 2 : 1; // runtype 1是立即运行 2是定时运行
     },
     changeHospital() {
-      // this.dialogVisible = false
-      this.$refs.hospitalSelection.showDialog(
-        this.checkRuleData,
-        this.type,
-        this.ruleOperationForm
-      );
+      this.$refs.hospitalSelection.showDialog(this.ruleOperationForm.ruleSql, this.type);
     },
     reset() {
       this.ruleOperationForm = {
@@ -156,10 +153,9 @@ export default {
         batchRemark: "",
         hospitalCode: "",
         hospitalName: "",
-        ruleId: ""
+        ruleSql: []
       };
     },
-
     handleClose() {
       this.dialogVisible = false;
       this.resetForm();
@@ -203,7 +199,7 @@ export default {
         }
       });
     },
-    setHospital(checkHospitalList, data) {
+    setHospital(checkHospitalList, checkRuleData) {
       let hospitalName = [];
       let hospitalCode = [];
       checkHospitalList.map(i => {
@@ -214,14 +210,9 @@ export default {
       this.ruleOperationForm.hospitalName = hospitalName.join(",");
       this.ruleOperationForm.hospitalCode = hospitalCode.join(",");
       //sql
-      this.ruleOperationForm.resultSqlValue = data;
+      this.ruleOperationForm.ruleSql = checkRuleData;
     },
-    cancel() {
-      this.dialogVisible = false;
-      this.resetForm();
-      this.reset();
-    },
-    resetForm(formName) {
+    resetForm() {
       if (this.$refs["ruleOperationForm"]) {
         this.$refs["ruleOperationForm"].resetFields();
       }
@@ -229,14 +220,6 @@ export default {
   },
   components: {
     hospitalSelection
-  },
-  watch: {
-    dialogVisible(nval, oval) {
-      if (nval) {
-        this.resetForm();
-        this.reset();
-      }
-    }
   },
   computed: {
     projectId: {

@@ -25,6 +25,7 @@
       <el-form-item prop="hospitalName" label="医院：">
         <el-input
           style="width:80%"
+          :title="dataForm.hospitalName"
           v-model="dataForm.hospitalName"
           placeholder="请选择"
           disabled
@@ -46,6 +47,7 @@
       </el-form-item>
       <el-form-item prop="manuscriptRemark" label="违规信息描述：">
         <el-input
+          :readonly="readonly"
           v-model="dataForm.manuscriptRemark"
           type="textarea"
           :rows="6"
@@ -215,6 +217,7 @@ export default {
                   this.$emit("ok");
                 }
               });
+              this.$emit('refreshDataList')
             } else {
               this.$message.error(data.message);
             }

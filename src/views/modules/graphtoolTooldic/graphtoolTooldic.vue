@@ -217,7 +217,7 @@
         <!--<div id="sql" class="box-bg"></div>-->
       </div>
     </div>
-    <el-dialog :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
+    <el-dialog :append-to-body='true' :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
       <div class="screen-body">
         <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
       </div>
@@ -226,7 +226,7 @@
         <el-button type="primary" @click="saveScreen()">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
+    <el-dialog :append-to-body='true' :modal-append-to-body="true" top="2vh" width="95%" title="执行结果" :visible.sync="wsVisiable">
       <el-tabs @tab-click="tabClick" v-if="resultTableTabs.length>0" v-model="resultTableTabsValue" type="border-card">
         <el-tab-pane
           :key="String(index)"
@@ -238,7 +238,7 @@
           <div v-if="item.list==''">
             <div v-if="!item.columnList">{{item.msg}}</div>
             <el-table height="52vh" v-if="item.columnList" border :data="[]" stripe style="width: 100%" class="box-table">
-              <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
+              <el-table-column align="center" :width="(key.length+1)*22" v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" prop="key" :key="index" :label="key">
 
               </el-table-column>
             </el-table>
@@ -246,7 +246,7 @@
           <!--<el-table :height="fullScreen?'80vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.list" stripe style="width: 100%" class="box-table">-->
           <!--<el-table :height="fullScreen?'70vh':boxHeight*0.35" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">-->
           <el-table height="52vh" v-if="item.list!=''" border :data="item.dataPageList" stripe style="width: 100%" class="box-table">
-            <el-table-column v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
+            <el-table-column align="center" :width="(key.length+1)*22" v-if="item.columnListSelf[0]" v-for="(vtem,key,index) in item.columnListSelf[0]" :key="index" :label="key">
               <template slot-scope="scope">
                 <div>
                   <span>{{scope.row[key]}}</span>
@@ -803,6 +803,7 @@
                     delete that.filter[item.panel.data.id];
                   }
                   that.initTableRow(item.panel.data.tableId);
+                  that.initOrder();
                   that.toSql();
                 }
                 that.myDiagram.model.updateTargetBindings(item.panel.data);

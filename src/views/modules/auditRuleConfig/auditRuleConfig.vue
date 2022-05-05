@@ -3,6 +3,7 @@
     <div class="left">
       <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <rule-tree
+          :key="treeKey"
           ref="ruleTree"
           :isShowSearch="true"
           :isShowCheckBox="false"
@@ -10,6 +11,7 @@
           @getTreeId="getTreeId"
           :isParent="false"
           :folderSorts="folderSorts"
+          :projectId="projectId"
         ></rule-tree>
       </el-card>
     </div>
@@ -42,9 +44,7 @@
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
-        </el-form>
-        <el-form style="float:right">
-          <el-form-item>
+          <el-form-item style="float: right">
             <el-button type="primary" @click="addFun">新增</el-button>
             <el-button
               type="primary"
@@ -53,7 +53,7 @@
               :disabled="
                 this.multipleTable.length == 0 || this.multipleTable.length > 1
               "
-              >提交至地区个性化规则</el-button
+            >提交至地区个性化规则</el-button
             >
 
             <!--<el-button-->
@@ -71,23 +71,31 @@
             >
           </el-form-item>
         </el-form>
-
         <div>
           <el-table
             v-loading="tableLoading"
             ref="multipleTable"
             :data="tableData"
             tooltip-effect="dark"
-            style="width: 100%;margin-top: 20px"
+            style="width: 100%"
             :row-key="getRowKeys"
             @selection-change="handleSelectionChange"
-            :height="tableHeight - 190"
+            :height="tableHeight - 150"
           >
             <el-table-column
               type="selection"
               width="55"
               :reserve-selection="true"
             ></el-table-column>
+            <el-table-column
+              type="index"
+              header-align="center"
+              align="center"
+              width="80"
+              label="序号"
+              :index="indexMethod"
+            >
+            </el-table-column>
             <el-table-column
               prop="ruleName"
               label="审核规则名称"
@@ -232,6 +240,7 @@ import AddOrUpdate from "../../modules/data/rule-add-or-update.vue";
 export default {
   data() {
     return {
+      treeKey:0,
       treeLoading: false,
       tableLoading: false,
       searchForm: {
@@ -252,25 +261,34 @@ export default {
         return row.ruleId;
       },
       treeData: [],
-      folderSorts: 3,
+      folderSorts: '',
       ruleCheckData: {}
     };
   },
   activated() {
     // this.getSelectPage();
     // this.getRuleFolder();
-    this.getRuleFolder();
+    // this.getRuleFolder();
+    this.treeKey=Math.random();
   },
   created() {
     // this.getRuleFolder();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.Pager.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.Pager.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     getSelectPage() {
+      this.treeData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });
@@ -362,6 +380,10 @@ export default {
     },
     //新增
     addFun() {
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       // this.$refs.ruleConfigDialog.showDialog([], this.treeData, 'add');
       this.$refs.addOrUpdate.init("", this.ruleCheckData);
     },
@@ -450,21 +472,19 @@ export default {
           type: "warning"
         });
 
-      var sql = [];
+      var ruleSql = [];
       for (var i = 0; i < this.multipleTable.length; i++) {
         if (this.multipleTable[i].ruleSqlValue != null) {
-          sql.push(this.multipleTable[i].ruleSqlValue);
+          ruleSql.push({
+            sql: this.multipleTable[i].ruleSqlValue,
+            ruleId: this.multipleTable[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (ruleSql.length === 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        this.$refs.ruleOperation.showDialog(
-          this.multipleTable,
-          "immediately",
-          [],
-          {}
-        );
+        this.$refs.ruleOperation.showDialog(ruleSql, "immediately");
       }
     },
     // 定时执行
@@ -479,21 +499,19 @@ export default {
           type: "warning"
         });
 
-      var sql = [];
+      var ruleSql = [];
       for (var i = 0; i < this.multipleTable.length; i++) {
         if (this.multipleTable[i].ruleSqlValue != null) {
-          sql.push(this.multipleTable[i].ruleSqlValue);
+          ruleSql.push({
+            sql: this.multipleTable[i].ruleSqlValue,
+            ruleId: this.multipleTable[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (ruleSql.length === 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        this.$refs.ruleOperation.showDialog(
-          this.multipleTable,
-          "timing",
-          [],
-          {}
-        );
+        this.$refs.ruleOperation.showDialog(ruleSql, "timing");
       }
     }
   },

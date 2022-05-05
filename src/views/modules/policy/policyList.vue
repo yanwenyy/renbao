@@ -1,9 +1,10 @@
 <template>
   <div>
     <div class="box" >
-      <div class="left list-left-tree" :style="{height:(tableHeight+120)+'px'}">
+      <div class="left list-left-tree" :style="{height:(tableHeight+100)+'px'}">
         <div class="custom-tree-container">
          <el-input
+           clearable
             class="filter-text"
             placeholder="输入关键字进行过滤"
             v-model="filterText">
@@ -44,7 +45,7 @@
             <!--</el-date-picker>-->
             <el-date-picker
               :picker-options="pickerOptionsStart"
-              v-model="dataForm.beginTime"
+              v-model="dataForm.endStartTime"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期">
@@ -52,7 +53,7 @@
             <span>--</span>
             <el-date-picker
               :picker-options="pickerOptionsEnd"
-              v-model="dataForm.endTime"
+              v-model="dataForm.endStopTime"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期">
@@ -89,10 +90,10 @@
             :loading="ruleExportLoading"
             >导出</el-button
           >
-          <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
+          <el-button type="danger" @click="deleteHandle()"  :disabled="dataListSelections.length <= 0">删除</el-button>
         </div>
         <el-table
-          :height="tableHeight-tableMinus"
+          :height="tableHeight-140"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -103,6 +104,15 @@
             header-align="center"
             align="center"
             width="50"
+          >
+          </el-table-column>
+          <el-table-column
+            type="index"
+            header-align="center"
+            align="center"
+            width="80"
+            label="序号"
+            :index="indexMethod"
           >
           </el-table-column>
           <el-table-column prop="policyName" align="center" label="政策名称">
@@ -185,7 +195,7 @@ export default {
       pickerOptionsStart: {
         disabledDate: time => {
           // 获取结束日期的 v-model 值并赋值给新定义的对象
-          let endDateVal = this.dataForm.endTime;
+          let endDateVal = this.dataForm.endStopTime;
           if (endDateVal) {
             // 比较 距 1970 年 1 月 1 日之间的毫秒数：
             return time.getTime() > new Date(endDateVal).getTime();
@@ -196,7 +206,7 @@ export default {
       pickerOptionsEnd: {
         disabledDate: time => {
           // 获取开始日期的 v-model 值并赋值给新定义的对象
-          let beginDateVal = this.dataForm.beginTime;
+          let beginDateVal = this.dataForm.endStartTime;
           if (beginDateVal) {
             // 比较 距 1970 年 1 月 1 日之间的毫秒数：
             return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
@@ -220,8 +230,8 @@ export default {
       path: window.SITE_CONFIG.cdnUrl,
       dataForm: {
         policyName: "",
-        endTime: "",
-        beginTime: "",
+        endStopTime: "",
+        endStartTime: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
       },
@@ -269,6 +279,13 @@ export default {
     this.getTreeData();
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     filterNode (value, data) {
       if (!value) return true;
       return data.regionName.indexOf(value) !== -1;
@@ -318,8 +335,8 @@ export default {
     //重置点击
     reset() {
       this.dataForm.policyName = "";
-      this.dataForm.endTime = "";
-      this.dataForm.beginTime = "";
+      this.dataForm.endStopTime = "";
+      this.dataForm.endStartTime = "";
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
@@ -336,8 +353,8 @@ export default {
           pageNo: this.pageIndex,
           pageSize: this.pageSize,
           policyName: this.dataForm.policyName,
-          endTime: this.dataForm.endTime,
-          beginTime: this.dataForm.beginTime,
+          endStopTime: this.dataForm.endStopTime,
+          endStartTime: this.dataForm.endStartTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
         })
@@ -411,11 +428,10 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var policyIds = id
-        ? [id]
-        : this.dataListSelections.map(item => {
-            return item.userId;
+      var policyIds = id ? [id] : this.dataListSelections.map(item => {
+            return item.policyId;
           });
+      console.log(policyIds)
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -463,9 +479,9 @@ export default {
     down() {
       var url =
         "/jinding/outcar/port?timeStart=" +
-        this.dataForm.timeStart +
+        this.dataForm.endStartTime +
         "&timeEnd=" +
-        this.dataForm.timeEnd +
+        this.dataForm.endStopTime +
         "&tranType=&emissionStand=" +
         this.dataForm.emissionStand +
         "&fuelType=" +
@@ -545,4 +561,7 @@ export default {
   width: 80%;
   margin-bottom: 5px;
 }
+  >>>.el-tree-node:focus > .el-tree-node__content ,>>>.el-tree-node.is-current{
+    background: #E0EDFA;
+  }
 </style>

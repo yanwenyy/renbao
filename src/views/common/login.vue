@@ -57,6 +57,8 @@
 </template>
 
 <script>
+  // 引入js
+  import hex_md5 from '../common/md5.js';
   import { getUUID } from '@/utils'
   export default {
     data () {
@@ -95,7 +97,8 @@
               method: 'post',
               data: this.$http.adornData({
                 'username': this.dataForm.userName,
-                'password': this.dataForm.password,
+                // 'password':this.dataForm.password,
+                'password': hex_md5(this.dataForm.password),
                 // 'checkKey':  this.dataForm.uuid,
                 // 'captcha': this.dataForm.captcha
               })

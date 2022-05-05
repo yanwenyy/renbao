@@ -42,6 +42,7 @@
             </span>
           </el-tree> -->
           <ruleTree
+            :folderSorts="folderSorts"
             ref="ruleTree"
             :isShowSearch="true"
             :isShowCheckBox="false"
@@ -126,6 +127,15 @@
             header-align="center"
             align="center"
             width="50"
+          >
+          </el-table-column>
+          <el-table-column
+            type="index"
+            header-align="center"
+            align="center"
+            width="80"
+            label="序号"
+            :index="indexMethod"
           >
           </el-table-column>
           <el-table-column
@@ -236,7 +246,7 @@
       @refreshDataList="getDataList"
       :ruleData="ruleData"
     ></add-or-update>
-    <Import-file ref="ImportFile"></Import-file>
+    <Import-file ref="ImportFile" :ruleData="ruleData" :ruleCheckData="ruleCheckData"></Import-file>
   </div>
 </template>
 
@@ -247,6 +257,7 @@ import ImportFile from "./Import-file.vue";
 export default {
   data() {
     return {
+      folderSorts: "1,2",
       tableMinus: 75,
       ruleData: {}, //组件规则数数据
       form: {
@@ -316,7 +327,24 @@ export default {
       get() {
         return this.$store.state.common.documentClientHeight;
       }
-    }
+    },
+    projectId: {
+      get() {
+        if (this.$store.state.common.projectId) {
+          return this.$store.state.common.projectId;
+        } else {
+          this.$http({
+            url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+            method: "get",
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 200) {
+              return data.result.projectId;
+            }
+          });
+        }
+      }
+    },
   },
   watch: {
     filterText(val) {
@@ -333,19 +361,30 @@ export default {
   },
   activated() {
     // this.getDataList();
-    this.getRuleFolder();
+    // this.getRuleFolder();
     this.$refs.addOrUpdate.deletCm();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     // 新增 / 修改
     addOrUpdateHandle(id, type) {
       // this.addOrUpdateVisible = true
-
+      this.ruleData = this.$refs.ruleTree.treeData;
+      if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+        this.$message.error("请先在右上角选择项目!");
+        return false;
+      }
       this.$nextTick(() => {
         if (id) {
           this.$refs.addOrUpdate.init(id, this.ruleCheckData, type);
@@ -370,9 +409,11 @@ export default {
       this.dataForm.createUserName = "";
       this.pageIndex = 1;
       this.pageSize = 10;
+      this.getDataList();
     },
     // 获取数据列表
     getDataList() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });
@@ -437,7 +478,7 @@ export default {
     },
     // 导入
     ruleImport() {
-      this.$refs.ImportFile.showDialog();
+      this.$refs.ImportFile.showDialog(this.ruleCheckData,this.$refs.ruleTree.treeData);
     },
     // 每页数
     sizeChangeHandle(val) {
@@ -469,7 +510,7 @@ export default {
       var userIds = id
         ? [id]
         : this.dataListSelections.map(item => {
-            return item.userId;
+            return item.ruleId;
           });
       this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
         confirmButtonText: "确定",

@@ -9,7 +9,7 @@
             :before-close="handleClose">
             <div class="rule-tree-box">
                 <span style="display: inline-block;width: 80px;">选择规则：</span>
-                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="2" :isShowIcon="true"></rule-tree>
+                <rule-tree ref="ruleTree" :isShowSearch="false" :isShowCheckBox="true" :isShowEdit="false"  :isRelation="true" :isParent="false" @getTreeId="getTreeCheckData" @checkChange="handleCheckChange" folderSorts="2" :projectId="0" :isShowIcon="true"></rule-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="onSubmit('form')" :loading="loading" size="small">确 定</el-button>
@@ -90,6 +90,8 @@ export default {
 
                 ruleSqlValue: this.multipleTable[0].ruleSqlValue||'',
                 paramRules: this.multipleTable[0].params||[],
+                ruleGraphicJoins: this.multipleTable[0].ruleGraphicJoins||[],
+                ruleGraphicOrders: this.multipleTable[0].ruleGraphicOrders||[],
             }
             this.loading = true
             this.$http({

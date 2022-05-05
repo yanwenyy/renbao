@@ -68,9 +68,18 @@
             @selection-change="handleSelectionChange"
             v-loading="loading"
             style="width: 100%"
-            :height="tableHeight - 85"
+            :height="tableHeight - 105"
           >
             <el-table-column type="selection" width="55" align="center">
+            </el-table-column>
+            <el-table-column
+              type="index"
+              header-align="center"
+              align="center"
+              width="80"
+              label="序号"
+              :index="indexMethod"
+            >
             </el-table-column>
             <el-table-column
               prop="ruleName"
@@ -314,6 +323,13 @@ export default {
     this.initData();
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.Pager.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.Pager.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     //初始化列表数据
     initData() {
       // this.loading = true;

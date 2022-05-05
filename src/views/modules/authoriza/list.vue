@@ -35,7 +35,7 @@
       </ul>
     </div>
     <div class="right">
-      <div class="buttons" v-if="dataRight != ''">
+      <div class="buttons inline-block" v-if="dataRight != ''">
         <el-button type="primary" @click="getCheckedNodes">保存</el-button>
         <!--<el-button @click="getCheckedKeys">通过 key 获取</el-button>-->
         <!--<el-button @click="setCheckedNodes">通过 node 设置</el-button>-->
@@ -369,7 +369,6 @@ export default {
 }
 .buttons {
   text-align: right;
-  width: 100%;
   position: fixed;
   right: 5%;
   z-index: 999;

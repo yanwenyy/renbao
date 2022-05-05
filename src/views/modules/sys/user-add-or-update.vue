@@ -52,7 +52,7 @@
             ref="menuListTree"
             :default-expand-all="false"
             :check-strictly="isCheck"
-            @check-change="isCheck=true"
+            @check-change="dataForm.id?isCheck=true:isCheck=false"
             show-checkbox>
           </el-tree>
         </el-form-item>
@@ -189,6 +189,9 @@
         this.visible = true;
         this.dataForm.id=id;
         this.selTree = [];
+        if(!this.dataForm.id){
+          this.isCheck=false;
+        }
         this.$http({
           url: this.$http.adornUrl('/menu/getMenuList'),
           method: 'get',

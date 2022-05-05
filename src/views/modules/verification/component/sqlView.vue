@@ -15,7 +15,7 @@
                 <div v-if="scope.row.runStatus == '3'">失败</div>
             </template>
         </el-table-column>
-        <el-table-column prop="runResult" header-align="center" align="center" label="运行结果">
+        <el-table-column prop="runResult" header-align="center" min-width="100" align="center" label="运行结果">
         </el-table-column>
         </el-table>
       </div>

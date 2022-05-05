@@ -96,7 +96,8 @@ export default {
         this.formCodeData.codeName == null ||
         this.formCodeData.codeName == ""
       ) {
-        alert("请输入类型名称");
+        this.$message.error("请输入类型名称");
+        // alert("请输入类型名称");
         return false;
       }
       if (
@@ -104,7 +105,8 @@ export default {
         this.formCodeData.codeValue == null ||
         this.formCodeData.codeValue == ""
       ) {
-        alert("请输入类型编码");
+        this.$message.error("请输入类型编码");
+        // alert("请输入类型编码");
         return false;
       }
       if (
@@ -112,7 +114,8 @@ export default {
         this.formCodeData.codeDesc == null ||
         this.formCodeData.codeDesc == ""
       ) {
-        alert("请输入类型描述");
+        this.$message.error("请输入类型描述");
+        // alert("请输入类型描述");
         return false;
       }
       if (sortId === "" || sortId === null || sortId === undefined) {
@@ -141,6 +144,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                     this.$emit("closeMain");
+                    this.$emit('BaseCodeTreeTwo')
                     this.resetForm();
                 }
             })
@@ -158,7 +162,8 @@ export default {
         this.formCodeData.codeName == null ||
         this.formCodeData.codeName == ""
       ) {
-        alert("请输入类型名称");
+        this.$message.error("请输入类型名称");
+        // alert("请输入类型名称");
         return false;
       }
       if (
@@ -166,7 +171,8 @@ export default {
         this.formCodeData.codeDesc == null ||
         this.formCodeData.codeDesc == ""
       ) {
-        alert("请输入类型描述");
+        this.$message.error("请输入类型描述");
+        // alert("请输入类型描述");
         return false;
       }
       this.$confirm(
@@ -199,6 +205,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                     this.$emit("closeMain");
+                    this.$emit('BaseCodeTreeTwo')
                     this.resetForm();
                 }
             })
@@ -225,7 +232,7 @@ export default {
       }
     }
   },
-    computed: {
+  computed: {
     tableHeight: {
       get() {
         return this.$store.state.common.tableHeight;

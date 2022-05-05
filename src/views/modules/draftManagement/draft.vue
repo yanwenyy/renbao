@@ -6,8 +6,9 @@
         ref="ruleTree"
         :isShowSearch="true"
         :isShowCheckBox="false"
-        :isShowEdit="true"
+        :isShowEdit="false"
         :folderSorts="folderSorts"
+        :projectId="projectId"
         @getTreeId="getTreeId"
         :isParent="false"
       ></rule-tree>
@@ -29,19 +30,41 @@
               placeholder="创建人"
             ></el-input>
           </el-form-item>
+          <el-form-item label="底稿编号：">
+            <el-input
+              v-model="searchForm.manuscriptCode"
+              clearable
+              placeholder="底稿编号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="底稿名称：">
+            <el-input
+              v-model="searchForm.manuscriptName"
+              clearable
+              placeholder="底稿名称"
+            ></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
           <el-button
-            style="float:right"
+            style="float:right;margin-left: 10px"
+            @click="deleteHandle()"
             type="primary"
-            :disabled="
-              this.multipleTable.length <= 0 || this.multipleTable.length > 1
-            "
-            @click="editData"
-            >编写底稿</el-button
-          >
+            :disabled="this.multipleTable.length <= 0"
+          >删除
+          </el-button>
+          <!--<el-button-->
+            <!--style="float:right"-->
+            <!--type="primary"-->
+            <!--:disabled="-->
+              <!--this.multipleTable.length <= 0 || this.multipleTable.length > 1-->
+            <!--"-->
+            <!--@click="editData"-->
+            <!--&gt;编写底稿</el-button-->
+          <!--&gt;-->
+
         </el-form>
       </div>
       <div class="rule-table">
@@ -51,15 +74,24 @@
             border
             v-loading="tableLoading"
             @selection-change="handleSelectionChange"
-            style="width: 100%;"
+            style="width: 100%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;"
             ref="multipleTable"
-            :height="tableHeight - 80"
+            :height="tableHeight - 150"
           >
             <el-table-column
               type="selection"
               header-align="center"
               align="center"
               width="50"
+            >
+            </el-table-column>
+            <el-table-column
+              type="index"
+              header-align="center"
+              align="center"
+              width="80"
+              label="序号"
+              :index="indexMethod"
             >
             </el-table-column>
             <el-table-column
@@ -120,11 +152,25 @@
                 <!--}}-->
               <!--</template>-->
             <!--</el-table-column>-->
+            <el-table-column
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button type="text" @click="editData(scope.row)"
+                >编写底稿
+                </el-button>
+                <el-button type="text" @click="deleteHandle(scope.row.manuscriptId)"
+                >删除
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="auditRuleConfig-right-bottom">
           <el-pagination
-            v-if="Pager.total >= 1"
             @size-change="sizeChangeHandle"
             @current-change="currentChangeHandle"
             :current-page="Pager.pageIndex"
@@ -144,6 +190,7 @@
             :title="title"
           >
             <editDraft
+              @refreshDataList="getSelectPage"
               @close="closeAddDrawer"
               @ok="addSucceed"
               v-if="showEditDialog"
@@ -171,7 +218,9 @@ export default {
         ruleName: "",
         createUserName: "",
         folderPath: "",
-        folderId: ""
+        folderId: "",
+        manuscriptCode: "",
+        manuscriptName: "",
       },
       tableData: [],
       Pager: {
@@ -181,7 +230,7 @@ export default {
       },
       multipleTable: [],
       treeData: [],
-      folderSorts: "3",
+      folderSorts: "1,2",
       ruleCheckData: {},
       showEditDialog: false,
       dataListLoading: false,
@@ -191,15 +240,73 @@ export default {
     };
   },
   activated() {
-    this.getRuleFolder();
+    // this.getRuleFolder();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.Pager.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.Pager.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
+    // 删除
+    deleteHandle(id) {
+      let canDel=true;
+      if(this.multipleTable.length>0){
+        this.multipleTable.forEach(item=>{
+          if(!item.manuscriptId){
+            canDel=false;
+            this.$message.error("只能删除有底稿的数据")
+            return false;
+          }
+        })
+      }
+      if(canDel){
+        var userIds = id
+          ? [id]
+          : this.multipleTable.map(item => {
+            return item.manuscriptId;
+          });
+        if(userIds.length==0){
+          this.$message.error("只能删除有底稿的数据")
+          return false;
+        }
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl("/manuscript/deleteByIds"),
+              method: "delete",
+              data: this.$http.adornData(userIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getSelectPage();
+                  }
+                });
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+          })
+          .catch(() => {});
+      }
+    },
     getSelectPage() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });
@@ -223,7 +330,7 @@ export default {
           this.tableLoading = false;
           if (data.code == 200) {
             data.result.records.map(i => {
-              i.createTime = i.createTime;
+              // i.createTime = i.createTime;
               i.ruleCategory =
                 i.ruleCategory == 1
                   ? "门诊规则"
@@ -284,6 +391,8 @@ export default {
     //重置
     onReset() {
       this.searchForm.ruleName='';
+      this.searchForm.manuscriptCode='';
+      this.searchForm.manuscriptName='';
       this.searchForm.createUserName='';
       this.Pager.pageIndex = 1;
       this.getSelectPage();
@@ -293,14 +402,14 @@ export default {
       // this.searchForm.folderId = '';
     },
     //编写底稿弹窗
-    editData() {
+    editData(row) {
       if(this.projectId==''||this.projectId==null||this.projectId==undefined){
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
       this.title = "编写底稿";
       this.showEditDialog = true;
-      this.data = this.multipleTable[0];
+      this.data = row;
       this.readonly = false;
     },
     //查看底稿弹窗
@@ -408,7 +517,7 @@ export default {
   min-width: 800px;
   // overflow-x: auto;
   .auditRuleConfig-left {
-    width: 300px;
+    width: 29%;
     // min-height: 100vh;
     // min-height: calc(100vh - 165px);
     // margin-right: 20px;
@@ -422,7 +531,8 @@ export default {
     }
   }
   .auditRuleConfig-right {
-    flex: 1;
+    width: 71%;
+    /*flex: 1;*/
     border: none;
     /*height: 75vh;*/
     overflow: auto;

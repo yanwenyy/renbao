@@ -7,6 +7,7 @@
         :style="{ height: tableHeight + 100 + 'px' }"
       >
         <rule-tree
+          :projectId="0"
           :isShowSearch="true"
           :isShowCheckBox="false"
           @getTreeId="getTreeId"
@@ -92,6 +93,15 @@
               align="center"
               :reserve-selection="true"
               width="55"
+            >
+            </el-table-column>
+            <el-table-column
+              type="index"
+              header-align="center"
+              align="center"
+              width="80"
+              label="序号"
+              :index="indexMethod"
             >
             </el-table-column>
             <el-table-column
@@ -237,8 +247,7 @@
             @close="closeRun"
             @ok="succeedRun"
             :info="info"
-            :runIds="runIds"
-            :sql="sql"
+            :ruleSql="ruleSql"
             v-if="showRunDialog"
           ></runNow>
         </el-dialog>
@@ -299,8 +308,6 @@ export default {
       folderPath: "",
       //规则树
       ruleTree: "",
-      //运行id
-      runIds: "",
       //当前页
       pageIndex: 1,
       //每页条数
@@ -344,7 +351,7 @@ export default {
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
-      sql: [],
+      ruleSql: [],
       folderSorts: '1,2'
     };
   },
@@ -363,16 +370,24 @@ export default {
     // this.initData();
   },
   mounted() {
-    this.$bus.$on("updateRuleData", () => {
-      this.getRuleFolder();
-    });
+    // this.$bus.$on("updateRuleData", () => {
+    //   this.getRuleFolder();
+    // });
   },
   activated () {
-    this.getRuleFolder()
+    // this.getRuleFolder()
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     //获取列表数据
     initData() {
+      this.ruleData=this.$refs.ruleTree.treeData;
       // 判断不选左侧规则节点列表为空
       if (!this.ruleCheckData.folderId) {
         this.$message({ message: "请选择对应的规则分类", type: "warning" });
@@ -527,25 +542,18 @@ export default {
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
-      var sql = [];
+      this.ruleSql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {
-          sql.push(this.multipleSelection[i].ruleSqlValue);
+          this.ruleSql.push({
+            sql: this.multipleSelection[i].ruleSqlValue,
+            ruleId: this.multipleSelection[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (this.ruleSql.length == 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        var arrIds = "";
-        for (var j = 0; j < this.multipleSelection.length; j++) {
-          arrIds += this.multipleSelection[j].ruleId + ",";
-        }
-        if (arrIds != null && arrIds != "" && arrIds != undefined) {
-          arrIds = arrIds.substr(0, arrIds.length - 1);
-        }
-
-        this.runIds = arrIds;
-        this.sql = sql;
         this.showRunDialog = true;
         this.info = false;
       }
@@ -556,24 +564,18 @@ export default {
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
-      var sql = [];
+      this.ruleSql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {
-          sql.push(this.multipleSelection[i].ruleSqlValue);
+          this.ruleSql.push({
+            sql: this.multipleSelection[i].ruleSqlValue,
+            ruleId: this.multipleSelection[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (this.ruleSql.length == 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        var arrIds = "";
-        for (var j = 0; j < this.multipleSelection.length; j++) {
-          arrIds += this.multipleSelection[j].ruleId + ",";
-        }
-        if (arrIds != null && arrIds != "" && arrIds != undefined) {
-          arrIds = arrIds.substr(0, arrIds.length - 1);
-        }
-        this.runIds = arrIds;
-        this.sql = sql;
         this.showRunDialog = true;
         this.info = true;
       }

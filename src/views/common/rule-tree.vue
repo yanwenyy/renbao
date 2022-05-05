@@ -1,6 +1,7 @@
 <template>
     <div class="rule-tree-box">
         <el-input
+            clearable
             class="filter-text"
             placeholder="输入关键字进行过滤"
             v-if="isShowSearch"
@@ -98,6 +99,9 @@ export default {
         folderSorts: { // 规则树查询参数
             default: ''
         },
+        projectId: { // 规则树查询参数
+            default: ''
+        },
         isShowIcon: {
             type: Boolean, // 是否显示文件夹
             default: true
@@ -108,24 +112,24 @@ export default {
 
     },
     computed: {
-      projectId: {
-        get () {
-          if(this.$store.state.common.projectId){
-            return this.$store.state.common.projectId
-          }else{
-            this.$http({
-              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
-              method: "get",
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              if (data && data.code === 200) {
-                return data.result && data.result.projectId && data.result.projectId || '';
-              }
-            });
-          }
-
-        }
-      },
+      // projectId: {
+      //   get () {
+      //     if(this.$store.state.common.projectId){
+      //       return this.$store.state.common.projectId
+      //     }else{
+      //       this.$http({
+      //         url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+      //         method: "get",
+      //         params: this.$http.adornParams()
+      //       }).then(({ data }) => {
+      //         if (data && data.code === 200) {
+      //           return data.result && data.result.projectId && data.result.projectId || '';
+      //         }
+      //       });
+      //     }
+      //
+      //   }
+      // },
     },
     data () {
         return {
@@ -158,11 +162,15 @@ export default {
         }
     },
     mounted () {
+      if(this.treeData.length==0){
         this.getRuleFolder();
+      }
     },
-    activated () {
-        this.getRuleFolder();
-    },
+    // activated () {
+    //   if(this.treeData==[]){
+    //     this.getRuleFolder();
+    //   }
+    // },
     methods: {
         // 获取规则树
         getRuleFolder (callBack,from) {
@@ -171,7 +179,7 @@ export default {
                 isLoading:false,
                 url: this.$http.adornUrl('/ruleFolder/getRuleFolder'),
                 method: 'get',
-                params:  this.$http.adornParams({folderSorts: this.folderSorts,projectId:this.projectId}, false)
+                params:  this.$http.adornParams({folderTypes: this.folderSorts,projectId:this.projectId}, false)
                 // params:  this.$http.adornParams({}, false)
             }).then(({data}) => {
                 this.treeLoading = false;

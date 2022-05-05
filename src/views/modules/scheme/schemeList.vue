@@ -6,18 +6,28 @@
       @keyup.enter.native="getDataList()"
       class="search-form-new"
     >
-      <el-form-item label="政策名称：">
+      <el-form-item label="方案编码:">
+        <el-input
+          v-model="dataForm.planCode"
+          placeholder="方案编码"
+          clearable
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="方案名称:">
         <el-input
           v-model="dataForm.planName"
           placeholder="方案名称"
           clearable
         ></el-input>
+      </el-form-item>
+      <el-form-item label="创建人:">
         <el-input
           v-model="dataForm.createUserName"
           placeholder="创建人"
           clearable
         ></el-input>
       </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="(pageIndex = 1), getDataList()"
         >查询</el-button
@@ -45,6 +55,15 @@
         width="50"
       >
       </el-table-column>
+      <el-table-column
+        type="index"
+        header-align="center"
+        align="center"
+        width="80"
+        label="序号"
+        :index="indexMethod"
+      >
+      </el-table-column>
       <el-table-column prop="planCode" align="center" label="方案编号">
       </el-table-column>
       <el-table-column
@@ -60,14 +79,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="fileInfos"
+        prop="fileName"
         header-align="center"
         align="center"
         label="方案附件"
       >
-        <template slot-scope="scope">
-          {{scope.row.fileInfos&&scope.row.fileInfos.length>0?scope.row.fileInfos[0].fileName:''}}
-        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -147,6 +163,7 @@ export default {
       dataForm: {
         planName: "",
         createUserName: "",
+        planCode: "",
       },
       token: "",
       imgUrlfront: "",
@@ -191,6 +208,13 @@ export default {
     this.getDataList();
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     filterNode (value, data) {
       if (!value) return true;
       return data.regionName.indexOf(value) !== -1;
@@ -212,8 +236,10 @@ export default {
     reset() {
       this.dataForm.planName = "";
       this.dataForm.createUserName = "";
+      this.dataForm.planCode = "";
       this.pageIndex = 1;
       this.pageSize = 10;
+      this.getDataList();
     },
     // 获取数据列表
     getDataList() {
@@ -227,6 +253,7 @@ export default {
           pageSize: this.pageSize,
           planName: this.dataForm.planName,
           createUserName: this.dataForm.createUserName,
+          planCode: this.dataForm.planCode,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {

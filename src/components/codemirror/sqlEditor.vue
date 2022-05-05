@@ -102,11 +102,18 @@
           <div class="dev-type-main-left">
             <!--鼠标右键菜单栏 -->
             <div v-show="showRightMenu">
-              <ul id="menu"
+              <ul v-if="treeType==='1'" id="menu"
                   class="right-menu">
                 <li class="menu-item" @click="treeTableClick(treeTabelNode)">
                   生成select语句
                 </li>
+              </ul>
+              <ul v-if="treeType==='3'" id="menu"
+                  class="right-menu">
+                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
+                <li class="menu-item" @click="addOrUpdateParmas" v-if="paramsTreeClickNode.type=='params'">查看参数关联</li>
               </ul>
             </div>
           </div>
@@ -172,14 +179,20 @@
       ></code-mirror-editor>
 
     </div>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update
+      ref="addOrUpdate"
+    ></add-or-update>
   </div>
 </template>
 <script>
+  import AddOrUpdate from "./addOrEditParams";
   // 使用时需要根据CodeMirrorEditor.vue的实际存放路径，调整from后面的组件路径，以便正确引用
   import CodeMirrorEditor from "./CodeMirrorEditor";
   export default {
     components: {
-      CodeMirrorEditor
+      CodeMirrorEditor,
+      AddOrUpdate
     },
     props:{
       //参数设置确定点击事件
@@ -276,6 +289,7 @@
     },
     data() {
       return {
+        paramsTreeClickNode:{},//右击参数列表的数据
         hideLeftTree:false,//是否隐左边的区域
         treeTabelNode:'',
         showRightMenu:false,//左侧数据表右击弹出框状态
@@ -894,10 +908,17 @@
       this.dragControllerDiv();
     },
     methods: {
-      //左侧右击事件
+      // 新增 / 修改参数
+      addOrUpdateParmas(id,type) {
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id,type);
+        })
+      },
+      //数据表左侧右击事件
       rightClick(event, data, node, obj) {
         //只有表可以点击
-        if(data.dataType==2){
+        if(data.dataType==2||data.type=='funFolder'||data.type=='params'){
+          this.paramsTreeClickNode=data;
           this.showRightMenu = false; // 先把模态框关死，目的是：第二次或者第n次右键鼠标的时候 它默认的是true
           this.showRightMenu = true;
           let menu = document.querySelector('#menu');

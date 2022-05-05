@@ -60,17 +60,15 @@
               <el-button type="primary" @click="onQuery">查询</el-button>
               <el-button @click="onReset">重置</el-button>
             </el-form-item>
+            <el-form-item  style="float: right">
+              <el-button
+                @click="deleteData"
+                type="danger"
+                :disabled="this.multipleTable.length <= 0"
+              >删除</el-button>
+            </el-form-item>
           </el-form>
-          <div style="float:right;margin-bottom:22px">
-            <el-button
-              @click="deleteData"
-              type="danger"
-              :disabled="this.multipleTable.length <= 0"
-              >删除</el-button
-            >
-          </div>
         </div>
-
         <div class="table-box">
           <el-table
             v-loading="tableLoading"
@@ -79,7 +77,7 @@
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="handleSelectionChange"
-            :height="tableHeight - 150"
+            :height="tableHeight - 110"
             :row-key="getRowKeys"
           >
             <el-table-column
@@ -88,6 +86,15 @@
               align="center"
               width="55"
             ></el-table-column>
+            <el-table-column
+              type="index"
+              header-align="center"
+              align="center"
+              width="80"
+              label="序号"
+              :index="indexMethod"
+            >
+            </el-table-column>
             <el-table-column
               prop="ruleName"
               label="规则名称"
@@ -295,6 +302,13 @@ export default {
     this.getTableData();
   },
   methods: {
+    // 序号翻页递增
+    indexMethod(index) {
+      // console.log("索引数下标", index);
+      let nowPage = this.Pager.pageIndex; //当前第几页，根据组件取值即可
+      let nowLimit = this.Pager.pageSize; //当前每页显示几条，根据组件取值即可
+      return index + 1 + (nowPage - 1) * nowLimit; // 这里可以理解成一个公式
+    },
     //获取列表数据
     getTableData() {
       // this.tableLoading = true;
