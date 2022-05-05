@@ -460,11 +460,11 @@ export default {
                     })
                 }).then(({data}) =>{
                     if(data && data.code === 200){
+                        this.getInitList()     
                         this.$message({
-                        message: '校验成功',
+                        message: '校验中，点击刷新查看规则校验进度！',
                         type: 'success',
-                    })      
-                    this.getInitList()        
+                        })         
                     }else{
                         this.$message.error(data.message)
                     }
