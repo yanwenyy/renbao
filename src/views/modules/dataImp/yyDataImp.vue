@@ -1532,9 +1532,13 @@
       // 导入数据
       impYYData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${1}/${this.hospitalName? this.hospitalName: -1}/${this.fileName}/${this.hosBatchId ? this.hosBatchId: -1}`),
+          url: this.$http.adornUrl(`dataImp/impData/${1}`),
           method: 'post',
-          data: this.importDataModelList,
+          data: {'importDataModels': this.importDataModelList,
+          'hospitalName':this.hospitalName? this.hospitalName: -1,
+          'fileName':this.fileName,
+          'filePath': this.hospitalPath,
+          'hospitalCollectPlanId': this.hosBatchId ? this.hosBatchId: -1},
           isLoading: false
         }).then(({data}) => {
           //if (data && data.code === 200) {

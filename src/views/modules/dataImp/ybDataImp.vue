@@ -1488,9 +1488,9 @@
       // 导入数据
       impYBData () {
         this.$http({
-          url: this.$http.adornUrl(`dataImp/impData/${2}/${'医保'}/${'医保'}/${'医保'}`),
+          url: this.$http.adornUrl(`dataImp/impData/${2}`),
           method: 'post',
-          data: this.importDataModelList,
+          data: {'importDataModels': this.importDataModelList},
           isLoading: false
         }).then(({data}) => {
           //if (data && data.code === 200) {
