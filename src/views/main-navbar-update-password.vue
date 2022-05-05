@@ -50,6 +50,13 @@ export default {
         callback();
       }
     };
+    var validatePassword = (rule, value, callback) => {
+      if (this.checkStrong(value)<4) {
+        callback(new Error("密码需包括数组,字母和特殊字符"));
+      } else {
+        callback();
+      }
+    };
     return {
       msgText: "",
       visible: false,
@@ -64,7 +71,8 @@ export default {
         ],
         newPassword: [
           { required: true, message: "新密码不能为空", trigger: "blur" },
-          { min:6,max:20,message:'长度在6到20个字符',trigger:"blur"}
+          { min:6,max:20,message:'长度在6到20个字符',trigger:"blur"},
+          { validator: validatePassword, trigger: "blur" }
         ],
         confirmPassword: [
           { required: true, message: "确认密码不能为空", trigger: "blur" },
