@@ -267,13 +267,13 @@
         })
       },
       //添加分类确定按钮点击
-      addParamsClassClick(data,type){
+      addParamsClassClick(datas,type){
         var params={
-          folderSort:data.folderSort,
-          paramFolderName:data.paramFolderName,
-          parentUuid:data.parentUuid,
-          paramFolderUuid:data.paramFolderUuid,
-          pbScope:data.pbScope=='publicParam'?'1':'2',
+          folderSort:datas.folderSort,
+          paramFolderName:datas.paramFolderName,
+          parentUuid:datas.parentUuid,
+          paramFolderUuid:datas.paramFolderUuid,
+          pbScope:datas.pbScope=='publicParam'?'1':'2',
         }
         this.$http({
           url: this.$http.adornUrl(`/aaParamFolder/${type=='add' ? 'add' : 'updateByUuId'}`),
@@ -282,7 +282,10 @@
         }).then(({data}) => {
           if (data && data.code === 200) {
             this.$message.success(data.message);
-            this.getParmasData();
+            // this.getParmasData();
+            //局部刷新参数树
+            // this.$refs.sqlEdits.refreshTreeParams(datas.parentUuid);
+            this.$refs.sqlEdits.refreshNodeBy(datas.parentUuid)
           } else {
             this.$message.error(data.message)
           }

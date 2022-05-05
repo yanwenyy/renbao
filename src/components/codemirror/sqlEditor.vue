@@ -345,6 +345,7 @@
     },
     data() {
       return {
+        maps: new Map(),
         paramsType:'add',//参数弹框的类型
         paramsTreeClickNode:{},//右击参数列表的数据
         hideLeftTree:false,//是否隐左边的区域
@@ -1118,6 +1119,7 @@
       },
       //参数树懒加载
       loadNodeParams(node, resolve) {
+        this.maps.set(node.data.id, { node, resolve }) ;//储存数据
         if (node.level === 0) {
           return resolve(this.paramsData);
         }
@@ -1134,7 +1136,13 @@
         }
 
       },
-
+      refreshNodeBy(id){
+        let node = this.$refs.tree3.getNode(id); // 通过节点id找到对应树节点对象
+        node.loaded = false; // 设置节点为未加载状态
+        node.data.children=[]; // 设置节点为未加载状态
+        this.getLoadTreeParams(node.data)
+        node.expand(); // 主动调用展开节点方法，重新查询该节点下的所有子节点
+      },
       // treeToHint(list){
       //   list.for
       // },

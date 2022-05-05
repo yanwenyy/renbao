@@ -8,7 +8,7 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="110px">
         <el-tabs v-if="visibleType=='params'" type="border-card" class="self-tabs" v-model="activeName">
           <el-tab-pane name="1" label="基本信息">
-            <div class="tabs1-div">
+            <div :key="paramsKey" class="tabs1-div">
               <el-form-item label="参数名称" prop="param.paramName">
                 <el-input :disabled="type=='look'" v-model="dataForm.param.paramName" placeholder="参数名称" maxlength="255"></el-input>
               </el-form-item>
@@ -258,6 +258,7 @@
     },
     data () {
       return {
+        paramsKey:0,
         sqlRuleVisible:false,//查看sql规则状态
         activeName: "1", //tab页切换时的状态值
         activeName2: "first", //tab页切换时的状态值
@@ -336,7 +337,7 @@
         for(let i in myObj){
           newObj[i] =myObj[i]?JSON.parse(JSON.stringify(myObj[i])):newObj[i];
         }
-        console.log(newObj)
+        // console.log(newObj)
         return newObj;
       },
       //关联参数配置保存
@@ -416,13 +417,14 @@
           names:'',
           value1:'',
         }];
+        this.paramsKey=Math.random();
       },
       init (id,type,paramsData) {
         this.relationParamTree=paramsData;
         // this.type=type;
-        this.cleanMsg();
         this.visibleType='params';
         this.visible = true;
+        this.cleanMsg();
         this.dataForm.id=id;
         this.dataForm.folderId=id;
         this.$nextTick(() => {
@@ -434,7 +436,6 @@
         this.visibleType='class';
         this.visible = true;
         this.dataForm.id=id;
-        console.log(formData,433)
         this.dataForm.parentUuid=formData.id;
         this.dataForm.pbScope=formData.ParamsType;
         this.dataForm.folderId=id;
@@ -478,18 +479,22 @@
       paramsDetail: {
         deep: true,
         handler(newVal, oldVal) {
-          this.visibleType='params';
-          this.dataForm=this.clone(newVal,this.dataForm);
-          this.dataForm.paramChoice.choiceType=Number(this.dataForm.paramChoice.choiceType);
-          this.visible=true;
+          if(this.type!='add'){
+            this.visibleType='params';
+            this.dataForm=this.clone(newVal,this.dataForm);
+            this.dataForm.paramChoice.choiceType=Number(this.dataForm.paramChoice.choiceType);
+            this.visible=true;
+          }
         },
       },
       paramsClassDetail: {
         deep: true,
         handler(newVal, oldVal) {
-          this.visibleType='class';
-          this.dataForm=this.clone(newVal,this.dataForm);
-          this.visible=true;
+          if(this.type!='add'){
+            this.visibleType='class';
+            this.dataForm=this.clone(newVal,this.dataForm);
+            this.visible=true;
+          }
         },
       },
       paramsType: {
