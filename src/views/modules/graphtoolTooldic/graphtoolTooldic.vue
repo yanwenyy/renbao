@@ -1561,23 +1561,23 @@
         // console.log(datas,obj,node,222);
         if (datas.children.length == 0) {
           // 正常的图形化展开树形结构
-          const url = '/sqlScript/getColumnList'
-          // 数据采集dmp跨表采集
-          if (this.dataImpFlag == "dataImp") {
-              url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
-          }
-          this.$http({
-            url: this.$http.adornUrl(url),
-            method: 'get',
-            isLoading: false,
-            params: this.$http.adornParams({
-              id: datas.id,
-              tableName: datas.title,
-            })
-          }).then(({data}) => {
-            var _data = data.result;
-            this.loadTree = _data || [];
-          })
+          // let url = '/sqlScript/getColumnList'
+          // // 数据采集dmp跨表采集
+          // if (this.dataImpFlag == "dataImp") {
+          //     url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
+          // }
+          // this.$http({
+          //   url: this.$http.adornUrl(url),
+          //   method: 'get',
+          //   isLoading: false,
+          //   params: this.$http.adornParams({
+          //     id: datas.id,
+          //     tableName: datas.title,
+          //   })
+          // }).then(({data}) => {
+          //   var _data = data.result;
+          //   this.loadTree = _data || [];
+          // })
         }
       },
       //获取数据表数据
@@ -1629,7 +1629,25 @@
 
             //   });
             // }
-            resolve(this.loadTree);
+            let url = '/sqlScript/getColumnList'
+            // 数据采集dmp跨表采集
+            if (this.dataImpFlag == "dataImp") {
+              url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
+            }
+            this.$http({
+              url: this.$http.adornUrl(url),
+              method: 'get',
+              isLoading: false,
+              params: this.$http.adornParams({
+                id: node.data.id,
+                tableName: node.data.title,
+              })
+            }).then(({data}) => {
+              var _data = data.result;
+              this.loadTree = _data || [];
+              resolve(this.loadTree);
+            })
+
           }, 500);
 
         }
