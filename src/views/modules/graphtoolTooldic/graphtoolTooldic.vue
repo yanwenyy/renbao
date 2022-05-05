@@ -297,6 +297,16 @@
         type: String,
         default: null,
       },
+      // 数据采集dmp跨表采集所用的属性
+      dataImpFlag: {
+        type: String,
+        default: null
+      },
+      // 数据采集dmp跨表采集所用的属性
+      dataSchema: {
+        type: String,
+        default: null
+      }
     },
     data() {
       return {
@@ -348,10 +358,20 @@
       };
     },
     activated() {
-      this.getSjbData()
+      // this.getOldjbData()
+      if (this.dataImpFlag != "dataImp") {
+        this.getSjbData()
+      } else {
+         this.getOldjbData()
+      }
     },
     mounted() {
-      this.getSjbData();
+      // this.getSjbData();
+      if (this.dataImpFlag != "dataImp") {
+        this.getSjbData()
+      } else {
+         this.getOldjbData()
+      }
       this.init();
       this.getGojsClientXY();
       window.changeType = this.changeType;
@@ -494,8 +514,14 @@
               buttonText:'取消执行',
               buttonFun:function(){SelfLoading.hide()}
             });
+            // 正常的图形化sql执行
+            const url = '/sqlScript/executeSQL_SqlEditor'
+            // 数据采集dmp跨表采集
+             if (this.dataImpFlag == "dataImp") {
+                url = `/sqlScript/executeSQL_SqlEditorByDmp/${this.dataSchema}`
+            }
             this.$http({
-              url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+              url: this.$http.adornUrl(url),
               method: 'post',
               data: this.$http.adornData(params),
               isLoading:false
@@ -1533,8 +1559,14 @@
       getLoadTree(datas, obj, node) {
         // console.log(datas,obj,node,222);
         if (datas.children.length == 0) {
+          // 正常的图形化展开树形结构
+          const url = '/sqlScript/getColumnList'
+          // 数据采集dmp跨表采集
+          if (this.dataImpFlag == "dataImp") {
+              url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
+          }
           this.$http({
-            url: this.$http.adornUrl('/sqlScript/getColumnList'),
+            url: this.$http.adornUrl(url),
             method: 'get',
             isLoading: false,
             params: this.$http.adornParams({
@@ -1551,6 +1583,20 @@
       getSjbData() {
         this.$http({
           url: this.$http.adornUrl('/sqlScript/listDBPTree'),
+          method: 'get',
+          isLoading: false,
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          // 注意层级 dataType是必须要的,1:一级,2:表,3:列
+          var datas = data.result;
+          this.dataTreeData = datas ? [datas] : [];
+          // this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
+        })
+      },
+      // 数据采集采集获取原始库数据
+      getOldjbData() {
+        this.$http({
+          url: this.$http.adornUrl(`/sqlScript/listOldDBPTree/${this.dataSchema}`),
           method: 'get',
           isLoading: false,
           params: this.$http.adornParams()

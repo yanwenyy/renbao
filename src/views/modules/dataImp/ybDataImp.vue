@@ -404,65 +404,197 @@
       title="数据表匹配"
       :visible.sync="checkDmpFileTableDialogVisible"
       width="60%"
+      class="dmpTableCheck"
       :close-on-click-modal="false">
-      <el-table
-        border
-        style="width: 100%;height:45vh; overflow:auto;"
-        :data="dmpImp.dmpBakTableInfoMaps">
-        <el-table-column 
-          label="序号" 
-          type="index" 
-          align="center" 
-          width="50"/>
-        <el-table-column
-          align="center"
-          label="数据表">
-          <template slot-scope="scope">
-            {{ getMapKey(scope.row) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="center"
-          label="目标表">
+      <!-- bak表匹配 -->
+      <div v-if="dmpImp.importType == 8">
+        <el-table
+          border
+          style="width: 100%;height:45vh; overflow:auto;"
+          :data="dmpImp.dmpBakTableInfoMaps">
+          <el-table-column 
+            label="序号" 
+            type="index" 
+            align="center" 
+            width="50"/>
+          <el-table-column
+            align="center"
+            label="数据表">
             <template slot-scope="scope">
-              <el-select
-                v-model="scope.row[getMapKey(scope.row)]"
-                value-key="tableInfoId"
-                placeholder="请选择匹配表"
-                clearable
-                filterable
-                @clear="setColumnNull(scope.row,getMapKey(scope.row))"
-                >
-                <el-option
-                  v-for="itemdbm in tableInfos"
-                  :key="itemdbm.tableInfoId"
-                  :label="itemdbm.tableNameCn"
-                  :value="itemdbm">
-                </el-option>
-              </el-select>
+              {{ getMapKey(scope.row) }}
             </template>
           </el-table-column>
           <el-table-column
             align="center"
-            width="240"
-            label="操作">
-            <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpBakTableInfoMaps)"
-                type="text"
-                size="small">
-                移除
-              </el-button>
-               <el-button
-                @click.native.prevent="dmpBakDataView(scope.$index, dmpImp, dmpImp.dmpBakTableInfoMaps)"
-                type="text"
-                size="small">
-                查看数据
-              </el-button>
-            </template>
-          </el-table-column>
-      </el-table>
+            label="目标表">
+              <template slot-scope="scope">
+                <el-select
+                  v-model="scope.row[getMapKey(scope.row)]"
+                  value-key="tableInfoId"
+                  placeholder="请选择匹配表"
+                  clearable
+                  filterable
+                  @clear="setColumnNull(scope.row,getMapKey(scope.row))"
+                  >
+                  <el-option
+                    v-for="itemdbm in tableInfos"
+                    :key="itemdbm.tableInfoId"
+                    :label="itemdbm.tableNameCn"
+                    :value="itemdbm">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              width="240"
+              label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpBakTableInfoMaps)"
+                  type="text"
+                  size="small">
+                  移除
+                </el-button>
+                <el-button
+                  @click.native.prevent="dmpBakDataView(scope.$index, dmpImp, dmpImp.dmpBakTableInfoMaps)"
+                  type="text"
+                  size="small">
+                  查看数据
+                </el-button>
+              </template>
+            </el-table-column>
+        </el-table>
+      </div>
+      <!-- dmp表匹配 -->
+      <div v-if="dmpImp.importType == 7">
+        <el-tabs v-model="activeNameDmp" @tab-click="handleClick">
+          <el-tab-pane label="标准采集" name="normal">
+            <el-table
+              border
+              style="width: 100%;height:45vh; overflow:auto;"
+              :data="dmpImp.dmpBakTableInfoMaps">
+              <el-table-column 
+                label="序号" 
+                type="index" 
+                align="center" 
+                width="50"/>
+              <el-table-column
+                align="center"
+                label="数据表">
+                <template slot-scope="scope">
+                  {{ getMapKey(scope.row) }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="目标表">
+                  <template slot-scope="scope">
+                    <el-select
+                      v-model="scope.row[getMapKey(scope.row)]"
+                      value-key="tableInfoId"
+                      placeholder="请选择匹配表"
+                      clearable
+                      filterable
+                      @clear="setColumnNull(scope.row,getMapKey(scope.row))"
+                      >
+                      <el-option
+                        v-for="itemdbm in tableInfos"
+                        :key="itemdbm.tableInfoId"
+                        :label="itemdbm.tableNameCn"
+                        :value="itemdbm">
+                      </el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center"
+                  width="240"
+                  label="操作">
+                  <template slot-scope="scope">
+                    <el-button
+                      @click.native.prevent="deleteRow(scope.$index, dmpImp.dmpBakTableInfoMaps)"
+                      type="text"
+                      size="small">
+                      移除
+                    </el-button>
+                    <el-button
+                      @click.native.prevent="dmpBakDataView(scope.$index, dmpImp, dmpImp.dmpBakTableInfoMaps)"
+                      type="text"
+                      size="small">
+                      查看数据
+                    </el-button>
+                  </template>
+                </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="跨表采集" name="unnormal">
+            <el-table
+              border
+              style="width: 100%;height:45vh; overflow:auto;"
+              :data="dmpImp.sqlTableInfoMaps">
+              <el-table-column 
+                label="序号" 
+                type="index" 
+                align="center" 
+                width="50"/>
+              <el-table-column
+                align="center"
+                label="跨表采集SQL">
+                <template slot-scope="scope">
+                  {{ getMapKey(scope.row) }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="目标表">
+                  <template slot-scope="scope">
+                    <el-select
+                      v-model="scope.row[getMapKey(scope.row)]"
+                      value-key="tableInfoId"
+                      placeholder="请选择匹配表"
+                      clearable
+                      filterable
+                      @clear="setColumnNull(scope.row,getMapKey(scope.row))"
+                      >
+                      <el-option
+                        v-for="itemdbm in tableInfos"
+                        :key="itemdbm.tableInfoId"
+                        :label="itemdbm.tableNameCn"
+                        :value="itemdbm">
+                      </el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center"
+                  width="240"
+                  label="操作">
+                  <template slot-scope="scope">
+                    <el-button
+                      @click.native.prevent="deleteRow(scope.$index, dmpImp.sqlTableInfoMaps)"
+                      type="text"
+                      size="small">
+                      移除
+                    </el-button>
+                    <el-button
+                      @click.native.prevent="editSqlTable(scope.$index, dmpImp.sqlTableInfoMaps)"
+                      type="text"
+                      size="small">
+                      编辑
+                    </el-button>
+                  </template>
+                </el-table-column>
+            </el-table>
+            <!-- <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="openSqlTable()">添加跨表采集</el-button>
+              <el-button @click="checkDmpSqlTableDialogVisible = false">返回</el-button>
+            </span> -->
+          </el-tab-pane>
+        </el-tabs>
+      </div>
       <span slot="footer" class="dialog-footer">
+        <el-button type="primary" v-if="dmpImp.importType == 7 && activeNameDmp == 'unnormal'" @click="openSqlTable()">添加跨表采集</el-button>
         <el-button @click="checkDmpFileTableDialogVisible = false">返回上一步</el-button>
         <el-button type="primary" @click="findFileTableDmp">下一步</el-button>
       </span>
@@ -494,6 +626,7 @@
     <el-dialog
     title="已导入文件"
       :visible.sync="dmpReImpDialogVisible"
+      :close-on-click-modal="false"
       width="60%">
       <el-table
         border
@@ -539,6 +672,27 @@
         <el-button type="primary" @click="dmpReImpDialogVisible = false">取消</el-button>
       </span>
     </el-dialog>
+    <el-dialog  
+      title="跨表采集SQL获取"
+      :visible.sync="graphtoolTooldicDialogVisible"
+      :close-on-click-modal="false"
+      :fullscreen="true">
+      <graphtool-tooldic 
+        ref="graphtoolTooldic"
+        :key="grahKey"
+        :data-imp-flag="dataImpFlag"
+        :data-schema="dmpImp.databaseUserOld"
+        :sqlEditMsg="sqlEditMsg"
+        :joinEdit="ruleGraphicJoin"
+        :orderEdit="ruleGraphicOrder"
+        :modelName="'gTruleManager'"
+        style="width: 100%;height:70vh; overflow:auto;">
+      </graphtool-tooldic>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeSqlTable()">确定</el-button>
+        <el-button @click="graphtoolTooldicDialogVisible = false">取消</el-button>
+      </span>
+      </el-dialog>
   </div>
 </template>
 
@@ -546,6 +700,7 @@
   import ColumnView from './columnView'
   import DataView from './dataView'
   import DmpBakDataView from './dmpBakDataView'
+  import GraphtoolTooldic from '@/views/modules/graphtoolTooldic/graphtoolTooldic'
   import {PxSocket} from '@/utils'
   export default {
     data () {
@@ -581,6 +736,8 @@
         dmpLogDialogVisible: false,
         // dmp继续采集弹窗
         dmpReImpDialogVisible: false,
+        // 图形化工具
+        graphtoolTooldicDialogVisible: false,
         // 医保表信息
         tableInfos: [],
         // 文件选中数据
@@ -632,7 +789,20 @@
         // 继续导入的implist
         dmpReImpList: [],
         // 是否强行关闭了
-        isForceColse: false
+        isForceColse: false,
+        dataImpFlag: "dataImp",
+        ruleGraphicJoins: {},
+        ruleGraphicOrders: {},
+        // dmp跨表采集页签
+        activeNameDmp: 'normal',
+        // 跨表采集图形化工具使用
+        grahKey:0,
+        sqlEditMsg: '',
+        ruleGraphicJoin: [],
+        ruleGraphicOrder: [],
+        // 0为新增 1 编辑
+        isEdit: 0,
+        editIndex: -1  
       }
     },
     computed:{
@@ -641,7 +811,7 @@
       },
     },
     components: {
-      ColumnView,DataView,DmpBakDataView
+      ColumnView,DataView,DmpBakDataView,GraphtoolTooldic
     },
     activated () {
       this.getDataList()
@@ -736,6 +906,7 @@
       // 恢复采集dmp
       reImpDmp(data){
         this.checkDmpFileTableDialogVisible = true
+        this.activeNameDmp = 'normal'
         this.$http({
           url: this.$http.adornUrl(`dmpCollectPlan/startCollectDmp`),
           method: 'get',
@@ -798,6 +969,7 @@
       closeLog(){
           this.dmpLogDialogVisible = false
           this.checkDmpFileTableDialogVisible = true
+          this.activeNameDmp = 'normal'
           this.countDown = 0
       },
        // 倒计时十秒
@@ -810,6 +982,7 @@
               this.dmpLogDialogVisible = false
               if(!this.isForceColse) {
                  this.checkDmpFileTableDialogVisible = true
+                 this.activeNameDmp = 'normal'
               }
             }
           },1000)
@@ -1066,6 +1239,7 @@
                           }
                         }
                     })
+                    this.activeNameDmp = 'normal'
                     //this.checkDmpFileTableDialogVisible = true
                   } else {
                     this.$message({
@@ -1122,6 +1296,7 @@
                         }
                       }
                   })
+                  this.activeNameDmp = 'normal'
                   //this.checkDmpFileTableDialogVisible = true
                 } else {
                   this.$message({
@@ -1397,6 +1572,66 @@
           this.dmpTableDataViewDialogVisible = true
           this.dmpCheckTableName = key
         }
+      },
+      openSqlTable(){
+        this.sqlEditMsg = ''
+        this.ruleGraphicJoin = []
+        this.ruleGraphicOrder = []
+        this.grahKey=Math.random()
+        this.graphtoolTooldicDialogVisible = true
+        this.grahInt()
+        this.isEdit = 0
+      },
+      grahInt(){
+        this.$nextTick(()=>{
+          this.$refs.graphtoolTooldic.getMsgFromParent(this.sqlEditMsg,this.ruleGraphicJoin,this.ruleGraphicOrder)
+        })
+      },
+      editSqlTable(index,tableinfo){
+        this.isEdit = 1
+        this.grahKey=Math.random()
+        for (const key in tableinfo[index]) {
+          this.sqlEditMsg = key
+          this.ruleGraphicJoin = this.ruleGraphicJoins[key]
+          this.ruleGraphicOrder = this.ruleGraphicOrders[key]
+          this.editIndex = index
+          this.grahInt()
+          this.graphtoolTooldicDialogVisible = true
+        }
+      },
+      // dmp跨表采集切换页签
+      // 待办页签切换
+      handleClick(tab, event) {
+        this.activeNameDmp = tab.name
+      },
+      closeSqlTable(){
+        this.$confirm('<span style="color:#af0f16">跨表采集需指定采集列，且不能有重复列，请仔细检查<span>', '确认信息', {
+          dangerouslyUseHTMLString: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '继续编辑'
+        })
+        .then(() => {
+          if (this.dmpImp.sqlTableInfoMaps == null) this.dmpImp.sqlTableInfoMaps = []
+          const sqlMsg = this.$refs.graphtoolTooldic.sqlMsg
+          var sqlObj = {}
+          sqlObj[sqlMsg] = null
+          if(this.isEdit == 1) {
+           const removeObj = {}
+           for (const key in this.dmpImp.sqlTableInfoMaps[this.editIndex]) {
+             removeObj = this.dmpImp.sqlTableInfoMaps[this.editIndex][key]
+           }
+           // 编辑反显
+           sqlObj[sqlMsg] = removeObj
+            // 替换
+            this.dmpImp.sqlTableInfoMaps.splice(this.editIndex, 1,sqlObj)
+          } else{
+            this.dmpImp.sqlTableInfoMaps.push(sqlObj)
+          }
+          this.ruleGraphicJoins[sqlMsg] = this.$refs.graphtoolTooldic.join
+          this.ruleGraphicOrders[sqlMsg] = this.$refs.graphtoolTooldic.order
+          this.graphtoolTooldicDialogVisible = false
+          this.activeNameDmp = 'unnormal'
+        })
       }
     }
   }
@@ -1413,5 +1648,8 @@
 
 .dmpLogDia /deep/ .el-loading-mask {
 	background-color: rgba(255,255,255,.1);
+}
+.dmpTableCheck /deep/ .el-dialog__body{
+  padding-top: 5px;
 }
 </style>
