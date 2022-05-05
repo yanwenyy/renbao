@@ -30,6 +30,9 @@
       :getParamsDetail="getParamsDetail"
       :getLoadTreeParams="getLoadTreeParams"
       :delParams="delParams"
+      :addParamsClassClick="addParamsClassClick"
+      :getParamsClassDetail="getParamsClassDetail"
+      :paramsClassDetail="paramsClassDetail"
     ></sql-edit>
   </div>
 
@@ -92,6 +95,7 @@
         useChinese:true,//是否汉字化
         userId:sessionStorage.getItem("userId")+"-"+(this.modelName!=null&&this.modelName!=''?this.modelName:'sqlEditor'),
         paramsDetail:{},//参数详情
+        paramsClassDetail:{},//分类详情
       }
     },
     watch: {
@@ -197,6 +201,22 @@
           }
         })
       },
+      //获取分类详情
+      getParamsClassDetail(data){
+        //data 点击的参数节点
+        this.$http({
+          url: this.$http.adornUrl(`/aaParamFolder/selectByUuid/${data.id}`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            //paramsClassDetail 需要跟新增或修改传过来的数据格式保持一致
+            this.paramsClassDetail=data.result;
+          }else{
+            this.$message.error(data.message)
+          }
+        })
+      },
       //添加参数确定按钮点击
       addParamsClick(data,type){
         //data from表单的内容,type:(add/新增,edit/修改)
@@ -215,6 +235,27 @@
           method: 'post',
           // data: params,
           data: data,
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            this.$message.success(data.message);
+            this.getParmasData();
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      },
+      //添加分类确定按钮点击
+      addParamsClassClick(data,type){
+        var params={
+          folderSort:data.folderSort,
+          paramFolderName:data.paramFolderName,
+          parentUuid:data.parentUuid,
+          pbScope:data.pbScope=='publicParam'?'1':'2',
+        }
+        this.$http({
+          url: this.$http.adornUrl(`/aaParamFolder/${type=='add' ? 'add' : 'updateByUuId'}`),
+          method: 'post',
+          data: params,
         }).then(({data}) => {
           if (data && data.code === 200) {
             this.$message.success(data.message);

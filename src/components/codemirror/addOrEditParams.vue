@@ -2,11 +2,11 @@
   <div>
     <el-dialog
       width="70vw"
-      :title="!dataForm.id ? '新增' :type=='look'?'查看': '修改'"
+      :title="type=='add' ? '新增' :type=='look'?'查看': '修改'"
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="110px">
-        <el-tabs type="border-card" class="self-tabs" v-model="activeName">
+        <el-tabs v-if="visibleType=='params'" type="border-card" class="self-tabs" v-model="activeName">
           <el-tab-pane name="1" label="基本信息">
             <div class="tabs1-div">
               <el-form-item label="参数名称" prop="param.paramName">
@@ -192,11 +192,18 @@
             <!--</div>-->
           <!--</el-tab-pane>-->
         </el-tabs>
-
+        <div v-if="visibleType=='class'">
+          <el-form-item label="文件夹名称" prop="paramFolderName">
+            <el-input v-model="dataForm.paramFolderName" placeholder="文件夹名称"></el-input>
+          </el-form-item>
+          <el-form-item label="排序号" prop="paramFolderName">
+            <el-input v-model="dataForm.folderSort" placeholder="排序号"></el-input>
+          </el-form-item>
+        </div>
       </el-form>
       <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false,cleanMsg()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button v-if="type!='look'" type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
     </el-dialog>
     <el-dialog
@@ -223,6 +230,11 @@
 <script>
   export default {
     props:{
+      //添加分类点击确定事件
+      addParamsClassClick:{
+        type: Function,
+        default: null,
+      },
       //添加参数确定点击事件
       addParamsClick: {
         type: Function,
@@ -230,6 +242,11 @@
       },
       //参数详情
       paramsDetail: {
+        type: Object,
+        default: null,
+      },
+      //分类详情
+      paramsClassDetail: {
         type: Object,
         default: null,
       },
@@ -246,6 +263,7 @@
         activeName2: "first", //tab页切换时的状态值
         type:'add',
         visible: false,
+        visibleType: 'params',
         selfActionsList:[{
           names:'',
           value1:'',
@@ -285,6 +303,10 @@
           associatedParamJsonStr:'',
           // scopeType: '',
           folderId: '',
+          paramFolderName:'',//文件夹名称
+          folderSort:'',//排序号
+          parentUuid:'',//父级编号
+          pbScope:'',//1、公共、2、个人
         },
         dataRule: {
           'param.paramName': [
@@ -383,6 +405,10 @@
           associatedParamJsonStr:'',
           // scopeType: '',
           folderId: '',
+          paramFolderName:'',//文件夹名称
+          folderSort:'',//排序号
+          parentUuid:'',//父级编号
+          pbScope:'',//1、公共、2、个人
         };
         this.selfActionsList=[{
           names:'',
@@ -393,6 +419,7 @@
         this.relationParamTree=paramsData;
         // this.type=type;
         this.cleanMsg();
+        this.visibleType='params';
         this.visible = true;
         this.dataForm.id=id;
         this.dataForm.folderId=id;
@@ -400,6 +427,20 @@
           this.$refs['dataForm'].resetFields()
         });
       },
+      initClass (id,type,formData) {
+        this.cleanMsg();
+        this.visibleType='class';
+        this.visible = true;
+        this.dataForm.id=id;
+        console.log(formData,433)
+        this.dataForm.parentUuid=formData.pid;
+        this.dataForm.pbScope=formData.ParamsType;
+        this.dataForm.folderId=id;
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+        });
+      },
+
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
@@ -411,8 +452,12 @@
             // });
             // this.dataForm.paramOptions.optionsNames=nameStr.join("-");
             // this.dataForm.paramOptions.optionsVals=valueStr.join("-");
-            this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList);
-            this.addParamsClick(this.dataForm,this.type);
+            if(this.visibleType=='params'){
+              this.dataForm.associatedParamJsonStr=JSON.stringify(this.relationParamList);
+              this.addParamsClick(this.dataForm,this.type);
+            }else{
+              this.addParamsClassClick(this.dataForm,this.type);
+            }
             this.visible=false;
           }
         })
@@ -432,16 +477,28 @@
         deep: true,
         handler(newVal, oldVal) {
           console.log(newVal,425);
+          this.visibleType='params';
           this.dataForm=this.clone(newVal,this.dataForm);
           this.dataForm.paramChoice.choiceType=Number(this.dataForm.paramChoice.choiceType);
+          this.visible=true;
+        },
+      },
+      paramsClassDetail: {
+        deep: true,
+        handler(newVal, oldVal) {
+          this.visibleType='class';
+          this.dataForm=this.clone(newVal,this.dataForm);
           this.visible=true;
         },
       },
       paramsType: {
         deep: true,
         handler(newVal, oldVal) {
-          this.type=newVal;
-          console.log(this.type,445)
+          if(newVal.indexOf("@split@")!=-1){
+            this.type=newVal.split("@split@")[0]
+          }else{
+            this.type=newVal;
+          }
         },
       },
 

@@ -115,9 +115,9 @@
               <ul v-if="treeType==='3'" id="menu"
                   class="right-menu">
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
-                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加分类</li>
-                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='funFolder'">修改分类</li>
-                <li class="menu-item" @click="selDelParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">删除分类</li>
+                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">添加分类</li>
+                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">修改分类</li>
+                <li class="menu-item" @click="selDelParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">删除分类</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
                 <li class="menu-item" @click="selfDelParmas(paramsTreeClickNode)" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'look')" v-if="paramsTreeClickNode.type=='params'">查看属性</li>
@@ -192,6 +192,7 @@
       :paramsDetail="paramsDetail"
       ref="addOrUpdate"
       :addParamsClick="addParamsClick"
+      :addParamsClassClick="addParamsClassClick"
     ></add-or-update>
   </div>
 </template>
@@ -205,6 +206,11 @@
       AddOrUpdate
     },
     props:{
+      //添加分类点击确定事件
+      addParamsClassClick:{
+        type: Function,
+        default: null,
+      },
       //添加参数确定点击事件
       addParamsClick: {
         type: Function,
@@ -222,6 +228,16 @@
       },
       //获取参数详情
       getParamsDetail: {
+        type: Function,
+        default: null,
+      },
+      //分类详情
+      paramsClassDetail: {
+        type: Object,
+        default: null,
+      },
+      //获取分类详情
+      getParamsClassDetail: {
         type: Function,
         default: null,
       },
@@ -968,7 +984,7 @@
       },
       // 新增 / 修改参数
       addOrUpdateParmas(data,type) {
-        this.paramsType=type;
+        this.paramsType=type+"@split@"+Math.random();
         if(type!='add'){
          this.getParamsDetail(data);
         }else{
@@ -980,12 +996,12 @@
       },
       //新增/修改分类
       addOrUpdateParmasClass(data,type) {
-        this.paramsType=type;
+        this.paramsType=type+"@split@"+Math.random();
         if(type!='add'){
          this.getParamsClassDetail(data);
         }else{
           this.$nextTick(() => {
-            this.$refs.addOrUpdate.initClass(data.id||'',type,this.paramsData);
+            this.$refs.addOrUpdate.initClass(data.id||'',type,data);
           })
         }
 
