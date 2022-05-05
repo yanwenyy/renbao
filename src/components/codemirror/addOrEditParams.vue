@@ -197,7 +197,7 @@
             <el-input v-model="dataForm.paramFolderName" placeholder="文件夹名称"></el-input>
           </el-form-item>
           <el-form-item label="排序号" prop="paramFolderName">
-            <el-input v-model="dataForm.folderSort" placeholder="排序号"></el-input>
+            <el-input v-model="dataForm.folderSort" type="Number" :min="1" placeholder="排序号"></el-input>
           </el-form-item>
         </div>
       </el-form>
@@ -307,6 +307,7 @@
           folderSort:'',//排序号
           parentUuid:'',//父级编号
           pbScope:'',//1、公共、2、个人
+          paramFolderUuid:'',//分类主键id ,修改时需要
         },
         dataRule: {
           'param.paramName': [
@@ -409,6 +410,7 @@
           folderSort:'',//排序号
           parentUuid:'',//父级编号
           pbScope:'',//1、公共、2、个人
+          paramFolderUuid:'',//分类主键id ,修改时需要
         };
         this.selfActionsList=[{
           names:'',
@@ -433,7 +435,7 @@
         this.visible = true;
         this.dataForm.id=id;
         console.log(formData,433)
-        this.dataForm.parentUuid=formData.pid;
+        this.dataForm.parentUuid=formData.id;
         this.dataForm.pbScope=formData.ParamsType;
         this.dataForm.folderId=id;
         this.$nextTick(() => {
@@ -476,7 +478,6 @@
       paramsDetail: {
         deep: true,
         handler(newVal, oldVal) {
-          console.log(newVal,425);
           this.visibleType='params';
           this.dataForm=this.clone(newVal,this.dataForm);
           this.dataForm.paramChoice.choiceType=Number(this.dataForm.paramChoice.choiceType);

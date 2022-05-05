@@ -116,8 +116,8 @@
                   class="right-menu">
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.type=='funFolder'">添加参数</li>
                 <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">添加分类</li>
-                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">修改分类</li>
-                <li class="menu-item" @click="selDelParmasClass(paramsTreeClickNode,'add')" v-if="paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam'">删除分类</li>
+                <li class="menu-item" @click="addOrUpdateParmasClass(paramsTreeClickNode,'edit')" v-if="(paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam')&&paramsTreeClickNode.level>2">修改分类</li>
+                <li class="menu-item" @click="selDelParmasClass(paramsTreeClickNode,'add')" v-if="(paramsTreeClickNode.ParamsType=='publicParam'||paramsTreeClickNode.ParamsType=='personalParam')&&paramsTreeClickNode.level>2">删除分类</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'edit')" v-if="paramsTreeClickNode.type=='params'">修改参数</li>
                 <li class="menu-item" @click="selfDelParmas(paramsTreeClickNode)" v-if="paramsTreeClickNode.type=='params'">删除参数</li>
                 <li class="menu-item" @click="addOrUpdateParmas(paramsTreeClickNode,'look')" v-if="paramsTreeClickNode.type=='params'">查看属性</li>
@@ -190,6 +190,7 @@
     <add-or-update
       :paramsType="paramsType"
       :paramsDetail="paramsDetail"
+      :paramsClassDetail="paramsClassDetail"
       ref="addOrUpdate"
       :addParamsClick="addParamsClick"
       :addParamsClassClick="addParamsClassClick"
@@ -218,6 +219,11 @@
       },
       //删除参数
       delParams: {
+        type: Function,
+        default: null,
+      },
+      //删除分类
+      delParamsClass: {
         type: Function,
         default: null,
       },
@@ -978,7 +984,7 @@
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
-          this.delParams(data);
+          this.delParamsClass(data);
         }).catch(() => {});
 
       },

@@ -33,6 +33,7 @@
       :addParamsClassClick="addParamsClassClick"
       :getParamsClassDetail="getParamsClassDetail"
       :paramsClassDetail="paramsClassDetail"
+      :delParamsClass="delParamsClass"
     ></sql-edit>
   </div>
 
@@ -185,6 +186,27 @@
           }
         });
       },
+      //删除分类点击
+      delParamsClass(data){
+        console.log(data);
+        this.$http({
+          url: this.$http.adornUrl(`/aaParamFolder/delete/${data.id}`),
+          method: "post",
+        }).then(({ data }) => {
+          if (data && data.code === 200) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {
+                this.getParmasData();
+              }
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
+      },
       //获取参数详情
       getParamsDetail(data){
         //data 点击的参数节点
@@ -250,6 +272,7 @@
           folderSort:data.folderSort,
           paramFolderName:data.paramFolderName,
           parentUuid:data.parentUuid,
+          paramFolderUuid:data.paramFolderUuid,
           pbScope:data.pbScope=='publicParam'?'1':'2',
         }
         this.$http({
