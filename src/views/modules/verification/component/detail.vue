@@ -4,7 +4,7 @@
              <h2 type="primary">数据质量报告</h2>
         </div>
         <el-table :data="tableList" border height="calc(100vh - 280px)" :header-cell-style="{textAlign:'center'}" style="width: 100%">
-             <el-table-column label="序号" align="center" prop="ruleNumber" width="50"></el-table-column>
+             <el-table-column label="序号" align="center" type='index' width="50"></el-table-column>
             <el-table-column label="校验规则" align="center" prop="ruleContent"></el-table-column>
             <el-table-column label="校验状态" align="center" prop="checkStatus" width="100">
                 <template slot-scope="scope">
