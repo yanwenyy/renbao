@@ -14,7 +14,12 @@
                     <div v-if="scope.row.checkStatus == '3'">校验失败</div>
                 </template>
             </el-table-column>
-            <el-table-column label="校验结果" align="center" prop="checkResult" width="100"></el-table-column>   
+            <el-table-column label="校验结果" align="center" prop="checkResult" width="100">
+                <template slot-scope="scope">
+                <div class="tac" v-if="scope.row.checkResult=='成功'">成功</div>
+                <div class="tac" v-if="scope.row.checkResult=='失败'" style="color:red">失败</div>
+                </template>
+            </el-table-column>   
             <el-table-column align="center" label="操作" width='100' prop="affirmStatus">
                 <template slot-scope="scope">
                     <el-button @click="tableSqlView(scope.row.dataCeeckTemplateProjectId)" type="text" size="small">查看sql</el-button>
