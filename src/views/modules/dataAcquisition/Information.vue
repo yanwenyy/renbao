@@ -300,7 +300,7 @@ export default {
         },
         //导出
         reportList(){
-            let url = this.$http.adornUrl('/threeCatalog/excelDataExport?catalogType='+this.ruleForm.catalogType+'&token=') + this.$cookie.get('token')
+            let url = this.$http.adornUrl('/threeCatalog/excelDataExport?catalogType='+this.ruleForm.catalogType+'&complexWhere='+this.sqlData+'&token=') + this.$cookie.get('token')
             window.open(url)
             // this.$http({
             //     url:this.$http.adornUrl('/threeCatalog/excelDataExport'),
