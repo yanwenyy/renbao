@@ -920,7 +920,7 @@
                     showClose: true,
                     message: data.message? data.message : "数据清除失败！",
                     type: 'error',
-                    duration: 0
+                    duration: 10000
                   })
                 }
             })
@@ -993,7 +993,7 @@
                     showClose: true,
                     message: data.message? data.message : "数据清除失败！",
                     type: 'error',
-                    duration: 0
+                    duration: 10000
                   })
                 }
             })
@@ -1229,7 +1229,7 @@
                     showClose: true,
                     message: data.message? data.message : "读取文件失败，请检查数据文件！",
                     type: 'error',
-                    duration: 0
+                    duration: 10000
                   })
                 }
             })
@@ -1292,7 +1292,7 @@
                       showClose: true,
                       message: data.message? data.message : "读取文件失败，请检查数据文件！",
                       type: 'error',
-                      duration: 0
+                      duration: 10000
                     })
                   }
               })
@@ -1348,7 +1348,7 @@
                     showClose: true,
                     message: data.message? data.message : "读取文件失败，请检查数据文件！",
                     type: 'error',
-                    duration: 0
+                    duration: 10000
                   })
                 }
             })
@@ -1382,7 +1382,7 @@
                   showClose: true,
                   message: data.message? data.message : "读取文件失败，请检查数据文件！",
                   type: 'error',
-                  duration: 0
+                  duration: 10000
                 })
               }
           })
@@ -1420,7 +1420,7 @@
               showClose: true,
               message: data.message? data.message : "读取文件失败，请检查数据文件！",
               type: 'error',
-              duration: 0
+              duration: 10000
             })
           }
         })
@@ -1452,14 +1452,14 @@
                 showClose: true,
                 message: data.message? data.message : "读取文件失败，请检查数据文件！",
                 type: 'error',
-                duration: 0
+                duration: 10000
               })
             } else {
               this.$message({
                 showClose: true,
                 message: data.message? data.message : "读取文件失败，请检查数据文件！",
                 type: 'error',
-                duration: 0
+                duration: 10000
               })
             }
           }
@@ -1520,7 +1520,7 @@
               showClose: true,
               message: data.message? data.message : "文件数据列信息重复",
               type: 'error',
-              duration: 0
+              duration: 10000
             })
             return
           }
