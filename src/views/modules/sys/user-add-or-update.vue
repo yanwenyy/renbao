@@ -65,7 +65,7 @@
             ref="menuListTree"
             :default-expand-all="false"
             :check-strictly="isCheck"
-            @check-change="isCheck=false"
+            @node-click="isCheck=false"
             show-checkbox>
           </el-tree>
         </el-form-item>
@@ -276,9 +276,11 @@
                 this.dataForm.userSex = user.userSex
                 this.selTree  = user.menuIds?user.menuIds.split(","):[];
                 this.$nextTick(() => {
+                  console.log( this.isCheck,279)
                   //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
                   this.$refs.menuListTree.setCheckedKeys(this.selTree);//给树节点赋值
                   this.isCheck= false //重点： 赋值完成后 设置为false
+                  console.log( this.isCheck,283)
                 })
               }
             })
