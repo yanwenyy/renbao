@@ -111,7 +111,7 @@
         </el-table>
       </el-form-item>
     </el-form>
-    <div align="center">
+    <div align="right">
       <el-button type="primary" @click="submitForm('dataForm')" v-if="showBtn"
         >确定</el-button
       >

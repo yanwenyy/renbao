@@ -47,7 +47,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <div align="center">
+    <div align="right">
       <el-button type="primary" @click="submitForm('dataForm')">确定</el-button>
       <el-button @click="closeRun">取消</el-button>
     </div>
@@ -65,7 +65,7 @@
         ref="hospital"
         v-if="showHospitalDialog"
       ></basicInformation>
-      <div align="center" style="margin-top:10px">
+      <div align="right" style="margin-top:10px">
         <el-button type="primary" @click="getData">确定</el-button>
         <el-button @click="close">取消</el-button>
       </div>

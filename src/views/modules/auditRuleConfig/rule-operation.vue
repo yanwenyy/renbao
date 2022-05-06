@@ -62,15 +62,18 @@
           </el-form-item>
         </el-form>
       </div>
-      <span slot="footer" class="dialog-footer">
+      <div align="right">
+         <span slot="footer" class="dialog-footer">
         <el-button
           type="primary"
           @click="onSubmit('ruleOperationForm')"
           :loading="loading"
-          >确 定</el-button
+        >确 定</el-button
         >
         <el-button @click="handleClose">取 消</el-button>
       </span>
+      </div>
+
     </el-dialog>
     <hospital-selection ref="hospitalSelection"></hospital-selection>
   </div>

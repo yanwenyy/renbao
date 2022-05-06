@@ -54,12 +54,12 @@
               <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
                 <el-input type="textarea" :rows="6" :readonly="readonly" v-model="dataForm.RULEREMARK" placeholder="规则备注"></el-input>
               </el-form-item>
-              
+
             </div>
 
         </el-tab-pane>
-        
-          
+
+
       </el-tabs>
       </el-form>
       <div class="itemBtn" v-if="showBtn">
@@ -401,10 +401,10 @@
         //     return false;
         //   }
         // }
-        
+
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-          
+
             this.$http({
               url: this.$http.adornUrl(`/demandCollaboration/${!this.dataForm.ruleId ? 'add' : 'updateByUuId'}`),
               method: 'post',
@@ -504,6 +504,10 @@
     content: '*';
     color: #F56C6C;
     margin-right: 4px;
+  }
+  .itemBtn{
+    text-align: right;
+    margin-top: 10px;
   }
 </style>
 
