@@ -5,6 +5,7 @@
         v-bind="vqbProps"
         :query.sync="query"
       />
+      {{query}}
     </slot>
   </div>
 </template>
@@ -42,6 +43,10 @@ export default {
         return defaultLabels;
       }
     },
+    queryObj: {
+      type: Object,
+      default:null
+    },
     maxDepth: {
       type: Number,
       default: 3,
@@ -53,10 +58,11 @@ export default {
   },
 
   data () {
+    console.log(this.queryObj)
     return {
       query: {
         logicalOperator: this.labels.matchTypes[0].id,
-        children: []
+        children:[]
       },
       ruleTypes: {
         "text": {
@@ -124,7 +130,6 @@ export default {
           mergedRules.push( rule );
         }
       });
-
       return mergedRules;
     },
 
@@ -135,7 +140,11 @@ export default {
         maxDepth: this.maxDepth,
         ruleTypes: this.ruleTypes,
         rules: this.mergedRules,
-        labels: this.mergedLabels
+        labels: this.mergedLabels,
+        query: {
+          logicalOperator: this.queryObj?this.queryObj.logicalOperator:this.labels.matchTypes[0].id,
+          children:this.queryObj?this.queryObj.children:[]
+        },
       }
     }
   },
@@ -145,6 +154,7 @@ export default {
       'query',
       newQuery => {
         if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
+          console.log(newQuery,157)
           this.$emit('input', deepClone(newQuery));
           this.$emit('sql', this.queryToSql(newQuery));
         }
