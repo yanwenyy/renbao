@@ -30,7 +30,7 @@
             </div>
             <div class='ax_default'>
                 <div @click="handleChange">查询条件<i v-if="!show" class="el-icon-arrow-down" style="padding-left:5px"></i><i v-show="show" class="el-icon-arrow-up" style="padding-left:5px"></i></div>
-                <transition name="sub-comments">
+                <transition name="sub-comments"> 
                     <myquerybuilder ref="myquerybuilder" :rules="queryRules" v-show="show" class="mask" v-model="output" :columns='columns1' :data='data'></myquerybuilder>
                 </transition>
             </div>
@@ -182,10 +182,11 @@ export default {
   },
     mounted(){
         //点击空白处隐藏复杂条件查询
+        // document.addEventListener('click',this.HiddenClick)
         let that=this;
         document.addEventListener('click',(e) =>{
-             if(!that.$refs.box.contains(e.target)){
-            that.show = false;
+            if(!that.$refs.box.contains(e.target)){
+             that.show = false;
         }
         })
     //    this.getDataList()
@@ -269,7 +270,11 @@ export default {
         //查询点击事件
         searchList(){
             var getSql = this.$refs.myquerybuilder.getSelectSql()
-            this.sqlData = getSql.sql
+            if(getSql == null){
+                this.sqlData = ''
+            }else{
+                this.sqlData = getSql.sql
+            }
            // this.$refs.myquerybuilder.ceshi()
             // return;
             this.dataListLoading = true;
@@ -278,7 +283,7 @@ export default {
                 method: "get",
                 params: this.$http.adornParams({
                     'catalogType':this.ruleForm.catalogType,
-                    'complexWhere':getSql.sql,
+                    'complexWhere':this.sqlData,
                 })
             }).then(({data}) =>{
                 if(data && data.code === 200){
