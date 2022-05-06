@@ -46,16 +46,16 @@
             <el-date-picker
               :picker-options="pickerOptionsStart"
               v-model="dataForm.endStartTime"
-              type="datetime"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              type="date"
+              value-format="yyyy-MM-dd"
               placeholder="选择日期">
             </el-date-picker>
             <span>--</span>
             <el-date-picker
               :picker-options="pickerOptionsEnd"
               v-model="dataForm.endStopTime"
-              type="datetime"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              type="date"
+              value-format="yyyy-MM-dd"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
