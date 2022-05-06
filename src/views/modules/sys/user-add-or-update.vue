@@ -57,6 +57,7 @@
       <div class="user-right inline-block">
         <el-form-item size="mini" label="授权">
           <el-tree
+            :key="treeKey"
             :default-checked-keys="selTree"
             :data="menuList"
             :props="menuListTreeProps"
@@ -90,7 +91,7 @@
         }
       }
       var validatePassword2 = (rule, value, callback) => {
-        if (this.checkStrong(value)<4) {
+        if (value!=''&&this.checkStrong(value)<4) {
           callback(new Error("密码需包括数组,字母和特殊字符"));
         } else {
           callback();
@@ -125,6 +126,7 @@
         }
       }
       return {
+        treeKey:0,
         selTree: [],
         isCheck:true,
         tempKey: -666666 ,// 临时key, 用于解决tree半选中状态项不能传给后台接口问题. # 待优化
@@ -199,6 +201,7 @@
         return modes;
       },
       cleanMsg(){
+        this.treeKey=Math.random();
         this.isCheck=true;
         this.dataForm={
             id: 0,
