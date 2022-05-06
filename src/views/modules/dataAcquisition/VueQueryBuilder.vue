@@ -5,7 +5,6 @@
         v-bind="vqbProps"
         :query.sync="query"
       />
-      {{query}}
     </slot>
   </div>
 </template>
@@ -58,11 +57,10 @@ export default {
   },
 
   data () {
-    console.log(this.queryObj)
     return {
       query: {
-        logicalOperator: this.labels.matchTypes[0].id,
-        children:[]
+        logicalOperator: this.queryObj&&this.queryObj.logicalOperator?JSON.parse(JSON.stringify(this.queryObj.logicalOperator)):this.labels.matchTypes[0].id,
+        children:this.queryObj&&this.queryObj.children?JSON.parse(JSON.stringify(this.queryObj.children)):[]
       },
       ruleTypes: {
         "text": {
@@ -111,7 +109,7 @@ export default {
           id: "inputselect-field"
          }
       },sql: ''
-    }
+    };
   },
 
   computed: {
@@ -142,8 +140,8 @@ export default {
         rules: this.mergedRules,
         labels: this.mergedLabels,
         query: {
-          logicalOperator: this.queryObj?this.queryObj.logicalOperator:this.labels.matchTypes[0].id,
-          children:this.queryObj?this.queryObj.children:[]
+          logicalOperator: this.queryObj&&this.queryObj.logicalOperator?JSON.parse(JSON.stringify(this.queryObj.logicalOperator)):this.labels.matchTypes[0].id,
+          children:this.queryObj&&this.queryObj.children?JSON.parse(JSON.stringify(this.queryObj.children)):[]
         },
       }
     }
@@ -154,7 +152,6 @@ export default {
       'query',
       newQuery => {
         if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
-          console.log(newQuery,157)
           this.$emit('input', deepClone(newQuery));
           this.$emit('sql', this.queryToSql(newQuery));
         }
@@ -198,7 +195,22 @@ export default {
           sql.splice(sql.length - 1, sql.length);
           return sql.join(' ');
       }
-  }
-
+  },
+  watch: {
+    queryObj: {
+      immediate: true,
+      deep: true,
+      handler(newname, oldname) {
+        if(newname.logicalOperator){
+          this.query.logicalOperator=newname.logicalOperator;
+        }
+        if(newname.children){
+          this.query.children=newname.children;
+        }
+        console.log(newname,210)
+        console.log(this.query,211)
+      }
+    }
+  },
 }
 </script>

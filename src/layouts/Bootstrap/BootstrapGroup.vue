@@ -4,6 +4,7 @@
     class="vqb-group card"
     :class="'depth-' + depth.toString()"
   >
+
     <div class="vqb-group-heading card-header">
       <div class="match-type-container form-inline">
         <label
