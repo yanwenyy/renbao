@@ -93,7 +93,7 @@
                     style="width:75%"></el-input>
         </el-form-item>
       </el-form>
-      <div style='text-align:center'>
+      <div style='text-align:right'>
         <el-button @click="ShowAddVisible = false">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">保存</el-button>
       </div>

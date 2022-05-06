@@ -35,7 +35,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <div class="itemBtn" v-if="showBtn">
+    <div align="right" class="itemBtn" v-if="showBtn">
       <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
       <el-button @click="close('ruleForm')">取消</el-button>

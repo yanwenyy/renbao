@@ -574,6 +574,7 @@
       },
       //筛选弹框确定点击
       saveScreen() {
+        // console.log(this.queryJson,577)
         this.dialogFormVisible = false;
         var sql = this.queryToSql(this.queryJson);
         var idx =  this.indexOfJoin(this.screenRow.table);
@@ -582,6 +583,7 @@
           var field = datajoin.fields[i];
           if(field.id == this.screenRow.id){
             this.join[idx].fields[i].more=sql;
+            this.join[idx].fields[i].screen=this.queryJson;
           }
         }
         this.initTableRow();
@@ -637,10 +639,13 @@
       },
       //筛选按钮点击
       screen(row) {
+        console.log(row);
         this.screenKey=Math.random();
         this.screenRow = row;
         this.queryRules = [];
         var v = {
+          logicalOperator:row.screen.logicalOperator,
+          children:row.screen.children,
           type: 'inputselect',
           label:row.key+"."+ row.info,
           value:row.key+"."+ row.info,

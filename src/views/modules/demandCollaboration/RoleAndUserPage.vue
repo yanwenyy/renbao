@@ -6,8 +6,8 @@
       :close-on-click-modal="false"
       :visible.sync="visible">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-        
-        
+
+
         <el-form-item>
           <div>项目成员信息：</div>
           <!--<el-button type="primary" @click="addMemberVisable=true">项目成员信息维护</el-button>-->
@@ -65,15 +65,18 @@
             <!--</el-table-column>-->
           </el-table>
         </el-form-item>
-        
-        
+
+
       </el-form>
-      <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false,clearMsg()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span>
+      <div align="right">
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="visible = false,clearMsg()">取消</el-button>
+          <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+        </span>
+      </div>
+
     </el-dialog>
-    
+
     <member-list  v-if="memberListVisible" ref="memberList" @refreshDataList="getDataList"></member-list>
   </div>
 </template>
@@ -177,7 +180,7 @@
           xmProjectRoleUsers:[],
         },
         dataRule: {
-        
+
           dataAmount: [
             { required: true,validator: validateInteger, trigger: 'blur' }
           ],
@@ -234,7 +237,7 @@
           list=this.MergeArray(list,item.userIds);
           this.userIds=item.userIds;
         })
-        
+
         return list;
       },
       MergeArray(arr1,arr2){
