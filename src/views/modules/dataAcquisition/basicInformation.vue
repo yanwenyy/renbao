@@ -78,7 +78,7 @@
         v-loading="tableLoading"
         @selection-change="handleSelectionChange" v-if="tableList != ''" 
       >
-        <el-table-column align='center' type="selection" width="55"></el-table-column>
+        <el-table-column align='center' type="selection" width="55"></el-table-column> 
         <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
         <template v-for="(item, index) in tableColumns">
           <el-table-column
@@ -161,6 +161,7 @@ export default {
       },
       tableList: [],
       tableColumns: [],
+      selections:false,
       options: [
         {
           value: "三级甲等",
@@ -208,9 +209,16 @@ export default {
   },
   created() {
     this.token = this.$cookie.get("token");
+    // debugger
   },
   mounted() {
     this.getInitList();
+    // if(window.performance.navigation.type == 1) {
+    //   debugger
+    //   this.selections = false
+    // }else{
+    //   this.selections = false
+    // }
   },
   methods: {
     //初始化数据列表
@@ -334,9 +342,8 @@ export default {
     exportData() {
       let url =
         this.$http.adornUrl(
-          "/threeCatalog/excelDataExport?catalogType=" +
-            this.catalogType +
-            "&token="
+          "/threeCatalog/excelDataExport?catalogType="+this.catalogType + '&hospitalName=' +this.dataForm.hospitalName + '&hospitalType=' + this.dataForm.hospitalType + '&moneyStart=' + this.dataForm.moneyStart + '&moneyEnd=' + this.dataForm.moneyEnd
+            + "&token="
         ) + this.$cookie.get("token");
       window.open(url);
     },
