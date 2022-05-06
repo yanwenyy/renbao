@@ -10,6 +10,8 @@
       :height="tableHeight+30"
       :data="dataList"
       row-key="menuId"
+      :row-style="isRed"
+      @row-click="rowClickEv"
       style="width: 100%; ">
       <el-table-column
         prop="menuName"
@@ -62,8 +64,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.menuId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.menuId)">删除</el-button>
+          <el-button type="text" size="small" @click.stop="addOrUpdateHandle(scope.row.menuId)">修改</el-button>
+          <el-button type="text" size="small" @click.stop="deleteHandle(scope.row.menuId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,6 +80,7 @@
   export default {
     data () {
       return {
+        selectedArrData: [], // 把选择到的当前行的id存到数组中
         dataForm: {},
         dataList: [],
         dataListLoading: false,
@@ -96,6 +99,20 @@
       this.getDataList()
     },
     methods: {
+      // 某一行被点击行触发事件，默认形参代表一整行数据
+      rowClickEv(row) {
+        // console.log(row);//点击的那行数据默认是对象{__ob__: Observer}，将其转数组
+        this.selectedArrData = [row];
+      },
+
+      isRed({ row }) {
+        const checkIdList = this.selectedArrData.map((item) => item.menuId);
+        if (checkIdList.includes(row.menuId)) {
+          return {
+            backgroundColor: "#E0EDFA",
+          };
+        }
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -110,9 +127,10 @@
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
+        this.addOrUpdateVisible = true;
+        var clickRow=id?null:this.selectedArrData[0]
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(id,clickRow)
         })
       },
       // 删除
@@ -145,3 +163,11 @@
     }
   }
 </script>
+<style lang="scss" scoped>
+  // 修改鼠标经过表格的颜色
+  /deep/ .el-table tbody tr:hover > td {
+    background-color: transparent !important;
+
+  }
+
+</style>
