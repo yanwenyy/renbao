@@ -135,46 +135,15 @@ export default {
         test() {
             this.disp = !this.disp;
         },
-        // select(selection,row){
-        //   this.$refs.multipleTable.clearSelection()
-        //   if(selection.length ==0) return
-	      //   this.$refs.multipleTable.toggleRowSelection(row, true)
-        // },
+
         handleSelectionChange(val) {
           this.multipleSelection = val;
           if(val.length > 1){
             this.$refs.multipleTable.clearSelection();
             this.$refs.multipleTable.toggleRowSelection(val.pop());
           }
-      
-          // this.multipleSelection = val;
-          // for(var i =0;i<this.multipleSelection.length;i++){
-              //  this.editTag = this.multipleSelection[i].editTag;
-          // }
-          // this.editTag = this.multipleSelection[0].editTag;
         },
     
-        // rowClick(row, column){
-        //   const selectData = this.multipleSelection
-
-        //  this.$refs.multipleTable.clearSelection()
-        // if( selectData.length == 1 ) {
-        //     selectData.forEach(item => {
-        //       // 判断 如果当前的一行被勾选, 再次点击的时候就会取消选中
-        //         if (item == row) {
-        //             this.$refs.multipleTable.toggleRowSelection(row, false);
-        //         }
-        //         // 不然就让当前的一行勾选
-        //         else {
-        //             this.$refs.multipleTable.toggleRowSelection(row, true);
-        //         }
-        //     })
-        // } 
-        // else {
-        //     this.$refs.multipleTable.toggleRowSelection(row, true);
-        // }
-          
-        // },
         toBaseInfo(row) { 
             if (row.extendTag == 0) {
                 this.addOrUpdateVisible = true,
@@ -222,7 +191,6 @@ export default {
         },
         // 修改
         editBaseData() {
-          debugger
             if (this.multipleSelection.length != 1) {
                 this.$notify.error({
                 title: "错误",
