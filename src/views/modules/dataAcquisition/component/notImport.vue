@@ -5,7 +5,7 @@
                     <el-table-column :prop="item" :label="item" :key="index"  width show-overflow-tooltip/>
              </template>
         </el-table>
-        <el-pagination 
+        <el-pagination
                 :page-size="apComServerData.pageSize"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="apComServerData.total"
@@ -79,7 +79,7 @@ export default {
 <style lang="scss" scoped>
 
 .itemBtn{
-    text-align: center;
+    text-align: right;
     margin-top: 10px;
 }
 </style>

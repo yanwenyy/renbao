@@ -23,6 +23,21 @@
               clearable
             ></el-input>
           </el-form-item>
+
+          <el-form-item label="底稿编号：">
+            <el-input
+              v-model="searchForm.manuscriptCode"
+              clearable
+              placeholder="底稿编号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="底稿名称：">
+            <el-input
+              v-model="searchForm.manuscriptName"
+              clearable
+              placeholder="底稿名称"
+            ></el-input>
+          </el-form-item>
           <el-form-item label="创建人：">
             <el-input
               v-model="searchForm.createUserName"
@@ -41,15 +56,15 @@
             :disabled="this.multipleTable.length <= 0"
           >删除
           </el-button>
-          <el-button
-            style="float:right"
-            type="primary"
-            :disabled="
-              this.multipleTable.length <= 0 || this.multipleTable.length > 1
-            "
-            @click="editData"
-            >编写底稿</el-button
-          >
+          <!--<el-button-->
+            <!--style="float:right"-->
+            <!--type="primary"-->
+            <!--:disabled="-->
+              <!--this.multipleTable.length <= 0 || this.multipleTable.length > 1-->
+            <!--"-->
+            <!--@click="editData"-->
+            <!--&gt;编写底稿</el-button-->
+          <!--&gt;-->
 
         </el-form>
       </div>
@@ -60,9 +75,9 @@
             border
             v-loading="tableLoading"
             @selection-change="handleSelectionChange"
-            style="width: 100%;"
+            style="width: 100%;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;"
             ref="multipleTable"
-            :height="tableHeight - 80"
+            :height="tableHeight - 150"
           >
             <el-table-column
               type="selection"
@@ -145,7 +160,10 @@
               label="操作"
             >
               <template slot-scope="scope">
-                <el-button type="text" @click="deleteHandle(scope.row.ruleId)"
+                <el-button type="text" @click="editData(scope.row)"
+                >编写底稿
+                </el-button>
+                <el-button type="text" @click="deleteHandle(scope.row.manuscriptId)"
                 >删除
                 </el-button>
               </template>
@@ -154,7 +172,6 @@
         </div>
         <div class="auditRuleConfig-right-bottom">
           <el-pagination
-            v-if="Pager.total >= 1"
             @size-change="sizeChangeHandle"
             @current-change="currentChangeHandle"
             :current-page="Pager.pageIndex"
@@ -202,7 +219,9 @@ export default {
         ruleName: "",
         createUserName: "",
         folderPath: "",
-        folderId: ""
+        folderId: "",
+        manuscriptCode: "",
+        manuscriptName: "",
       },
       tableData: [],
       Pager: {
@@ -239,37 +258,53 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var userIds = id
-        ? [id]
-        : this.multipleTable.map(item => {
-          return item.userId;
-        });
-      this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl("/manuscript/deleteByIds"),
-            method: "delete",
-            data: this.$http.adornData(userIds, false)
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList();
-                }
-              });
-            } else {
-              this.$message.error(data.msg);
-            }
-          });
+      let canDel=true;
+      if(this.multipleTable.length>0){
+        this.multipleTable.forEach(item=>{
+          if(!item.manuscriptId){
+            canDel=false;
+            this.$message.error("只能删除有底稿的数据")
+            return false;
+          }
         })
-        .catch(() => {});
+      }
+      if(canDel){
+        var userIds = id
+          ? [id]
+          : this.multipleTable.map(item => {
+            return item.manuscriptId;
+          });
+        if(userIds.length==0){
+          this.$message.error("只能删除有底稿的数据")
+          return false;
+        }
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl("/manuscript/deleteByIds"),
+              method: "delete",
+              data: this.$http.adornData(userIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getSelectPage();
+                  }
+                });
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+          })
+          .catch(() => {});
+      }
     },
     getSelectPage() {
       this.ruleData=this.$refs.ruleTree.treeData;
@@ -296,7 +331,7 @@ export default {
           this.tableLoading = false;
           if (data.code == 200) {
             data.result.records.map(i => {
-              i.createTime = i.createTime;
+              // i.createTime = i.createTime;
               i.ruleCategory =
                 i.ruleCategory == 1
                   ? "门诊规则"
@@ -357,6 +392,8 @@ export default {
     //重置
     onReset() {
       this.searchForm.ruleName='';
+      this.searchForm.manuscriptCode='';
+      this.searchForm.manuscriptName='';
       this.searchForm.createUserName='';
       this.Pager.pageIndex = 1;
       this.getSelectPage();
@@ -366,14 +403,14 @@ export default {
       // this.searchForm.folderId = '';
     },
     //编写底稿弹窗
-    editData() {
+    editData(row) {
       if(this.projectId==''||this.projectId==null||this.projectId==undefined){
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
       this.title = "编写底稿";
       this.showEditDialog = true;
-      this.data = this.multipleTable[0];
+      this.data = row;
       this.readonly = false;
     },
     //查看底稿弹窗
@@ -481,7 +518,7 @@ export default {
   min-width: 800px;
   // overflow-x: auto;
   .auditRuleConfig-left {
-    width: 300px;
+    width: 29%;
     // min-height: 100vh;
     // min-height: calc(100vh - 165px);
     // margin-right: 20px;
@@ -495,7 +532,8 @@ export default {
     }
   }
   .auditRuleConfig-right {
-    flex: 1;
+    width: 71%;
+    /*flex: 1;*/
     border: none;
     /*height: 75vh;*/
     overflow: auto;

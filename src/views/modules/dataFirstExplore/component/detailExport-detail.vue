@@ -110,7 +110,7 @@ export default {
     //点击空白处隐藏复杂条件查询
     let that = this;
     document.addEventListener("click", e => {
-      if (!that.$refs.box.contains(e.target)) {
+      if (that.$refs.box&&!that.$refs.box.contains(e.target)) {
         that.show = false;
       }
     });

@@ -62,6 +62,10 @@
         get () { return this.$store.state.user.name },
         set (val) { this.$store.commit('user/updateName', val) }
       },
+      loginName: {
+        get () { return this.$store.state.user.loginName },
+        set (val) { this.$store.commit('user/updateLoginName', val) }
+      },
       useMagnifier: {
         get () { return this.$store.state.common.useMagnifier }
       }
@@ -92,6 +96,7 @@
             this.loading = false
             this.userId = data.result.userId;
             this.userName = data.result.userName;
+            this.loginName = data.result.userLoginName;
             sessionStorage.setItem("userId",this.userId)
             sessionStorage.setItem("userName",this.userName)
           }

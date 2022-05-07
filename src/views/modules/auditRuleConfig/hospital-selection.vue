@@ -53,10 +53,10 @@
             </div> -->
       <basicInformation ref="hospital"></basicInformation>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="onSubmit('form')" :loading="loading"
+        <el-button type="primary" @click="onSubmit()" :loading="loading"
           >确 定</el-button
         >
-        <el-button @click="cancel">取 消</el-button>
+        <el-button @click="handleClose">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -101,13 +101,12 @@ export default {
       ],
       type: "",
       checkHospitalList: [], // 选中的医院列表
-      checkRuleData: [], // 选中的规则列表
-      ruleOperationForm: {}
+      checkRuleData: [] // 选中的规则列表
     };
   },
   methods: {
     //默认打开页面
-    showDialog(checkRuleData, type, ruleOperationForm) {
+    showDialog(checkRuleData, type) {
       this.innerVisible = true;
       this.$nextTick(() => {
         if (this.$refs.hospital) {
@@ -116,8 +115,6 @@ export default {
       });
       this.type = type;
       this.checkRuleData = checkRuleData;
-      // this.getHospital();
-      this.ruleOperationForm = ruleOperationForm;
     },
     mounted() {},
     // 获取医院列表
@@ -142,45 +139,22 @@ export default {
           this.tableLoading = false;
         });
     },
-
     handleClose() {
       this.innerVisible = false;
-      this.$parent.showDialog(
-        this.checkRuleData,
-        this.type,
-        [],
-        this.ruleOperationForm,
-        "hospitalBack"
-      );
     },
     handleSelectionChange(val) {
       this.checkHospitalList = val;
     },
-    onSubmit(formName) {
+    onSubmit() {
       this.innerVisible = false;
-      // console.log(this.$refs.hospital.multipleSelection, '查看选中的列表')
-      // debugger
       this.checkHospitalList = this.$refs.hospital.multipleSelection;
-      this.$parent.showDialog(
-        this.checkRuleData,
-        this.type,
-        this.checkHospitalList,
-        this.ruleOperationForm,
-        "hospitalBack"
-      );
       //转换sql处理
-      var resultSqlValue = [];
-      // console.log('医院',this.checkHospitalList)
       if (this.checkRuleData.length > 0) {
-        for (var i = 0; i < this.checkRuleData.length; i++) {
-          resultSqlValue.push(
-            transSql(this.checkRuleData[i].ruleSqlValue, this.checkHospitalList)
-          );
-        }
+        this.checkRuleData.forEach(item => {
+          item.sql = transSql(item.sql, this.checkHospitalList);
+        });
       }
-      // console.log('传',this.checkRuleData)
-      // console.log('返',resultSqlValue)
-      this.$parent.setHospital(this.checkHospitalList, resultSqlValue); // 回显医院名称
+      this.$parent.setHospital(this.checkHospitalList, this.checkRuleData); // 回显医院名称
     },
     onQuery() {
       this.getHospital();
@@ -189,16 +163,6 @@ export default {
       this.searchHospitalForm.hospitalName = "";
       this.searchHospitalForm.hospitalType = "";
     },
-    cancel() {
-      this.innerVisible = false;
-      this.$parent.showDialog(
-        this.checkRuleData,
-        this.type,
-        [],
-        this.ruleOperationForm,
-        "hospitalBack"
-      );
-    }
   },
   watch: {},
   components: {

@@ -6,36 +6,47 @@
       @keyup.enter.native="getDataList()"
       class="search-form-new"
     >
-      <el-form-item>
+      <el-form-item label="方案编号:">
+        <el-input
+          v-model="dataForm.planCode"
+          placeholder="方案编号"
+          clearable
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="方案名称:">
         <el-input
           v-model="dataForm.planName"
           placeholder="方案名称"
           clearable
         ></el-input>
+      </el-form-item>
+      <el-form-item label="创建人:">
         <el-input
           v-model="dataForm.createUserName"
           placeholder="创建人"
           clearable
         ></el-input>
-        <el-input
-          v-model="dataForm.planCode"
-          placeholder="方案编码"
-          clearable
-        ></el-input>
       </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="(pageIndex = 1), getDataList()"
         >查询</el-button
         >
         <el-button @click="reset()">重置</el-button>
+
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="addOrUpdateHandle('')"
+        >新增</el-button
+        >
       </el-form-item>
     </el-form>
-    <div class="search-btn">
-      <el-button type="primary" @click="addOrUpdateHandle('')"
-      >新增</el-button
-      >
-      <!--<el-button type="danger" @click="getDataList()">删除</el-button>-->
-    </div>
+    <!--<div class="search-btn">-->
+      <!--<el-button type="primary" @click="addOrUpdateHandle('')"-->
+      <!--&gt;新增</el-button-->
+      <!--&gt;-->
+      <!--&lt;!&ndash;<el-button type="danger" @click="getDataList()">删除</el-button>&ndash;&gt;-->
+    <!--</div>-->
     <el-table
       :height="tableHeight-50"
       :data="dataList"

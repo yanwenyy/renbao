@@ -19,6 +19,18 @@
       <el-form-item label="确认密码" prop="confirmPassword">
         <el-input type="password" v-model="dataForm.confirmPassword"></el-input>
       </el-form-item>
+      <el-form-item label="密码强度">
+        <div class="input_span">
+          <span id="one"></span>
+          <span id="two"></span>
+          <span id="three"></span>
+        </div>
+        <div id="font">
+          <span>弱</span>
+          <span>中</span>
+          <span>强</span>
+        </div>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -38,7 +50,16 @@ export default {
         callback();
       }
     };
+    var validatePassword = (rule, value, callback) => {
+      if (this.checkStrong(value)<4) {
+        callback(new Error("密码需包括数组,字母和特殊字符"));
+      } else {
+        callback();
+      }
+    };
     return {
+      from:'',
+      msgText: "",
       visible: false,
       dataForm: {
         password: "",
@@ -50,7 +71,9 @@ export default {
           { required: true, message: "原密码不能为空", trigger: "blur" }
         ],
         newPassword: [
-          { required: true, message: "新密码不能为空", trigger: "blur" }
+          { required: true, message: "新密码不能为空", trigger: "blur" },
+          { min:6,max:20,message:'长度在6到20个字符',trigger:"blur"},
+          { validator: validatePassword, trigger: "blur" }
         ],
         confirmPassword: [
           { required: true, message: "确认密码不能为空", trigger: "blur" },
@@ -62,7 +85,7 @@ export default {
   computed: {
     userName: {
       get() {
-        return this.$store.state.user.name;
+        return this.$store.state.user.loginName;
       }
     },
     mainTabs: {
@@ -75,8 +98,33 @@ export default {
     }
   },
   methods: {
+    checkStrong(sValue) {
+      var modes = 0;
+      //正则表达式验证符合要求的
+      if (sValue.length < 1) return modes;
+      if (/\d/.test(sValue)) modes++; //数字
+      if (/[a-z]/.test(sValue)) modes++; //小写
+      if (/[A-Z]/.test(sValue)) modes++; //大写
+      if (/\W/.test(sValue)) modes++; //特殊字符
+
+      //逻辑处理
+      switch (modes) {
+        case 1:
+          return 1;
+          break;
+        case 2:
+          return 2;
+          break;
+        case 3:
+        case 4:
+          return sValue.length < 4 ? 3 : 4;
+          break;
+      }
+      return modes;
+    },
     // 初始化
-    init() {
+    init(from) {
+      this.from=from;
       this.visible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
@@ -116,6 +164,47 @@ export default {
         }
       });
     }
-  }
+  },
+  watch: {
+    'dataForm.newPassword': {
+      handler(newname, oldname) {
+        this.msgText = this.checkStrong(newname);
+        if (this.msgText > 1 || this.msgText == 1) {
+          document.getElementById("one").style.background = "red";
+        } else {
+          document.getElementById("one").style.background = "#eee";
+        }
+        if (this.msgText > 2 || this.msgText == 2) {
+          document.getElementById("two").style.background = "orange";
+        } else {
+          document.getElementById("two").style.background = "#eee";
+        }
+        if (this.msgText == 4) {
+          document.getElementById("three").style.background = "#00D1B2";
+        } else {
+          document.getElementById("three").style.background = "#eee";
+        }
+      }
+    }
+  },
 };
 </script>
+<style scoped>
+  .input_span>span{
+    background: #eee;
+    height: 10px;
+  }
+  #font>span,.input_span>span{
+    display: inline-block;
+    width: 30%;
+    text-align: right;
+  }
+  #one{
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  #three{
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+</style>

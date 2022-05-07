@@ -15,6 +15,18 @@
         <el-form-item label="确认密码" prop="comfirmPassword" class="no-autofill-pwd" :class="{ 'is-required': !dataForm.id }">
           <el-input class="no-autofill-pwd" v-model="dataForm.comfirmPassword" type="text" placeholder="确认密码"></el-input>
         </el-form-item>
+        <el-form-item label="密码强度">
+          <div class="input_span">
+            <span id="one"></span>
+            <span id="two"></span>
+            <span id="three"></span>
+          </div>
+          <div id="font">
+            <span>弱</span>
+            <span>中</span>
+            <span>强</span>
+          </div>
+        </el-form-item>
         <el-form-item label="用户姓名" prop="userName">
           <el-input v-model="dataForm.userName" placeholder="用户姓名（30字以内）" maxlength="30"></el-input>
         </el-form-item>
@@ -45,6 +57,7 @@
       <div class="user-right inline-block">
         <el-form-item size="mini" label="授权">
           <el-tree
+            :key="treeKey"
             :default-checked-keys="selTree"
             :data="menuList"
             :props="menuListTreeProps"
@@ -52,7 +65,7 @@
             ref="menuListTree"
             :default-expand-all="false"
             :check-strictly="isCheck"
-            @check-change="dataForm.id?isCheck=true:isCheck=false"
+            @node-click="isCheck=false"
             show-checkbox>
           </el-tree>
         </el-form-item>
@@ -77,14 +90,26 @@
           callback()
         }
       }
-      var validateComfirmPassword = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('确认密码不能为空'))
-        } else if (this.dataForm.userPassword !== value) {
-          callback(new Error('确认密码与密码输入不一致'))
+      var validatePassword2 = (rule, value, callback) => {
+        if (value!=''&&this.checkStrong(value)<4) {
+          callback(new Error("密码需包括数组,字母和特殊字符"));
         } else {
-          callback()
+          callback();
         }
+      };
+      var validateComfirmPassword = (rule, value, callback) => {
+        // if (!this.dataForm.id && !/\S/.test(value)) {
+        //   callback(new Error('确认密码不能为空'))
+        // } else if (this.dataForm.userPassword !== value) {
+        //   callback(new Error('确认密码与密码输入不一致'))
+        // } else {
+        //   callback()
+        // }
+          if (this.dataForm.userPassword !== value) {
+              callback(new Error('确认密码与密码输入不一致'))
+            } else {
+              callback()
+            }
       }
       var validateEmail = (rule, value, callback) => {
         if (!isEmail(value)) {
@@ -101,6 +126,7 @@
         }
       }
       return {
+        treeKey:0,
         selTree: [],
         isCheck:true,
         tempKey: -666666 ,// 临时key, 用于解决tree半选中状态项不能传给后台接口问题. # 待优化
@@ -126,7 +152,8 @@
             { required: true, message: '用户账号不能为空', trigger: 'blur' }
           ],
           userPassword: [
-            { validator: validatePassword, trigger: 'blur' }
+            // { validator: validatePassword, trigger: 'blur' },
+            { validator: validatePassword2, trigger: "blur" }
           ],
           comfirmPassword: [
             { validator: validateComfirmPassword, trigger: 'blur' }
@@ -149,7 +176,33 @@
       }
     },
     methods: {
+      checkStrong(sValue) {
+        var modes = 0;
+        //正则表达式验证符合要求的
+        if (sValue.length < 1) return modes;
+        if (/\d/.test(sValue)) modes++; //数字
+        if (/[a-z]/.test(sValue)) modes++; //小写
+        if (/[A-Z]/.test(sValue)) modes++; //大写
+        if (/\W/.test(sValue)) modes++; //特殊字符
+
+        //逻辑处理
+        switch (modes) {
+          case 1:
+            return 1;
+            break;
+          case 2:
+            return 2;
+            break;
+          case 3:
+          case 4:
+            return sValue.length < 4 ? 3 : 4;
+            break;
+        }
+        return modes;
+      },
       cleanMsg(){
+        this.treeKey=Math.random();
+        this.isCheck=true;
         this.dataForm={
             id: 0,
             userLoginName: '',
@@ -215,17 +268,19 @@
               if (data && data.code === 200) {
                 var user=data.result;
                 this.dataForm.userLoginName = user.userLoginName
-                this.dataForm.userPassword = user.userPassword
-                this.dataForm.comfirmPassword = user.comfirmPassword
+                // this.dataForm.userPassword = user.userPassword
+                // this.dataForm.comfirmPassword = user.comfirmPassword
                 this.dataForm.userName = user.userName
                 this.dataForm.userNumber = user.userNumber
                 this.dataForm.userPhone = user.userPhone
                 this.dataForm.userSex = user.userSex
                 this.selTree  = user.menuIds?user.menuIds.split(","):[];
                 this.$nextTick(() => {
+                  console.log( this.isCheck,279)
                   //因为我是根据数据id来判断选中所以使用setCheckedKeys，具体可以查看element官网api
                   this.$refs.menuListTree.setCheckedKeys(this.selTree);//给树节点赋值
                   this.isCheck= false //重点： 赋值完成后 设置为false
+                  console.log( this.isCheck,283)
                 })
               }
             })
@@ -271,7 +326,29 @@
           }
         })
       }
-    }
+    },
+    watch: {
+      'dataForm.userPassword': {
+        handler(newname, oldname) {
+          this.msgText = this.checkStrong(newname);
+          if (this.msgText > 1 || this.msgText == 1) {
+            document.getElementById("one").style.background = "red";
+          } else {
+            document.getElementById("one").style.background = "#eee";
+          }
+          if (this.msgText > 2 || this.msgText == 2) {
+            document.getElementById("two").style.background = "orange";
+          } else {
+            document.getElementById("two").style.background = "#eee";
+          }
+          if (this.msgText == 4) {
+            document.getElementById("three").style.background = "#00D1B2";
+          } else {
+            document.getElementById("three").style.background = "#eee";
+          }
+        }
+      }
+    },
   }
 </script>
 <style scoped>
@@ -286,5 +363,22 @@
     height: auto;
     overflow-y: auto;
     max-height: 70vh;
+  }
+  .input_span>span{
+    background: #eee;
+    height: 10px;
+  }
+  #font>span,.input_span>span{
+    display: inline-block;
+    width: 30%;
+    text-align: right;
+  }
+  #one{
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  #three{
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
 </style>

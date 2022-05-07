@@ -175,11 +175,11 @@
                 width="100"
               >
                 <template slot-scope="scope">
-                  <i class="el-icon-sort-up table-sort-btn"
+                  <i title="正序" class="el-icon-sort-up table-sort-btn"
                      @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-sort-down table-sort-btn"
+                  <i title="倒序" class="el-icon-sort-down table-sort-btn"
                      @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-s-fold table-sort-btn"
+                  <i title="无序" class="el-icon-s-fold table-sort-btn"
                      @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
                 </template>
               </el-table-column>
@@ -219,7 +219,7 @@
     </div>
     <el-dialog :append-to-body='true' :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
       <div class="screen-body">
-        <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules"/>
+        <queryBuilder v-if="dialogFormVisible" :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules" :value="queryObj"/>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false,cleanQueryRules()">取 消</el-button>
@@ -297,6 +297,16 @@
         type: String,
         default: null,
       },
+      // 数据采集dmp跨表采集所用的属性
+      dataImpFlag: {
+        type: String,
+        default: null
+      },
+      // 数据采集dmp跨表采集所用的属性
+      dataSchema: {
+        type: String,
+        default: null
+      }
     },
     data() {
       return {
@@ -311,6 +321,10 @@
         screenRow: {},//筛选的当前行
         queryRules: [], // querybuilder的规则数据
         queryJson: {}, // queryBuilder上动态绑定的json数据
+        queryObj: {
+          logicalOperator:'and',
+          children:[]
+        }, // queryBuilder回显数据
         dialogFormVisible: false,//筛选弹框状态
         sqlMsg: '',//sql语句
         //是否隐藏数据表
@@ -348,10 +362,20 @@
       };
     },
     activated() {
-      this.getSjbData()
+      // this.getOldjbData()
+      if (this.dataImpFlag != "dataImp") {
+        this.getSjbData()
+      } else {
+         this.getOldjbData()
+      }
     },
     mounted() {
-      this.getSjbData();
+      // this.getSjbData();
+      if (this.dataImpFlag != "dataImp") {
+        this.getSjbData()
+      } else {
+         this.getOldjbData()
+      }
       this.init();
       this.getGojsClientXY();
       window.changeType = this.changeType;
@@ -494,8 +518,14 @@
               buttonText:'取消执行',
               buttonFun:function(){SelfLoading.hide()}
             });
+            // 正常的图形化sql执行
+            const url = '/sqlScript/executeSQL_SqlEditor'
+            // 数据采集dmp跨表采集
+             if (this.dataImpFlag == "dataImp") {
+                url = `/sqlScript/executeSQL_SqlEditorByDmp/${this.dataSchema}`
+            }
             this.$http({
-              url: this.$http.adornUrl('/sqlScript/executeSQL_SqlEditor'),
+              url: this.$http.adornUrl(url),
               method: 'post',
               data: this.$http.adornData(params),
               isLoading:false
@@ -548,6 +578,7 @@
       },
       //筛选弹框确定点击
       saveScreen() {
+        // console.log(this.queryJson,577)
         this.dialogFormVisible = false;
         var sql = this.queryToSql(this.queryJson);
         var idx =  this.indexOfJoin(this.screenRow.table);
@@ -556,6 +587,7 @@
           var field = datajoin.fields[i];
           if(field.id == this.screenRow.id){
             this.join[idx].fields[i].more=sql;
+            this.join[idx].fields[i].screen=this.queryJson;
           }
         }
         this.initTableRow();
@@ -611,10 +643,13 @@
       },
       //筛选按钮点击
       screen(row) {
+        console.log(row);
         this.screenKey=Math.random();
         this.screenRow = row;
         this.queryRules = [];
         var v = {
+          logicalOperator:row.screen.logicalOperator,
+          children:row.screen.children,
           type: 'inputselect',
           label:row.key+"."+ row.info,
           value:row.key+"."+ row.info,
@@ -626,6 +661,12 @@
             "label": "不为空值"
           },]
         };
+        if(row.screen.logicalOperator){
+          this.queryObj.logicalOperator=row.screen.logicalOperator;
+        }
+        if(row.screen.children){
+          this.queryObj.children=row.screen.children;
+        }
         this.queryRules.push(v);
         this.dialogFormVisible = true;
 
@@ -1534,24 +1575,44 @@
       getLoadTree(datas, obj, node) {
         // console.log(datas,obj,node,222);
         if (datas.children.length == 0) {
-          this.$http({
-            url: this.$http.adornUrl('/sqlScript/getColumnList'),
-            method: 'get',
-            isLoading: false,
-            params: this.$http.adornParams({
-              id: datas.id,
-              tableName: datas.title,
-            })
-          }).then(({data}) => {
-            var _data = data.result;
-            this.loadTree = _data || [];
-          })
+          // 正常的图形化展开树形结构
+          // let url = '/sqlScript/getColumnList'
+          // // 数据采集dmp跨表采集
+          // if (this.dataImpFlag == "dataImp") {
+          //     url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
+          // }
+          // this.$http({
+          //   url: this.$http.adornUrl(url),
+          //   method: 'get',
+          //   isLoading: false,
+          //   params: this.$http.adornParams({
+          //     id: datas.id,
+          //     tableName: datas.title,
+          //   })
+          // }).then(({data}) => {
+          //   var _data = data.result;
+          //   this.loadTree = _data || [];
+          // })
         }
       },
       //获取数据表数据
       getSjbData() {
         this.$http({
           url: this.$http.adornUrl('/sqlScript/listDBPTree'),
+          method: 'get',
+          isLoading: false,
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          // 注意层级 dataType是必须要的,1:一级,2:表,3:列
+          var datas = data.result;
+          this.dataTreeData = datas ? [datas] : [];
+          // this.treeExpandData = [this.dataTreeData[0].id] // 默认展开一级节点
+        })
+      },
+      // 数据采集采集获取原始库数据
+      getOldjbData() {
+        this.$http({
+          url: this.$http.adornUrl(`/sqlScript/listOldDBPTree/${this.dataSchema}`),
           method: 'get',
           isLoading: false,
           params: this.$http.adornParams()
@@ -1583,7 +1644,25 @@
 
             //   });
             // }
-            resolve(this.loadTree);
+            let url = '/sqlScript/getColumnList'
+            // 数据采集dmp跨表采集
+            if (this.dataImpFlag == "dataImp") {
+              url = `/sqlScript/getColumnListByDmp/${this.dataSchema}`
+            }
+            this.$http({
+              url: this.$http.adornUrl(url),
+              method: 'get',
+              isLoading: false,
+              params: this.$http.adornParams({
+                id: node.data.id,
+                tableName: node.data.title,
+              })
+            }).then(({data}) => {
+              var _data = data.result;
+              this.loadTree = _data || [];
+              resolve(this.loadTree);
+            })
+
           }, 500);
 
         }

@@ -54,74 +54,74 @@
         </div>
          <el-dialog title="操作明细" :visible.sync="showDetailVisible" v-if="showDetailVisible" width="80%" :close-on-click-modal="false">
             <el-form style="height:550px;overflow-y:auto" :model="dataListForm" ref="dataListForm" label-width="160px">
-                <el-row>  
+                <el-row>
                     <el-col :span="12">
-                    <el-form-item prop="appCode" label-width="150px" label="应用编码"> 
+                    <el-form-item prop="appCode" label-width="150px" label="应用编码">
                         <el-input v-model="dataListForm.appCode" placeholder="证据名称"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="module" label-width="150px" label="模块"> 
+                    <el-form-item prop="module" label-width="150px" label="模块">
                         <el-input v-model="dataListForm.module" placeholder="模块"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="logType" label-width="150px" label="日志类型"> 
+                    <el-form-item prop="logType" label-width="150px" label="日志类型">
                         <el-input v-model="dataListForm.logType" placeholder="日志类型"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="remoteIp" label-width="150px" label="操作ip地址"> 
+                    <el-form-item prop="remoteIp" label-width="150px" label="操作ip地址">
                         <el-input v-model="dataListForm.remoteIp" placeholder="操作ip地址"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="operateType" label-width="150px" label="操作类型"> 
+                    <el-form-item prop="operateType" label-width="150px" label="操作类型">
                         <el-input v-model="dataListForm.operateType" placeholder="操作类型"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="operator" label-width="150px" label="操作人"> 
+                    <el-form-item prop="operator" label-width="150px" label="操作人">
                         <el-input v-model="dataListForm.operator" placeholder="操作人"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="browser" label-width="150px" label="浏览器类型"> 
+                    <el-form-item prop="browser" label-width="150px" label="浏览器类型">
                         <el-input v-model="dataListForm.browser" placeholder="浏览器类型"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="os" label-width="150px" label="操作系统"> 
+                    <el-form-item prop="os" label-width="150px" label="操作系统">
                         <el-input v-model="dataListForm.os" placeholder="操作系统"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="infos" label-width="150px" label="操作明细"> 
+                    <el-form-item prop="infos" label-width="150px" label="操作明细">
                         <el-input v-model="dataListForm.infos" placeholder="操作明细"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="24">
-                    <el-form-item prop="params" label-width="150px" label="请求参数"> 
+                    <el-form-item prop="params" label-width="150px" label="请求参数">
                         <el-input v-model="dataListForm.params" type="textarea" placeholder="请求参数"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="24">
-                    <el-form-item prop="result" label-width="150px" label="响应参数"> 
+                    <el-form-item prop="result" label-width="150px" label="响应参数">
                         <el-input v-model="dataListForm.result" type="textarea" placeholder="响应参数"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="createId" label-width="150px" label="创建人ID"> 
+                    <el-form-item prop="createId" label-width="150px" label="创建人ID">
                         <el-input v-model="dataListForm.createId" placeholder="创建人ID"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                    <el-form-item prop="createTimeStr" label-width="150px" label="创建时间"> 
+                    <el-form-item prop="createTimeStr" label-width="150px" label="创建时间">
                         <el-input v-model="dataListForm.createTimeStr" placeholder="创建时间"></el-input>
                     </el-form-item>
                     </el-col>
                     <el-col>
-                    <div class="itemBtn" style="text-align:center">
+                    <div class="itemBtn" style="text-align:right">
                         <el-button type="primary" @click="showDetailVisible = false">关闭</el-button>
                     </div>
                     </el-col>
@@ -138,7 +138,7 @@ export default {
             dataForm:{
                 operator:''
             },
-            tableData:[],      
+            tableData:[],
             seleteLengthData: [],
             listLoading:false,
             pageSize: 10,
@@ -244,7 +244,7 @@ export default {
                 this.tableLoading = false;
             })
         },
-        
+
     }
 }
 </script>

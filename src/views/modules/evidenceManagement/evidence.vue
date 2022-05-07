@@ -141,6 +141,7 @@
       width="40%"
       :close-on-press-escape="false"
       append-to-body
+      custom-class="evidence-dialog"
     >
       <addOrUpdate
         @close="closeAddDrawer"
@@ -329,7 +330,7 @@ export default {
     },
     //查询
     search() {
-      this.pageIndex = "";
+      this.pageIndex = 1;
       this.getDataList();
     },
     //重置
@@ -404,3 +405,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+  >>>.el-dialog.evidence-dialog{
+    margin-top: 8vh!important;
+  }
+</style>

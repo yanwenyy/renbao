@@ -3,6 +3,7 @@
     <div class="left">
       <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <rule-tree
+          :key="treeKey"
           ref="ruleTree"
           :isShowSearch="true"
           :isShowCheckBox="false"
@@ -43,8 +44,10 @@
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
-          <el-form-item style="float: right">
+          <el-form-item>
             <el-button type="primary" @click="addFun">新增</el-button>
+          </el-form-item>
+          <el-form-item>
             <el-button
               type="primary"
               class="search-right-btn"
@@ -61,6 +64,8 @@
             <!--:disabled="this.multipleTable <= 0"-->
             <!--&gt;编辑</el-button-->
             <!--&gt;-->
+          </el-form-item>
+          <el-form-item>
             <el-button
               type="danger"
               @click="deleteFn(0)"
@@ -239,6 +244,7 @@ import AddOrUpdate from "../../modules/data/rule-add-or-update.vue";
 export default {
   data() {
     return {
+      treeKey:0,
       treeLoading: false,
       tableLoading: false,
       searchForm: {
@@ -267,6 +273,7 @@ export default {
     // this.getSelectPage();
     // this.getRuleFolder();
     // this.getRuleFolder();
+    this.treeKey=Math.random();
   },
   created() {
     // this.getRuleFolder();
@@ -469,21 +476,19 @@ export default {
           type: "warning"
         });
 
-      var sql = [];
+      var ruleSql = [];
       for (var i = 0; i < this.multipleTable.length; i++) {
         if (this.multipleTable[i].ruleSqlValue != null) {
-          sql.push(this.multipleTable[i].ruleSqlValue);
+          ruleSql.push({
+            sql: this.multipleTable[i].ruleSqlValue,
+            ruleId: this.multipleTable[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (ruleSql.length === 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        this.$refs.ruleOperation.showDialog(
-          this.multipleTable,
-          "immediately",
-          [],
-          {}
-        );
+        this.$refs.ruleOperation.showDialog(ruleSql, "immediately");
       }
     },
     // 定时执行
@@ -498,21 +503,19 @@ export default {
           type: "warning"
         });
 
-      var sql = [];
+      var ruleSql = [];
       for (var i = 0; i < this.multipleTable.length; i++) {
         if (this.multipleTable[i].ruleSqlValue != null) {
-          sql.push(this.multipleTable[i].ruleSqlValue);
+          ruleSql.push({
+            sql: this.multipleTable[i].ruleSqlValue,
+            ruleId: this.multipleTable[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (ruleSql.length === 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        this.$refs.ruleOperation.showDialog(
-          this.multipleTable,
-          "timing",
-          [],
-          {}
-        );
+        this.$refs.ruleOperation.showDialog(ruleSql, "timing");
       }
     }
   },

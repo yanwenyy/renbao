@@ -247,8 +247,7 @@
             @close="closeRun"
             @ok="succeedRun"
             :info="info"
-            :runIds="runIds"
-            :sql="sql"
+            :ruleSql="ruleSql"
             v-if="showRunDialog"
           ></runNow>
         </el-dialog>
@@ -309,8 +308,6 @@ export default {
       folderPath: "",
       //规则树
       ruleTree: "",
-      //运行id
-      runIds: "",
       //当前页
       pageIndex: 1,
       //每页条数
@@ -354,7 +351,7 @@ export default {
       // 选中的规则节点
       ruleCheckData: {},
       //sql语句
-      sql: [],
+      ruleSql: [],
       folderSorts: '1,2'
     };
   },
@@ -525,7 +522,7 @@ export default {
     //搜索
     getAllSearch() {
       // this.folderId = 1;
-      this.pageIndex = "";
+      this.pageIndex = 1;
       this.initData();
     },
     //重置搜索
@@ -545,25 +542,18 @@ export default {
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
-      var sql = [];
+      this.ruleSql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {
-          sql.push(this.multipleSelection[i].ruleSqlValue);
+          this.ruleSql.push({
+            sql: this.multipleSelection[i].ruleSqlValue,
+            ruleId: this.multipleSelection[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (this.ruleSql.length == 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        var arrIds = "";
-        for (var j = 0; j < this.multipleSelection.length; j++) {
-          arrIds += this.multipleSelection[j].ruleId + ",";
-        }
-        if (arrIds != null && arrIds != "" && arrIds != undefined) {
-          arrIds = arrIds.substr(0, arrIds.length - 1);
-        }
-
-        this.runIds = arrIds;
-        this.sql = sql;
         this.showRunDialog = true;
         this.info = false;
       }
@@ -574,24 +564,18 @@ export default {
         this.$message.error("请先在右上角选择项目!");
         return false;
       }
-      var sql = [];
+      this.ruleSql = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].ruleSqlValue != null) {
-          sql.push(this.multipleSelection[i].ruleSqlValue);
+          this.ruleSql.push({
+            sql: this.multipleSelection[i].ruleSqlValue,
+            ruleId: this.multipleSelection[i].ruleId
+          });
         }
       }
-      if (sql.length == 0) {
+      if (this.ruleSql.length == 0) {
         this.$message.error("选择的规则下没有sql，无法运行");
       } else {
-        var arrIds = "";
-        for (var j = 0; j < this.multipleSelection.length; j++) {
-          arrIds += this.multipleSelection[j].ruleId + ",";
-        }
-        if (arrIds != null && arrIds != "" && arrIds != undefined) {
-          arrIds = arrIds.substr(0, arrIds.length - 1);
-        }
-        this.runIds = arrIds;
-        this.sql = sql;
         this.showRunDialog = true;
         this.info = true;
       }

@@ -9,8 +9,8 @@
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="type.id">{{ type.name }}</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="名称" prop="menuName">
-        <el-input v-model="dataForm.menuName" placeholder="请输入名称"></el-input>
+      <el-form-item label="菜单名称" prop="menuName">
+        <el-input clearable v-model="dataForm.menuName" placeholder="请输入菜单名称"></el-input>
       </el-form-item>
       <el-form-item label="上级菜单">
         <el-popover
@@ -33,7 +33,7 @@
         <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true" placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
       </el-form-item>
       <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="menuUrl">
-        <el-input v-model="dataForm.menuUrl" placeholder="菜单路由"></el-input>
+        <el-input clearable v-model="dataForm.menuUrl" placeholder="菜单路由"></el-input>
       </el-form-item>
       <!--<el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="perms">-->
         <!--<el-input v-model="dataForm.perms" placeholder="多个用逗号分隔, 如: user:list,user:create"></el-input>-->
@@ -45,6 +45,7 @@
         <el-row>
           <el-col :span="22">
             <el-popover
+              v-model="iconVisible"
               ref="iconListPopover"
               placement="bottom-start"
               trigger="click"
@@ -61,7 +62,7 @@
                 </div>
               </div>
             </el-popover>
-            <el-input v-model="dataForm.icon" v-popover:iconListPopover :readonly="true" placeholder="菜单图标名称" class="icon-list__input"></el-input>
+            <el-input @click="iconVisible=true" v-model="dataForm.icon" v-popover:iconListPopover :readonly="true" placeholder="菜单图标名称" class="icon-list__input"></el-input>
           </el-col>
           <!--<el-col :span="2" class="icon-list__tips">-->
             <!--<el-tooltip placement="top" effect="light">-->
@@ -92,6 +93,7 @@
         }
       }
       return {
+        iconVisible:false,
         treeVisible:false,
         visible: false,
         dataForm: {
@@ -138,7 +140,7 @@
       this.iconList = Icon.getNameList()
     },
     methods: {
-      init (id) {
+      init (id,clickRow) {
         this.dataForm.menuParentId='';
         this.dataForm.parentName='';
         this.dataForm.id = id || 0
@@ -155,8 +157,12 @@
           })
         }).then(() => {
           if (!this.dataForm.id) {
-            // 新增
-            this.menuListTreeSetCurrentNode()
+            this.dataForm.type=0;
+            if(clickRow){
+              this.dataForm.menuParentId=clickRow.menuId
+              this.menuListTreeSetCurrentNode()
+            }
+
           } else {
             // 修改
             this.$http({
@@ -191,7 +197,8 @@
       },
       // 图标选中
       iconActiveHandle (iconName) {
-        this.dataForm.icon = iconName
+        this.dataForm.icon = iconName;
+        this.iconVisible=false;
       },
       // 表单提交
       dataFormSubmit () {
@@ -226,7 +233,19 @@
           }
         })
       }
-    }
+    },
+    // watch:{
+    //   'dataForm.type':{
+    //     handler(val) {
+    //       if(!this.dataForm.id&&val===0){
+    //         this.dataForm.menuParentId='';
+    //         this.dataForm.parentName='';
+    //       }else{
+    //         this.menuListTreeSetCurrentNode()
+    //       }
+    //     }
+    //   }
+    // }
   }
 </script>
 

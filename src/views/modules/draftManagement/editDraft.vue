@@ -25,6 +25,7 @@
       <el-form-item prop="hospitalName" label="医院：">
         <el-input
           style="width:80%"
+          :title="dataForm.hospitalName"
           v-model="dataForm.hospitalName"
           placeholder="请选择"
           disabled
@@ -46,6 +47,7 @@
       </el-form-item>
       <el-form-item prop="manuscriptRemark" label="违规信息描述：">
         <el-input
+          :readonly="readonly"
           v-model="dataForm.manuscriptRemark"
           type="textarea"
           :rows="6"
@@ -60,7 +62,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <div align="center">
+    <div align="right">
       <el-button v-if="!readonly" type="primary" @click="submit"
         >确定</el-button
       >
@@ -102,7 +104,7 @@
         :isShow="isShow"
         :evidenceId="dataForm.evidenceId"
       ></evidence>
-      <div>
+      <div align="right" class="zjfooter">
         <el-button type="primary" @click="getEvidenceData">确定</el-button>
         <el-button @click="closeEvidence">取消</el-button>
       </div>
@@ -291,4 +293,13 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .zjfooter:before{
+    display: table;
+    content: '';
+    clear: both;
+  }
+  .zjfooter >>>.el-button{
+    margin-top: 10px;
+  }
+</style>
