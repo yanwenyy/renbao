@@ -36,7 +36,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="开始时间：">
+          <el-form-item label="有效时间：">
             <!--<el-date-picker-->
               <!--value-format="yyyy-MM-dd"-->
               <!--v-model="dataForm.endTime"-->
@@ -54,6 +54,29 @@
             <el-date-picker
               :picker-options="pickerOptionsEnd"
               v-model="dataForm.endStopTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="开始时间：">
+            <!--<el-date-picker-->
+              <!--value-format="yyyy-MM-dd"-->
+              <!--v-model="dataForm.endTime"-->
+              <!--type="date"-->
+              <!--placeholder="选择日期">-->
+            <!--</el-date-picker>-->
+            <el-date-picker
+              :picker-options="pickerOptionsStart2"
+              v-model="dataForm.beginStartTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+            <span>--</span>
+            <el-date-picker
+              :picker-options="pickerOptionsEnd2"
+              v-model="dataForm.beginStopTime"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期">
@@ -233,6 +256,28 @@ export default {
           }
         }
       },
+      // 开始日期 :picker-options 中引用
+      pickerOptionsStart2: {
+        disabledDate: time => {
+          // 获取结束日期的 v-model 值并赋值给新定义的对象
+          let endDateVal = this.dataForm.beginStopTime;
+          if (endDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() > new Date(endDateVal).getTime();
+          }
+        }
+      },
+      // 结束日期 :picker-options 中引用
+      pickerOptionsEnd2: {
+        disabledDate: time => {
+          // 获取开始日期的 v-model 值并赋值给新定义的对象
+          let beginDateVal = this.dataForm.beginStartTime;
+          if (beginDateVal) {
+            // 比较 距 1970 年 1 月 1 日之间的毫秒数：
+            return time.getTime() < new Date(beginDateVal).getTime() - 1 * 24 * 60 * 60 * 1000
+          }
+        }
+      },
       defaultProps: {
         children: 'children',
         label: 'regionName'
@@ -252,6 +297,8 @@ export default {
         policyName: "",
         endStopTime: "",
         endStartTime: "",
+        beginStartTime: "",
+        beginStopTime: "",
         createUserName: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
@@ -359,6 +406,8 @@ export default {
       this.dataForm.endStopTime = "";
       this.dataForm.endStartTime = "";
       this.dataForm.createUserName = "";
+      this.dataForm.beginStartTime = "";
+      this.dataForm.beginStopTime = "";
       this.pageIndex = 1;
       this.pageSize = 10;
       this.getDataList();
@@ -379,6 +428,8 @@ export default {
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
           createUserName: this.dataForm.createUserName,
+          beginStartTime: this.dataForm.beginStartTime,
+          beginStopTime: this.dataForm.beginStopTime,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -507,9 +558,13 @@ export default {
         "&tranType=&emissionStand=" +
         this.dataForm.emissionStand +
         "&fuelType=" +
-        this.dataForm.fuelType;
+        this.dataForm.fuelType +
         "&createUserName=" +
-        this.dataForm.createUserName;
+        this.dataForm.createUserName+
+        "&beginStartTime=" +
+        this.dataForm.beginStartTime+
+        "&beginStopTime=" +
+        this.dataForm.beginStopTime;
       // console.log(url)
       window.open(this.$http.adornUrl(url));
     },
