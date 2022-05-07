@@ -522,7 +522,7 @@ export default {
     //搜索
     getAllSearch() {
       // this.folderId = 1;
-      this.pageIndex = "";
+      this.pageIndex = 1;
       this.initData();
     },
     //重置搜索

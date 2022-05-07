@@ -6,10 +6,10 @@
       @keyup.enter.native="getDataList()"
       class="search-form-new"
     >
-      <el-form-item label="方案编码:">
+      <el-form-item label="方案编号:">
         <el-input
           v-model="dataForm.planCode"
-          placeholder="方案编码"
+          placeholder="方案编号"
           clearable
         ></el-input>
       </el-form-item>

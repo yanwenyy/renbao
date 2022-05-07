@@ -175,11 +175,11 @@
                 width="100"
               >
                 <template slot-scope="scope">
-                  <i class="el-icon-sort-up table-sort-btn"
+                  <i title="正序" class="el-icon-sort-up table-sort-btn"
                      @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-sort-down table-sort-btn"
+                  <i title="倒序" class="el-icon-sort-down table-sort-btn"
                      @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-s-fold table-sort-btn"
+                  <i title="无序" class="el-icon-s-fold table-sort-btn"
                      @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
                 </template>
               </el-table-column>
