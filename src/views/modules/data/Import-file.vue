@@ -56,11 +56,7 @@
               action="#"
               class="upload-demo"
               :on-remove="handleRemove"
-              :on-success="onSuccess"
-              :on-change="onChange"
               :http-request="uploadData"
-              :auto-upload="false"
-              :limit="1"
               :file-list="fileList"
             >
               <el-button size="small" type="primary">点击上传</el-button>
@@ -91,7 +87,8 @@ export default {
       default: []
     },
     ruleCheckData: {
-      default: []
+      type:Object,
+      default:null
     },
     getData: {
       default: null
@@ -99,6 +96,9 @@ export default {
   },
   data() {
     return {
+      dataForm: {
+        multipartFiles :[],
+      },
       loading: false,
       dialogVisible: false,
       //文件上传成功状态
@@ -165,38 +165,42 @@ export default {
       if (this.fileList.length == 0) {
         return this.$message({ message: "请选择上传文件！", type: "warning" });
       }
-      console.log(this.rule, "rulerulerule");
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$refs.ruleFileUpload.submit();
+          // this.$refs.ruleFileUpload.submit();
+          let fd = new FormData();
+          this.loading = true;
+          this.dataForm.multipartFiles.forEach(item=>{
+            fd.append("ruleFile", item);
+          });
+          fd.append("folderId", this.rule.folderId);
+          fd.append("folderPath", this.rule.folderPath);
+          this.$http({
+            method: "post",
+            isLoading: false,
+            url: this.$http.adornUrl("rule/ruleImport"),
+            headers: {
+              "Content-Type": "multipart/form-data"
+            },
+            data: fd
+          }).then(res => {
+            this.loading = false;
+            if (res.data.code == 200) {
+              this.$message.success("导入成功");
+              this.$parent.getDataList();
+              this.dialogVisible = false;
+            } else {
+              this.$message.error(res.data.message);
+            }
+          });
         }
       });
     },
     // 上传文件
-    uploadData(params) {
-      let fd = new FormData();
-      this.loading = true;
-      fd.append("ruleFile", params.file); //传文件
-      fd.append("folderId", this.rule.folderId);
-      fd.append("folderPath", this.rule.folderPath);
-      this.$http({
-        method: "post",
-        isLoading: false,
-        url: this.$http.adornUrl("rule/ruleImport"),
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        data: fd
-      }).then(res => {
-        this.loading = false;
-        if (res.data.code == 200) {
-          this.$message.success("导入成功");
-          this.$parent.getDataList();
-          this.dialogVisible = false;
-        } else {
-          this.$message.error(res.data.message);
-        }
-      });
+    uploadData(file) {
+      this.dataForm.multipartFiles=[file.file];
+      this.fileList=[file.file];
+
     },
     cancel() {
       this.dialogVisible = false;

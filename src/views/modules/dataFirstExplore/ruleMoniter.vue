@@ -60,7 +60,7 @@
               <el-button type="primary" @click="onQuery">查询</el-button>
               <el-button @click="onReset">重置</el-button>
             </el-form-item>
-            <el-form-item  style="float: right">
+            <el-form-item>
               <el-button
                 @click="deleteData"
                 type="danger"

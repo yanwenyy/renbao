@@ -36,7 +36,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="有效时间：">
+          <el-form-item label="开始时间：">
             <!--<el-date-picker-->
               <!--value-format="yyyy-MM-dd"-->
               <!--v-model="dataForm.endTime"-->
@@ -59,6 +59,13 @@
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
+          <el-form-item label="创建人：">
+            <el-input
+              v-model="dataForm.createUserName"
+              placeholder="创建人"
+              clearable
+            ></el-input>
+          </el-form-item>
           <!--<el-form-item label="文件内容：">-->
             <!--<el-input-->
               <!--v-model="dataForm.createUserName"-->
@@ -72,28 +79,34 @@
             >
             <el-button @click="reset()">重置</el-button>
           </el-form-item>
-        </el-form>
-        <div class="search-btn">
-          <el-button type="primary" :disabled="dataForm.regionId==''" @click="addOrUpdateHandle('')"
+          <el-form-item>
+            <el-button type="primary" :disabled="dataForm.regionId==''" @click="addOrUpdateHandle('')"
             >新增</el-button
-          >
-          <!--<el-button-->
-            <!--type="warning"-->
-            <!--@click="ruleExport('all')"-->
-            <!--:loading="ruleExportAllLoading"-->
-            <!--&gt;全部导出</el-button-->
-          <!--&gt;-->
-          <el-button
-            :disabled="dataListSelections.length==0"
-            type="warning"
-            @click="ruleExport('one')"
-            :loading="ruleExportLoading"
+            >
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              :disabled="dataListSelections.length==0"
+              type="warning"
+              @click="ruleExport('one')"
+              :loading="ruleExportLoading"
             >导出</el-button
-          >
-          <el-button type="danger" @click="deleteHandle()"  :disabled="dataListSelections.length <= 0">删除</el-button>
-        </div>
+            >
+          </el-form-item>
+          <el-form-item>
+            <el-button type="danger" @click="deleteHandle()"  :disabled="dataListSelections.length <= 0">删除</el-button>
+          </el-form-item>
+        </el-form>
+        <!--<div class="search-btn">-->
+          <!--&lt;!&ndash;<el-button&ndash;&gt;-->
+            <!--&lt;!&ndash;type="warning"&ndash;&gt;-->
+            <!--&lt;!&ndash;@click="ruleExport('all')"&ndash;&gt;-->
+            <!--&lt;!&ndash;:loading="ruleExportAllLoading"&ndash;&gt;-->
+            <!--&lt;!&ndash;&gt;全部导出</el-button&ndash;&gt;-->
+          <!--&lt;!&ndash;&gt;&ndash;&gt;-->
+        <!--</div>-->
         <el-table
-          :height="tableHeight-140"
+          :height="tableHeight-100"
           :data="dataList"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandle"
@@ -129,6 +142,13 @@
             header-align="center"
             align="center"
             label="有效时间"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="createUserName"
+            header-align="center"
+            align="center"
+            label="创建人"
           >
           </el-table-column>
           <el-table-column
@@ -232,6 +252,7 @@ export default {
         policyName: "",
         endStopTime: "",
         endStartTime: "",
+        createUserName: "",
         regionId: "", //行政区划分主键
         regionPath: "", //行政区划分path
       },
@@ -357,6 +378,7 @@ export default {
           endStartTime: this.dataForm.endStartTime,
           regionId: this.dataForm.regionId,
           regionPath: this.dataForm.regionPath,
+          createUserName: this.dataForm.createUserName,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -486,6 +508,8 @@ export default {
         this.dataForm.emissionStand +
         "&fuelType=" +
         this.dataForm.fuelType;
+        "&createUserName=" +
+        this.dataForm.createUserName;
       // console.log(url)
       window.open(this.$http.adornUrl(url));
     },
@@ -564,4 +588,7 @@ export default {
   >>>.el-tree-node:focus > .el-tree-node__content ,>>>.el-tree-node.is-current{
     background: #E0EDFA;
   }
+.search-form-new .el-input, .search-form-new .el-select, .search-form-new .el-date-editor{
+  width: 180px;
+}
 </style>

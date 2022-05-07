@@ -58,6 +58,7 @@ export default {
       }
     };
     return {
+      from:'',
       msgText: "",
       visible: false,
       dataForm: {
@@ -84,7 +85,7 @@ export default {
   computed: {
     userName: {
       get() {
-        return this.$store.state.user.name;
+        return this.$store.state.user.loginName;
       }
     },
     mainTabs: {
@@ -122,7 +123,8 @@ export default {
       return modes;
     },
     // 初始化
-    init() {
+    init(from) {
+      this.from=from;
       this.visible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
