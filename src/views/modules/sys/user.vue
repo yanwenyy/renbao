@@ -7,6 +7,13 @@
     >
       <el-form-item>
         <el-input
+          v-model="dataForm.userLoginName"
+          placeholder="用户账号"
+          clearable
+        ></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input
           v-model="dataForm.userName"
           placeholder="用户姓名"
           clearable
@@ -29,13 +36,13 @@
           <el-option label="女" value="2"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item>
-        <el-input
-          v-model="dataForm.userPhone"
-          placeholder="手机号"
-          clearable
-        ></el-input>
-      </el-form-item>
+      <!--<el-form-item>-->
+        <!--<el-input-->
+          <!--v-model="dataForm.userPhone"-->
+          <!--placeholder="手机号"-->
+          <!--clearable-->
+        <!--&gt;</el-input>-->
+      <!--</el-form-item>-->
       <!--<el-form-item>-->
       <!--<el-select v-model="dataForm.userName" placeholder="请选择性别">-->
       <!--<el-option label="请选择" value=""></el-option>-->
@@ -94,6 +101,13 @@
         <!-- <template slot-scope="scope">
           <span>{{ scope.$index + 1 + (this.pageIndex - 1) * this.pageSize }}</span>
         </template> -->
+      </el-table-column>
+      <el-table-column
+        prop="userLoginName"
+        header-align="center"
+        align="center"
+        label="用户账号"
+      >
       </el-table-column>
       <el-table-column
         prop="userName"
@@ -199,7 +213,8 @@ export default {
         userName: "",
         userNumber: "",
         userSex: "",
-        userPhone: ""
+        userPhone: "",
+        userLoginName: ""
       },
       dataList: [],
       pageIndex: 1,
@@ -261,7 +276,8 @@ export default {
           userName: this.dataForm.userName,
           userNumber: this.dataForm.userNumber,
           userSex: this.dataForm.userSex,
-          userPhone: this.dataForm.userPhone
+          userPhone: this.dataForm.userPhone,
+          userLoginName: this.dataForm.userLoginName,
         })
       }).then(({ data }) => {
         if (data && data.code === 200) {
@@ -370,7 +386,8 @@ export default {
         userName: "",
         userNumber: "",
         userSex: "",
-        userPhone: ""
+        userPhone: "",
+        userLoginName: "",
       };
       this.pageIndex = 1;
       this.getDataList();

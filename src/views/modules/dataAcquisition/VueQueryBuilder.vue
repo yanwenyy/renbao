@@ -56,7 +56,7 @@ export default {
     return {
       query: {
         logicalOperator: this.labels.matchTypes[0].id,
-        children: []
+        children:[]
       },
       ruleTypes: {
         "text": {
@@ -105,7 +105,7 @@ export default {
           id: "inputselect-field"
          }
       },sql: ''
-    }
+    };
   },
 
   computed: {
@@ -124,7 +124,6 @@ export default {
           mergedRules.push( rule );
         }
       });
-
       return mergedRules;
     },
 
@@ -135,22 +134,26 @@ export default {
         maxDepth: this.maxDepth,
         ruleTypes: this.ruleTypes,
         rules: this.mergedRules,
-        labels: this.mergedLabels
+        labels: this.mergedLabels,
+        query: {
+          logicalOperator: this.queryObj&&this.queryObj.logicalOperator?JSON.parse(JSON.stringify(this.queryObj.logicalOperator)):this.labels.matchTypes[0].id,
+          children:this.queryObj&&this.queryObj.children?JSON.parse(JSON.stringify(this.queryObj.children)):[]
+        },
       }
     }
   },
 
   mounted () {
-    this.$watch(
-      'query',
-      newQuery => {
-        if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
-          this.$emit('input', deepClone(newQuery));
-          this.$emit('sql', this.queryToSql(newQuery));
-        }
-      }, {
-      deep: true
-    });
+    // this.$watch(
+    //   'query',
+    //   newQuery => {
+    //     if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
+    //       this.$emit('input', deepClone(newQuery));
+    //       this.$emit('sql', this.queryToSql(newQuery));
+    //     }
+    //   }, {
+    //   deep: true
+    // });
 
     this.$watch(
       'value',
@@ -164,6 +167,7 @@ export default {
 
     if ( typeof this.$options.propsData.value !== "undefined" ) {
       this.query = Object.assign(this.query, this.$options.propsData.value);
+      console.log(this.value,this.query,174)
     }
   },//add by wxg.
   methods:{
@@ -188,7 +192,18 @@ export default {
           sql.splice(sql.length - 1, sql.length);
           return sql.join(' ');
       }
-  }
+  },
+  watch: {
+    query: {
+      deep: true,
+      handler(newQuery) {
+        if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
+          this.$emit('input', deepClone(newQuery));
+          this.$emit('sql', this.queryToSql(newQuery));
+        }
 
+      }
+    }
+  },
 }
 </script>

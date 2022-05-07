@@ -61,7 +61,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .itemBtn{
-    text-align: center;
+    text-align: right;
     margin-top: 10px;
 }
 </style>

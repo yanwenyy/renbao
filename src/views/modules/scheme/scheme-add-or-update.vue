@@ -11,7 +11,7 @@
         <el-input :disabled="type=='look'" v-model="dataForm.planName" placeholder="方案名称" maxlength="255"></el-input>
       </el-form-item>
 
-      <el-form-item label="上传文件" prop="userPassword" v-if="!dataForm.id">
+      <el-form-item label="上传文件" prop="multipartFiles" v-if="!dataForm.id">
         <el-upload
           ref="ruleFileUpload"
           action="#"
@@ -19,14 +19,13 @@
           :on-remove="handleRemove"
           :file-list="fileList"
           :http-request="uploadData"
-          :limit="1"
         >
           <el-button size="small" type="primary"
           >点击上传</el-button
           >
         </el-upload>
       </el-form-item>
-      <el-form-item label="附件" prop="userPassword" v-if="dataForm.id!=''">
+      <el-form-item  label="附件" prop="multipartFiles" v-if="dataForm.id!=''">
         <el-table
           :data="dataForm.multipartFiles"
           border
@@ -112,6 +111,9 @@
           planCode: [
             { required: true, message: '方案编号不能为空', trigger: 'blur' }
           ],
+          multipartFiles: [
+            { required: true, message: '上传文件不能为空', trigger: 'blur' }
+          ],
         }
       }
     },
@@ -158,7 +160,8 @@
         this.dataForm.multipartFiles=[];
         file.file.uploaderName=sessionStorage.getItem("userName");
         file.file.fileName=file.file.name;
-        this.dataForm.multipartFiles.push(file.file);
+        this.dataForm.multipartFiles=[file.file];
+        this.fileList=[file.file];
       },
       //验证唯一性
       verification(val,msg,name){

@@ -23,13 +23,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="创建人：">
-            <el-input
-              v-model="searchForm.createUserName"
-              clearable
-              placeholder="创建人"
-            ></el-input>
-          </el-form-item>
+
           <el-form-item label="底稿编号：">
             <el-input
               v-model="searchForm.manuscriptCode"
@@ -42,6 +36,13 @@
               v-model="searchForm.manuscriptName"
               clearable
               placeholder="底稿名称"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="创建人：">
+            <el-input
+              v-model="searchForm.createUserName"
+              clearable
+              placeholder="创建人"
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -162,7 +163,7 @@
                 <el-button type="text" @click="editData(scope.row)"
                 >编写底稿
                 </el-button>
-                <el-button type="text" @click="deleteHandle(scope.row.ruleId)"
+                <el-button type="text" @click="deleteHandle(scope.row.manuscriptId)"
                 >删除
                 </el-button>
               </template>
@@ -257,37 +258,53 @@ export default {
     },
     // 删除
     deleteHandle(id) {
-      var userIds = id
-        ? [id]
-        : this.multipleTable.map(item => {
-          return item.userId;
-        });
-      this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl("/manuscript/deleteByIds"),
-            method: "delete",
-            data: this.$http.adornData(userIds, false)
-          }).then(({ data }) => {
-            if (data && data.code === 200) {
-              this.$message({
-                message: "操作成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList();
-                }
-              });
-            } else {
-              this.$message.error(data.msg);
-            }
-          });
+      let canDel=true;
+      if(this.multipleTable.length>0){
+        this.multipleTable.forEach(item=>{
+          if(!item.manuscriptId){
+            canDel=false;
+            this.$message.error("只能删除有底稿的数据")
+            return false;
+          }
         })
-        .catch(() => {});
+      }
+      if(canDel){
+        var userIds = id
+          ? [id]
+          : this.multipleTable.map(item => {
+            return item.manuscriptId;
+          });
+        if(userIds.length==0){
+          this.$message.error("只能删除有底稿的数据")
+          return false;
+        }
+        this.$confirm(`确认删除该条数据吗?删除后数据不可恢复`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$http({
+              url: this.$http.adornUrl("/manuscript/deleteByIds"),
+              method: "delete",
+              data: this.$http.adornData(userIds, false)
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                this.$message({
+                  message: "操作成功",
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.getSelectPage();
+                  }
+                });
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+          })
+          .catch(() => {});
+      }
     },
     getSelectPage() {
       this.ruleData=this.$refs.ruleTree.treeData;

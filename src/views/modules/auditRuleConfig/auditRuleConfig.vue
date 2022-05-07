@@ -3,6 +3,7 @@
     <div class="left">
       <el-card :style="{ height: tableHeight + 100 + 'px' }">
         <rule-tree
+          :key="treeKey"
           ref="ruleTree"
           :isShowSearch="true"
           :isShowCheckBox="false"
@@ -43,8 +44,10 @@
             <el-button type="primary" @click="queryClick">查询</el-button>
             <el-button @click="onReset">重置</el-button>
           </el-form-item>
-          <el-form-item style="float: right">
+          <el-form-item>
             <el-button type="primary" @click="addFun">新增</el-button>
+          </el-form-item>
+          <el-form-item>
             <el-button
               type="primary"
               class="search-right-btn"
@@ -61,6 +64,8 @@
             <!--:disabled="this.multipleTable <= 0"-->
             <!--&gt;编辑</el-button-->
             <!--&gt;-->
+          </el-form-item>
+          <el-form-item>
             <el-button
               type="danger"
               @click="deleteFn(0)"
@@ -239,6 +244,7 @@ import AddOrUpdate from "../../modules/data/rule-add-or-update.vue";
 export default {
   data() {
     return {
+      treeKey:0,
       treeLoading: false,
       tableLoading: false,
       searchForm: {
@@ -267,6 +273,7 @@ export default {
     // this.getSelectPage();
     // this.getRuleFolder();
     // this.getRuleFolder();
+    this.treeKey=Math.random();
   },
   created() {
     // this.getRuleFolder();

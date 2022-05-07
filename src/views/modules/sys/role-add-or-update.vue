@@ -26,6 +26,15 @@
           :readonly="readonly"
         ></el-input>
       </el-form-item>
+      <el-form-item label="角色排序" prop="roleSort" class="item-a">
+        <el-input
+          v-model="ruleForm.roleSort"
+          placeholder="请输入序号"
+          clearable
+          type="Number"
+          :min="0"
+        ></el-input>
+      </el-form-item>
       <el-form-item label="角色描述" prop="roleDes" class="item-b">
         <el-input
           type="textarea"
@@ -35,7 +44,7 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <div class="itemBtn" v-if="showBtn">
+    <div align="right" class="itemBtn" v-if="showBtn">
       <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
       <el-button @click="close('ruleForm')">取消</el-button>
@@ -57,12 +66,14 @@ export default {
       ruleForm: {
         roleNumber: "",
         roleName: "",
-        roleDes: ""
+        roleDes: "",
+        roleSort: "",
       },
       //form校验
       rules: {
         roleNumber: [{ required: true, message: "请输入", trigger: "blur" }],
-        roleName: [{ required: true, message: "请输入", trigger: "blur" }]
+        roleName: [{ required: true, message: "请输入", trigger: "blur" }],
+        roleSort: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       loading: false,
       //单位选择页是否显示
@@ -89,6 +100,7 @@ export default {
             this.ruleForm.roleNumber = role.roleNumber;
             this.ruleForm.roleName = role.roleName;
             this.ruleForm.roleDes = role.roleDes;
+            this.ruleForm.roleSort = role.roleSort;
             this.loading = false;
           }
         });
@@ -107,7 +119,8 @@ export default {
               roleId: this.id || undefined,
               roleNumber: this.ruleForm.roleNumber,
               roleName: this.ruleForm.roleName,
-              roleDes: this.ruleForm.roleDes
+              roleDes: this.ruleForm.roleDes,
+              roleSort: this.ruleForm.roleSort,
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {

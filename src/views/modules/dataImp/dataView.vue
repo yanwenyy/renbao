@@ -4,6 +4,7 @@
       :data="dataList"
       border
       :height="tableHeight-60"
+      ref="tableref"
       style="width: 100%;">
       <el-table-column
        v-for="(column,index) in columnList"
@@ -41,7 +42,7 @@
         deep: true,
         immediate: true,
         handler() {
-          this.getDataList(this.tableName)
+          //this.getDataList(this.tableName)
         }
       }
     },
@@ -60,8 +61,14 @@
           if (data && data.code === 200) {
             this.dataList = data.result.result
             this.columnList = data.result.columnInfo.columnList
+            //当页面数据加完完毕后
+            this.$nextTick(() => {
+                // 初始化表格
+                this.$refs.tableref.doLayout();
+            })
           } else {
             this.dataList = []
+            this.columnList = []
           }
           //this.dataListLoading = false
         })

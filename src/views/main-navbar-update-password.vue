@@ -50,7 +50,15 @@ export default {
         callback();
       }
     };
+    var validatePassword = (rule, value, callback) => {
+      if (this.checkStrong(value)<4) {
+        callback(new Error("密码需包括数组,字母和特殊字符"));
+      } else {
+        callback();
+      }
+    };
     return {
+      from:'',
       msgText: "",
       visible: false,
       dataForm: {
@@ -63,7 +71,9 @@ export default {
           { required: true, message: "原密码不能为空", trigger: "blur" }
         ],
         newPassword: [
-          { required: true, message: "新密码不能为空", trigger: "blur" }
+          { required: true, message: "新密码不能为空", trigger: "blur" },
+          { min:6,max:20,message:'长度在6到20个字符',trigger:"blur"},
+          { validator: validatePassword, trigger: "blur" }
         ],
         confirmPassword: [
           { required: true, message: "确认密码不能为空", trigger: "blur" },
@@ -75,7 +85,7 @@ export default {
   computed: {
     userName: {
       get() {
-        return this.$store.state.user.name;
+        return this.$store.state.user.loginName;
       }
     },
     mainTabs: {
@@ -113,7 +123,8 @@ export default {
       return modes;
     },
     // 初始化
-    init() {
+    init(from) {
+      this.from=from;
       this.visible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
