@@ -404,15 +404,8 @@
         //     return false;
         //   }
         // }
-<<<<<<< HEAD
-        debugger
-=======
-
->>>>>>> 6f06a9adeb0e462b9ba91015cd4547c9cd92717a
         this.$refs['dataForm'].validate((valid) => {
-          debugger
           if (valid) {
-
             this.$http({
               url: this.$http.adornUrl(`/demandCollaboration/${!this.dataForm.DEMANDCOLLABORATIONID ? 'add' : 'updateByUuId'}`),
               method: 'post',
@@ -458,7 +451,7 @@
     }
   }
 </script>
-<style scoped>
+<style lang="scss" scoped>
   >>> .el-form-item__label{
     width: 120px!important;
   }
