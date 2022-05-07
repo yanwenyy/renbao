@@ -4,7 +4,7 @@
       @close="deletCm"
       custom-class="rule-dialog"
       width="80%"
-      :title="!dataForm.DEMANDCOLLABORATIONID ? '新增' : '修改'"
+      :title="!dataForm.DEMANDCOLLABORATIONID ? '新增' : type=='look'?'查看':'修改'"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="visible">
@@ -13,10 +13,10 @@
         <el-tabs type="border-card" class="self-tabs" v-model="activeName">
         <el-tab-pane name="1" label="基本信息">
             <div class="tabs1-div">
-              <el-form-item label="规则名称" prop="ruleName">
+              <el-form-item label="规则名称" prop="DEMANDNAME">
                 <el-input v-model="dataForm.DEMANDNAME" :readonly="readonly" placeholder="规则名称"></el-input>
               </el-form-item>
-              <el-form-item label="规则类别" prop="ruleCategory">
+              <el-form-item label="规则类别" prop="RULECATEGORY">
                 <el-select :disabled="readonly" v-model="dataForm.RULECATEGORY">
                   <el-option label="请选择" value=""></el-option>
                   <el-option label="门诊规则" :value="1"></el-option>
@@ -51,7 +51,7 @@
                 <el-input @click="treeVisible=true" v-popover:menuListPopover v-model="dataForm.parentName" :readonly="true"
                           placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
               </el-form-item>
-              <el-form-item label="规则备注" prop="ruleRemark" class="markItem">
+              <el-form-item label="规则备注" prop="RULEREMARK" class="markItem">
                 <el-input type="textarea" :rows="6" :readonly="readonly" v-model="dataForm.RULEREMARK" placeholder="规则备注"></el-input>
               </el-form-item>
               
@@ -111,6 +111,7 @@
         }
       };
       return {
+        type : '',
         sqlKey:0,
         mustList:{},//sql编译器必填的项
         paramsSqlSelf:'',//选择参数后返回的转义的sql
@@ -170,7 +171,7 @@
           RULEREMARK: [
             { required: true, message: '规则备注不能为空', trigger: ['blur',"change"] }
           ],
-          treeVisible: [
+          menuListTreeProps: [
             { required: true, message: '规则分类不能为空', trigger: 'change' }
           ],
           // dataTime: [
@@ -243,15 +244,17 @@
           xmProjectRoleUsers:[],
         };
       },
-      init (id, ruleCheckData) {
+      init (id, ruleCheckData,type,folderId,folderPath) {
+        debugger
         //this.deletCm();
-        this.getMustList();
+        //this.getMustLiinitst();
         //this.cleanMsg();
+        this.type = type;
         this.visible = true;
         this.ruleCheckData = ruleCheckData; // 获取左侧树选择的规则
         this.projectId = id;
-        this.dataForm.folderId = this.ruleCheckData.folderId;
-        this.dataForm.folderPath = this.ruleCheckData.folderPath;
+        this.dataForm.folderId =folderId;
+        this.dataForm.folderPath = folderPath;
         this.sqlMsgCopy='';
         //this.getUserInfo();
         this.$nextTick(() => {
@@ -401,21 +404,22 @@
         //     return false;
         //   }
         // }
-        
+        debugger
         this.$refs['dataForm'].validate((valid) => {
+          debugger
           if (valid) {
           
             this.$http({
-              url: this.$http.adornUrl(`/demandCollaboration/${!this.dataForm.ruleId ? 'add' : 'updateByUuId'}`),
+              url: this.$http.adornUrl(`/demandCollaboration/${!this.dataForm.DEMANDCOLLABORATIONID ? 'add' : 'updateByUuId'}`),
               method: 'post',
               data: this.$http.adornData({
-                'ruleId': this.dataForm.ruleId || undefined,
+                'ruleId': this.dataForm.RULEID || undefined,
                 'ruleName': this.dataForm.DEMANDNAME,
                 'ruleCategory': this.dataForm.RULECATEGORY,
                 'ruleRemark': this.dataForm.RULEREMARK,
                 'folderId': this.dataForm.folderId,
                 'folderPath' : this.dataForm.folderPath,
-                'demandCollaborationId': this.demandCollaborationId,
+                'demandCollaborationId': this.dataForm.DEMANDCOLLABORATIONID,
                 'projectId': this.projectId,
               })
             }).then(({data}) => {

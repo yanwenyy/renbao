@@ -505,7 +505,7 @@
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData)
+          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData,'look')
         })
       },
       // 新增
@@ -530,14 +530,15 @@
           message: "已提交的需求不可修改",
           type: "warning"
         });
+        debugger
         this.showBtn = true;
         this.readonly = false;
         this.demandCollaboration = this.multipleTable[0];
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData)
+          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData,'',this.demandCollaboration.FOLDERID,this.demandCollaboration.FOLDERPATH)
         })
-        this.multipleTable = []
+        //this.multipleTable = []
       },
       //提交
       submitHandle () {
