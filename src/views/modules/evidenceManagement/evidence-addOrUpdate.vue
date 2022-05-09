@@ -7,7 +7,7 @@
       ref="dataForm"
       label-width="120px"
       v-loading="loading"
-      style="height:50vh;overflow-y:auto"
+      style="height:60vh;overflow-y:auto"
     >
       <el-form-item prop="evidenceName" label="证据名称：">
         <el-input
@@ -111,7 +111,7 @@
         </el-table>
       </el-form-item>
     </el-form>
-    <div align="right">
+    <div align="right" style="margin-top: 20px">
       <el-button type="primary" @click="submitForm('dataForm')" v-if="showBtn"
         >确定</el-button
       >

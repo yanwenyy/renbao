@@ -23,13 +23,7 @@
               clearable
             ></el-input>
           </el-form-item>
-          <el-form-item label="创建人：">
-            <el-input
-              v-model="searchForm.createUserName"
-              clearable
-              placeholder="创建人"
-            ></el-input>
-          </el-form-item>
+
           <el-form-item label="底稿编号：">
             <el-input
               v-model="searchForm.manuscriptCode"
@@ -42,6 +36,13 @@
               v-model="searchForm.manuscriptName"
               clearable
               placeholder="底稿名称"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="创建人：">
+            <el-input
+              v-model="searchForm.createUserName"
+              clearable
+              placeholder="创建人"
             ></el-input>
           </el-form-item>
           <el-form-item>

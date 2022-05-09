@@ -232,11 +232,17 @@ export default {
     dataOperate() {
       //数据监视
       if (this.dataOperate.length != 0) {
+        const extendTags = ''
+        if(this.dataOperate[0].extendTag == 0){
+            extendTags = '否'
+        }else{
+            extendTags = '是'
+        }
         this.formOpera.dataSortId = this.dataOperate[0].dataSortId;
         this.formOpera.dataSortName = this.dataOperate[0].dataSortName;
         this.formOpera.dataSortValue = this.dataOperate[0].dataSortValue;
         this.formOpera.dataSortDesc = this.dataOperate[0].dataSortDesc;
-        this.formOpera.extendTag = this.dataOperate[0].extendTag;
+        this.formOpera.extendTag = extendTags;
         this.editDataSortValue = this.dataOperate[0].dataSortValue;
          this.show = true;
     //     this.checkTag();

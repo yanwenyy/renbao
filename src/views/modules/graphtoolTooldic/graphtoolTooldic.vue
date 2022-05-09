@@ -175,11 +175,11 @@
                 width="100"
               >
                 <template slot-scope="scope">
-                  <i class="el-icon-sort-up table-sort-btn"
+                  <i title="正序" class="el-icon-sort-up table-sort-btn"
                      @click="clickOrderASC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-sort-down table-sort-btn"
+                  <i title="倒序" class="el-icon-sort-down table-sort-btn"
                      @click="clickOrderDESC(scope.row.id,scope.row.table,scope.row.name)"></i>
-                  <i class="el-icon-s-fold table-sort-btn"
+                  <i title="无序" class="el-icon-s-fold table-sort-btn"
                      @click="clickOrderWX(scope.row.id,scope.row.table,scope.row.name)"></i>
                 </template>
               </el-table-column>
@@ -219,7 +219,7 @@
     </div>
     <el-dialog :append-to-body='true' :modal-append-to-body="true" width="75%" title="筛选" :visible.sync="dialogFormVisible">
       <div class="screen-body">
-        <queryBuilder :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules" :queryObj="queryObj"/>
+        <queryBuilder v-if="dialogFormVisible" :key="screenKey" ref="queryBuilder" v-model="queryJson" :rules="queryRules" :value="queryObj"/>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false,cleanQueryRules()">取 消</el-button>
@@ -321,7 +321,10 @@
         screenRow: {},//筛选的当前行
         queryRules: [], // querybuilder的规则数据
         queryJson: {}, // queryBuilder上动态绑定的json数据
-        queryObj: {}, // queryBuilder回显数据
+        queryObj: {
+          logicalOperator:'and',
+          children:[]
+        }, // queryBuilder回显数据
         dialogFormVisible: false,//筛选弹框状态
         sqlMsg: '',//sql语句
         //是否隐藏数据表
@@ -658,8 +661,12 @@
             "label": "不为空值"
           },]
         };
-        this.queryObj.logicalOperator=row.screen.logicalOperator;
-        this.queryObj.children=row.screen.children;
+        if(row.screen.logicalOperator){
+          this.queryObj.logicalOperator=row.screen.logicalOperator;
+        }
+        if(row.screen.children){
+          this.queryObj.children=row.screen.children;
+        }
         this.queryRules.push(v);
         this.dialogFormVisible = true;
 

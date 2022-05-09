@@ -42,10 +42,6 @@ export default {
         return defaultLabels;
       }
     },
-    queryObj: {
-      type: Object,
-      default:null
-    },
     maxDepth: {
       type: Number,
       default: 3,
@@ -59,8 +55,8 @@ export default {
   data () {
     return {
       query: {
-        logicalOperator: this.queryObj&&this.queryObj.logicalOperator?JSON.parse(JSON.stringify(this.queryObj.logicalOperator)):this.labels.matchTypes[0].id,
-        children:this.queryObj&&this.queryObj.children?JSON.parse(JSON.stringify(this.queryObj.children)):[]
+        logicalOperator: this.labels.matchTypes[0].id,
+        children:[]
       },
       ruleTypes: {
         "text": {
@@ -148,16 +144,16 @@ export default {
   },
 
   mounted () {
-    this.$watch(
-      'query',
-      newQuery => {
-        if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
-          this.$emit('input', deepClone(newQuery));
-          this.$emit('sql', this.queryToSql(newQuery));
-        }
-      }, {
-      deep: true
-    });
+    // this.$watch(
+    //   'query',
+    //   newQuery => {
+    //     if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
+    //       this.$emit('input', deepClone(newQuery));
+    //       this.$emit('sql', this.queryToSql(newQuery));
+    //     }
+    //   }, {
+    //   deep: true
+    // });
 
     this.$watch(
       'value',
@@ -171,6 +167,7 @@ export default {
 
     if ( typeof this.$options.propsData.value !== "undefined" ) {
       this.query = Object.assign(this.query, this.$options.propsData.value);
+      console.log(this.value,this.query,174)
     }
   },//add by wxg.
   methods:{
@@ -197,18 +194,14 @@ export default {
       }
   },
   watch: {
-    queryObj: {
-      immediate: true,
+    query: {
       deep: true,
-      handler(newname, oldname) {
-        if(newname.logicalOperator){
-          this.query.logicalOperator=newname.logicalOperator;
+      handler(newQuery) {
+        if (JSON.stringify(newQuery) !== JSON.stringify(this.value)) {
+          this.$emit('input', deepClone(newQuery));
+          this.$emit('sql', this.queryToSql(newQuery));
         }
-        if(newname.children){
-          this.query.children=newname.children;
-        }
-        console.log(newname,210)
-        console.log(this.query,211)
+
       }
     }
   },

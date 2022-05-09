@@ -19,7 +19,6 @@
           :on-remove="handleRemove"
           :file-list="fileList"
           :http-request="uploadData"
-          :limit="1"
         >
           <el-button size="small" type="primary"
           >点击上传</el-button
@@ -161,7 +160,8 @@
         this.dataForm.multipartFiles=[];
         file.file.uploaderName=sessionStorage.getItem("userName");
         file.file.fileName=file.file.name;
-        this.dataForm.multipartFiles.push(file.file);
+        this.dataForm.multipartFiles=[file.file];
+        this.fileList=[file.file];
       },
       //验证唯一性
       verification(val,msg,name){

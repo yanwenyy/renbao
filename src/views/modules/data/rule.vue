@@ -88,33 +88,41 @@
             >
             <el-button @click="reset()">重置</el-button>
           </el-form-item>
-        </el-form>
-        <div class="search-btn">
-          <el-button type="primary" @click="addOrUpdateHandle('')"
+          <el-form-item>
+            <el-button type="primary" @click="addOrUpdateHandle('')"
             >新增</el-button
-          >
-          <el-button
-            @click="deleteHandle()"
-            type="primary"
-            :disabled="this.dataListSelections.length <= 0"
+            >
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              @click="deleteHandle()"
+              type="primary"
+              :disabled="this.dataListSelections.length <= 0"
             >删除
-          </el-button>
-          <el-button type="warning" @click="ruleImport">导入</el-button>
-
-          <el-button
-            type="warning"
-            @click="ruleExport('one')"
-            :disabled="this.dataListSelections.length <= 0"
-            :loading="ruleExportLoading"
+            </el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="warning" @click="ruleImport">导入</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="warning"
+              @click="ruleExport('one')"
+              :disabled="this.dataListSelections.length <= 0"
+              :loading="ruleExportLoading"
             >导出</el-button
-          >
-          <el-button
-            type="warning"
-            @click="ruleExport('all')"
-            :loading="ruleExportAllLoading"
+            >
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="warning"
+              @click="ruleExport('all')"
+              :loading="ruleExportAllLoading"
             >全部导出</el-button
-          >
-        </div>
+            >
+          </el-form-item>
+        </el-form>
+        <!--<div class="search-btn"></div>-->
         <el-table
           :height="tableHeight - tableMinus"
           :data="dataList"
@@ -259,7 +267,7 @@ export default {
     return {
       folderSorts: "1,2",
       tableMinus: 75,
-      ruleData: {}, //组件规则数数据
+      ruleData: [], //组件规则数数据
       form: {
         name: ""
       },

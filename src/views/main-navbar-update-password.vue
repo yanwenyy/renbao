@@ -7,6 +7,7 @@
       @keyup.enter.native="dataFormSubmit()"
       label-width="80px"
     >
+      <div v-if="from=='login'" class="notice">温馨提示! 初始密码存在安全隐患,请先修改密码再登录系统</div>
       <el-form-item label="账号">
         <span>{{ userName }}</span>
       </el-form-item>
@@ -52,12 +53,13 @@ export default {
     };
     var validatePassword = (rule, value, callback) => {
       if (this.checkStrong(value)<4) {
-        callback(new Error("密码需包括数组,字母和特殊字符"));
+        callback(new Error("密码需包括数字、字母、特殊字符！"));
       } else {
         callback();
       }
     };
     return {
+      from:'',
       msgText: "",
       visible: false,
       dataForm: {
@@ -84,7 +86,7 @@ export default {
   computed: {
     userName: {
       get() {
-        return this.$store.state.user.name;
+        return this.$store.state.user.loginName;
       }
     },
     mainTabs: {
@@ -122,7 +124,8 @@ export default {
       return modes;
     },
     // 初始化
-    init() {
+    init(froms) {
+      this.from=froms;
       this.visible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].resetFields();
@@ -204,5 +207,10 @@ export default {
   #three{
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+  }
+  .notice{
+    color:red;
+    text-align: center;
+    font-size: 16px;
   }
 </style>

@@ -53,16 +53,23 @@
         </div>
       </div>
     </div>
+    <!-- 弹窗, 修改密码 -->
+    <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
   </div>
 </template>
 
 <script>
+  import UpdatePassword from '../main-navbar-update-password'
   // 引入js
   import hex_md5 from '../common/md5.js';
   import { getUUID } from '@/utils'
   export default {
+    components: {
+      UpdatePassword
+    },
     data () {
       return {
+        updatePassowrdVisible:false,
         currdatetime:'',
         dataForm: {
           userName: '',
@@ -105,6 +112,15 @@
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.$cookie.set('token', data.result.token);
+                if(this.dataForm.password=='111111'){
+                  this.updatePassowrdVisible = true;
+                  this.$store.commit('user/updateLoginName', this.dataForm.userName)
+                  this.$store.commit('user/updateId', data.result.userId)
+                  this.$nextTick(() => {
+                    this.$refs.updatePassowrd.init('login')
+                  })
+                  return false;
+                }
                 this.$router.replace({ name: 'home' });
               } else {
                 this.getCaptcha();

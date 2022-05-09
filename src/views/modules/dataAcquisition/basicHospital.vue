@@ -61,7 +61,7 @@
         :data="tableList"
         border
         style="100%"
-        :height="tableHeight - 105"
+        :height="tableHeight -45"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange" v-if="tableList == ''" 
@@ -73,12 +73,12 @@
         :data="tableList"
         border
         style="100%"
-        :height="tableHeight - 105"
+        :height="tableHeight - 45"
         class="demo-ruleForm"
         v-loading="tableLoading"
         @selection-change="handleSelectionChange" v-if="tableList != ''" 
       >
-        <el-table-column align='center' type="selection" width="55"></el-table-column> 
+        <!-- <el-table-column align='center' type="selection" width="55" v-if="selections == '1'"></el-table-column>  -->
         <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
         <template v-for="(item, index) in tableColumns">
           <el-table-column
