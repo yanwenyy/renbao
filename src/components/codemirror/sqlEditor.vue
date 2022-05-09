@@ -150,7 +150,7 @@
         <!--<el-button type="primary" size="small" style="margin-left:10x" @click="setValue">修改内容</el-button>-->
       <!--</div>-->
       <code-mirror-editor
-        :paramsData="paramsData"
+        :paramsData="paramsDataSelf"
         :resultTabClick="resultTabClick"
         :useChinese="useChinese"
         :getwsData="getwsData"
@@ -289,6 +289,7 @@
     },
     data() {
       return {
+        paramsDataSelf:[],
         paramsTreeClickNode:{},//右击参数列表的数据
         hideLeftTree:false,//是否隐左边的区域
         treeTabelNode:'',
@@ -849,6 +850,15 @@
       };
     },
     watch: {
+      paramsData:{
+        deep: true,
+        handler(val) {
+          if(val!=''){
+            this.paramsDataSelf=val;
+            console.log(this.paramsDataSelf,858)
+          }
+        }
+      },
       filterText(val) {
         if(this.treeType==='1'){
           this.$refs.tree1.filter(val);
