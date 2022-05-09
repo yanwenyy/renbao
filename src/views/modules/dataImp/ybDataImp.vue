@@ -21,7 +21,7 @@
       </el-form-item>
       <el-form-item style="float:right">
         <!-- <el-button type="warning" @click="deletDmpData()">清除缓存数据</el-button> -->
-        <el-button type="warning" @click="getDmpReImpList()">查看已导入文件</el-button>
+        <el-button type="warning" @click="getDmpReImpList()">继续采集</el-button>
         <el-button type="warning" @click="getFileTree()">导入数据</el-button>
       </el-form-item>
     </el-form>
@@ -606,7 +606,7 @@
       class="dmpLogDia"
       :before-close="dmpLoghandleClose"
       :close-on-click-modal="false">
-      <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</el-row>
+      <el-row style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理，关闭后若想继续采集可以点击右上方继续采集按钮进行采集。</el-row>
       <el-row
         v-loading="dmpLogLoading"
         element-loading-text="数据库还原中...">
@@ -806,6 +806,23 @@
       }
     },
     computed:{
+      projectId: {
+        get() {
+          if (this.$store.state.common.projectId) {
+            return this.$store.state.common.projectId;
+          } else {
+            this.$http({
+              url: this.$http.adornUrl("/xmProject/selectProjectByUserId"),
+              method: "get",
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 200) {
+                return data.result && data.result.projectId && data.result.projectId || '';
+              }
+            });
+          }
+        }
+      },
       tableHeight: {
         get () { return this.$store.state.common.tableHeight}
       },
@@ -865,6 +882,10 @@
       },
       //获取继续导入的dmp列表
       getDmpReImpList(){
+        if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+          this.$message.error("请先在右上角选择项目!");
+          return false;
+        }
         this.dmpReImpDialogVisible = true
         this.dmpReImpList = []
         this.$http({
@@ -933,7 +954,7 @@
       },
       // dmp日志关闭
       dmpLoghandleClose(done){
-         this.$confirm('<span style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理。</span>'
+         this.$confirm('<span style="color:#af0f16">数据正在还原中，如果关闭则会造成垃圾，需要人工介入才能清理，关闭后若想继续采集可以点击右上方继续采集按钮进行采集。</span>'
          ,{dangerouslyUseHTMLString: true,
           confirmButtonText: '仍要关闭'})
           .then(_ => {
@@ -1007,6 +1028,10 @@
       },
       // 获取医保数据文件树
       getFileTree () {
+        if(this.projectId==''||this.projectId==null||this.projectId==undefined){
+          this.$message.error("请先在右上角选择项目!");
+          return false;
+        }
         this.fileTreeData = []
         this.selectedFileData = []
         this.fileTreeDialogVisible = true

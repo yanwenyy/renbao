@@ -761,17 +761,19 @@
       //获取选中的参数
       getSelectParams(list,markList){
         var _newList=[];
-        markList.forEach(atem=>{
+        var getNewList=function(list,markList){markList.forEach(atem=>{
           list.forEach(item=>{
             if(item.children&&item.children.length>0){
               item.children.forEach(vtem=>{
                 if(atem=="{#"+vtem.id+"#}"){
-                  _newList.push(vtem)
+                  _newList.push(vtem);
                 }
               })
+              getNewList(item.children,markList)
             }
           });
-        });
+        })};
+        getNewList(list,markList);
         return _newList;
       },
       //删除智能提示框
@@ -1054,7 +1056,14 @@
         this.fullScreen=type==1?true:false;
         this.$emit("setFS",this.fullScreen);
       },
-      // 执行
+      //数组去重
+      unique(arr) {
+        var obj = {};
+        return arr.filter(function(item, index, arr){
+          return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+        })
+      },
+  // 执行
       implement: function () {
         var _marks=this.$refs.myCm.codemirror.getAllMarks(),_list=[];
         _marks.forEach((item)=>{
@@ -1062,6 +1071,7 @@
             _list.push(item.replacedWith.id)
           }
         });
+        _list=this.unique(_list)
         var selectValue = this.$refs.myCm.codemirror.getSelection();
         this.dragParmasList=this.getSelectParams(this.paramsData,_list);
         // this.dragParmasList=this.dragParmasList.filter(item=>{
