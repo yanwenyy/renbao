@@ -157,7 +157,7 @@
         <!--<el-button type="primary" size="small" style="margin-left:10x" @click="setValue">修改内容</el-button>-->
       <!--</div>-->
       <code-mirror-editor
-        :paramsData="paramsData"
+        :paramsData="paramsDataSelf"
         :resultTabClick="resultTabClick"
         :useChinese="useChinese"
         :getwsData="getwsData"
@@ -345,6 +345,7 @@
     },
     data() {
       return {
+        paramsDataSelf:[],
         maps: new Map(),
         paramsType:'add',//参数弹框的类型
         paramsTreeClickNode:{},//右击参数列表的数据
@@ -908,6 +909,14 @@
       };
     },
     watch: {
+      paramsData:{
+        deep: true,
+        handler(val) {
+          if(val!=''){
+            this.paramsDataSelf=val;
+          }
+        }
+      },
       filterText(val) {
         if(this.treeType==='1'){
           this.$refs.tree1.filter(val);
@@ -1128,6 +1137,7 @@
           return resolve(node.data.children);
         }else if(node.data.type!='params'){
           setTimeout(() => {
+            node.data.children = this.loadTree;
             resolve(this.loadTree);
           }, 500);
 
