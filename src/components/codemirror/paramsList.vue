@@ -80,10 +80,8 @@
       methods:{
         //参数设置确定点击
         selfParamssub(){
-
           var _str=JSON.parse(JSON.stringify(this.paramsSql));
           this.paramsList.forEach(item=>{
-            console.log(item)
             if(this.paramsSql.indexOf("{#"+item.id+"#}")!=-1&&item.paramsValue){
               var _reg=new RegExp("{#"+item.id+"#}",'g');
               var _s='';
