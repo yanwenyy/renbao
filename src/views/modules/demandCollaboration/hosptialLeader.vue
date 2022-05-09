@@ -473,7 +473,7 @@
         this.demandCollaboration = data;
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData)
+          this.$refs.addOrUpdate.init(this.projectId,this.ruleCheckData,'look')
         })
       },
      //退回
