@@ -240,7 +240,7 @@
         })
       },
       //添加参数确定按钮点击
-      addParamsClick(data,type){
+      addParamsClick(datas,type){
         //data from表单的内容,type:(add/新增,edit/修改)
         // var params = new FormData();
         // for(let i in data){
@@ -252,15 +252,17 @@
         //     params.append(i,data[i]);
         //   }
         // };
+        console.log(datas)
         this.$http({
           url: this.$http.adornUrl(`/ammParam/${type=='add' ? 'add' : 'updateByUuId'}`),
           method: 'post',
           // data: params,
-          data: data,
+          data: datas,
         }).then(({data}) => {
           if (data && data.code === 200) {
             this.$message.success(data.message);
-            this.getParmasData();
+            //局部刷新参数树 this.$refs.sqlEdits.refreshNodeBy(当前操作的id)
+            this.$refs.sqlEdits.refreshNodeBy(datas.folderId)
           } else {
             this.$message.error(data.message)
           }
